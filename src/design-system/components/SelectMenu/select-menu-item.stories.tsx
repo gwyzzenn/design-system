@@ -195,19 +195,35 @@ export const Sizes: Story = {
 
 // ── 完整範例 ──
 
-export const FullExample: Story = {
-  name: '完整範例',
-  render: () => (
+const FullExampleDemo = () => {
+  const [selected, setSelected] = useState<Record<string, boolean>>({
+    alice: true, bob: false,
+  })
+  const toggle = (key: string) => setSelected((s) => ({ ...s, [key]: !s[key] }))
+  const keys = ['alice', 'bob']
+  const checkedCount = keys.filter((k) => selected[k]).length
+  const allState = checkedCount === 0 ? false : checkedCount === keys.length ? true : ('indeterminate' as const)
+  const toggleAll = () => {
+    const next = allState !== true
+    setSelected(Object.fromEntries(keys.map((k) => [k, next])))
+  }
+
+  return (
     <MenuContainer>
       <SelectMenuGroup>
         <SelectMenuItem header>成員</SelectMenuItem>
-        <SelectMenuItem checkbox checked={true} avatar={<AvatarImg />} description="設計部門">Alice Chen</SelectMenuItem>
-        <SelectMenuItem checkbox checked={false} avatar={<AvatarImg bg="#fce7f3" />} description="工程部門">Bob Wang</SelectMenuItem>
+        <SelectMenuItem checkbox checked={selected.alice} onClick={() => toggle('alice')} avatar={<AvatarImg />} description="設計部門">Alice Chen</SelectMenuItem>
+        <SelectMenuItem checkbox checked={selected.bob} onClick={() => toggle('bob')} avatar={<AvatarImg bg="#fce7f3" />} description="工程部門">Bob Wang</SelectMenuItem>
         <SelectMenuItem checkbox checked={false} avatar={<AvatarImg bg="#d1fae5" />} description="行銷部門" disabled>Carol Lin（已離職）</SelectMenuItem>
       </SelectMenuGroup>
       <SelectMenuFooter>
-        <SelectMenuItem checkbox checked="indeterminate">全部</SelectMenuItem>
+        <SelectMenuItem checkbox checked={allState} onClick={toggleAll}>全部</SelectMenuItem>
       </SelectMenuFooter>
     </MenuContainer>
-  ),
+  )
+}
+
+export const FullExample: Story = {
+  name: '完整範例',
+  render: () => <FullExampleDemo />,
 }

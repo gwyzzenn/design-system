@@ -67,10 +67,13 @@ src/
 │   │   ├── Popover/                   ← shadcn Popover（浮動容器）
 │   │   ├── Dialog/                    ← shadcn Dialog
 │   │   ├── ScrollArea/                ← shadcn ScrollArea
-│   │   ├── SelectMenu/                ← 下拉選單浮層
+│   │   ├── SelectMenu/                ← 下拉選單浮層（由 SelectField 消費）
 │   │   │   ├── select-menu.tsx        ← SelectMenu（Popover + Command 組合）
 │   │   │   ├── select-menu-item.tsx   ← MenuItem + Group + Footer
 │   │   │   └── select-menu-item.spec.md ← 設計原則（含 searchIn 規則）
+│   │   ├── DropdownMenu/              ← 操作選單（由 Button 觸發）
+│   │   │   ├── dropdown-menu.tsx      ← Radix DropdownMenu + 設計系統 token
+│   │   │   └── dropdown-menu.spec.md
 │   │   └── fields/                    ← 資料輸入 / 顯示元件
 │   │       ├── field-types.ts         ← FieldMode、InlineActionConfig 共用型別
 │   │       ├── field-wrapper.tsx      ← 共用 wrapper 樣式

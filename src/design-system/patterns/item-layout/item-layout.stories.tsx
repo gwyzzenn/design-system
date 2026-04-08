@@ -378,13 +378,13 @@ export const PrefixSuffixSymmetry: StoryObj = {
                   <span className="mt-0.5 text-caption text-fg-secondary">切換介面顏色主題</span>
                 </div>
                 <div className="h-[1lh] flex items-center gap-1 ml-auto shrink-0">
-                  <span className="text-caption text-fg-muted">深色</span>
+                  <span className="text-fg-muted">深色</span>
                   <ChevronRight size={16} className="text-fg-muted" />
                 </div>
               </div>
             </SelectMenuGroup>
           </MenuFrame>
-          <Label>suffix 靠 ml-auto 推到右邊，h-[1lh] 對齊第一行</Label>
+          <Label>suffix 靠 ml-auto 推到右邊，h-[1lh] 對齊第一行。value 文字跟 label 同字體大小，顏色 fg-muted</Label>
         </div>
 
         {/* Both */}
@@ -394,7 +394,7 @@ export const PrefixSuffixSymmetry: StoryObj = {
             <SelectMenuGroup>
               <div className="flex items-start gap-2 px-3 w-full text-body leading-compact py-[calc((var(--field-height-md)-1lh)/2)] cursor-pointer hover:bg-neutral-hover">
                 <div className="h-[1lh] flex items-center shrink-0">
-                  <Settings size={16} className="text-fg-muted" />
+                  <Settings size={16} />
                 </div>
                 <div className="flex flex-col min-w-0 flex-1">
                   <span className="truncate">進階設定</span>
@@ -470,7 +470,7 @@ export const GapConventions: StoryObj = {
           <SelectMenuGroup>
             <div className="flex items-start gap-2 px-3 w-full text-body leading-compact py-[calc((var(--field-height-md)-1lh)/2)] cursor-pointer hover:bg-neutral-hover">
               <div className="h-[1lh] flex items-center shrink-0">
-                <Star size={16} className="text-fg-muted" />
+                <Star size={16} />
               </div>
               <div className="flex flex-col min-w-0 flex-1">
                 <span className="truncate">收藏項目</span>
@@ -491,13 +491,13 @@ export const GapConventions: StoryObj = {
           <SelectMenuGroup>
             <div className="flex items-start gap-2 px-3 w-full text-body leading-compact py-[calc((var(--field-height-md)-1lh)/2)] cursor-pointer hover:bg-neutral-hover">
               <div className="h-[1lh] flex items-center shrink-0">
-                <Settings size={16} className="text-fg-muted" />
+                <Settings size={16} />
               </div>
               <div className="flex flex-col min-w-0 flex-1">
                 <span className="truncate">外觀主題</span>
               </div>
               <div className="h-[1lh] flex items-center gap-1 ml-auto shrink-0">
-                <span className="text-caption text-fg-muted">深色</span>
+                <span className="text-fg-muted">深色</span>
                 <ChevronRight size={16} className="text-fg-muted" />
               </div>
             </div>

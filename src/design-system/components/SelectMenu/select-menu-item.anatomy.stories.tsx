@@ -1,0 +1,677 @@
+import type { Meta } from '@storybook/react'
+import { useState, useEffect } from 'react'
+import { Mail, Bell, Settings, User, FileText, Folder, Plus } from 'lucide-react'
+import { SelectMenuItem, SelectMenuGroup, SelectMenuFooter } from './select-menu-item'
+import { Tag } from '@/design-system/components/Tag/tag'
+
+const meta: Meta = {
+  title: 'Design System/Components/SelectMenu/設計規格',
+  parameters: { layout: 'padded' },
+}
+export default meta
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Types & Data
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+type SizeKey = 'sm' | 'md' | 'lg'
+type StateKey = 'default' | 'hover' | 'selected' | 'disabled'
+type ModeKey = 'single' | 'multi'
+type ColorSpec = { bg: string; text: string; icon: string; desc: string }
+
+const SIZES: SizeKey[] = ['sm', 'md', 'lg']
+const STATES: StateKey[] = ['default', 'hover', 'selected', 'disabled']
+
+/** 單選 token map */
+const SINGLE_TOKEN_MAP: Record<StateKey, ColorSpec> = {
+  default:  { bg: 'transparent',     text: '--foreground', icon: '--foreground',  desc: '--fg-secondary' },
+  hover:    { bg: '--neutral-hover', text: '--foreground', icon: '--foreground',  desc: '--fg-secondary' },
+  selected: { bg: '--neutral-active',text: '--foreground', icon: '--foreground',  desc: '--fg-secondary' },
+  disabled: { bg: 'transparent',     text: '--fg-disabled',icon: '--fg-disabled', desc: '--fg-disabled' },
+}
+
+/** 多選 token map */
+const MULTI_TOKEN_MAP: Record<StateKey, ColorSpec> = {
+  default:  { bg: 'transparent',     text: '--foreground', icon: '--foreground',  desc: '--fg-secondary' },
+  hover:    { bg: '--neutral-hover', text: '--foreground', icon: '--foreground',  desc: '--fg-secondary' },
+  selected: { bg: 'transparent',     text: '--foreground', icon: '--foreground',  desc: '--fg-secondary' },
+  disabled: { bg: 'transparent',     text: '--fg-disabled',icon: '--fg-disabled', desc: '--fg-disabled' },
+}
+
+interface SizeSpec {
+  heightToken: string
+  labelFont: string; labelSize: string
+  descFont: string; descSize: string
+  icon: number
+  checkbox: string
+  avatarInline: number; avatarBlock: number
+  py: string
+}
+
+const SIZE_SPECS: Record<SizeKey, SizeSpec> = {
+  sm: {
+    heightToken: '--field-height-sm',
+    labelFont: 'text-body leading-compact', labelSize: '14px × 1.3',
+    descFont: 'text-caption', descSize: '12px × 1.3',
+    icon: 16, checkbox: 'sm (16px)',
+    avatarInline: 20, avatarBlock: 32,
+    py: 'calc((var(--field-height-sm) - 1lh) / 2)',
+  },
+  md: {
+    heightToken: '--field-height-md',
+    labelFont: 'text-body leading-compact', labelSize: '14px × 1.3',
+    descFont: 'text-caption', descSize: '12px × 1.3',
+    icon: 16, checkbox: 'md (16px)',
+    avatarInline: 24, avatarBlock: 32,
+    py: 'calc((var(--field-height-md) - 1lh) / 2)',
+  },
+  lg: {
+    heightToken: '--field-height-lg',
+    labelFont: 'text-body-lg leading-compact', labelSize: '16px × 1.3',
+    descFont: 'text-body leading-compact', descSize: '14px × 1.3',
+    icon: 20, checkbox: 'lg (20px)',
+    avatarInline: 24, avatarBlock: 40,
+    py: 'calc((var(--field-height-lg) - 1lh) / 2)',
+  },
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Shared UI
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const H3 = ({ children }: { children: React.ReactNode }) => (
+  <h3 className="text-h6 font-semibold text-foreground">{children}</h3>
+)
+const Desc = ({ children }: { children: React.ReactNode }) => (
+  <p className="text-caption text-fg-muted max-w-[720px]">{children}</p>
+)
+const Th = ({ children }: { children: React.ReactNode }) => (
+  <th className="text-left p-2 border-b border-divider text-fg-muted font-medium text-caption whitespace-nowrap">{children}</th>
+)
+const Td = ({ children, mono }: { children: React.ReactNode; mono?: boolean }) => (
+  <td className={`p-2 border-b border-divider align-top whitespace-nowrap text-caption ${mono ? 'font-mono' : ''}`}>{children}</td>
+)
+const TkVal = ({ token, value }: { token: string; value?: string }) => (
+  <div className="flex flex-col gap-0.5">
+    <span className="font-mono text-[12px] text-fg-secondary">{token}</span>
+    {value && <span className="font-mono text-[10px] text-fg-muted">{value}</span>}
+  </div>
+)
+
+const Swatch = ({ value, size = 'md' }: { value: string; size?: 'sm' | 'md' }) => {
+  const s = size === 'sm' ? 'w-3 h-3' : 'w-4 h-4'
+  if (value === 'transparent') {
+    return <span className={`${s} rounded-sm shrink-0 border border-border`}
+      style={{ backgroundImage: 'linear-gradient(45deg,#ddd 25%,transparent 25%,transparent 75%,#ddd 75%),linear-gradient(45deg,#ddd 25%,transparent 25%,transparent 75%,#ddd 75%)', backgroundSize: '6px 6px', backgroundPosition: '0 0,3px 3px' }} />
+  }
+  return <span className={`${s} rounded-sm shrink-0 border border-black/10`} style={{ backgroundColor: `var(${value})` }} />
+}
+
+const TokenAnnotation = ({ colors }: { colors: ColorSpec }) => (
+  <div className="flex flex-col gap-0.5 mt-2">
+    {([['bg', 'bg'], ['text', 'label'], ['icon', 'icon'], ['desc', 'desc']] as const).map(([key, label]) => (
+      <span key={key} className="inline-flex items-center gap-1 text-[10px]">
+        <Swatch value={colors[key]} size="sm" />
+        <span className="text-fg-muted w-7 shrink-0">{label}</span>
+        <span className="font-mono text-fg-secondary">{colors[key]}</span>
+      </span>
+    ))}
+  </div>
+)
+
+const Tab = ({ active, onClick, disabled, children }: { active: boolean; onClick: () => void; disabled?: boolean; children: React.ReactNode }) => {
+  if (disabled) return <span className="px-2.5 py-1 text-[12px] font-mono rounded-md text-fg-disabled bg-neutral-hover cursor-not-allowed">{children}</span>
+  return (
+    <button type="button" onClick={onClick}
+      className={`px-2.5 py-1 text-[12px] font-mono rounded-md cursor-pointer transition-colors ${
+        active ? 'bg-primary text-white font-semibold' : 'bg-neutral-hover text-fg-secondary hover:bg-neutral-active'
+      }`}>
+      {children}
+    </button>
+  )
+}
+
+const PropRow = ({ label, dot, children }: { label: string; dot?: string; children: React.ReactNode }) => (
+  <div className="flex items-start gap-3 py-2 border-b border-divider last:border-b-0">
+    <span className="text-[11px] text-fg-muted font-medium w-[80px] shrink-0 pt-0.5 flex items-center gap-1.5">
+      {dot && <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: dot }} />}
+      {label}
+    </span>
+    <div className="flex-1 text-[12px] font-mono text-fg-secondary">{children}</div>
+  </div>
+)
+
+const TokenValue = ({ value }: { value: string }) => (
+  <span className="inline-flex items-center gap-2"><Swatch value={value} /><span>{value}</span></span>
+)
+
+const MenuContainer = ({ children, width = 320 }: { children: React.ReactNode; width?: number }) => (
+  <div className="rounded-lg bg-surface-raised border border-border overflow-hidden"
+    style={{ boxShadow: 'var(--elevation-200)', width }}>
+    {children}
+  </div>
+)
+
+const AvatarImg = ({ bg = '#e0e7ff' }: { bg?: string }) => (
+  <div className="w-full h-full rounded-full flex items-center justify-center text-[10px] font-medium" style={{ backgroundColor: bg }}>
+    <User size={12} className="text-fg-muted" />
+  </div>
+)
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   1. 元件總覽
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export const Overview = {
+  name: '1. 元件總覽',
+  render: () => (
+    <div className="flex flex-col gap-8">
+      {/* Anatomy */}
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <H3>結構（Anatomy）</H3>
+          <Desc>三個區域：prefix（checkbox + icon 或 avatar）、content（label + description）、suffix（tag）。prefix 內 checkbox 和 icon/avatar 由對齊容器統一管理。</Desc>
+        </div>
+        <div className="flex flex-col gap-4">
+          {/* Full structure */}
+          <div className="flex flex-col gap-2 items-start">
+            <span className="text-[11px] text-fg-muted font-medium">完整結構</span>
+            <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-2">
+              {[
+                { name: 'checkbox', color: 'warning' },
+                { name: 'startIcon | avatar', color: 'info' },
+                { name: 'label', color: 'success' },
+                { name: 'description', color: 'magenta' },
+                { name: 'tag', color: 'warning' },
+              ].map((s) => (
+                <span key={s.name} className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
+                  style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color})` }}>{s.name}</span>
+              ))}
+            </div>
+            <span className="text-[10px] text-fg-muted font-mono">
+              prefix: [checkbox?] [startIcon? | avatar?] &middot; content: [label + description?] &middot; suffix: [tag?]
+            </span>
+          </div>
+
+          {/* Prefix alignment modes */}
+          <div className="flex gap-8">
+            <div className="flex flex-col gap-2 items-start">
+              <span className="text-[11px] text-fg-muted font-medium">Inline 對齊（prefix &le; 24px）</span>
+              <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-2">
+                <span className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
+                  style={{ borderColor: 'var(--info)', backgroundColor: 'var(--info-subtle)', color: 'var(--info)' }}>icon 16px</span>
+                <div className="flex flex-col gap-0.5">
+                  <span className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
+                    style={{ borderColor: 'var(--success)', backgroundColor: 'var(--success-subtle)', color: 'var(--success)' }}>label</span>
+                  <span className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
+                    style={{ borderColor: 'var(--magenta)', backgroundColor: 'var(--magenta-subtle)', color: 'var(--magenta)' }}>description</span>
+                </div>
+              </div>
+              <span className="text-[10px] text-fg-muted font-mono">prefix 容器 h-[1lh]，對齊第一行 label</span>
+            </div>
+            <div className="flex flex-col gap-2 items-start">
+              <span className="text-[11px] text-fg-muted font-medium">Block 對齊（avatar &gt; 24px + description）</span>
+              <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-2">
+                <span className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
+                  style={{ borderColor: 'var(--info)', backgroundColor: 'var(--info-subtle)', color: 'var(--info)' }}>avatar 32px</span>
+                <div className="flex flex-col gap-0.5">
+                  <span className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
+                    style={{ borderColor: 'var(--success)', backgroundColor: 'var(--success-subtle)', color: 'var(--success)' }}>label</span>
+                  <span className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
+                    style={{ borderColor: 'var(--magenta)', backgroundColor: 'var(--magenta-subtle)', color: 'var(--magenta)' }}>description</span>
+                </div>
+              </div>
+              <span className="text-[10px] text-fg-muted font-mono">prefix 容器 h-[calc(1lh+2px+desc_1lh)]，對齊文字塊中心</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* searchIn rules */}
+      <div className="flex flex-col gap-3">
+        <H3>搜尋行為（searchIn）</H3>
+        <Desc>搜尋框位置由選擇模式決定，影響選後行為。</Desc>
+        <div className="overflow-x-auto">
+          <table className="border-collapse text-caption">
+            <thead><tr><Th>模式</Th><Th>searchIn 預設</Th><Th>選了之後</Th><Th>原因</Th></tr></thead>
+            <tbody>
+              <tr><Td>單選</Td><Td mono>trigger（不可覆寫）</Td><Td>關閉浮層</Td><Td>選完就結束</Td></tr>
+              <tr><Td>多選</Td><Td mono>menu</Td><Td>關鍵字保留，繼續勾選</Td><Td>搜一個詞，勾多個相關項</Td></tr>
+              <tr><Td>多選 + searchIn=trigger</Td><Td mono>trigger</Td><Td>關鍵字清除</Td><Td>一個一個挑不同類型</Td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Props */}
+      <div className="flex flex-col gap-3">
+        <H3>Props</H3>
+        <div className="overflow-x-auto">
+          <table className="text-caption border-collapse">
+            <thead><tr><Th>Prop</Th><Th>Type</Th><Th>Default</Th><Th>說明</Th></tr></thead>
+            <tbody>
+              {[
+                ['children', 'ReactNode', '(required)', 'Label 文字'],
+                ['description', 'ReactNode', '—', '次要說明，顯示在 label 下方'],
+                ['startIcon', 'LucideIcon', '—', '左側 icon，與 avatar 互斥'],
+                ['avatar', 'ReactNode', '—', '左側頭像，與 startIcon 互斥'],
+                ['checkbox', 'boolean', 'false', '顯示 checkbox（多選模式）'],
+                ['checked', "boolean | 'indeterminate'", 'false', 'checkbox 選中狀態'],
+                ['selected', 'boolean', 'false', '單選選中（bg-neutral-active 背景）'],
+                ['tag', 'ReactNode', '—', '後綴 Tag，靠右對齊'],
+                ['disabled', 'boolean', 'false', '停用，所有子元素統一 fg-disabled'],
+                ['header', 'boolean', 'false', '群組標題，不可選不可 hover'],
+                ['size', "'sm' | 'md' | 'lg'", "'md'", '尺寸，對齊 field-height token'],
+              ].map(([p, t, d, desc]) => (
+                <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  ),
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   2. 元件檢閱器
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const InspectorInner = () => {
+  const [size, setSize] = useState<SizeKey>('md')
+  const [mode, setMode] = useState<ModeKey>('single')
+  const [selected, setSelected] = useState(false)
+  const [disabled, setDisabled] = useState(false)
+  const [hasIcon, setHasIcon] = useState(true)
+  const [hasAvatar, setHasAvatar] = useState(false)
+  const [hasDesc, setHasDesc] = useState(false)
+  const [hasTag, setHasTag] = useState(false)
+
+  // avatar and icon are mutually exclusive
+  useEffect(() => { if (hasAvatar) setHasIcon(false) }, [hasAvatar])
+  useEffect(() => { if (hasIcon) setHasAvatar(false) }, [hasIcon])
+
+  const s = SIZE_SPECS[size]
+  const isMulti = mode === 'multi'
+  const stateKey: StateKey = disabled ? 'disabled' : selected ? 'selected' : 'default'
+  const colors = isMulti ? MULTI_TOKEN_MAP[stateKey] : SINGLE_TOKEN_MAP[stateKey]
+  const avatarPx = hasAvatar ? (hasDesc ? s.avatarBlock : s.avatarInline) : 0
+  const prefixAlign = avatarPx > 24 && hasDesc ? 'block' : 'inline'
+
+  return (
+    <div className="flex flex-col gap-6">
+      {/* Controls */}
+      <div className="flex flex-col gap-2.5">
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-fg-muted w-20 shrink-0">Size</span>
+          <div className="flex gap-1.5">
+            {SIZES.map((sz) => <Tab key={sz} active={size === sz} onClick={() => setSize(sz)}>{sz}</Tab>)}
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-fg-muted w-20 shrink-0">Mode</span>
+          <div className="flex gap-1.5">
+            <Tab active={mode === 'single'} onClick={() => setMode('single')}>single</Tab>
+            <Tab active={mode === 'multi'} onClick={() => setMode('multi')}>multi</Tab>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-fg-muted w-20 shrink-0">selected</span>
+          <div className="flex gap-1.5">
+            <Tab active={!selected} onClick={() => setSelected(false)}>off</Tab>
+            <Tab active={selected} onClick={() => setSelected(true)}>on</Tab>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-fg-muted w-20 shrink-0">disabled</span>
+          <div className="flex gap-1.5">
+            <Tab active={!disabled} onClick={() => setDisabled(false)}>off</Tab>
+            <Tab active={disabled} onClick={() => setDisabled(true)}>on</Tab>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-fg-muted w-20 shrink-0">startIcon</span>
+          <div className="flex gap-1.5">
+            <Tab active={!hasIcon} onClick={() => setHasIcon(false)}>off</Tab>
+            <Tab active={hasIcon} onClick={() => setHasIcon(true)} disabled={hasAvatar}>on</Tab>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-fg-muted w-20 shrink-0">avatar</span>
+          <div className="flex gap-1.5">
+            <Tab active={!hasAvatar} onClick={() => setHasAvatar(false)}>off</Tab>
+            <Tab active={hasAvatar} onClick={() => setHasAvatar(true)} disabled={hasIcon}>on</Tab>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-fg-muted w-20 shrink-0">description</span>
+          <div className="flex gap-1.5">
+            <Tab active={!hasDesc} onClick={() => setHasDesc(false)}>off</Tab>
+            <Tab active={hasDesc} onClick={() => setHasDesc(true)}>on</Tab>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-fg-muted w-20 shrink-0">tag</span>
+          <div className="flex gap-1.5">
+            <Tab active={!hasTag} onClick={() => setHasTag(false)}>off</Tab>
+            <Tab active={hasTag} onClick={() => setHasTag(true)}>on</Tab>
+          </div>
+        </div>
+      </div>
+
+      {/* Preview + Panel */}
+      <div className="flex gap-6 items-start">
+        {/* Left: preview */}
+        <div className="flex flex-col gap-5 min-w-[360px]">
+          <div className="px-4 py-6 rounded-lg bg-canvas border border-divider flex items-center justify-center">
+            <MenuContainer width={340}>
+              <SelectMenuGroup>
+                <SelectMenuItem
+                  size={size}
+                  startIcon={hasIcon ? Mail : undefined}
+                  avatar={hasAvatar ? <AvatarImg /> : undefined}
+                  description={hasDesc ? '每日摘要信件到信箱' : undefined}
+                  checkbox={isMulti}
+                  checked={isMulti ? selected : undefined}
+                  selected={!isMulti ? selected : undefined}
+                  disabled={disabled}
+                  tag={hasTag ? <Tag size={size} variant="secondary">標籤</Tag> : undefined}
+                >
+                  電子郵件通知
+                </SelectMenuItem>
+              </SelectMenuGroup>
+            </MenuContainer>
+          </div>
+        </div>
+
+        {/* Right: inspect panel */}
+        <div className="w-[300px] shrink-0 border border-divider rounded-lg bg-surface overflow-hidden">
+          <div className="px-4 py-2.5 border-b border-divider bg-neutral-hover">
+            <span className="text-[12px] font-semibold text-foreground">Inspect</span>
+          </div>
+
+          {/* COLOR */}
+          <div className="px-4 py-1">
+            <div className="py-2 border-b border-divider"><span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider">Color</span></div>
+            <PropRow label="Background"><TokenValue value={colors.bg} /></PropRow>
+            <PropRow label="Label"><TokenValue value={colors.text} /></PropRow>
+            <PropRow label="Prefix icon"><TokenValue value={colors.icon} /></PropRow>
+            {hasDesc && <PropRow label="Description"><TokenValue value={colors.desc} /></PropRow>}
+          </div>
+
+          {/* LAYOUT */}
+          <div className="px-4 py-1">
+            <div className="py-2 border-b border-divider"><span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider">Layout</span></div>
+            <PropRow label="單行高度"><TkVal token={s.heightToken} /></PropRow>
+            <PropRow label="padding-y"><TkVal token={s.py} /></PropRow>
+            <PropRow label="padding-x"><TkVal token="px-3" value="12px" /></PropRow>
+            <PropRow label="元素間距"><TkVal token="gap-2" value="8px" /></PropRow>
+            <PropRow label="Prefix align">
+              {prefixAlign === 'inline'
+                ? <TkVal token="h-[1lh]" value="對齊第一行 label" />
+                : <TkVal token={`h-[calc(1lh+2px+desc_1lh)]`} value="對齊文字塊中心" />
+              }
+            </PropRow>
+            {hasIcon && <PropRow label="Icon">{s.icon}px</PropRow>}
+            {hasAvatar && <PropRow label="Avatar">{avatarPx}px ({prefixAlign})</PropRow>}
+            {isMulti && <PropRow label="Checkbox">{s.checkbox}</PropRow>}
+          </div>
+
+          {/* TYPOGRAPHY */}
+          <div className="px-4 py-1">
+            <div className="py-2 border-b border-divider"><span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider">Typography</span></div>
+            <PropRow label="Label"><TkVal token={s.labelFont} value={s.labelSize} /></PropRow>
+            {hasDesc && <PropRow label="Description"><TkVal token={s.descFont} value={s.descSize} /></PropRow>}
+            {hasDesc && <PropRow label="Label-Desc 間距"><TkVal token="mt-0.5" value="2px" /></PropRow>}
+          </div>
+
+          {/* SELECTION */}
+          <div className="px-4 py-1 pb-3">
+            <div className="py-2 border-b border-divider"><span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider">Selection</span></div>
+            <PropRow label="模式">{isMulti ? 'Checkbox 勾選' : 'bg-neutral-active 背景'}</PropRow>
+            <PropRow label="選後行為">{isMulti ? '不關閉浮層' : '關閉浮層'}</PropRow>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export const Inspector = {
+  name: '2. 元件檢閱器',
+  render: () => (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1">
+        <H3>元件檢閱器</H3>
+        <Desc>選擇任意組合，即時查看所有 token。開發只需確認 token 正確——theme / density 的值解析由系統處理。</Desc>
+      </div>
+      <InspectorInner />
+    </div>
+  ),
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   3. 色彩對照表
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export const ColorMatrix = {
+  name: '3. 色彩對照表',
+  render: () => (
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-1">
+        <H3>State 色彩對照</H3>
+        <Desc>單選用 bg-neutral-active 背景指示選中，多選用 Checkbox 勾選——背景不變。disabled 時所有元素統一 fg-disabled。色塊即時渲染，切 dark mode 自動更新。</Desc>
+      </div>
+
+      {/* Single-select */}
+      <div className="flex flex-col gap-3">
+        <span className="text-caption font-medium text-fg-secondary">單選（selected = bg-neutral-active）</span>
+        <div className="overflow-x-auto">
+          <table className="border-collapse">
+            <thead><tr><Th>State</Th><Th>預覽</Th><Th>Token</Th></tr></thead>
+            <tbody>
+              {STATES.map((st) => (
+                <tr key={st}>
+                  <Td mono>{st}</Td>
+                  <td className="p-3 border-b border-divider align-top min-w-[280px]">
+                    <MenuContainer width={260}>
+                      <SelectMenuGroup>
+                        <SelectMenuItem
+                          size="md"
+                          startIcon={Mail}
+                          selected={st === 'selected'}
+                          disabled={st === 'disabled'}
+                          description="摘要通知"
+                        >
+                          電子郵件
+                        </SelectMenuItem>
+                      </SelectMenuGroup>
+                    </MenuContainer>
+                  </td>
+                  <td className="p-3 border-b border-divider align-top min-w-[200px]">
+                    <TokenAnnotation colors={SINGLE_TOKEN_MAP[st]} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Multi-select */}
+      <div className="flex flex-col gap-3">
+        <span className="text-caption font-medium text-fg-secondary">多選（selected = checkbox 勾選，背景不變）</span>
+        <div className="overflow-x-auto">
+          <table className="border-collapse">
+            <thead><tr><Th>State</Th><Th>預覽</Th><Th>Token</Th></tr></thead>
+            <tbody>
+              {STATES.map((st) => (
+                <tr key={st}>
+                  <Td mono>{st}</Td>
+                  <td className="p-3 border-b border-divider align-top min-w-[280px]">
+                    <MenuContainer width={260}>
+                      <SelectMenuGroup>
+                        <SelectMenuItem
+                          size="md"
+                          startIcon={Mail}
+                          checkbox
+                          checked={st === 'selected'}
+                          disabled={st === 'disabled'}
+                          description="摘要通知"
+                        >
+                          電子郵件
+                        </SelectMenuItem>
+                      </SelectMenuGroup>
+                    </MenuContainer>
+                  </td>
+                  <td className="p-3 border-b border-divider align-top min-w-[200px]">
+                    <TokenAnnotation colors={MULTI_TOKEN_MAP[st]} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Header */}
+      <div className="flex flex-col gap-3">
+        <span className="text-caption font-medium text-fg-secondary">Header（群組標題）</span>
+        <div className="flex items-start gap-4">
+          <MenuContainer width={260}>
+            <SelectMenuGroup>
+              <SelectMenuItem size="md" header>群組標題</SelectMenuItem>
+              <SelectMenuItem size="md" startIcon={FileText}>一般選項</SelectMenuItem>
+            </SelectMenuGroup>
+          </MenuContainer>
+          <div className="flex flex-col gap-0.5">
+            <span className="inline-flex items-center gap-1 text-[10px]">
+              <span className="text-fg-muted w-7 shrink-0">text</span>
+              <span className="font-mono text-fg-secondary">--fg-muted + font-medium</span>
+            </span>
+            <span className="inline-flex items-center gap-1 text-[10px]">
+              <span className="text-fg-muted w-7 shrink-0">互動</span>
+              <span className="font-mono text-fg-secondary">pointer-events-none</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  ),
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   4. 尺寸對照表
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export const SizeMatrix = {
+  name: '4. 尺寸對照表',
+  render: () => (
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-1">
+        <H3>Size Token 對照</H3>
+        <Desc>每個 size 對應的 token 一覽。density 切換由系統自動處理 field-height 值。</Desc>
+      </div>
+
+      {/* Token comparison table */}
+      <div className="overflow-x-auto">
+        <table className="border-collapse text-caption">
+          <thead><tr>
+            <Th>屬性</Th>
+            {SIZES.map((sz) => <Th key={sz}>{sz}{sz === 'md' ? '（預設）' : ''}</Th>)}
+          </tr></thead>
+          <tbody>
+            <tr>
+              <Td>單行高度</Td>
+              {SIZES.map((sz) => <Td key={sz} mono><TkVal token={SIZE_SPECS[sz].heightToken} /></Td>)}
+            </tr>
+            <tr>
+              <Td>padding-y</Td>
+              {SIZES.map((sz) => <Td key={sz} mono><span className="text-fg-secondary text-[11px]">(field-height - 1lh) / 2</span></Td>)}
+            </tr>
+            <tr>
+              <Td>padding-x</Td>
+              {SIZES.map(() => <Td mono><TkVal token="px-3" value="12px" /></Td>)}
+            </tr>
+            <tr>
+              <Td>Label 字體</Td>
+              {SIZES.map((sz) => <Td key={sz} mono><TkVal token={SIZE_SPECS[sz].labelFont} value={SIZE_SPECS[sz].labelSize} /></Td>)}
+            </tr>
+            <tr>
+              <Td>Description 字體</Td>
+              {SIZES.map((sz) => <Td key={sz} mono><TkVal token={SIZE_SPECS[sz].descFont} value={SIZE_SPECS[sz].descSize} /></Td>)}
+            </tr>
+            <tr>
+              <Td>Icon</Td>
+              {SIZES.map((sz) => <Td key={sz} mono>{SIZE_SPECS[sz].icon}px</Td>)}
+            </tr>
+            <tr>
+              <Td>Checkbox</Td>
+              {SIZES.map((sz) => <Td key={sz} mono>{SIZE_SPECS[sz].checkbox}</Td>)}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {/* Avatar sizing */}
+      <div className="flex flex-col gap-3">
+        <H3>Avatar 尺寸——24px 閾值</H3>
+        <Desc>
+          avatar 尺寸由 description 決定。無 description 時使用 inline 尺寸（對齊 Tag 高度，&le; 24px），有 description 時使用 block 尺寸（floor8(1lh+2px+desc_1lh)，&gt; 24px）。24px 是物理限制——16px icon 在 24px 圓內可辨識，更小則不行。
+        </Desc>
+        <div className="overflow-x-auto">
+          <table className="border-collapse text-caption">
+            <thead><tr>
+              <Th>Avatar 模式</Th>
+              {SIZES.map((sz) => <Th key={sz}>{sz}</Th>)}
+              <Th>Prefix 對齊</Th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <Td>inline（無 description）</Td>
+                {SIZES.map((sz) => <Td key={sz} mono>{SIZE_SPECS[sz].avatarInline}px</Td>)}
+                <Td mono>h-[1lh]</Td>
+              </tr>
+              <tr>
+                <Td>block（有 description）</Td>
+                {SIZES.map((sz) => <Td key={sz} mono>{SIZE_SPECS[sz].avatarBlock}px</Td>)}
+                <Td mono>h-[calc(1lh+2px+desc_1lh)]</Td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Visual preview per size */}
+      <div className="flex flex-col gap-4">
+        <span className="text-caption font-medium text-fg-secondary">預覽</span>
+        <div className="flex flex-col gap-6">
+          {SIZES.map((sz) => (
+            <div key={sz} className="flex flex-col gap-1">
+              <span className="text-caption text-fg-muted font-mono">{sz}{sz === 'md' ? '（預設）' : ''}</span>
+              <MenuContainer width={380}>
+                <SelectMenuGroup>
+                  <SelectMenuItem size={sz} startIcon={Mail} description="每日摘要信件">
+                    電子郵件通知
+                  </SelectMenuItem>
+                  <SelectMenuItem size={sz} avatar={<AvatarImg />}>
+                    Alice Chen
+                  </SelectMenuItem>
+                  <SelectMenuItem size={sz} avatar={<AvatarImg bg="#fce7f3" />} description="工程部門">
+                    Bob Wang
+                  </SelectMenuItem>
+                  <SelectMenuItem size={sz} checkbox checked={true} startIcon={Bell}>
+                    推播通知
+                  </SelectMenuItem>
+                  <SelectMenuItem size={sz} tag={<Tag size={sz} variant="secondary">Admin</Tag>}>
+                    權限標記
+                  </SelectMenuItem>
+                </SelectMenuGroup>
+              </MenuContainer>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  ),
+}

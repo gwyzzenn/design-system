@@ -105,6 +105,25 @@ export const WrapModes: Story = {
   },
 }
 
+/* ── 搜尋 ── */
+export const Searchable: Story = {
+  name: '搜尋',
+  render: () => {
+    const [value, setValue] = React.useState<string[]>(['electronics'])
+    return (
+      <div className="flex flex-col gap-4 max-w-sm">
+        <p className="text-caption text-fg-muted">searchable — 浮層內搜尋框，關鍵字保留可連續勾選</p>
+        <MultiSelectField
+          options={categoryOptions}
+          value={value}
+          onChange={setValue}
+          searchable
+        />
+      </div>
+    )
+  },
+}
+
 /* ── DataTable 整合 ── */
 export const InDataTable: Story = {
   name: 'DataTable 整合',
