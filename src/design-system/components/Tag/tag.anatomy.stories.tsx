@@ -430,80 +430,115 @@ export const ColorMatrix = {
       <div className="flex flex-col gap-1">
         <H3>Variant 色彩對照</H3>
         <Desc>
-          Tag 無 hover/active 狀態（非互動元件），只有單一色彩組合。有色 variant 文字一律 step-7（優先辨識度），neutral 用 foreground。色塊即時渲染，切 dark mode 自動更新。
+          Tag 無 hover/active 狀態（非互動元件），只有單一色彩組合。有色 variant 文字一律 step-7（優先辨識度），neutral 用 foreground。Solid 模式使用 step-6 背景 + 白字（yellow 例外用 --warning-foreground）。色塊即時渲染，切 dark mode 自動更新。
         </Desc>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="border-collapse">
-          <thead>
-            <tr>
-              <Th>Variant</Th>
-              <Th>預覽</Th>
-              <Th>背景 (bg)</Th>
-              <Th>文字 (text)</Th>
-              <Th>邊框 (border)</Th>
-            </tr>
-          </thead>
-          <tbody>
-            {VARIANTS.map((v) => {
-              const c = TOKEN_MAP[v]
-              return (
-                <tr key={v}>
-                  <td className="p-3 border-b border-divider font-mono text-caption font-medium align-middle">{v}</td>
-                  <td className="p-3 border-b border-divider align-middle">
-                    <Tag variant={v} icon={Hash}>Label</Tag>
-                  </td>
-                  <td className="p-3 border-b border-divider align-middle">
-                    <span className="inline-flex items-center gap-1.5 text-[11px]">
-                      <Swatch value={c.bg} />
-                      <span className="font-mono text-fg-secondary">{c.bg}</span>
-                    </span>
-                  </td>
-                  <td className="p-3 border-b border-divider align-middle">
-                    <span className="inline-flex items-center gap-1.5 text-[11px]">
-                      <Swatch value={c.text} />
-                      <span className="font-mono text-fg-secondary">{c.text}</span>
-                    </span>
-                  </td>
-                  <td className="p-3 border-b border-divider align-middle">
-                    <span className="inline-flex items-center gap-1.5 text-[11px]">
-                      <Swatch value={c.border} />
-                      <span className="font-mono text-fg-secondary">{c.border}</span>
-                    </span>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+      {/* Subtle */}
+      <div className="flex flex-col gap-3">
+        <span className="text-caption font-semibold text-fg-secondary">Subtle（預設）</span>
+        <div className="overflow-x-auto">
+          <table className="border-collapse">
+            <thead>
+              <tr>
+                <Th>Variant</Th>
+                <Th>預覽</Th>
+                <Th>背景 (bg)</Th>
+                <Th>文字 (text)</Th>
+              </tr>
+            </thead>
+            <tbody>
+              {VARIANTS.map((v) => {
+                const c = TOKEN_MAP.subtle[v]
+                return (
+                  <tr key={v}>
+                    <td className="p-3 border-b border-divider font-mono text-caption font-medium align-middle">{v}</td>
+                    <td className="p-3 border-b border-divider align-middle">
+                      <Tag variant={v} icon={Hash}>Label</Tag>
+                    </td>
+                    <td className="p-3 border-b border-divider align-middle">
+                      <span className="inline-flex items-center gap-1.5 text-[11px]">
+                        <Swatch value={c.bg} />
+                        <span className="font-mono text-fg-secondary">{c.bg}</span>
+                      </span>
+                    </td>
+                    <td className="p-3 border-b border-divider align-middle">
+                      <span className="inline-flex items-center gap-1.5 text-[11px]">
+                        <Swatch value={c.text} />
+                        <span className="font-mono text-fg-secondary">{c.text}</span>
+                      </span>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Solid */}
+      <div className="flex flex-col gap-3">
+        <span className="text-caption font-semibold text-fg-secondary">Solid</span>
+        <div className="overflow-x-auto">
+          <table className="border-collapse">
+            <thead>
+              <tr>
+                <Th>Variant</Th>
+                <Th>預覽</Th>
+                <Th>背景 (bg)</Th>
+                <Th>文字 (text)</Th>
+              </tr>
+            </thead>
+            <tbody>
+              {VARIANTS.map((v) => {
+                const c = TOKEN_MAP.solid[v]
+                return (
+                  <tr key={v}>
+                    <td className="p-3 border-b border-divider font-mono text-caption font-medium align-middle">{v}</td>
+                    <td className="p-3 border-b border-divider align-middle">
+                      <Tag variant={v} icon={Hash} solid>Label</Tag>
+                    </td>
+                    <td className="p-3 border-b border-divider align-middle">
+                      <span className="inline-flex items-center gap-1.5 text-[11px]">
+                        <Swatch value={c.bg} />
+                        <span className="font-mono text-fg-secondary">{c.bg}</span>
+                      </span>
+                    </td>
+                    <td className="p-3 border-b border-divider align-middle">
+                      <span className="inline-flex items-center gap-1.5 text-[11px]">
+                        <span className="font-mono text-fg-secondary">{c.text}</span>
+                      </span>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Dismiss action colors */}
       <div className="flex flex-col gap-3">
-        <span className="text-caption font-medium text-fg-secondary">Dismiss 按鈕色彩（Inline Action 統一規則）</span>
+        <span className="text-caption font-semibold text-fg-secondary">Dismiss 按鈕色彩</span>
         <div className="overflow-x-auto">
           <table className="border-collapse text-caption">
-            <thead><tr><Th>狀態</Th><Th>Icon 色</Th><Th>Hover 背景</Th></tr></thead>
+            <thead><tr><Th>模式</Th><Th>狀態</Th><Th>Icon 色</Th><Th>Hover 背景</Th></tr></thead>
             <tbody>
               {[
-                { state: 'default', iconColor: '--fg-muted', hoverBg: 'transparent' },
-                { state: 'hover', iconColor: '--foreground', hoverBg: '--neutral-hover' },
-                { state: 'active', iconColor: '--foreground', hoverBg: '--neutral-active' },
-              ].map(({ state, iconColor, hoverBg }) => (
-                <tr key={state}>
+                { mode: 'Subtle', state: 'default', iconColor: '--fg-muted', hoverBg: 'transparent' },
+                { mode: '', state: 'hover', iconColor: '--foreground', hoverBg: '--neutral-hover' },
+                { mode: '', state: 'active', iconColor: '--foreground', hoverBg: '--neutral-active' },
+                { mode: 'Solid', state: 'default', iconColor: 'inherit (opacity-70)', hoverBg: 'transparent' },
+                { mode: '', state: 'hover', iconColor: 'inherit (opacity-100)', hoverBg: 'white/20' },
+              ].map(({ mode, state, iconColor, hoverBg }, i) => (
+                <tr key={i}>
+                  {mode ? <td className="p-2 border-b border-divider align-top text-caption font-mono font-medium" rowSpan={mode === 'Subtle' ? 3 : 2}>{mode}</td> : null}
                   <Td mono>{state}</Td>
                   <Td>
-                    <span className="inline-flex items-center gap-1.5">
-                      <Swatch value={iconColor} size="sm" />
-                      <span className="font-mono text-fg-secondary text-[11px]">{iconColor}</span>
-                    </span>
+                    <span className="font-mono text-fg-secondary text-[11px]">{iconColor}</span>
                   </Td>
                   <Td>
-                    <span className="inline-flex items-center gap-1.5">
-                      <Swatch value={hoverBg} size="sm" />
-                      <span className="font-mono text-fg-secondary text-[11px]">{hoverBg}</span>
-                    </span>
+                    <span className="font-mono text-fg-secondary text-[11px]">{hoverBg}</span>
                   </Td>
                 </tr>
               ))}

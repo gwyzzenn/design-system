@@ -20,17 +20,32 @@ type ColorKey = 'neutral' | 'blue' | 'red' | 'green' | 'yellow' | 'purple' | 'ma
 const ALL_COLORS: ColorKey[] = ['neutral', 'blue', 'red', 'green', 'yellow', 'purple', 'magenta', 'turquoise', 'indigo']
 const PRESET_SIZES = [20, 24, 32, 40] as const
 
-// 與 Tag 元件對齊：neutral = foreground，有色 = step-7
-const COLOR_TOKENS: Record<ColorKey, { bg: string; text: string }> = {
-  neutral:   { bg: '--muted',              text: '--foreground' },
-  blue:      { bg: '--info-subtle',        text: '--color-blue-7' },
-  red:       { bg: '--error-subtle',       text: '--color-deep-orange-7' },
-  green:     { bg: '--success-subtle',     text: '--color-green-7' },
-  yellow:    { bg: '--warning-subtle',     text: '--color-yellow-7' },
-  purple:    { bg: '--purple-subtle',      text: '--color-purple-7' },
-  magenta:   { bg: '--magenta-subtle',     text: '--color-magenta-7' },
-  turquoise: { bg: '--turquoise-subtle',   text: '--color-turquoise-7' },
-  indigo:    { bg: '--indigo-subtle',      text: '--color-indigo-7' },
+type VariantKey = 'subtle' | 'solid'
+
+// 與 Tag 元件完全對齊：subtle = step-7 前景，solid = step-6 背景 + 白字（yellow 例外）
+const COLOR_TOKENS: Record<VariantKey, Record<ColorKey, { bg: string; text: string }>> = {
+  subtle: {
+    neutral:   { bg: '--muted',              text: '--foreground' },
+    blue:      { bg: '--info-subtle',        text: '--color-blue-7' },
+    red:       { bg: '--error-subtle',       text: '--color-deep-orange-7' },
+    green:     { bg: '--success-subtle',     text: '--color-green-7' },
+    yellow:    { bg: '--warning-subtle',     text: '--color-yellow-7' },
+    turquoise: { bg: '--turquoise-subtle',   text: '--color-turquoise-7' },
+    purple:    { bg: '--purple-subtle',      text: '--color-purple-7' },
+    magenta:   { bg: '--magenta-subtle',     text: '--color-magenta-7' },
+    indigo:    { bg: '--indigo-subtle',      text: '--color-indigo-7' },
+  },
+  solid: {
+    neutral:   { bg: '--fg-secondary',       text: 'white (#fff)' },
+    blue:      { bg: '--primary',            text: 'white (#fff)' },
+    red:       { bg: '--error',              text: 'white (#fff)' },
+    green:     { bg: '--success',            text: 'white (#fff)' },
+    yellow:    { bg: '--warning',            text: '--warning-foreground' },
+    turquoise: { bg: '--turquoise',          text: 'white (#fff)' },
+    purple:    { bg: '--purple',             text: 'white (#fff)' },
+    magenta:   { bg: '--magenta',            text: 'white (#fff)' },
+    indigo:    { bg: '--indigo',             text: 'white (#fff)' },
+  },
 }
 
 /** round_even(size * 0.6) */
@@ -162,6 +177,7 @@ export const Overview = {
                 ['alt', 'string', '—', '替代文字（圖片失敗時取首字作 fallback）'],
                 ['icon', 'LucideIcon', '—', 'Icon 模式（與 src/alt 互斥優先）'],
                 ['color', 'ColorKey', "'neutral'", 'Icon / Text 模式的背景色'],
+                ['solid', 'boolean', 'false', '深底白字模式（step-6 背景 + 白色前景，yellow 例外）'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
               ))}
@@ -188,17 +204,18 @@ const InspectorInner = () => {
   const [shape, setShape] = useState<ShapeKey>('circle')
   const [size, setSize] = useState(32)
   const [color, setColor] = useState<ColorKey>('blue')
+  const [solid, setSolid] = useState(false)
 
   const iconPx = getIconSize(size)
   const textPx = getTextSize(size)
-  const colors = COLOR_TOKENS[color]
+  const colors = COLOR_TOKENS[solid ? 'solid' : 'subtle'][color]
   const radius = shape === 'circle' ? '9999px (rounded-full)' : '4px (rounded-md)'
 
   const renderAvatar = () => {
     switch (mode) {
       case 'image': return <Avatar size={size} shape={shape} src="https://i.pravatar.cc/96?u=inspector" alt="User" />
-      case 'icon': return <Avatar size={size} shape={shape} icon={Folder} color={color} />
-      case 'text': return <Avatar size={size} shape={shape} alt="Alice" color={color} />
+      case 'icon': return <Avatar size={size} shape={shape} icon={Folder} color={color} solid={solid} />
+      case 'text': return <Avatar size={size} shape={shape} alt="Alice" color={color} solid={solid} />
     }
   }
 
@@ -229,6 +246,15 @@ const InspectorInner = () => {
             <span className="text-[11px] text-fg-muted w-16 shrink-0">Color</span>
             <div className="flex flex-wrap gap-1.5">
               {ALL_COLORS.map((c) => <Tab key={c} active={color === c} onClick={() => setColor(c)}>{c}</Tab>)}
+            </div>
+          </div>
+        )}
+        {mode !== 'image' && (
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-fg-muted w-16 shrink-0">Solid</span>
+            <div className="flex gap-1.5">
+              <Tab active={!solid} onClick={() => setSolid(false)}>off</Tab>
+              <Tab active={solid} onClick={() => setSolid(true)}>on</Tab>
             </div>
           </div>
         )}
@@ -357,48 +383,96 @@ export const ColorMatrix = {
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-1">
         <H3>色彩對照表</H3>
-        <Desc>所有語義色的背景 + 前景 token 對照。色塊即時渲染，切 dark mode 自動更新。Image 模式不使用背景色。</Desc>
+        <Desc>所有語義色的背景 + 前景 token 對照，含 subtle 與 solid 兩種模式。色塊即時渲染，切 dark mode 自動更新。Image 模式不使用背景色。</Desc>
       </div>
-      <div className="overflow-x-auto">
-        <table className="border-collapse">
-          <thead>
-            <tr>
-              <Th>Color</Th>
-              <Th>Icon 模式</Th>
-              <Th>Text 模式</Th>
-              <Th>背景 token</Th>
-              <Th>前景 token</Th>
-            </tr>
-          </thead>
-          <tbody>
-            {ALL_COLORS.map((c) => {
-              const tokens = COLOR_TOKENS[c]
-              return (
-                <tr key={c}>
-                  <Td mono>{c}{c === 'neutral' ? '（預設）' : ''}</Td>
-                  <td className="p-3 border-b border-divider">
-                    <Avatar size={32} icon={Globe} color={c} />
-                  </td>
-                  <td className="p-3 border-b border-divider">
-                    <Avatar size={32} alt={c.charAt(0).toUpperCase() + c.slice(1)} color={c} />
-                  </td>
-                  <td className="p-2 border-b border-divider">
-                    <span className="inline-flex items-center gap-2">
-                      <Swatch value={tokens.bg} />
-                      <span className="font-mono text-[12px] text-fg-secondary">{tokens.bg}</span>
-                    </span>
-                  </td>
-                  <td className="p-2 border-b border-divider">
-                    <span className="inline-flex items-center gap-2">
-                      <Swatch value={tokens.text} />
+
+      {/* Subtle */}
+      <div className="flex flex-col gap-3">
+        <span className="text-caption font-semibold text-fg-secondary">Subtle（預設）</span>
+        <div className="overflow-x-auto">
+          <table className="border-collapse">
+            <thead>
+              <tr>
+                <Th>Color</Th>
+                <Th>Icon 模式</Th>
+                <Th>Text 模式</Th>
+                <Th>背景 token</Th>
+                <Th>前景 token</Th>
+              </tr>
+            </thead>
+            <tbody>
+              {ALL_COLORS.map((c) => {
+                const tokens = COLOR_TOKENS.subtle[c]
+                return (
+                  <tr key={c}>
+                    <Td mono>{c}{c === 'neutral' ? '（預設）' : ''}</Td>
+                    <td className="p-3 border-b border-divider">
+                      <Avatar size={32} icon={Globe} color={c} />
+                    </td>
+                    <td className="p-3 border-b border-divider">
+                      <Avatar size={32} alt={c.charAt(0).toUpperCase() + c.slice(1)} color={c} />
+                    </td>
+                    <td className="p-2 border-b border-divider">
+                      <span className="inline-flex items-center gap-2">
+                        <Swatch value={tokens.bg} />
+                        <span className="font-mono text-[12px] text-fg-secondary">{tokens.bg}</span>
+                      </span>
+                    </td>
+                    <td className="p-2 border-b border-divider">
+                      <span className="inline-flex items-center gap-2">
+                        <Swatch value={tokens.text} />
+                        <span className="font-mono text-[12px] text-fg-secondary">{tokens.text}</span>
+                      </span>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Solid */}
+      <div className="flex flex-col gap-3">
+        <span className="text-caption font-semibold text-fg-secondary">Solid</span>
+        <div className="overflow-x-auto">
+          <table className="border-collapse">
+            <thead>
+              <tr>
+                <Th>Color</Th>
+                <Th>Icon 模式</Th>
+                <Th>Text 模式</Th>
+                <Th>背景 token</Th>
+                <Th>前景 token</Th>
+              </tr>
+            </thead>
+            <tbody>
+              {ALL_COLORS.map((c) => {
+                const tokens = COLOR_TOKENS.solid[c]
+                return (
+                  <tr key={c}>
+                    <Td mono>{c}</Td>
+                    <td className="p-3 border-b border-divider">
+                      <Avatar size={32} icon={Globe} color={c} solid />
+                    </td>
+                    <td className="p-3 border-b border-divider">
+                      <Avatar size={32} alt={c.charAt(0).toUpperCase() + c.slice(1)} color={c} solid />
+                    </td>
+                    <td className="p-2 border-b border-divider">
+                      <span className="inline-flex items-center gap-2">
+                        <Swatch value={tokens.bg} />
+                        <span className="font-mono text-[12px] text-fg-secondary">{tokens.bg}</span>
+                      </span>
+                    </td>
+                    <td className="p-2 border-b border-divider">
                       <span className="font-mono text-[12px] text-fg-secondary">{tokens.text}</span>
-                    </span>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   ),
