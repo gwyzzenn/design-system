@@ -116,11 +116,11 @@
   --primary-active:       var(--blue-active);
   --primary-subtle:       var(--blue-subtle);
 
-  /* Status: Info — = primary = blue */
-  --info:                 var(--primary);
-  --info-hover:           var(--primary-hover);
-  --info-active:          var(--primary-active);
-  --info-subtle:          var(--primary-subtle);
+  /* Status: Info — 指向 categorical --blue（與 primary 同色但語義獨立） */
+  --info:                 var(--blue);
+  --info-hover:           var(--blue-hover);
+  --info-active:          var(--blue-active);
+  --info-subtle:          var(--blue-subtle);
 
   /* Status: Error — 指向 categorical --red */
   --error:                var(--red);
