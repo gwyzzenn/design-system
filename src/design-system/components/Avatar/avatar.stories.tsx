@@ -89,7 +89,7 @@ export const Shapes = {
    3. 色彩
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const ALL_COLORS = ['neutral', 'info', 'success', 'warning', 'error', 'purple', 'magenta', 'turquoise', 'indigo'] as const
+const ALL_COLORS = ['neutral', 'blue', 'red', 'green', 'yellow', 'purple', 'magenta', 'turquoise', 'indigo'] as const
 
 export const Colors = {
   name: '色彩',
