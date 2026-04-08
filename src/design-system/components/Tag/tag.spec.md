@@ -59,7 +59,7 @@ Dismiss 是 Inline Action，但 icon 色繼承 Tag 文字色（非 `fg-muted`）
 | 模式 | Icon 色 | Hover 背景 |
 |---|---|---|
 | subtle | 繼承 Tag 文字色 | `neutral-hover` |
-| solid | 繼承 Tag 文字色（白或 --warning-foreground） | 無（cursor:pointer 即可） |
+| solid | 繼承 Tag 文字色 | `neutral-hover` |
 
 Inline Action 的其他規則（尺寸、hover 背景 pattern）不變。
 
