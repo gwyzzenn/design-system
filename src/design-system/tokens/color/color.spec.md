@@ -2,11 +2,35 @@
 
 ## 系統架構
 
-色彩分兩層定義：
-- **`primitives.css`**：原始色票（`--color-blue-6` 等），不直接使用
-- **`semantic.css`**：語義 token（`--primary`、`--canvas` 等），元件只用這層
+色彩分三層定義：
 
-Tailwind utility 透過 `@theme inline` 橋接語義 token，元件寫 `bg-primary` 即可。
+| 層 | 檔案 | 用途 | 範例 |
+|---|---|---|---|
+| **Primitive** | `primitives.css` | 原始色票，不直接使用 | `--color-blue-6` |
+| **Categorical** | `semantic.css` | 色相 token，用於需要多色區分的場景（Tag、Avatar 等） | `--blue`、`--red`、`--green`、`--yellow` |
+| **Semantic** | `semantic.css` | 語義 token，用於表達意圖（操作、狀態） | `--primary`、`--error`、`--info` |
+
+```
+Primitive          Categorical         Semantic
+──────────         ───────────         ──────────
+--color-blue-6  →  --blue           →  --primary（互動入口）
+                                    →  --info（資訊狀態）
+--color-d.o.-6  →  --red            →  --error（錯誤狀態）
+--color-green-6 →  --green          →  --success（成功狀態）
+--color-yellow-6→  --yellow         →  --warning（警告狀態）
+```
+
+**消費規則**：
+
+| 場景 | 使用層級 | 原因 |
+|---|---|---|
+| Tag、Avatar 的色彩 variant | **Categorical**（`--blue`、`--red`） | 色名是顏色本身，不代表語義 |
+| Button、Checkbox、Switch、Focus ring | **Semantic**（`--primary`） | 代表「使用者可以執行的操作」 |
+| Badge 層級（high/medium） | **Semantic**（`--info`） | 代表「資訊狀態」，不是操作 |
+| 錯誤訊息、驗證錯誤 | **Semantic**（`--error`） | 代表「系統出了問題」 |
+| 直接引用 primitive | **禁止** | primitive 是實作細節 |
+
+Tailwind utility 透過 `@theme inline` 橋接語義 / categorical token，元件寫 `bg-primary` 或 `bg-blue` 即可。
 
 
 ## Surface 分層（非常重要）
@@ -140,16 +164,24 @@ disabled 元件內的所有子元素必須呈現 disabled 狀態：
 
 ### Categorical — 分類色
 
-無固定語義，用於 Tag、avatar 等需要多色區分的場景（專案標籤、團隊分類等）。消費端自行決定用途。
+無固定語義，用於 Tag、Avatar 等需要多色區分的場景（專案標籤、團隊分類等）。消費端自行決定用途。
+
+每個 categorical token 都有完整的四態：base / hover / active / subtle。
 
 | Token | 色相 | Tailwind |
 |-------|------|----------|
-| `--turquoise` / `--turquoise-subtle` | turquoise | `text-turquoise` / `bg-turquoise-subtle` |
-| `--purple` / `--purple-subtle` | purple | `text-purple` / `bg-purple-subtle` |
-| `--magenta` / `--magenta-subtle` | magenta | `text-magenta` / `bg-magenta-subtle` |
-| `--indigo` / `--indigo-subtle` | indigo | `text-indigo` / `bg-indigo-subtle` |
+| `--blue` / `--blue-hover` / `--blue-active` / `--blue-subtle` | blue | `bg-blue` / `bg-blue-subtle` |
+| `--red` / `--red-hover` / `--red-active` / `--red-subtle` | deep-orange | `bg-red` / `bg-red-subtle` |
+| `--green` / `--green-hover` / `--green-active` / `--green-subtle` | green | `bg-green` / `bg-green-subtle` |
+| `--yellow` / `--yellow-hover` / `--yellow-active` / `--yellow-subtle` | yellow | `bg-yellow` / `bg-yellow-subtle` |
+| `--turquoise` / `--turquoise-hover` / `--turquoise-active` / `--turquoise-subtle` | turquoise | `bg-turquoise` / `bg-turquoise-subtle` |
+| `--purple` / `--purple-hover` / `--purple-active` / `--purple-subtle` | purple | `bg-purple` / `bg-purple-subtle` |
+| `--magenta` / `--magenta-hover` / `--magenta-active` / `--magenta-subtle` | magenta | `bg-magenta` / `bg-magenta-subtle` |
+| `--indigo` / `--indigo-hover` / `--indigo-active` / `--indigo-subtle` | indigo | `bg-indigo` / `bg-indigo-subtle` |
 
-與 status 色的差別：status 色（info/error/success/warning）有固定語義，分類色沒有。兩者不混用。
+語義 token 指向對應的 categorical token：`--primary` → `var(--blue)`、`--error` → `var(--red)`、`--success` → `var(--green)`、`--warning` → `var(--yellow)`。`--info` 直接指向 `var(--blue)`（與 `--primary` 同色但語義獨立）。
+
+**與 semantic 色的差別**：semantic 色（primary/info/error/success/warning）有固定語義，categorical 色沒有。Tag / Avatar 使用 categorical 是因為「blue」代表顏色本身，不代表「主要操作」或「資訊狀態」。
 
 ### 文字色 Step 原則
 
@@ -219,15 +251,26 @@ cursor 變化 + 細微色移疊加仍提供足夠互動回饋。
 
 ### 各 semantic 色的 step 對應
 
+**Categorical token 的 step 對應**
+
 | Token | base | hover (light/dark) | active (light/dark) | subtle |
 |-------|------|--------------------|---------------------|--------|
-| primary | blue-6 | blue-5 / blue-7 | blue-7 / blue-5 | blue-1 |
-| info | = primary | = primary-hover | = primary-active | = primary-subtle |
-| error | deep-orange-6 | deep-orange-5 / -7 | deep-orange-7 / -5 | deep-orange-1 |
-| success | green-6 | green-5 / -7 | green-7 / -5 | green-1 |
-| warning | yellow-6 | yellow-5 / -7 | yellow-7 / -5 | yellow-1 |
+| --blue | blue-6 | blue-5 / blue-7 | blue-7 / blue-5 | blue-1 |
+| --red | deep-orange-6 | deep-orange-5 / -7 | deep-orange-7 / -5 | deep-orange-1 |
+| --green | green-6 | green-5 / -7 | green-7 / -5 | green-1 |
+| --yellow | yellow-6 | yellow-5 / -7 | yellow-7 / -5 | yellow-1 |
 
-每個語義色使用色盤的 4 個 step：-1（subtle）、-5（hover）、-6（base）、-7（active）。
+**Semantic token 指向 categorical**
+
+| Token | 指向 |
+|-------|------|
+| --primary / --primary-hover / --primary-active / --primary-subtle | → --blue / --blue-hover / --blue-active / --blue-subtle |
+| --info / --info-hover / --info-active / --info-subtle | → --blue / --blue-hover / --blue-active / --blue-subtle |
+| --error / --error-hover / --error-active / --error-subtle | → --red / --red-hover / --red-active / --red-subtle |
+| --success / --success-hover / --success-active / --success-subtle | → --green / --green-hover / --green-active / --green-subtle |
+| --warning / --warning-hover / --warning-active / --warning-subtle | → --yellow / --yellow-hover / --yellow-active / --yellow-subtle |
+
+每個色相使用色盤的 4 個 step：-1（subtle）、-5（hover）、-6（base）、-7（active）。
 
 ### 新增色相的推導步驟
 
@@ -384,8 +427,8 @@ CSS 變數在定義元素上解析。`:root` 的 `--foreground: var(--color-neut
 // ❌ 不要硬寫色碼
 <div className="bg-[#1677FF]" />
 
-// ❌ 不要直接使用 primitive token（Layer 1）
-<div className="bg-[var(--color-blue-6)]" />  // 改用 bg-primary
+// ❌ 不要直接使用 primitive token
+<div className="bg-[var(--color-blue-6)]" />  // 改用 bg-blue（categorical）或 bg-primary（semantic）
 
 // ❌ 自己寫的元件不要用 shadcn alias
 <div className="bg-background" />  // 改用 bg-canvas

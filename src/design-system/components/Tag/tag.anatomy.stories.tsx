@@ -24,10 +24,10 @@ const SIZES: SizeKey[] = ['sm', 'md', 'lg']
 const TOKEN_MAP: Record<SolidSpec, Record<VariantKey, ColorSpec>> = {
   subtle: {
     neutral:   { bg: '--muted',            text: '--foreground',           border: 'transparent' },
-    blue:      { bg: '--info-subtle',      text: '--color-blue-7',        border: 'transparent' },
-    red:       { bg: '--error-subtle',     text: '--color-deep-orange-7', border: 'transparent' },
-    green:     { bg: '--success-subtle',   text: '--color-green-7',       border: 'transparent' },
-    yellow:    { bg: '--warning-subtle',   text: '--color-yellow-7',      border: 'transparent' },
+    blue:      { bg: '--blue-subtle',      text: '--color-blue-7',        border: 'transparent' },
+    red:       { bg: '--red-subtle',       text: '--color-deep-orange-7', border: 'transparent' },
+    green:     { bg: '--green-subtle',     text: '--color-green-7',       border: 'transparent' },
+    yellow:    { bg: '--yellow-subtle',    text: '--color-yellow-7',      border: 'transparent' },
     turquoise: { bg: '--turquoise-subtle', text: '--color-turquoise-7',   border: 'transparent' },
     purple:    { bg: '--purple-subtle',    text: '--color-purple-7',      border: 'transparent' },
     magenta:   { bg: '--magenta-subtle',   text: '--color-magenta-7',     border: 'transparent' },
@@ -35,10 +35,10 @@ const TOKEN_MAP: Record<SolidSpec, Record<VariantKey, ColorSpec>> = {
   },
   solid: {
     neutral:   { bg: '--fg-secondary',     text: 'white (#fff)',           border: 'transparent' },
-    blue:      { bg: '--primary',          text: 'white (#fff)',           border: 'transparent' },
-    red:       { bg: '--error',            text: 'white (#fff)',           border: 'transparent' },
-    green:     { bg: '--success',          text: 'white (#fff)',           border: 'transparent' },
-    yellow:    { bg: '--warning',          text: '--warning-foreground',   border: 'transparent' },
+    blue:      { bg: '--blue',             text: 'white (#fff)',           border: 'transparent' },
+    red:       { bg: '--red',              text: 'white (#fff)',           border: 'transparent' },
+    green:     { bg: '--green',            text: 'white (#fff)',           border: 'transparent' },
+    yellow:    { bg: '--yellow',           text: '--warning-foreground',   border: 'transparent' },
     turquoise: { bg: '--turquoise',        text: 'white (#fff)',           border: 'transparent' },
     purple:    { bg: '--purple',           text: 'white (#fff)',           border: 'transparent' },
     magenta:   { bg: '--magenta',          text: 'white (#fff)',           border: 'transparent' },
@@ -520,6 +520,7 @@ export const ColorMatrix = {
       {/* Dismiss action colors */}
       <div className="flex flex-col gap-3">
         <span className="text-caption font-semibold text-fg-secondary">Dismiss 按鈕色彩</span>
+        <Desc>Subtle 模式使用 neutral-hover/active。Solid 模式使用色相自身的 categorical hover/active token——深色底上 neutral-hover 幾乎不可見。</Desc>
         <div className="overflow-x-auto">
           <table className="border-collapse text-caption">
             <thead><tr><Th>模式</Th><Th>狀態</Th><Th>Icon 色</Th><Th>Hover 背景</Th></tr></thead>
@@ -529,8 +530,8 @@ export const ColorMatrix = {
                 { mode: '', state: 'hover', iconColor: '繼承 Tag 文字色', hoverBg: '--neutral-hover' },
                 { mode: '', state: 'active', iconColor: '繼承 Tag 文字色', hoverBg: '--neutral-active' },
                 { mode: 'Solid', state: 'default', iconColor: '繼承 Tag 文字色', hoverBg: 'transparent' },
-                { mode: '', state: 'hover', iconColor: '繼承 Tag 文字色', hoverBg: '--neutral-hover' },
-                { mode: '', state: 'active', iconColor: '繼承 Tag 文字色', hoverBg: '--neutral-active' },
+                { mode: '', state: 'hover', iconColor: '繼承 Tag 文字色', hoverBg: '--{hue}-hover（如 --blue-hover）' },
+                { mode: '', state: 'active', iconColor: '繼承 Tag 文字色', hoverBg: '--{hue}-active（如 --blue-active）' },
               ].map(({ mode, state, iconColor, hoverBg }, i) => (
                 <tr key={i}>
                   {mode ? <td className="p-2 border-b border-divider align-top text-caption font-mono font-medium" rowSpan={3}>{mode}</td> : null}

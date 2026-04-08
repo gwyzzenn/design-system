@@ -22,7 +22,7 @@ Tag 是 inline label，用於分類標籤、狀態標記、多選已選值。不
 | `magenta` | 分類色（無固定語義） |
 | `indigo` | 分類色（無固定語義） |
 
-前五個色（neutral ~ yellow）有對應的語義 token；後四個色（turquoise ~ indigo）使用原始色票，專供需要多色區分的場景（專案標籤、團隊分類等）。
+所有有色 variant 使用 categorical token（`--blue`、`--red`、`--green`、`--yellow`、`--turquoise` 等），不使用 semantic token（`--primary`、`--error`）。Tag 的「blue」代表藍色本身，不代表「主要操作」語義。
 
 ### 文字色
 
@@ -41,10 +41,10 @@ Tag 是 inline label，用於分類標籤、狀態標記、多選已選值。不
 | Variant | Subtle 背景 | Subtle 文字 | Solid 背景 | Solid 文字 |
 |---|---|---|---|---|
 | neutral | `--muted` | `--foreground` | `--fg-secondary` | white |
-| blue | `--info-subtle` | step-7 | `--primary` | white |
-| red | `--error-subtle` | step-7 | `--error` | white |
-| green | `--success-subtle` | step-7 | `--success` | white |
-| yellow | `--warning-subtle` | step-7 | `--warning` | **`--warning-foreground`** |
+| blue | `--blue-subtle` | step-7 | `--blue` | white |
+| red | `--red-subtle` | step-7 | `--red` | white |
+| green | `--green-subtle` | step-7 | `--green` | white |
+| yellow | `--yellow-subtle` | step-7 | `--yellow` | **`--warning-foreground`** |
 | turquoise | `--turquoise-subtle` | step-7 | `--turquoise` | white |
 | purple | `--purple-subtle` | step-7 | `--purple` | white |
 | magenta | `--magenta-subtle` | step-7 | `--magenta` | white |
@@ -56,10 +56,12 @@ Tag 是 inline label，用於分類標籤、狀態標記、多選已選值。不
 
 Dismiss 是 Inline Action，但 icon 色繼承 Tag 文字色（非 `fg-muted`），因為宿主有色彩：
 
-| 模式 | Icon 色 | Hover 背景 |
-|---|---|---|
-| subtle | 繼承 Tag 文字色 | `neutral-hover` |
-| solid | 繼承 Tag 文字色 | `neutral-hover` |
+| 模式 | Icon 色 | Hover 背景 | Active 背景 |
+|---|---|---|---|
+| subtle | 繼承 Tag 文字色 | `neutral-hover` | `neutral-active` |
+| solid | 繼承 Tag 文字色 | 色相自身的 hover token（如 `--blue-hover`） | 色相自身的 active token（如 `--blue-active`） |
+
+Solid 模式的 dismiss hover/active 使用色相自己的 categorical hover/active token，而非 neutral-hover——因為 solid 底色是深色，neutral-hover 在深色底上幾乎不可見。Categorical token 自動處理 dark mode 方向反轉。
 
 Inline Action 的其他規則（尺寸、hover 背景 pattern）不變。
 

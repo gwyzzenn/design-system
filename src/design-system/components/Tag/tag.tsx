@@ -30,14 +30,14 @@ const tagVariants = cva(
       variant: {
         // 有顏色的 Tag 文字一律用 step-7（非 step-6），優先辨識度
         neutral: "bg-muted text-foreground",
-        blue: "bg-[var(--blue-subtle)] text-[var(--color-blue-7)]",
-        red: "bg-[var(--red-subtle)] text-[var(--color-deep-orange-7)]",
-        green: "bg-[var(--green-subtle)] text-[var(--color-green-7)]",
-        yellow: "bg-[var(--yellow-subtle)] text-[var(--color-yellow-7)]",
-        turquoise: "bg-turquoise-subtle text-[var(--color-turquoise-7)]",
-        purple: "bg-purple-subtle text-[var(--color-purple-7)]",
-        magenta: "bg-magenta-subtle text-[var(--color-magenta-7)]",
-        indigo: "bg-indigo-subtle text-[var(--color-indigo-7)]",
+        blue: "bg-[var(--blue-subtle)] text-[var(--blue-active)]",
+        red: "bg-[var(--red-subtle)] text-[var(--red-active)]",
+        green: "bg-[var(--green-subtle)] text-[var(--green-active)]",
+        yellow: "bg-[var(--yellow-subtle)] text-[var(--yellow-active)]",
+        turquoise: "bg-turquoise-subtle text-[var(--turquoise-active)]",
+        purple: "bg-purple-subtle text-[var(--purple-active)]",
+        magenta: "bg-magenta-subtle text-[var(--magenta-active)]",
+        indigo: "bg-indigo-subtle text-[var(--indigo-active)]",
       },
       size: {
         sm: "h-5 px-1 text-caption font-medium",

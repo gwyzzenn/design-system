@@ -232,11 +232,11 @@
   --yellow-hover:         var(--color-yellow-7);
   --yellow-active:        var(--color-yellow-5);
 
-  /* Subtle — alpha + 亮度補償 */
-  --primary-subtle:       oklch(from var(--primary) l c h / calc(0.12 / l));
-  --error-subtle:         oklch(from var(--error)   l c h / calc(0.12 / l));
-  --success-subtle:       oklch(from var(--success) l c h / calc(0.12 / l));
-  --warning-subtle:       oklch(from var(--warning) l c h / calc(0.12 / l));
+  /* Categorical subtle — dark mode alpha + 亮度補償 */
+  --blue-subtle:          oklch(from var(--blue)    l c h / calc(0.12 / l));
+  --red-subtle:           oklch(from var(--red)     l c h / calc(0.12 / l));
+  --green-subtle:         oklch(from var(--green)   l c h / calc(0.12 / l));
+  --yellow-subtle:        oklch(from var(--yellow)  l c h / calc(0.12 / l));
 
   /* Categorical hover/active — 方向反轉 */
   --turquoise-hover:      var(--color-turquoise-7);

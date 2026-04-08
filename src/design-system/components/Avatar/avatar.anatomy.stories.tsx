@@ -22,14 +22,15 @@ const PRESET_SIZES = [20, 24, 32, 40] as const
 
 type VariantKey = 'subtle' | 'solid'
 
-// 與 Tag 元件完全對齊：subtle = step-7 前景，solid = step-6 背景 + 白字（yellow 例外）
+// 與 Tag 元件完全對齊：使用 categorical token（--blue 等），不用 semantic（--primary 等）
+// subtle = step-7 前景，solid = step-6 背景 + 白字（yellow 例外）
 const COLOR_TOKENS: Record<VariantKey, Record<ColorKey, { bg: string; text: string }>> = {
   subtle: {
     neutral:   { bg: '--muted',              text: '--foreground' },
-    blue:      { bg: '--info-subtle',        text: '--color-blue-7' },
-    red:       { bg: '--error-subtle',       text: '--color-deep-orange-7' },
-    green:     { bg: '--success-subtle',     text: '--color-green-7' },
-    yellow:    { bg: '--warning-subtle',     text: '--color-yellow-7' },
+    blue:      { bg: '--blue-subtle',        text: '--color-blue-7' },
+    red:       { bg: '--red-subtle',         text: '--color-deep-orange-7' },
+    green:     { bg: '--green-subtle',       text: '--color-green-7' },
+    yellow:    { bg: '--yellow-subtle',      text: '--color-yellow-7' },
     turquoise: { bg: '--turquoise-subtle',   text: '--color-turquoise-7' },
     purple:    { bg: '--purple-subtle',      text: '--color-purple-7' },
     magenta:   { bg: '--magenta-subtle',     text: '--color-magenta-7' },
@@ -37,10 +38,10 @@ const COLOR_TOKENS: Record<VariantKey, Record<ColorKey, { bg: string; text: stri
   },
   solid: {
     neutral:   { bg: '--fg-secondary',       text: 'white (#fff)' },
-    blue:      { bg: '--primary',            text: 'white (#fff)' },
-    red:       { bg: '--error',              text: 'white (#fff)' },
-    green:     { bg: '--success',            text: 'white (#fff)' },
-    yellow:    { bg: '--warning',            text: '--warning-foreground' },
+    blue:      { bg: '--blue',               text: 'white (#fff)' },
+    red:       { bg: '--red',                text: 'white (#fff)' },
+    green:     { bg: '--green',              text: 'white (#fff)' },
+    yellow:    { bg: '--yellow',             text: '--warning-foreground' },
     turquoise: { bg: '--turquoise',          text: 'white (#fff)' },
     purple:    { bg: '--purple',             text: 'white (#fff)' },
     magenta:   { bg: '--magenta',            text: 'white (#fff)' },

@@ -21,9 +21,9 @@ type ColorSpec = { bg: string; text: string }
 
 const TOKEN_MAP: Record<VariantKey, ColorSpec> = {
   critical: { bg: '--notification', text: 'white' },
-  high:     { bg: '--primary',      text: 'white' },
-  medium:   { bg: '--primary-subtle', text: '--primary' },
-  low:      { bg: '--secondary',     text: '--fg-muted' },
+  high:     { bg: '--info',         text: 'white' },
+  medium:   { bg: '--info-subtle',  text: '--info' },
+  low:      { bg: '--secondary',    text: '--fg-muted' },
 }
 
 const VARIANT_DESC: Record<VariantKey, string> = {

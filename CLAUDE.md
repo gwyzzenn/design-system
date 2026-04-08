@@ -58,7 +58,9 @@ src/
 │   ├── components/                    ← shadcn 積木元件（一個元件一個資料夾）
 │   │   ├── Badge/                     ← 通知計數指示器（紅點 / 計數膠囊）
 │   │   ├── Tag/                       ← inline label（分類標籤 / 狀態標記）
+│   │   ├── Avatar/                    ← 視覺身份標識（人物 / 實體）
 │   │   ├── Button/                    ← 觸發操作或導覽
+│   │   ├── Switch/                    ← 即時開關切換
 │   │   ├── Checkbox/                  ← 選擇控件（方形，含 indeterminate）
 │   │   ├── Radio/                     ← 選擇控件（圓形，互斥）
 │   │   ├── Tooltip/                   ← hover 短文字提示
@@ -84,6 +86,7 @@ src/
 │   │       ├── DateField/
 │   │       ├── SelectField/
 │   │       ├── MultiSelectField/
+│   │       ├── SwitchField/           ← Switch 欄位（即時開關切換）
 │   │       └── LinkField/             ← URL 輸入，藍色連結 + Pencil 編輯
 │   └── patterns/                      ← 複合元件 / 已定案的 UI 流程（依互動領域分資料夾）
 │       ├── action-bar/                ← 工具列、操作列
