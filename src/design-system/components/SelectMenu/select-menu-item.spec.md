@@ -131,9 +131,18 @@ description 降一級：sm/md 的 label 14px → description 12px；lg 的 label
 |---|---|---|---|
 | default | transparent | foreground | — |
 | hover | `--neutral-hover` | foreground | 滑鼠 hover |
-| selected（單選） | `--neutral-active` | foreground | 選中 |
-| selected（多選） | transparent | foreground | checkbox 勾選，背景不變 |
+| selected（單選） | transparent | foreground | prefix ✓ 勾號（opacity-100 / 0 切換，保留空間對齊） |
+| selected（多選） | transparent | foreground | checkbox 勾選 |
 | disabled | transparent | `--fg-disabled` | disabled prop |
+
+### 選中指示器
+
+**統一用 prefix ✓ 勾號，不用 bg 背景色。** 跟 DropdownMenu 的 RadioItem / CheckboxItem 一致。
+
+| 模式 | 選中指示器 | 未選中 |
+|---|---|---|
+| 單選 | ✓ 勾號（opacity-100） | ✓ 空間保留（opacity-0），對齊 |
+| 多選 | ☑ Checkbox 勾選 | ☐ Checkbox 未勾選 |
 
 disabled 時所有元素（icon、checkbox、文字）統一 `fg-disabled`。
 
