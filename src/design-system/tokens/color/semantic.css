@@ -72,10 +72,23 @@
    │  --secondary      Badge low 底色（neutral-3，比 muted 深一階）      │
    └─────────────────────────────────────────────────────────────────────┘
 
-   ┌─ 中性互動背景（視覺深度遞進：無 → neutral-1 → neutral-2）─────────┐
-   │  --neutral-hover     hover 回饋                         = neutral-1   │
-   │  --neutral-active    active（按下）+ selected（選中）   = neutral-2   │
-   │  --bg-disabled        互動元件 disabled 背景             = neutral-2   │
+   ┌─ 中性互動背景（兩個獨立 family）─────────────────────────────────────┐
+   │  Default state family（non-selected element 的互動）                │
+   │    --neutral-hover        hover 回饋          = neutral-1            │
+   │    --neutral-active       :active click 回饋 = neutral-2            │
+   │                                                                     │
+   │  Selected state family（toggle on / 持續選中 element 的互動）       │
+   │    --neutral-selected         rest 持續選中   = neutral-2            │
+   │    --neutral-selected-hover   hover（變淺）   = neutral-1            │
+   │    --neutral-selected-active  :active 深一階  = neutral-3            │
+   │                                                                     │
+   │  --bg-disabled                互動元件 disabled 背景  = neutral-2    │
+   │                                                                     │
+   │  ⚠ active vs selected 語意區分（見 color.spec.md「active vs selected」）│
+   │    active   = :active 瞬間 click 回饋（transient）                  │
+   │    selected = 持續 toggle on / 長時間選中狀態（persistent）          │
+   │    值相同不代表應合併 token——語意獨立就該是獨立 token，             │
+   │    未來若 selected 視覺需獨立演化不影響 active。                    │
    └─────────────────────────────────────────────────────────────────────┘
 
    ┌─ Nested Theme 架構 ─────────────────────────────────────────────────┐
@@ -108,6 +121,8 @@
    │                  ↑ 用於 subtle bg 上的文字（資訊呈現）                │
    │  Special     text-warning-foreground（yellow solid 例外）            │
    │  Neutral     bg-neutral-hover / bg-neutral-active / bg-disabled     │
+   │              bg-neutral-selected / bg-neutral-selected-hover /       │
+   │              bg-neutral-selected-active                              │
    │              bg-muted / bg-secondary                                 │
    │  Border      border-border / border-border-hover / border-divider   │
    │  Focus       ring-ring                                               │
@@ -253,10 +268,32 @@
   --input:                var(--border);           /* shadcn input 邊框 */
   --ring:                 var(--primary);           /* shadcn focus ring */
 
-  /* Neutral Interactive */
+  /* Neutral Interactive — Default state family
+     用於 non-selected element 的互動回饋 */
   --neutral-hover:        var(--color-neutral-1);
   --neutral-active:       var(--color-neutral-2);
   --bg-disabled:          var(--color-neutral-2);
+
+  /* Neutral Interactive — Selected state family
+     ─────────────────────────────────────────────────────────────
+     用於 toggle on / 持續選中 element 的互動回饋。
+
+     值與 default family 可能重疊，但語意獨立——未來若 selected
+     視覺需獨立演化（例：改用 brand tint），只需改此組不影響 default。
+
+     命名對齊既有 --inverse-neutral-* 的 compound namespace 模式：
+       namespace = neutral-selected（複合）
+       role      = hover / active
+
+     語意區分（見 color.spec.md「active vs selected」）：
+       --neutral-active  = :active 瞬間 click 回饋（transient）
+       --neutral-selected = 持續 toggle on / 長時間選中（persistent）
+
+     典型消費者：Button text variant pressed、DropdownMenu 單選項目、
+     SelectMenu 單選項目、Tab active、menu item selected。 */
+  --neutral-selected:         var(--color-neutral-2);
+  --neutral-selected-hover:   var(--color-neutral-1);
+  --neutral-selected-active:  var(--color-neutral-3);
 
   /* Static Subtle — 靜態弱化背景
      muted / secondary 原為 shadcn 定義的 token，本系統沿用並賦予明確用途 */
@@ -398,10 +435,15 @@
   --color-inverse-neutral-hover:     var(--inverse-neutral-hover);
   --color-inverse-neutral-active:    var(--inverse-neutral-active);
 
-  /* Neutral Interaction */
-  --color-neutral-hover:         var(--neutral-hover);
-  --color-neutral-active:        var(--neutral-active);
-  --color-disabled:              var(--bg-disabled);
+  /* Neutral Interaction — Default state */
+  --color-neutral-hover:             var(--neutral-hover);
+  --color-neutral-active:            var(--neutral-active);
+  --color-disabled:                  var(--bg-disabled);
+
+  /* Neutral Interaction — Selected state family */
+  --color-neutral-selected:          var(--neutral-selected);
+  --color-neutral-selected-hover:    var(--neutral-selected-hover);
+  --color-neutral-selected-active:   var(--neutral-selected-active);
 
   /* Surface Utility */
   --color-overlay:               var(--overlay);

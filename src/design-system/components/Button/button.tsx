@@ -14,7 +14,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/design-system/compone
  *   secondary  次要品牌操作，藍框藍字；正面 vs 負面並存時用於正面那個
  *   tertiary   一般輔助操作，灰框灰字，hover 轉藍（最常用的非主要按鈕）
  *   text       無底色無邊框，hover 顯示灰底（工具列、密集 UI）
- *   checked    Toggle 選中狀態，淡藍底藍字
  *   link       外觀像連結的按鈕（本質仍是 button）
  *
  * ── danger prop ──
@@ -22,6 +21,14 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/design-system/compone
  *
  *   <Button variant="primary" danger>永久刪除</Button>        → 紅底白字（立即不可逆）
  *   <Button variant="secondary" danger>移至垃圾桶</Button>    → 紅框紅字（點下去還可反悔）
+ *
+ * ── pressed prop（toggle）──
+ *   pressed    Toggle 按下狀態（持續 on/off），寫入 aria-pressed + data-state
+ *   僅 secondary / tertiary / text 三個 variant 支援 toggle 視覺：
+ *     - secondary + pressed → primary-subtle 底、primary 字、透明邊框
+ *     - tertiary  + pressed → primary-subtle 底、primary 字、透明邊框（同 secondary 按下視覺）
+ *     - text      + pressed → neutral-selected 底，hover 反向變淺，:active 深一階
+ *   primary / link 傳入 pressed 無視覺效果（語意不符）
  *
  * ── Sizes（預設 sm）──
  *   xs   h-field-xs（24px 固定），不隨 density 縮放
@@ -37,7 +44,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/design-system/compone
  *   <Button startIcon={Plus}>新增</Button>
  *   <Button variant="tertiary">取消</Button>
  *   <Button variant="primary" danger>永久刪除</Button>
- *   <Button variant="secondary" danger>移至垃圾桶</Button>
+ *   <Button variant="text" pressed={isPinned} startIcon={Pin} aria-label="釘選" iconOnly />
  *   <Button badge={<Badge count={3} />} endIcon={ChevronDown}>通知</Button>
  *   <Button size="sm" iconOnly startIcon={Plus} aria-label="新增" />
  *
@@ -69,24 +76,33 @@ const buttonVariants = cva(
           'hover:text-primary-hover hover:border-primary-hover',
           'active:text-primary-active active:border-primary-active',
           'disabled:bg-transparent disabled:text-fg-disabled disabled:border-border',
+          // Toggle pressed（secondary + data-state=on）：對齊原 checked variant 視覺
+          'data-[state=on]:bg-primary-subtle data-[state=on]:text-primary data-[state=on]:border-transparent',
+          'data-[state=on]:hover:text-primary-hover',
+          'data-[state=on]:active:text-primary-active',
+          'data-[state=on]:disabled:bg-disabled data-[state=on]:disabled:text-fg-disabled data-[state=on]:disabled:border-transparent',
         ],
         tertiary: [
           'bg-surface text-foreground border-border',
           'hover:text-primary-hover hover:border-primary-hover',
           'active:text-primary-active active:border-primary-active',
           'disabled:bg-transparent disabled:text-fg-disabled disabled:border-border',
+          // Toggle pressed（tertiary + data-state=on）：與 secondary pressed 共用視覺
+          'data-[state=on]:bg-primary-subtle data-[state=on]:text-primary data-[state=on]:border-transparent',
+          'data-[state=on]:hover:text-primary-hover',
+          'data-[state=on]:active:text-primary-active',
+          'data-[state=on]:disabled:bg-disabled data-[state=on]:disabled:text-fg-disabled data-[state=on]:disabled:border-transparent',
         ],
         text: [
           'bg-transparent text-foreground border-transparent',
           'hover:bg-neutral-hover',
           'active:bg-neutral-active',
           'disabled:bg-transparent disabled:text-fg-disabled',
-        ],
-        checked: [
-          'bg-primary-subtle text-primary border-transparent',
-          'hover:text-primary-hover',
-          'active:text-primary-active',
-          'disabled:bg-disabled disabled:text-fg-disabled disabled:border-transparent',
+          // Toggle pressed（text + data-state=on）：走 neutral-selected family
+          'data-[state=on]:bg-neutral-selected',
+          'data-[state=on]:hover:bg-neutral-selected-hover',
+          'data-[state=on]:active:bg-neutral-selected-active',
+          'data-[state=on]:disabled:bg-transparent data-[state=on]:disabled:text-fg-disabled',
         ],
         link: [
           'bg-transparent text-primary border-transparent',
@@ -163,9 +179,18 @@ export interface ButtonProps
    * 按鈕視覺強調等級。
    * `destructive` / `ghost` 為 shadcn 內部 compat，請勿在應用程式碼中直接使用。
    */
-  variant?: 'primary' | 'secondary' | 'tertiary' | 'text' | 'checked' | 'link' | (string & {})
+  variant?: 'primary' | 'secondary' | 'tertiary' | 'text' | 'link' | (string & {})
   /** 套用危險色（紅色）。可與任何 variant 組合使用。 */
   danger?: boolean
+  /**
+   * Toggle 按下狀態（持續 on/off）。設定時 Button 變為 toggle：
+   * - 自動寫入 `aria-pressed` + `data-state="on" | "off"`
+   * - 樣式由 variant 的 `data-[state=on]` 分支套用
+   * - 僅 secondary / tertiary / text 有 toggle 視覺；primary / link 傳入無效果
+   *
+   * 不傳此 prop 時 Button 就是一般按鈕，不帶 aria-pressed。
+   */
+  pressed?: boolean
   /** 左側 icon（LucideIcon），最多一個，loading 時自動替換為 spinner */
   startIcon?: LucideIcon
   /** 右側 badge（ReactNode），通常傳入計數指示器 */
@@ -194,6 +219,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       iconOnly = false,
       loading = false,
       fullWidth = false,
+      pressed,
       children,
       disabled,
       ...props
@@ -224,6 +250,15 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     // icon-only 自動 tooltip：從 props 提取 aria-label，同時保留在 DOM
     const { 'aria-label': ariaLabel, ...restProps } = props
 
+    // Toggle 狀態：pressed 定義時自動寫入 aria-pressed + data-state。
+    // 未定義時不寫入任何 toggle 屬性（按鈕為一般 action button）。
+    // 樣式由 cva 的 data-[state=on] 分支套用——secondary/tertiary 走 primary-subtle，
+    // text 走 neutral-selected family；primary/link 不定義 on 分支，傳入無效果。
+    const toggleAttrs =
+      pressed === undefined
+        ? {}
+        : { 'aria-pressed': pressed, 'data-state': pressed ? 'on' : 'off' }
+
     const buttonEl = (
       <Comp
         className={cn(
@@ -236,6 +271,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled || loading}
         aria-busy={loading || undefined}
         aria-label={ariaLabel}
+        {...toggleAttrs}
         {...restProps}
       >
         {loading

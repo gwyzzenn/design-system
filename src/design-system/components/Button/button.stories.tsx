@@ -17,7 +17,7 @@ const meta: Meta<typeof Button> = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['primary', 'secondary', 'tertiary', 'text', 'checked', 'link'],
+      options: ['primary', 'secondary', 'tertiary', 'text', 'link'],
       description: '視覺強調等級。`destructive` / `ghost` 為 shadcn 內部 compat alias，應用層請勿直接使用。',
     },
     danger: {
@@ -89,8 +89,27 @@ export const Link: Story = {
   args: { variant: 'link', children: 'Link' },
 }
 
-export const Checked: Story = {
-  args: { variant: 'checked', children: 'Checked' },
+export const Pressed: Story = {
+  name: 'Pressed (toggle)',
+  render: () => (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="text-caption text-fg-muted w-24">secondary</span>
+        <Button variant="secondary">Not pressed</Button>
+        <Button variant="secondary" pressed>Pressed</Button>
+      </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="text-caption text-fg-muted w-24">tertiary</span>
+        <Button variant="tertiary">Not pressed</Button>
+        <Button variant="tertiary" pressed>Pressed</Button>
+      </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="text-caption text-fg-muted w-24">text</span>
+        <Button variant="text">Not pressed</Button>
+        <Button variant="text" pressed>Pressed</Button>
+      </div>
+    </div>
+  ),
 }
 
 // ── danger prop ─────────────────────────────────────────────────
@@ -164,7 +183,7 @@ export const IconOnly: Story = {
         <Button size="sm" iconOnly variant="secondary" startIcon={Download}  aria-label="下載" />
         <Button size="sm" iconOnly variant="tertiary"  startIcon={Search}    aria-label="搜尋" />
         <Button size="sm" iconOnly variant="text"      startIcon={Settings}  aria-label="設定" />
-        <Button size="sm" iconOnly variant="checked"   startIcon={Maximize2} aria-label="全螢幕（開啟中）" />
+        <Button size="sm" iconOnly variant="text" pressed startIcon={Maximize2} aria-label="全螢幕（開啟中）" />
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <p className="w-full text-caption text-fg-muted">danger — size="sm"</p>
@@ -218,7 +237,7 @@ export const Disabled: Story = {
           <Button variant="secondary" disabled>Secondary</Button>
           <Button variant="tertiary" disabled>Tertiary</Button>
           <Button variant="text" disabled>Text</Button>
-          <Button variant="checked" disabled>Checked</Button>
+          <Button variant="text" pressed disabled>Text pressed</Button>
           <Button variant="link" disabled>Link</Button>
         </div>
       </div>
@@ -237,7 +256,7 @@ export const Disabled: Story = {
           <Button variant="secondary" disabled size="sm" iconOnly startIcon={Download} aria-label="下載" />
           <Button variant="tertiary" disabled size="sm" iconOnly startIcon={Settings} aria-label="設定" />
           <Button variant="text" disabled size="sm" iconOnly startIcon={Search} aria-label="搜尋" />
-          <Button variant="checked" disabled size="sm" iconOnly startIcon={Maximize2} aria-label="全螢幕" />
+          <Button variant="text" pressed disabled size="sm" iconOnly startIcon={Maximize2} aria-label="全螢幕" />
         </div>
       </div>
       <div>
@@ -288,7 +307,7 @@ export const Loading: Story = {
           <Button variant="secondary" startIcon={Download} loading>Secondary</Button>
           <Button variant="tertiary" startIcon={Download} loading>Tertiary</Button>
           <Button variant="text" startIcon={Download} loading>Text</Button>
-          <Button variant="checked" startIcon={Download} loading>Checked</Button>
+          <Button variant="text" pressed startIcon={Download} loading>Text pressed</Button>
           <Button variant="primary" danger startIcon={Trash2} loading>Danger</Button>
         </div>
       </div>
@@ -301,7 +320,7 @@ export const Loading: Story = {
           <Button variant="secondary" loading>Secondary</Button>
           <Button variant="tertiary" loading>Tertiary</Button>
           <Button variant="text" loading>Text</Button>
-          <Button variant="checked" loading>Checked</Button>
+          <Button variant="text" pressed loading>Text pressed</Button>
           <Button variant="primary" danger loading>Danger</Button>
         </div>
       </div>
@@ -314,7 +333,7 @@ export const Loading: Story = {
           <Button variant="secondary" loading size="sm" iconOnly startIcon={Download} aria-label="下載" />
           <Button variant="tertiary" loading size="sm" iconOnly startIcon={RefreshCw} aria-label="刷新" />
           <Button variant="text" loading size="sm" iconOnly startIcon={Settings} aria-label="設定" />
-          <Button variant="checked" loading size="sm" iconOnly startIcon={Maximize2} aria-label="全螢幕" />
+          <Button variant="text" pressed loading size="sm" iconOnly startIcon={Maximize2} aria-label="全螢幕" />
         </div>
       </div>
     </div>

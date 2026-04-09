@@ -498,19 +498,72 @@ Dark mode 覆寫：hover/active 方向反轉（hover → step-7，active → ste
 
 ## Neutral Interaction
 
-中性互動背景按深度遞進：
+中性互動背景分成**兩個獨立的 family**，對應兩種本質不同的狀態。
 
-| Utility | 用途 |
-|---------|------|
-| `bg-neutral-hover` | hover |
-| `bg-neutral-active` | active（按下）、selected（選中） |
+### active vs selected 語意區分（重要）
 
-文字一律用 `text-foreground`。
+`--neutral-active` 和 `--neutral-selected` 目前**數值相同**（都是 neutral-2），但**語意獨立**，不可互用：
+
+| Token | 語意 | 生命週期 | 典型場景 |
+|---|---|---|---|
+| `--neutral-active` | `:active` 瞬間 click 回饋 | **Transient**（按下去那一瞬間，放開就消失） | Button `:active`、list row 點擊回饋、inline action 按下瞬間 |
+| `--neutral-selected` | 持續 toggle on / 長時間選中狀態 | **Persistent**（一直維持直到使用者切換） | Button text pressed、DropdownMenu 單選項目、SelectMenu 單選項目、Tab active、selected menu item |
+
+**判斷法**：「這個狀態在使用者放開滑鼠後還存在嗎？」
+- 不存在 → `active`（瞬間回饋）
+- 存在 → `selected`（持續狀態）
+
+### 為什麼同值仍分兩個 token
+
+這是 token 層存在的核心價值：**把「值」和「用途」解耦**。
+
+1. **讀 code 的語意清晰**：`bg-neutral-selected` 比 `bg-neutral-active` 更精準表達「這個 element 處於選中狀態」，不需要讀者在腦裡轉換語意
+2. **未來演化的安全界線**：若未來要把 click 回饋加強（例：`--neutral-active` 改成 neutral-3），selected 狀態視覺不會被意外牽動
+3. **對齊流派原則**：本系統選 Atlassian 流派（Semantic State Token），把互動狀態封裝進 semantic 層——active 和 selected 本來就是兩個語意
+
+此原則對齊 Carbon Design System 的 `$layer-*` 族命名（`$layer-active` vs `$layer-selected`），是世界級系統處理「同值不同語意」的標準做法。
+
+### Default state family
+
+用於 non-selected element 的互動回饋：
+
+| Utility | Token | 用途 |
+|---|---|---|
+| `bg-neutral-hover` | neutral-1 | hover 回饋 |
+| `bg-neutral-active` | neutral-2 | `:active` 瞬間 click 回饋 |
 
 ```tsx
 <div className="hover:bg-neutral-hover active:bg-neutral-active">list row</div>
-<div className="bg-neutral-active">selected row</div>
 ```
+
+### Selected state family
+
+用於持續 toggle on / 選中 element 的互動回饋。**三件成套，對應 rest / hover / :active 三種互動態**：
+
+| Utility | Token | 用途 |
+|---|---|---|
+| `bg-neutral-selected` | neutral-2 | 持續 selected rest |
+| `bg-neutral-selected-hover` | neutral-1 | selected 上 hover（反向變淺，暗示「可取消」） |
+| `bg-neutral-selected-active` | neutral-3 | selected 上 `:active` 深一階 click 回饋 |
+
+```tsx
+// toggle button pressed 狀態
+<button
+  data-state="on"
+  className="data-[state=on]:bg-neutral-selected data-[state=on]:hover:bg-neutral-selected-hover data-[state=on]:active:bg-neutral-selected-active"
+>
+  釘選
+</button>
+
+// 列表單選項目
+<div className={cn(selected && 'bg-neutral-selected')}>選項 A</div>
+```
+
+### 禁止事項
+
+- ❌ 不得用 `bg-neutral-active` 表達持續選中狀態——會造成 class name 語意與視覺行為不符
+- ❌ 不得用 `bg-neutral-selected` 作為 `:active` 瞬間回饋——selected 是 persistent，不是 transient
+- ❌ 不得因為目前同值就合併為一個 token——語意獨立就該獨立存在
 
 
 ## Static Subtle Background

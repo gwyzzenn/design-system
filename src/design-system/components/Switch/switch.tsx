@@ -3,6 +3,7 @@ import * as SwitchPrimitives from '@radix-ui/react-switch'
 import { Check } from 'lucide-react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
+import { useFieldContext } from '@/design-system/components/Field/field'
 
 /**
  * Switch — 開關控件
@@ -15,10 +16,32 @@ import { cn } from '@/lib/utils'
  *   sm/md: track 20×40, thumb 20, 白色圓 16, check 12（= checkbox sm/md）
  *   lg:    track 24×48, thumb 24, 白色圓 20, check 16（= checkbox lg）
  *
- * ── 狀態 ──
- *   OFF: track fg-disabled (neutral-6), thumb 白色無 border 無 check
+ * ── 視覺狀態 ──
+ *   OFF: track border (neutral-5), thumb 白色無 border 無 check
  *   ON:  track primary, thumb 白色 + 2px primary border + primary check icon
  *   disabled: opacity-disabled（整體透明度）
+ *   readOnly: 視覺同一般態，但 pointer-events-none + aria-readonly
+ *
+ * ── label / description / readOnly ──
+ * Switch 可以透過 `label` 和 `description` props 在元件內直接渲染緊鄰的文字，
+ * 樣式全部 codify 在元件內（text-body、foreground/fg-secondary、disabled 色）。
+ *
+ * 單獨使用時：
+ *   <Switch label="啟用通知" description="收到新訊息時提醒" />
+ *
+ * Form 內使用（在 <Field> context 內）：
+ *   <Field>
+ *     <FieldLabel>啟用通知</FieldLabel>
+ *     <Switch />                      ← label/description prop 會被自動忽略
+ *     <FieldDescription>收到新訊息時提醒</FieldDescription>
+ *   </Field>
+ *
+ * Field context 透過 useFieldContext() 偵測，避免雙層 label。
+ *
+ * readOnly 模式：
+ *   <Switch readOnly checked={true} label="..." />
+ *   視覺維持 ON/OFF 正確狀態，但無法互動、不在 tab order 內、寫入 aria-readonly。
+ *   與 disabled 的差異：readonly 不降色（可讀），disabled 降色（弱化）。
  */
 
 const switchVariants = cva(
@@ -27,6 +50,8 @@ const switchVariants = cva(
     'transition-colors duration-150',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
     'disabled:cursor-not-allowed disabled:opacity-disabled',
+    // readOnly：鎖定互動但視覺正常
+    'data-[readonly=true]:pointer-events-none data-[readonly=true]:cursor-default',
     // OFF → ON 背景色
     'data-[state=unchecked]:bg-border',
     'data-[state=checked]:bg-primary',
@@ -51,41 +76,130 @@ const SPECS: Record<string, { thumb: number; check: number; translate: string }>
 
 export interface SwitchProps
   extends React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>,
-    VariantProps<typeof switchVariants> {}
+    VariantProps<typeof switchVariants> {
+  /**
+   * Inline label。提供時 Switch 自動包一個 <label> 並連結 htmlFor，
+   * 套用 text-body / text-foreground / disabled 色 的 codified 樣式。
+   * 在 <Field> context 內時此 prop 會被忽略（由 FieldLabel 接管）。
+   */
+  label?: React.ReactNode
+  /**
+   * Inline description（secondary 文字）。須與 label 搭配使用，
+   * 單獨設定 description 無效果。套用 text-body / text-fg-secondary 樣式。
+   * 在 <Field> context 內時此 prop 會被忽略（由 FieldDescription 接管）。
+   */
+  description?: React.ReactNode
+  /**
+   * readonly 模式：鎖定互動但維持 ON/OFF 視覺正確。
+   * 與 disabled 的差異：readonly 不降色（可讀），disabled 降色（弱化）。
+   * 用於表單 readonly 呈現、DataTable cell 非編輯態。
+   */
+  readOnly?: boolean
+}
 
 const Switch = React.forwardRef<
   React.ElementRef<typeof SwitchPrimitives.Root>,
   SwitchProps
->(({ className, size, ...props }, ref) => {
-  const sizeKey = size ?? 'md'
-  const spec = SPECS[sizeKey]
+>(
+  (
+    {
+      className,
+      size,
+      label,
+      description,
+      readOnly = false,
+      disabled,
+      id: idProp,
+      ...props
+    },
+    ref
+  ) => {
+    const sizeKey = size ?? 'md'
+    const spec = SPECS[sizeKey]
 
-  return (
-    <SwitchPrimitives.Root
-      className={cn(switchVariants({ size }), className)}
-      ref={ref}
-      {...props}
-    >
-      <SwitchPrimitives.Thumb
-        className={cn(
-          'pointer-events-none flex items-center justify-center rounded-full bg-white border-2',
-          'transition-all duration-150',
-          'data-[state=unchecked]:translate-x-0 data-[state=unchecked]:border-border',
-          'data-[state=checked]:border-primary',
-          sizeKey === 'lg' ? 'data-[state=checked]:translate-x-6' : 'data-[state=checked]:translate-x-5',
-        )}
-        style={{ width: spec.thumb, height: spec.thumb }}
+    // Field context 偵測：在 Field 內時忽略自己的 label/description，避免雙層
+    const fieldCtx = useFieldContext()
+    const insideField = fieldCtx?.hasFieldWrapper === true
+    const effectiveLabel = insideField ? undefined : label
+    const effectiveDescription = insideField ? undefined : description
+
+    // Id 連結：優先使用 prop，再退到 Field context 的 id，最後用 useId 生成
+    const generatedId = React.useId()
+    const inputId = idProp ?? fieldCtx?.id ?? generatedId
+
+    const rootEl = (
+      <SwitchPrimitives.Root
+        id={inputId}
+        className={cn(switchVariants({ size }), className)}
+        ref={ref}
+        disabled={disabled}
+        aria-readonly={readOnly || undefined}
+        data-readonly={readOnly || undefined}
+        tabIndex={readOnly ? -1 : undefined}
+        aria-describedby={fieldCtx?.descriptionId}
+        {...props}
       >
-        {/* Check icon — Radix Thumb inherits data-state from Root */}
-        <Check
-          size={spec.check}
-          className="text-primary opacity-0 transition-opacity duration-150 group-data-[state=checked]:opacity-100"
-          aria-hidden
-        />
-      </SwitchPrimitives.Thumb>
-    </SwitchPrimitives.Root>
-  )
-})
+        <SwitchPrimitives.Thumb
+          className={cn(
+            'pointer-events-none flex items-center justify-center rounded-full bg-white border-2',
+            'transition-all duration-150',
+            'data-[state=unchecked]:translate-x-0 data-[state=unchecked]:border-border',
+            'data-[state=checked]:border-primary',
+            sizeKey === 'lg' ? 'data-[state=checked]:translate-x-6' : 'data-[state=checked]:translate-x-5',
+          )}
+          style={{ width: spec.thumb, height: spec.thumb }}
+        >
+          {/* Check icon — Radix Thumb inherits data-state from Root */}
+          <Check
+            size={spec.check}
+            className="text-primary opacity-0 transition-opacity duration-150 group-data-[state=checked]:opacity-100"
+            aria-hidden
+          />
+        </SwitchPrimitives.Thumb>
+      </SwitchPrimitives.Root>
+    )
+
+    // 無 label → 只渲染 switch 本體
+    if (effectiveLabel == null) return rootEl
+
+    // 有 label → 包 <label> + codified 樣式
+    // Switch 慣例：label 在左、switch 在右（對齊 iOS / Polaris / Material 標準）
+    // label 行第一行對齊 switch 中線：容器用 items-start + switch 包 h-[1lh] flex-center
+    return (
+      <label
+        htmlFor={inputId}
+        className={cn(
+          'inline-flex items-start gap-3 select-none',
+          disabled ? 'cursor-not-allowed' : readOnly ? 'cursor-default' : 'cursor-pointer'
+        )}
+      >
+        <span className="flex-1 min-w-0 flex flex-col gap-1">
+          <span
+            className={cn(
+              'text-body',
+              disabled ? 'text-fg-disabled' : 'text-foreground'
+            )}
+          >
+            {effectiveLabel}
+          </span>
+          {effectiveDescription != null && (
+            <span
+              className={cn(
+                'text-body',
+                disabled ? 'text-fg-disabled' : 'text-fg-secondary'
+              )}
+            >
+              {effectiveDescription}
+            </span>
+          )}
+        </span>
+        <span className="h-[1lh] flex items-center shrink-0">
+          {rootEl}
+        </span>
+      </label>
+    )
+  }
+)
 Switch.displayName = SwitchPrimitives.Root.displayName
 
 export { Switch, switchVariants }

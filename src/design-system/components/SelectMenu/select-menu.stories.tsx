@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import React, { useState } from 'react'
 import { Mail, Bell, Settings, Globe, Code, Palette, Zap, User, ChevronDown, Plus } from 'lucide-react'
-import { SelectField } from '@/design-system/components/fields/SelectField/select-field'
-import { MultiSelectField } from '@/design-system/components/fields/MultiSelectField/multi-select-field'
+import { Select } from '@/design-system/components/Select/select'
+import { Combobox } from '@/design-system/components/Combobox/combobox'
 import { Button } from '@/design-system/components/Button/button'
 
 const meta: Meta = {
@@ -11,7 +11,7 @@ const meta: Meta = {
 }
 export default meta
 
-// ── 單選（SelectField 觸發）──
+// ── 單選（Select 觸發）──
 
 const statusOptions = [
   { value: 'in_stock', label: 'In stock' },
@@ -23,8 +23,8 @@ const SingleSelectDemo = () => {
   const [value, setValue] = useState<string>('in_stock')
   return (
     <div className="flex flex-col gap-4 max-w-xs">
-      <p className="text-caption text-fg-muted">SelectField 作為觸發點，點擊開啟 SelectMenu</p>
-      <SelectField options={statusOptions} value={value} onChange={setValue} />
+      <p className="text-caption text-fg-muted">Select 作為觸發點，點擊開啟 SelectMenu</p>
+      <Select options={statusOptions} value={value} onChange={setValue} />
     </div>
   )
 }
@@ -49,7 +49,7 @@ const SearchableDemo = () => {
   return (
     <div className="flex flex-col gap-4 max-w-xs">
       <p className="text-caption text-fg-muted">searchable — 觸發點變 input，打字即篩選</p>
-      <SelectField options={countries} value={value} onChange={setValue} searchable clearable placeholder="選擇國家…" />
+      <Select options={countries} value={value} onChange={setValue} searchable clearable placeholder="選擇國家…" />
     </div>
   )
 }
@@ -72,8 +72,8 @@ const MultiSelectDemo = () => {
   const [value, setValue] = useState<string[]>(['electronics'])
   return (
     <div className="flex flex-col gap-4 max-w-sm">
-      <p className="text-caption text-fg-muted">MultiSelectField — checkbox 多選，浮層不關閉</p>
-      <MultiSelectField options={categoryOptions} value={value} onChange={setValue} />
+      <p className="text-caption text-fg-muted">Combobox — checkbox 多選，浮層不關閉</p>
+      <Combobox options={categoryOptions} value={value} onChange={setValue} />
     </div>
   )
 }
@@ -90,7 +90,7 @@ const MultiSearchDemo = () => {
   return (
     <div className="flex flex-col gap-4 max-w-sm">
       <p className="text-caption text-fg-muted">searchable — 浮層內搜尋框，關鍵字保留可連續勾選</p>
-      <MultiSelectField options={countries} value={value} onChange={setValue} searchable />
+      <Combobox options={countries} value={value} onChange={setValue} searchable />
     </div>
   )
 }
@@ -107,7 +107,7 @@ const ClearableDemo = () => {
   return (
     <div className="flex flex-col gap-4 max-w-xs">
       <p className="text-caption text-fg-muted">clearable — 有值時右側出現清除按鈕</p>
-      <SelectField options={statusOptions} value={value} onChange={setValue} clearable />
+      <Select options={statusOptions} value={value} onChange={setValue} clearable />
     </div>
   )
 }
@@ -133,7 +133,7 @@ const SizesDemo = () => {
       ]).map(({ size, value, set }) => (
         <div key={size} className="flex items-center gap-3">
           <span className="text-caption text-fg-muted font-mono w-8">{size}</span>
-          <SelectField options={statusOptions} value={value} onChange={set} size={size} className="max-w-xs" />
+          <Select options={statusOptions} value={value} onChange={set} size={size} className="max-w-xs" />
           <Button size={size}>送出</Button>
         </div>
       ))}
@@ -156,19 +156,19 @@ export const States: StoryObj = {
       <div className="flex flex-col gap-6 max-w-xs">
         <div>
           <span className="text-caption text-fg-muted mb-1 block">edit</span>
-          <SelectField options={statusOptions} value={value} onChange={setValue} />
+          <Select options={statusOptions} value={value} onChange={setValue} />
         </div>
         <div>
           <span className="text-caption text-fg-muted mb-1 block">readonly</span>
-          <SelectField mode="readonly" options={statusOptions} value={value} />
+          <Select mode="readonly" options={statusOptions} value={value} />
         </div>
         <div>
           <span className="text-caption text-fg-muted mb-1 block">disabled</span>
-          <SelectField mode="disabled" options={statusOptions} value={value} />
+          <Select mode="disabled" options={statusOptions} value={value} />
         </div>
         <div>
           <span className="text-caption text-fg-muted mb-1 block">error</span>
-          <SelectField options={statusOptions} value={value} onChange={setValue} error />
+          <Select options={statusOptions} value={value} onChange={setValue} error />
         </div>
       </div>
     )

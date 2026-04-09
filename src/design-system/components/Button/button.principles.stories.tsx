@@ -73,15 +73,15 @@ export const VariantRule: Story = {
       </Rule>
 
       <Rule
-        title="checked — 單一功能目前啟用中（binary toggle）"
-        note="功能關閉時可以是任何 variant（text、tertiary 等），功能開啟後換成 checked。僅描述「這個按鈕自己的功能是否開啟」，不表達多選一"
+        title="pressed prop — 單一功能目前啟用中（binary toggle）"
+        note="設定 pressed 時 Button 自動寫入 aria-pressed + data-state，由 variant 的 data-[state=on] 分支套用樣式。僅 secondary/tertiary/text 支援 toggle 視覺，primary/link 傳入無效果。描述「這個按鈕自己的功能是否開啟」，不表達多選一"
       >
         <div className="flex items-center gap-2">
           <Button variant="text" size="sm" iconOnly startIcon={Maximize2} aria-label="全螢幕（關閉）" />
           <span className="text-footnote text-fg-muted">→ 啟用後 →</span>
-          <Button variant="checked" size="sm" iconOnly startIcon={Maximize2} aria-label="全螢幕（開啟中）" />
+          <Button variant="text" pressed size="sm" iconOnly startIcon={Maximize2} aria-label="全螢幕（開啟中）" />
         </div>
-        <Label warn>⚠️ 多選一（視圖切換）不用 checked → 用 Segmented Control</Label>
+        <Label warn>⚠️ 多選一（視圖切換）不用 pressed → 用 Segmented Control</Label>
       </Rule>
 
       <Rule

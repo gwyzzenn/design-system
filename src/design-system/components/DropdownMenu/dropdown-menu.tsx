@@ -153,7 +153,7 @@ interface DropdownMenuItemProps
   endIcon?: LucideIcon
   /** 鍵盤快捷鍵 */
   shortcut?: string
-  /** 單選選中（bg-neutral-active） */
+  /** 單選選中（bg-neutral-selected，持續選中狀態）*/
   selected?: boolean
 }
 
@@ -170,7 +170,7 @@ const DropdownMenuItem = React.forwardRef<
       disabled={disabled}
       className={cn(
         radixItemClass,
-        selected && 'bg-neutral-active',
+        selected && 'bg-neutral-selected',
         className,
       )}
       {...props}

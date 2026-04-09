@@ -14,12 +14,14 @@ export default meta
    Types & Data
    ═══════════════════════════════════════════════════════════════════════════ */
 
-type VariantKey = 'primary' | 'secondary' | 'tertiary' | 'text' | 'checked' | 'link'
+type VariantKey = 'primary' | 'secondary' | 'tertiary' | 'text' | 'link'
+type PressedVariantKey = 'secondary' | 'tertiary' | 'text'  // 支援 toggle 的 variant 子集
 type StateKey = 'default' | 'hover' | 'active' | 'disabled'
 type SizeKey = 'xs' | 'sm' | 'md' | 'lg'
 type ColorSpec = { bg: string; text: string; border: string }
 
-const VARIANTS: VariantKey[] = ['primary', 'secondary', 'tertiary', 'text', 'checked', 'link']
+const VARIANTS: VariantKey[] = ['primary', 'secondary', 'tertiary', 'text', 'link']
+const PRESSED_VARIANTS: PressedVariantKey[] = ['secondary', 'tertiary', 'text']
 const DANGER_VARIANTS: VariantKey[] = ['primary', 'secondary', 'text']
 const STATES: StateKey[] = ['default', 'hover', 'active', 'disabled']
 
@@ -47,12 +49,6 @@ const TOKEN_MAP: Record<VariantKey, Record<StateKey, ColorSpec>> = {
     hover: { bg: '--neutral-hover', text: '--foreground', border: 'transparent' },
     active: { bg: '--neutral-active', text: '--foreground', border: 'transparent' },
     disabled: { bg: 'transparent', text: '--fg-disabled', border: 'transparent' },
-  },
-  checked: {
-    default: { bg: '--primary-subtle', text: '--primary', border: 'transparent' },
-    hover: { bg: '--primary-subtle', text: '--primary-hover', border: 'transparent' },
-    active: { bg: '--primary-subtle', text: '--primary-active', border: 'transparent' },
-    disabled: { bg: '--bg-disabled', text: '--fg-disabled', border: 'transparent' },
   },
   link: {
     default: { bg: 'transparent', text: '--primary', border: 'transparent' },
@@ -104,8 +100,31 @@ const VARIANT_DESC: Record<VariantKey, string> = {
   secondary: '正面與負面選項並存時，代表正面那個',
   tertiary: '最常用——取消、關閉、一般輔助操作',
   text: '低視覺權重，不需強調的輔助動作',
-  checked: 'Toggle 選中狀態——功能目前啟用中',
   link: '外觀像連結的按鈕，不用於操作列',
+}
+
+// Toggle pressed 狀態的 token 對照（僅 secondary/tertiary/text 支援）
+// secondary 與 tertiary 按下後視覺合併（都變 primary-subtle 系列）；
+// text 走 neutral-selected family，hover 反向變淺、:active 深一階。
+const PRESSED_TOKEN_MAP: Record<PressedVariantKey, Record<StateKey, ColorSpec>> = {
+  secondary: {
+    default: { bg: '--primary-subtle', text: '--primary', border: 'transparent' },
+    hover: { bg: '--primary-subtle', text: '--primary-hover', border: 'transparent' },
+    active: { bg: '--primary-subtle', text: '--primary-active', border: 'transparent' },
+    disabled: { bg: '--bg-disabled', text: '--fg-disabled', border: 'transparent' },
+  },
+  tertiary: {
+    default: { bg: '--primary-subtle', text: '--primary', border: 'transparent' },
+    hover: { bg: '--primary-subtle', text: '--primary-hover', border: 'transparent' },
+    active: { bg: '--primary-subtle', text: '--primary-active', border: 'transparent' },
+    disabled: { bg: '--bg-disabled', text: '--fg-disabled', border: 'transparent' },
+  },
+  text: {
+    default: { bg: '--neutral-selected', text: '--foreground', border: 'transparent' },
+    hover: { bg: '--neutral-selected-hover', text: '--foreground', border: 'transparent' },
+    active: { bg: '--neutral-selected-active', text: '--foreground', border: 'transparent' },
+    disabled: { bg: 'transparent', text: '--fg-disabled', border: 'transparent' },
+  },
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -246,8 +265,9 @@ export const Overview = {
             <thead><tr><Th>Prop</Th><Th>Type</Th><Th>Default</Th><Th>說明</Th></tr></thead>
             <tbody>
               {[
-                ['variant', "'primary'|'secondary'|'tertiary'|'text'|'checked'|'link'", "'primary'", '視覺強調等級'],
+                ['variant', "'primary'|'secondary'|'tertiary'|'text'|'link'", "'primary'", '視覺強調等級'],
                 ['danger', 'boolean', 'false', '套用紅色，與 variant 正交'],
+                ['pressed', 'boolean', '—', 'Toggle 按下狀態（aria-pressed + data-state），僅 secondary/tertiary/text 有視覺效果'],
                 ['size', "'xs'|'sm'|'md'|'lg'", "'sm'", '尺寸，xs 固定不縮放'],
                 ['startIcon', 'LucideIcon', '—', '左側 icon，loading 時替換為 spinner'],
                 ['endIcon', 'LucideIcon', '—', '右側 icon（方向指示，如 ChevronDown）'],
@@ -630,7 +650,7 @@ export const StateBehavior = {
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-1">
         <H3>狀態行為</H3>
-        <Desc>Loading、disabled、checked 的視覺變化與行為規則。</Desc>
+        <Desc>Loading、disabled、pressed toggle 的視覺變化與行為規則。</Desc>
       </div>
 
       <div className="flex flex-col gap-4">
@@ -670,12 +690,22 @@ export const StateBehavior = {
       </div>
 
       <div className="flex flex-col gap-3">
-        <span className="text-caption font-medium text-fg-secondary">Checked — binary toggle（on / off）</span>
-        <div className="flex items-center gap-3">
-          <Button variant="text" iconOnly startIcon={Settings} aria-label="設定（關）" />
-          <span className="text-fg-muted">⇄</span>
-          <Button variant="checked" iconOnly startIcon={Settings} aria-label="設定（開）" />
-          <span className="text-[11px] text-fg-muted">text (off) ⇄ checked (on)</span>
+        <span className="text-caption font-medium text-fg-secondary">Pressed prop — binary toggle（on / off）</span>
+        <p className="text-[11px] text-fg-muted">設定 pressed 時 Button 自動寫 aria-pressed + data-state，樣式由 variant 的 data-[state=on] 分支套用。僅 secondary/tertiary/text 有視覺效果。</p>
+        <div className="flex flex-col gap-2">
+          {PRESSED_VARIANTS.map((v) => (
+            <div key={v} className="flex items-center gap-3">
+              <span className="text-[11px] text-fg-muted w-20 font-mono">{v}</span>
+              <Button variant={v} iconOnly startIcon={Settings} aria-label={`${v}（關）`} />
+              <span className="text-fg-muted">⇄</span>
+              <Button variant={v} pressed iconOnly startIcon={Settings} aria-label={`${v}（開）`} />
+              <span className="text-[11px] text-fg-muted">
+                {v === 'text'
+                  ? 'text + pressed → neutral-selected family'
+                  : `${v} + pressed → primary-subtle 系列`}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </div>

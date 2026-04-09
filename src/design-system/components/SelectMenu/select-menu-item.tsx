@@ -101,7 +101,7 @@ export interface SelectMenuItemProps
   checkbox?: boolean
   /** Checkbox 選中狀態 */
   checked?: boolean | 'indeterminate'
-  /** 單選選中（bg-neutral-active 背景高亮） */
+  /** 單選選中（bg-neutral-selected 背景高亮，持續選中狀態） */
   selected?: boolean
   /** 後綴 Tag（ReactNode），靠右對齊 */
   tag?: React.ReactNode
@@ -179,7 +179,7 @@ const SelectMenuItem = React.forwardRef<HTMLDivElement, SelectMenuItemProps>(
         className={cn(
           menuItemVariants({ size }),
           !disabled && !selected && 'hover:bg-neutral-hover',
-          !disabled && selected && 'bg-neutral-active',
+          !disabled && selected && 'bg-neutral-selected',
           disabled && 'pointer-events-none text-fg-disabled cursor-default',
           className,
         )}

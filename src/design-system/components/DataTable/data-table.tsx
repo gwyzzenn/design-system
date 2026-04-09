@@ -15,14 +15,14 @@ import { ChevronDown, Calendar } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/design-system/components/Tooltip/tooltip'
 import { columnTypeDefaults, type ColumnType } from './column-types'
-import { TextFieldDisplay } from '@/design-system/components/fields/TextField/text-field'
-import { NumberFieldDisplay } from '@/design-system/components/fields/NumberField/number-field'
-import { CheckboxFieldDisplay } from '@/design-system/components/fields/CheckboxField/checkbox-field'
-import { SelectFieldDisplay } from '@/design-system/components/fields/SelectField/select-field'
-import { MultiSelectFieldDisplay } from '@/design-system/components/fields/MultiSelectField/multi-select-field'
-import { DateFieldDisplay } from '@/design-system/components/fields/DateField/date-field'
+import { InputDisplay } from '@/design-system/components/Input/input'
+import { NumberInputDisplay } from '@/design-system/components/NumberInput/number-input'
+import { BooleanDisplay } from '@/design-system/components/Checkbox/boolean-display'
+import { SelectDisplay } from '@/design-system/components/Select/select'
+import { ComboboxDisplay } from '@/design-system/components/Combobox/combobox'
+import { DatePickerDisplay } from '@/design-system/components/DatePicker/date-picker'
 import { PersonDisplay, MultiPersonDisplay, type PersonValue } from './person-display'
-import { LinkFieldDisplay } from '@/design-system/components/fields/LinkField/link-field'
+import { LinkInputDisplay } from '@/design-system/components/LinkInput/link-input'
 
 // ── Variants ─────────────────────────────────────────────────────────────────
 
@@ -62,15 +62,15 @@ function renderTypedValue(value: unknown, meta?: Record<string, any>, autoRowHei
   const wrap = autoRowHeight && meta?.wrap === true
   switch (type) {
     case 'number': case 'currency':
-      return <NumberFieldDisplay value={value as number | null} prefix={type === 'currency' ? (meta?.prefix ?? '$') : meta?.prefix} suffix={meta?.suffix} precision={meta?.precision} locale={meta?.locale} />
-    case 'date': return <DateFieldDisplay value={value as string | number | Date | null} formatOptions={meta?.formatOptions} locale={meta?.locale} />
-    case 'boolean': return <CheckboxFieldDisplay value={value as boolean | null} />
-    case 'select': return <SelectFieldDisplay value={value as string | null} options={meta?.options} size={tableSize} />
-    case 'multiSelect': return <MultiSelectFieldDisplay value={value as string[] | null} options={meta?.options} wrap={wrap} />
+      return <NumberInputDisplay value={value as number | null} prefix={type === 'currency' ? (meta?.prefix ?? '$') : meta?.prefix} suffix={meta?.suffix} precision={meta?.precision} locale={meta?.locale} />
+    case 'date': return <DatePickerDisplay value={value as string | number | Date | null} formatOptions={meta?.formatOptions} locale={meta?.locale} />
+    case 'boolean': return <BooleanDisplay value={value as boolean | null} />
+    case 'select': return <SelectDisplay value={value as string | null} options={meta?.options} size={tableSize} />
+    case 'multiSelect': return <ComboboxDisplay value={value as string[] | null} options={meta?.options} wrap={wrap} />
     case 'person': return <PersonDisplay value={value as PersonValue | null} size={tableSize} />
     case 'multiPerson': return <MultiPersonDisplay value={value as PersonValue[] | null} size={tableSize} />
-    case 'link': return <LinkFieldDisplay value={value as string | null} label={meta?.linkLabel} />
-    default: return <TextFieldDisplay value={value != null ? String(value) : null} />
+    case 'link': return <LinkInputDisplay value={value as string | null} label={meta?.linkLabel} />
+    default: return <InputDisplay value={value != null ? String(value) : null} />
   }
 }
 

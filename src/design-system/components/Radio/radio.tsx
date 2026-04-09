@@ -4,6 +4,8 @@ import { Circle } from "lucide-react"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
+import { useFieldContext } from "@/design-system/components/Field/field"
+import { SelectionItem } from "@/design-system/components/SelectionControl/selection-item"
 
 // ── RadioGroup ──────────────────────────────────────────────────────────────
 
@@ -33,6 +35,9 @@ const radioItemVariants = cva(
     'data-[state=checked]:hover:border-primary-hover data-[state=checked]:hover:text-primary-hover',
     'disabled:cursor-not-allowed disabled:bg-disabled disabled:border-transparent disabled:hover:border-transparent',
     'disabled:data-[state=checked]:bg-disabled disabled:data-[state=checked]:border-transparent disabled:data-[state=checked]:text-fg-disabled',
+    // readOnly：鎖定互動但維持 checked/unchecked 視覺
+    'data-[readonly=true]:pointer-events-none data-[readonly=true]:cursor-default',
+    'data-[readonly=true]:hover:border-border',
   ],
   {
     variants: {
@@ -51,29 +56,104 @@ const radioItemVariants = cva(
 // ── Dot Size ────────────────────────────────────────────────────────────────
 const dotSize: Record<string, number> = { sm: 8, md: 8, lg: 10 }
 
+// ── Types ───────────────────────────────────────────────────────────────────
+
+type RadioItemPrimitiveProps = React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>
+
+export interface RadioGroupItemProps
+  extends RadioItemPrimitiveProps,
+    VariantProps<typeof radioItemVariants> {
+  /**
+   * Inline label。提供時 RadioGroupItem 自動透過 SelectionItem 包裝，
+   * 套用 codified 樣式（text-body / text-foreground / disabled 色）。
+   * 在 <Field> context 內時此 prop 仍然生效（Radio 的 label 是每個 item
+   * 各自的，不是整組 Field 的；FieldLabel 是 RadioGroup 整體的 label）。
+   */
+  label?: React.ReactNode
+  /**
+   * Inline description（secondary 文字）。須與 label 搭配使用。
+   * 套用 text-body / text-fg-secondary 樣式。
+   */
+  description?: React.ReactNode
+  /**
+   * readonly 模式：鎖定互動但維持 checked/unchecked 視覺正確。
+   * 通常整個 RadioGroup 一起設 readonly（由 parent RadioGroup 的 disabled
+   * 或 readonly 行為決定），個別 item 也可設。
+   */
+  readOnly?: boolean
+}
+
 // ── RadioGroupItem ──────────────────────────────────────────────────────────
 
 const RadioGroupItem = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item> & VariantProps<typeof radioItemVariants>
->(({ className, size, ...props }, ref) => {
-  const dotPx = dotSize[size ?? 'md']
+  RadioGroupItemProps
+>(
+  (
+    {
+      className,
+      size,
+      label,
+      description,
+      readOnly = false,
+      disabled,
+      id: idProp,
+      ...props
+    },
+    ref
+  ) => {
+    const sizeKey = size ?? 'md'
+    const dotPx = dotSize[sizeKey]
 
-  return (
-    <RadioGroupPrimitive.Item
-      ref={ref}
-      className={cn(radioItemVariants({ size }), className)}
-      {...props}
-    >
-      <RadioGroupPrimitive.Indicator className="grid place-content-center">
-        <Circle
-          style={{ width: dotPx, height: dotPx }}
-          className="fill-current text-current"
-        />
-      </RadioGroupPrimitive.Indicator>
-    </RadioGroupPrimitive.Item>
-  )
-})
+    // 注意：Radio 的 label 語意與 Checkbox/Switch 不同——
+    // Checkbox/Switch 的 label 就是該 control 的唯一 label（被 Field context 接管），
+    // RadioGroupItem 的 label 是「該選項」的 label（每 item 各自擁有），
+    // FieldLabel 則是整個 RadioGroup 的 label。
+    // 因此 RadioGroupItem 的 label 不因 Field context 被忽略。
+    const fieldCtx = useFieldContext()
+
+    const generatedId = React.useId()
+    const inputId = idProp ?? generatedId
+
+    const rootEl = (
+      <RadioGroupPrimitive.Item
+        id={inputId}
+        ref={ref}
+        disabled={disabled}
+        aria-readonly={readOnly || undefined}
+        data-readonly={readOnly || undefined}
+        tabIndex={readOnly ? -1 : undefined}
+        className={cn(radioItemVariants({ size }), className)}
+        {...props}
+      >
+        <RadioGroupPrimitive.Indicator className="grid place-content-center">
+          <Circle
+            style={{ width: dotPx, height: dotPx }}
+            className="fill-current text-current"
+          />
+        </RadioGroupPrimitive.Indicator>
+      </RadioGroupPrimitive.Item>
+    )
+
+    // 無 label → 只渲染 radio 本體
+    if (label == null) return rootEl
+
+    // 有 label → 透過 SelectionItem 包裝，與 Checkbox 一致
+    // 同時繼承 Field context 的 disabled（若 RadioGroup 在 Field disabled 內）
+    const resolvedDisabled = disabled ?? fieldCtx?.disabled ?? false
+
+    return (
+      <SelectionItem
+        control={rootEl}
+        label={label}
+        description={description}
+        htmlFor={inputId}
+        disabled={resolvedDisabled}
+        size={sizeKey}
+      />
+    )
+  }
+)
 RadioGroupItem.displayName = RadioGroupPrimitive.Item.displayName
 
 export { RadioGroup, RadioGroupItem, radioItemVariants }
