@@ -547,11 +547,12 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
                 const IconComp = info?.icon
                 return (
                   <div className={cn(
-                    'flex items-center gap-2 rounded-md bg-surface px-3 py-1.5 shadow-lg pointer-events-none opacity-80',
-                    size === 'lg' ? 'text-body-lg leading-compact' : 'text-body leading-compact',
+                    'flex items-center gap-2 rounded-lg bg-surface border border-border pointer-events-none',
+                    'opacity-90 shadow-[0_4px_12px_rgba(0,0,0,0.12)]',
+                    size === 'lg' ? 'text-body-lg leading-compact px-4 py-2' : 'text-body leading-compact px-3 py-1.5',
                   )}>
                     {IconComp && <IconComp size={ICON_PX[size]} className="shrink-0" aria-hidden />}
-                    <span className="text-foreground truncate">{info?.label ?? draggingId}</span>
+                    <span className="text-foreground truncate max-w-[200px]">{info?.label ?? draggingId}</span>
                   </div>
                 )
               })() : null}
@@ -759,14 +760,20 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
           data-tree-parent-id={parentId ?? ''}
           data-tree-has-children={hasChildren}
           tabIndex={-1}
-          className={cn('w-full min-w-0 relative', isDragging && 'opacity-40')}
+          className={cn('w-full min-w-0 relative', isDragging && 'opacity-30')}
         >
-          {/* Drop indicator — before: 藍色線,indent 跟隨 target depth(Figma 風格） */}
+          {/* Drop indicator — before: 藍色線 + 起始圓點(Figma 風格） */}
           {isDropTarget && dropTarget?.position === 'before' && (
-            <div
-              className="absolute top-0 right-0 h-0.5 bg-primary z-10"
-              style={{ left: `calc(var(--tree-px) + ${indentPx}px)` }}
-            />
+            <>
+              <div
+                className="absolute top-0 right-0 h-0.5 bg-primary z-10"
+                style={{ left: `calc(var(--tree-px) + ${indentPx}px)` }}
+              />
+              <div
+                className="absolute top-0 w-1.5 h-1.5 rounded-full bg-primary z-10 -translate-y-[2px]"
+                style={{ left: `calc(var(--tree-px) + ${indentPx}px - 2px)` }}
+              />
+            </>
           )}
 
           {/* Row: draggable + droppable 都在這一行(合併 ref),確保碰撞偵測只看行高 */}
@@ -780,7 +787,8 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
             className={cn(
               'group/tree-item',
               treeItemVariants({ size }),
-              isDropTarget && dropTarget?.position === 'inside' && 'bg-primary-subtle ring-2 ring-primary ring-inset',
+              // inside: 資料夾背景高亮(Figma 風格),不用 ring/border
+              isDropTarget && dropTarget?.position === 'inside' && 'bg-primary-subtle',
               !disabled && 'hover:bg-neutral-hover',
               !disabled && isSelected && selectionMode === 'single' && 'bg-neutral-selected',
               showRing && 'ring-2 ring-ring ring-inset',
@@ -833,12 +841,18 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
             )}
           </div>
 
-          {/* Drop indicator — after: 藍色線,indent 跟隨 target depth */}
+          {/* Drop indicator — after: 藍色線 + 起始圓點 */}
           {isDropTarget && dropTarget?.position === 'after' && (
-            <div
-              className="absolute bottom-0 right-0 h-0.5 bg-primary z-10"
-              style={{ left: `calc(var(--tree-px) + ${indentPx}px)` }}
-            />
+            <>
+              <div
+                className="absolute bottom-0 right-0 h-0.5 bg-primary z-10"
+                style={{ left: `calc(var(--tree-px) + ${indentPx}px)` }}
+              />
+              <div
+                className="absolute bottom-0 w-1.5 h-1.5 rounded-full bg-primary z-10 translate-y-[2px]"
+                style={{ left: `calc(var(--tree-px) + ${indentPx}px - 2px)` }}
+              />
+            </>
           )}
 
           {/* Children: Collapsible 展開/收合 */}
