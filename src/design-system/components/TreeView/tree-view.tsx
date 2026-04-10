@@ -496,28 +496,25 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
 
     return (
       <TreeViewContext.Provider value={contextValue}>
-        {draggable ? (
-          <DndContext
-            sensors={sensors}
-            onDragStart={handleDragStart}
-            onDragOver={handleDragOver}
-            onDragEnd={handleDragEnd}
-            onDragCancel={handleDragCancel}
-          >
-            {treeEl}
-            {/* DragOverlay — 拖曳中的 ghost(跟著滑鼠的半透明 node) */}
+        {/* 永遠包 DndContext(hooks 不能 conditional call)。不 draggable 時無 sensors = 不可拖 */}
+        <DndContext
+          sensors={draggable ? sensors : undefined}
+          onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
+          onDragEnd={handleDragEnd}
+          onDragCancel={handleDragCancel}
+        >
+          {treeEl}
+          {draggable && (
             <DragOverlay dropAnimation={null}>
               {draggingId ? (
                 <div className="opacity-80 shadow-lg rounded-md bg-surface px-3 py-1 text-body leading-compact pointer-events-none">
-                  {/* 簡化的 overlay:只顯示 label text,不重新渲染完整 TreeItem */}
                   <span className="text-foreground">Dragging...</span>
                 </div>
               ) : null}
             </DragOverlay>
-          </DndContext>
-        ) : (
-          treeEl
-        )}
+          )}
+        </DndContext>
       </TreeViewContext.Provider>
     )
   }

@@ -244,11 +244,13 @@ const Field = React.forwardRef<HTMLDivElement, FieldProps>(
     // - block:  flex-col + items-start + padding-top: calc((field-height - 1lh) / 2)
     //   多行 control(RadioGroup 等),第一行往下推到 field-height 中線,
     //   後續 item 自然往下流。不設 min-h(內容自己決定高度)。
+    // Block control area 不加額外 paddingTop——block primitive(RadioGroup 等)
+    // 的子元件(SelectionItem)已自帶 py = calc((field-height - 1lh) / 2),
+    // 第一個 item 的文字自然落在 field-height/2。額外加 paddingTop 會 double padding。
     const controlArea =
       controlLayout === 'block' ? (
         <div
           className="flex flex-col items-start min-w-0"
-          style={{ paddingTop: `calc((${FIELD_HEIGHT_VAR[size]} - 1lh) / 2)` }}
           data-field-slot="control"
           data-field-control-layout="block"
         >

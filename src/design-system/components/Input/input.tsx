@@ -4,6 +4,7 @@ import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { FieldMode, InlineActionConfig } from '@/design-system/components/fields/field-types'
 import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/fields/field-wrapper'
+import { useFieldContext } from '@/design-system/components/Field/field'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/design-system/components/Tooltip/tooltip'
 
 // ── Types ───────────────────────────────────────────────────────────────────
@@ -38,8 +39,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     },
     ref
   ) => {
-    const resolvedMode = disabled ? 'disabled' : readOnly ? 'readonly' : mode
+    // ── FieldContext 自動讀取(在 <Field> 內時,invalid / disabled 由 context 接管) ──
+    const fieldCtx = useFieldContext()
+    const resolvedMode = disabled ? 'disabled' : readOnly ? 'readonly' : fieldCtx?.disabled ? 'disabled' : mode
     const isEditable = resolvedMode === 'edit'
+    // error 合併:自身 error prop OR Field context invalid
+    const resolvedError = error || (fieldCtx?.invalid ?? false)
     const iconSize = size === 'lg' ? 20 : 16
     const iconColor = resolvedMode === 'disabled' ? 'text-fg-disabled' : 'text-fg-muted'
     const actionHoverSize = iconSize + 2
@@ -48,14 +53,14 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <div
         className={cn(
           fieldWrapperStyles({ mode: resolvedMode, size }),
-          isEditable && error && [
+          isEditable && resolvedError && [
             'border-error hover:border-error-hover',
             'focus-within:border-error focus-within:hover:border-error',
           ],
           className,
         )}
         data-field-mode={resolvedMode}
-        data-error={isEditable && error ? '' : undefined}
+        data-error={isEditable && resolvedError ? '' : undefined}
       >
         {StartIcon && (
           <StartIcon
@@ -69,10 +74,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           type="text"
           readOnly={resolvedMode === 'readonly'}
           disabled={resolvedMode === 'disabled'}
-          aria-invalid={error || undefined}
+          aria-invalid={resolvedError || undefined}
           className={cn(
             bareInputStyles,
-            resolvedMode === 'disabled' && 'text-fg-disabled cursor-not-allowed',
+            resolvedMode === 'disabled' && 'text-fg-disabled placeholder:text-fg-disabled cursor-not-allowed',
           )}
           {...props}
         />
