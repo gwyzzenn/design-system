@@ -7,9 +7,9 @@ import { DataTable } from '@/design-system/components/DataTable/data-table'
 import '@/design-system/components/DataTable/column-types'
 
 const statusOptions = [
-  { value: 'in_stock', label: 'In stock' },
-  { value: 'low_stock', label: 'Low stock' },
-  { value: 'out_of_stock', label: 'Out of stock' },
+  { value: 'in_stock', label: 'In stock', tagVariant: 'green' },
+  { value: 'low_stock', label: 'Low stock', tagVariant: 'yellow' },
+  { value: 'out_of_stock', label: 'Out of stock', tagVariant: 'red' },
 ]
 
 const categoryOptions = [

@@ -94,8 +94,8 @@ interface TreeViewContextValue {
   focusedId: string | null
   /** 目前拖曳中的 node id(null = 沒在拖) */
   draggingId: string | null
-  /** 目前 drop indicator 的位置 */
-  dropTarget: { id: string; position: DropPosition } | null
+  /** 目前 drop indicator 的位置 + depth(用於 line indent) */
+  dropTarget: { id: string; position: DropPosition; depth: number } | null
   toggleExpand: (id: string) => void
   select: (id: string) => void
   setFocusedId: (id: string | null) => void
@@ -261,7 +261,7 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
 
     // ── Drag state ──
     const [draggingId, setDraggingId] = React.useState<string | null>(null)
-    const [dropTarget, setDropTarget] = React.useState<{ id: string; position: DropPosition } | null>(null)
+    const [dropTarget, setDropTarget] = React.useState<{ id: string; position: DropPosition; depth: number } | null>(null)
 
     const sensors = useSensors(
       useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
@@ -271,39 +271,60 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
       setDraggingId(String(event.active.id))
     }, [])
 
+    // ── Figma-style drop detection ──
+    // Y position → which item to drop near (top 30% = before, middle 40% = inside, bottom 30% = after)
+    // Leaf nodes: only before/after (no inside, since they can't have children)
+    // Drop indicator 的 indent 跟隨 target depth(使用者能看到 drop 在哪一層）
     const handleDragOver = React.useCallback((event: DragOverEvent) => {
       const { over, active } = event
       if (!over || over.id === active.id) {
         setDropTarget(null)
         return
       }
-      // 計算 drop position:滑鼠在 item 上方 25% = before,下方 25% = after,中間 50% = inside
-      const overRect = over.rect
-      const mouseY = (event.activatorEvent as MouseEvent)?.clientY ?? 0
-      // 用 delta 近似計算
-      const offsetY = overRect ? (mouseY - overRect.top) : 0
-      const height = overRect?.height ?? 32
-      const ratio = offsetY / height
 
-      let position: DropPosition = 'inside'
-      if (ratio < 0.25) position = 'before'
-      else if (ratio > 0.75) position = 'after'
+      const targetEl = document.querySelector(`[data-tree-id="${over.id}"]`) as HTMLElement | null
+      if (!targetEl) { setDropTarget(null); return }
 
-      setDropTarget({ id: String(over.id), position })
+      const rect = targetEl.getBoundingClientRect()
+      // 用 pointer coordinates (from the delta of the drag)
+      const pointerY = rect.top + (event.delta?.y ?? 0)
+      const offsetY = pointerY - rect.top
+      const height = rect.height || 32
+      const ratio = Math.max(0, Math.min(1, offsetY / height))
+
+      const hasChildren = targetEl.dataset.treeHasChildren === 'true'
+      const depth = Number(targetEl.getAttribute('aria-level') ?? 1) - 1
+
+      let position: DropPosition
+      if (hasChildren) {
+        // Folder: 上 30% = before, 中 40% = inside, 下 30% = after
+        if (ratio < 0.3) position = 'before'
+        else if (ratio > 0.7) position = 'after'
+        else position = 'inside'
+      } else {
+        // Leaf: 上 50% = before, 下 50% = after (不能 inside)
+        position = ratio < 0.5 ? 'before' : 'after'
+      }
+
+      setDropTarget({ id: String(over.id), position, depth })
     }, [])
+
+    const dropTargetRef = React.useRef(dropTarget)
+    dropTargetRef.current = dropTarget
 
     const handleDragEnd = React.useCallback((event: DragEndEvent) => {
       const { active, over } = event
-      if (over && active.id !== over.id && dropTarget) {
+      const dt = dropTargetRef.current
+      if (over && active.id !== over.id && dt) {
         onDragEndProp?.({
           sourceId: String(active.id),
           targetId: String(over.id),
-          position: dropTarget.position,
+          position: dt.position,
         })
       }
       setDraggingId(null)
       setDropTarget(null)
-    }, [dropTarget, onDragEndProp])
+    }, [onDragEndProp])
 
     const handleDragCancel = React.useCallback(() => {
       setDraggingId(null)
@@ -736,9 +757,12 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
           tabIndex={-1}
           className={cn('w-full min-w-0 relative', isDragging && 'opacity-40')}
         >
-          {/* Drop indicator — before / inside 位置 */}
+          {/* Drop indicator — before: 藍色線,indent 跟隨 target depth(Figma 風格） */}
           {isDropTarget && dropTarget?.position === 'before' && (
-            <div className="absolute top-0 left-0 right-0 h-0.5 bg-primary z-10" />
+            <div
+              className="absolute top-0 right-0 h-0.5 bg-primary z-10"
+              style={{ left: `calc(var(--tree-px) + ${indentPx}px)` }}
+            />
           )}
 
           {/* Row: drag handle + indent + chevron + checkbox + icon + label + hover actions */}
@@ -746,7 +770,8 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
             className={cn(
               'group/tree-item',
               treeItemVariants({ size }),
-              isDropTarget && dropTarget?.position === 'inside' && 'bg-primary-subtle',
+              // inside: 背景高亮 + 左側 2px 藍色 accent,明確區分「放進資料夾」vs「放在旁邊」
+              isDropTarget && dropTarget?.position === 'inside' && 'bg-primary-subtle ring-2 ring-primary ring-inset',
               !disabled && 'hover:bg-neutral-hover',
               // selected bg 只在單選模式(multi-select 用 checkbox 表達,不用背景色)
               !disabled && isSelected && selectionMode === 'single' && 'bg-neutral-selected',
@@ -802,9 +827,12 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
             )}
           </div>
 
-          {/* Drop indicator — after 位置 */}
+          {/* Drop indicator — after: 藍色線,indent 跟隨 target depth */}
           {isDropTarget && dropTarget?.position === 'after' && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary z-10" />
+            <div
+              className="absolute bottom-0 right-0 h-0.5 bg-primary z-10"
+              style={{ left: `calc(var(--tree-px) + ${indentPx}px)` }}
+            />
           )}
 
           {/* Children: Collapsible 展開/收合 */}

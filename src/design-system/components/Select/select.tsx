@@ -32,8 +32,10 @@ export interface SelectOption {
 
 function SelectDisplay({ value, options, size }: { value?: string | null; options?: SelectOption[]; size?: 'sm' | 'md' | 'lg' }) {
   if (!value) return <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
-  const label = options?.find(o => o.value === value)?.label ?? value
-  return <Tag size={size}>{label}</Tag>
+  const opt = options?.find(o => o.value === value)
+  const label = opt?.label ?? value
+  const variant = opt?.tagVariant as 'blue' | 'green' | 'red' | 'yellow' | 'neutral' | undefined
+  return <Tag size={size} variant={variant}>{label}</Tag>
 }
 SelectDisplay.displayName = 'SelectDisplay'
 
@@ -80,9 +82,12 @@ function ReadonlyDisplay({
     )
   }
 
+  const selectedOpt = options?.find(o => o.value === value)
+  const tagVariant = selectedOpt?.tagVariant as 'blue' | 'green' | 'red' | 'yellow' | 'neutral' | undefined
+
   return (
     <div className={cn(fieldWrapperStyles({ mode: resolvedMode, size: sz }), value && tagPadding[sz], className)} data-field-mode={resolvedMode}>
-      {value ? <Tag size={sz}>{label}</Tag> : <span className="text-fg-muted">{EMPTY_DISPLAY}</span>}
+      {value ? <Tag size={sz} variant={tagVariant}>{label}</Tag> : <span className="text-fg-muted">{EMPTY_DISPLAY}</span>}
     </div>
   )
 }
@@ -138,14 +143,16 @@ const NativeSelect = React.forwardRef<HTMLSelectElement, SelectProps>(
     ) : null
 
     const chevronEl = <ChevronDown size={iconSize} className="shrink-0 text-fg-muted cursor-pointer relative z-10" onClick={openSelect} aria-hidden />
-    const label = options?.find(o => o.value === value)?.label ?? value
+    const selectedOpt = options?.find(o => o.value === value)
+    const label = selectedOpt?.label ?? value
+    const nativeTagVariant = selectedOpt?.tagVariant as 'blue' | 'green' | 'red' | 'yellow' | 'neutral' | undefined
 
     if (!isTextDisplay) {
       return (
         <div className={cn(fieldWrapperStyles({ mode: 'edit', size }), value && tagPadding[size], 'relative',
           error && ['border-error hover:border-error-hover', 'focus-within:border-error focus-within:hover:border-error'], className)}
           style={{ paddingRight: '0.75rem' }} data-field-mode="edit" data-error={error ? '' : undefined}>
-          {value ? <Tag size={size} className="shrink-0 relative z-10 pointer-events-none">{label}</Tag> : <span className="text-fg-muted">{placeholder ?? '選擇...'}</span>}
+          {value ? <Tag size={size} variant={nativeTagVariant} className="shrink-0 relative z-10 pointer-events-none">{label}</Tag> : <span className="text-fg-muted">{placeholder ?? '選擇...'}</span>}
           {selectEl}
           <span className="flex-1" />
           {clearEl}
