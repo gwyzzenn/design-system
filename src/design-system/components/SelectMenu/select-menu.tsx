@@ -230,9 +230,14 @@ export function SelectMenu({
             </div>
           )}
           <CommandList>
-            {/* 空狀態:py-12(48px)寬鬆呼吸,字體跟 item 一致(text-body) */}
-            <CommandEmpty className="py-12 text-center text-body text-fg-muted">
-              {emptyText}
+            {/* 空狀態高度 = 一個單 item 的 group:py-2(group padding)+ h-field(item 高度) */}
+            <CommandEmpty className="py-2">
+              <span className={cn(
+                'flex items-center justify-center text-body text-fg-muted',
+                size === 'sm' ? 'h-field-sm' : size === 'lg' ? 'h-field-lg' : 'h-field-md',
+              )}>
+                {emptyText}
+              </span>
             </CommandEmpty>
 
             {groupedOptions.map((group, gi) => (

@@ -769,17 +769,19 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
             />
           )}
 
-          {/* Row: droppable 在 ROW 上(不是 treeitem wrapper),確保碰撞偵測只看這一行的高度 */}
+          {/* Row: draggable + droppable 都在這一行(合併 ref),確保碰撞偵測只看行高 */}
           <div
-            ref={setDropRef}
+            ref={(node) => {
+              // 合併 drag + drop ref 到同一個 element
+              if (draggable) setDragRef(node)
+              setDropRef(node)
+            }}
             data-tree-row={id}
             className={cn(
               'group/tree-item',
               treeItemVariants({ size }),
-              // inside: 背景高亮 + 左側 2px 藍色 accent,明確區分「放進資料夾」vs「放在旁邊」
               isDropTarget && dropTarget?.position === 'inside' && 'bg-primary-subtle ring-2 ring-primary ring-inset',
               !disabled && 'hover:bg-neutral-hover',
-              // selected bg 只在單選模式(multi-select 用 checkbox 表達,不用背景色)
               !disabled && isSelected && selectionMode === 'single' && 'bg-neutral-selected',
               showRing && 'ring-2 ring-ring ring-inset',
               disabled && 'pointer-events-none text-fg-disabled cursor-default',
@@ -792,8 +794,6 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
               paddingRight: 'var(--tree-px)',
             }}
             onClick={handleRowClick}
-            // Figma 風格:整列可拖,distance:5 區分 click vs drag
-            ref={draggable ? setDragRef : undefined}
             {...(draggable ? { ...dragListeners, ...dragAttrs } : {})}
             {...props}
           >
