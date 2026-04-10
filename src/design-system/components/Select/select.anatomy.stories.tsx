@@ -32,7 +32,7 @@ const statusOptions = [
 interface ColorSpec { bg: string; text: string; border: string; icon: string }
 
 // ── Token map: mode x state ────────────────────────────────────────────────
-// Traced from field-wrapper.tsx cva (fieldWrapperStyles) + select-field.tsx
+// Traced from field-wrapper.tsx cva (fieldWrapperStyles) + select.tsx
 const TOKEN_MAP: Record<ModeKey, Record<StateKey, ColorSpec>> = {
   edit: {
     default:  { bg: '--surface',     text: '--foreground',  border: '--border',       icon: '--fg-muted' },
@@ -57,7 +57,7 @@ const TOKEN_MAP: Record<ModeKey, Record<StateKey, ColorSpec>> = {
   },
 }
 
-// Error state tokens (edit only) — traced from select-field.tsx line 177-178
+// Error state tokens (edit only) — traced from select.tsx line 177-178
 // border-error hover:border-error-hover, focus-within:border-error
 const ERROR_TOKENS: Record<StateKey, ColorSpec> = {
   default:  { bg: '--surface', text: '--foreground', border: '--error',       icon: '--fg-muted' },
@@ -77,7 +77,7 @@ interface SizeSpec {
   tagPaddingFormula: string
 }
 
-// Traced from field-wrapper.tsx cva (size variants) + select-field.tsx tagPadding
+// Traced from field-wrapper.tsx cva (size variants) + select.tsx tagPadding
 const SIZE_SPECS: Record<SizeKey, SizeSpec> = {
   sm: {
     heightToken: 'h-field-sm', height: '28px',

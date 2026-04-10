@@ -8,14 +8,14 @@ Field 是**表單欄位的佈局容器**。只負責排版（label / control / d
 
 ---
 
-## 與現有 fields/XxxField 的關係
+## 與 Input 家族的職責切分
 
-本專案原本的 `fields/TextField` / `NumberField` / `CheckboxField` 等是**型別感知 + Field 佈局合一**的單一元件。新架構把這兩個職責拆開：
+Field 和 Input 家族（Input / NumberInput / DatePicker / Select / Combobox / LinkInput / PeoplePicker / Textarea）是兩件事：
 
 - **Field**（本元件）：只管佈局 + 狀態 context
-- **Control 元件**（Input、Checkbox、Switch 等）：只管自己的資料型別 + edit/readonly/disabled 三態 + 格式化（XxxDisplay 供 DataTable 共用）
+- **Input 家族 / Checkbox / Switch / RadioGroup**：管自己的資料型別 + edit/readonly/disabled 三態 + 格式化（XxxDisplay 供 DataTable 共用）
 
-這麼拆的理由：**Checkbox 在 table cell 和 form field 裡應該是同一個 primitive**，不該為了進到 form 就被包一層 CheckboxField；form 的高度對齊由 Field 的 control area 負責，不由 primitive 本身負責。
+這麼拆的理由：**Checkbox 在 table cell、form field、settings row 應該是同一個 primitive**，不該為了進到 form 就被包一層 CheckboxField；form 的高度對齊由 Field 的 control area 負責，不由 primitive 本身負責。Input 家族的詳細共用規則見 `components/fields/input-family.spec.md`。
 
 ---
 
@@ -132,28 +132,93 @@ padding-top: calc((var(--field-height-{size}) - 1lh) / 2);
 
 ---
 
-## Control area 高度對齊（重要）
+## Control area:Inline vs Block
 
-### 規則
+Field 的 control area 有兩種佈局模型,涵蓋所有 control 類型。**核心原則:無論哪一種,「control 第一行內容的中線」都錨在 `field-height/2`**——這是維持 FieldGroup 垂直韻律的關鍵錨點,也讓 horizontal 模式的 label 公式對 inline / block 都成立。
 
-Field 的 control area 是一個 `min-h-field-{size}` + `flex items-center` 的 box。任何 control（Input、Checkbox、Switch、Radio...）都渲染在這個 box 內。
+| Layout | Control area 樣式 | 適用 control |
+|---|---|---|
+| **inline**(預設) | `min-h-field-{size}` + `flex items-center` | Input / NumberInput / DatePicker / Select / Combobox / LinkInput / Textarea(單行使用)、Checkbox / Switch / 單一 Button(如 upload picker) |
+| **block** | `flex flex-col items-start` + `padding-top: calc((field-height - 1lh) / 2)`,**不設 min-h** | RadioGroup / CheckboxGroup / FileDropzone / RichTextEditor / inline DataTable 等多行/任意高度區塊 |
 
-| Control | 渲染行為 |
-|---|---|
-| **Input / NumberInput / DatePicker / Select / Combobox / Textarea** | 自身 height 等於 `field-height`，填滿 control area |
-| **Checkbox / Switch / Radio** | 自身 height 小於 `field-height`，垂直置中於 control area box，視覺上對齊 Input 中線 |
+### 兩種模式的對齊幾何
+
+```
+Inline                            Block
+┌────┬───────────────┐           ┌────┬───────────────┐
+│    │               │           │Lbl │ ● Option A    │ ← 第一行中線 = field-height/2
+│Lbl │ [Input      ] │ ← 中線    │    │ ● Option B    │
+│    │               │           │    │ ● Option C    │
+└────┴───────────────┘           └────┴───────────────┘
+```
+
+兩個 Field 放在同一個 FieldGroup 時,Lbl 第一行中線完全對齊——Input 的中線與 Option A 的中線都落在同一條水平線上。
+
+### 為什麼 block 不是「整組垂直置中」
+
+直覺上會想說 control area 多行時整組 vertical center,但這會讓:
+1. 第一個 Radio 往下掉,跟 label 第一行中線錯位
+2. FieldGroup 裡 inline / block field 並排時節奏斷掉
+
+正確做法是「**第一行對齊**」——後續 item 從第一行往下流,label 公式錨在第一行中線。Atlassian DSP / Polaris / Material 都是這個模型。
 
 ### 為什麼 primitive 不自己變高
 
-**Checkbox / Switch / Radio 的 primitive 保持原生尺寸**（16-20px），不為了 form 而被拉高。世界級系統（shadcn、Radix、Material、Atlassian）全部這樣做。理由：
+**Checkbox / Switch / RadioGroupItem 的 primitive 保持原生尺寸**(16-20px),不為了 form 而被拉高。世界級系統(shadcn、Radix、Material、Atlassian)全部這樣做。理由:
 
-1. **Primitive 保持單一職責**——Checkbox 在 table cell、toolbar、menu 裡仍然是 16px，不受 form 高度污染
-2. **高度節奏由 Field 容器提供**——一次設定，所有 primitive 在任何 size / density 都自動對齊
+1. **Primitive 保持單一職責**——Checkbox 在 table cell、toolbar、menu 裡仍然是 16px,不受 form 高度污染
+2. **高度節奏由 Field 容器提供**——一次設定,所有 primitive 在任何 size / density 都自動對齊
 3. **DataTable cell 共用同一個 min-h 機制**——不需為 cell 另發明對齊邏輯
 
 ### 水平排列 Field 時的垂直對齊
 
-多個 Field 並排（多欄表單）時，每個 Field 的 control area 都是同樣 `min-h-field-{size}`，所以並排 Field 的 control 中線都對齊——Input、Checkbox、Switch 放在同一列時視覺上完全對齊。
+多個 Field 並排時,每個 Field 的 control area 都依公式錨在 `field-height/2`,不論 inline 還是 block,**「控件第一行中線」都落在同一條線上**——Input、Checkbox、Switch、RadioGroup 第一個 option 並列時視覺上完全對齊。
+
+---
+
+## 如何宣告 block primitive(程式化機制)
+
+block / inline 不是 consumer 決定的——是**元件本身的固有性質**(RadioGroup 永遠是 block,Input 永遠是 inline)。所以由 primitive 自己宣告,Field 自動偵測。
+
+### Convention
+
+block primitive 在自己的 `.tsx` 檔案掛一個 static 屬性:
+
+```tsx
+const RadioGroup = React.forwardRef(...)
+RadioGroup.displayName = 'RadioGroup'
+;(RadioGroup as unknown as { fieldLayout: 'block' }).fieldLayout = 'block'
+```
+
+Field 在 render 時讀第一個 control child 的 `type.fieldLayout`,沒宣告就視為 `'inline'`。**Consumer 完全無感**:
+
+```tsx
+<Field>
+  <FieldLabel>性別</FieldLabel>
+  <RadioGroup>...</RadioGroup>   {/* Field 自動切 block,不用傳任何 prop */}
+</Field>
+```
+
+### 為什麼選這個機制(不是 Field 內部寫死白名單,也不是 consumer 傳 prop)
+
+| 候選 | 缺點 |
+|---|---|
+| Consumer 每次傳 `<Field controlLayout="block">` | consumer 要記得;忘了就 layout 歪掉;非世界級設計系統的做法 |
+| Field 內部寫死白名單 `['RadioGroup', 'CheckboxGroup', ...]` | Field 耦合一堆它不該知道的元件名稱;新增 block primitive 都要回來改 Field |
+| **Primitive 自我宣告 `static fieldLayout`**(採用) | 元件對自己的性質負責;Field 零耦合;新增 block primitive 只要在自己檔案加一行 |
+
+### 逃生艙
+
+`Field` 有 `controlLayout?: 'inline' | 'block'` prop 覆寫自動偵測,只在兩種情況使用:
+
+1. Consumer 把自己手寫的 JSX(`<div>` / 函式元件)當 control,系統無法偵測——強制 `block`
+2. 想覆寫 primitive 預設(罕見)
+
+### 已宣告為 block 的 primitive
+
+- `RadioGroup`(`components/RadioGroup/radio-group.tsx`)
+
+未來新增 `CheckboxGroup` / `FileDropzone` / `RichTextEditor` / inline `DataTableField` 時,在元件檔案加一行 `;(X as any).fieldLayout = 'block'` 即可,Field 不需要任何修改。
 
 ---
 
@@ -244,11 +309,39 @@ gap 三個選項：
 
 ---
 
+## Button 作為 control 的判斷標準
+
+Field 的 control 是「**承載這個欄位 value 的輸入介面**」。Button 在某些場景就是這個介面——例如 upload button(點擊開檔案選擇器,結果寫回 field)、picker opener(連結 OAuth、開選人對話框)。這類 Button **可以**作為 control:
+
+```tsx
+<Field orientation="horizontal" labelWidth="120px">
+  <FieldLabel>合約附件</FieldLabel>
+  <Button startIcon={Upload} variant="secondary">上傳檔案</Button>
+  <FieldDescription>PDF / DOCX,最大 10 MB</FieldDescription>
+</Field>
+```
+
+Button 的 height 與 `field-height` 共用同一組 token,放進 inline control area 自然對齊 Input 中線,horizontal 模式的 label 公式也自然對到——不需要任何特例。
+
+**判斷標準**:點擊這顆 Button 是否產生 / 修改此欄位的 value?
+
+| 是 | 否 |
+|---|---|
+| ✅ Upload(產生 file value) | ❌ 表單 submit / cancel(form action,放到 form footer) |
+| ✅ Picker opener(開對話框選 value) | ❌ 「重設此欄位」(可放到 endAction 或 description 旁,不是 control) |
+| ✅ Connect OAuth(產生 token value) | ❌ 頁面導覽、刪除整筆資料(page action) |
+
+**規則**:Button 是 control 時通常 inline(高度 = field-height);若是 block 類的「上傳區塊」(FileDropzone),則該元件本身宣告為 block primitive。
+
+---
+
 ## 禁止事項
 
 - ❌ 不得在 Field 內再包 Field——Field 不支援巢狀
-- ❌ 不得在 Field 內同時放 `<FieldLabel>` 和給 primitive 傳 `label` prop——Field context 會讓 primitive 忽略自己的 label，但語意上仍是重複宣告，避免誤導
+- ❌ 不得在 Field 內同時放 `<FieldLabel>` 和給 primitive 傳 `label` prop——Field context 會讓 primitive 忽略自己的 label,但語意上仍是重複宣告,避免誤導
 - ❌ 不得跳過 `<FieldLabel>` 直接寫 `<label>`——失去 required 星號、disabled 處理、size 連動等 codified 樣式
 - ❌ 不得為了「讓 Checkbox 與 Input 同高」而修改 Checkbox primitive——高度對齊由 Field control area 負責
 - ❌ Horizontal 模式下不得對 FieldLabel 自訂 `padding-top`——會打破公式對齊
-- ❌ 不得把 Button 或其他 action 放進 control area 作為主要 control——Field 是資料輸入容器，不是 action container
+- ❌ 不得把**與此欄位 value 無關的 action**(form submit/cancel、頁面導覽、刪除整筆資料)放進 control area——Field 是資料輸入容器,不是 action container。Button 是否能當 control,看上一節的判斷標準
+- ❌ 不得在 block control area 自訂 `min-height` 或改 `items-start`——會打破第一行對齊公式
+- ❌ 不得在 block primitive 的 `.tsx` 漏掉 `fieldLayout = 'block'` 宣告——Field 會誤判成 inline 導致 layout 歪掉

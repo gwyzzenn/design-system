@@ -173,10 +173,12 @@ const Switch = React.forwardRef<
           disabled ? 'cursor-not-allowed' : readOnly ? 'cursor-default' : 'cursor-pointer'
         )}
       >
-        <span className="flex-1 min-w-0 flex flex-col gap-1">
+        {/* gap-0.5 (2px) 是 spec 的 label↔desc 標準間距,跟 SelectionItem 的 mt-0.5 對齊 */}
+        <span className="flex-1 min-w-0 flex flex-col gap-0.5">
           <span
             className={cn(
-              'text-body',
+              // Reading mode 字級:lg → text-body-lg (16px),sm/md → text-body (14px)
+              sizeKey === 'lg' ? 'text-body-lg' : 'text-body',
               disabled ? 'text-fg-disabled' : 'text-foreground'
             )}
           >
@@ -185,9 +187,11 @@ const Switch = React.forwardRef<
           {effectiveDescription != null && (
             <span
               className={cn(
-                'text-body',
                 disabled ? 'text-fg-disabled' : 'text-fg-secondary'
               )}
+              // Reading mode description:**最小 14px**(spec 14→14px, 16→14px),lh 預設 1.5。
+              // 用 inline style 直接繞過 tailwind-merge 對 text-body / text-fg-* 的潛在衝突。
+              style={{ fontSize: 'var(--font-body-size)' }}
             >
               {effectiveDescription}
             </span>

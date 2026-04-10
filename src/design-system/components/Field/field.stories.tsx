@@ -1,9 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import * as React from 'react'
+import { Upload } from 'lucide-react'
 import { Field, FieldLabel, FieldDescription, FieldError, FieldGroup } from './field'
 import { Input } from '@/design-system/components/Input/input'
 import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
 import { Switch } from '@/design-system/components/Switch/switch'
+import { Button } from '@/design-system/components/Button/button'
+import { RadioGroup, RadioGroupItem } from '@/design-system/components/RadioGroup/radio-group'
 
 const meta: Meta = {
   title: 'Design System/Components/Field/展示',
@@ -243,6 +246,121 @@ export const States: Story = {
           <FieldError>格式不正確，請重新輸入</FieldError>
         </Field>
       </FieldGroup>
+    </div>
+  ),
+}
+
+// ── Block Control: RadioGroup ───────────────────────────────────────────
+
+export const BlockControlRadioGroup: Story = {
+  name: 'Block control — RadioGroup(自動偵測)',
+  render: () => (
+    <div className="flex flex-col gap-8 max-w-3xl">
+      <div>
+        <h3 className="text-body font-bold mb-2">Vertical:RadioGroup 在 control area 內堆疊</h3>
+        <p className="text-caption text-fg-muted mb-4 max-w-xl">
+          RadioGroup 的 `fieldLayout = 'block'` static 屬性讓 Field 自動切 block 模式——
+          control area 不設 min-h、改用 padding-top 公式,第一個 option 的中線錨在 field-height/2。
+          Consumer 不需要傳任何 prop。
+        </p>
+        <div className="max-w-sm">
+          <Field>
+            <FieldLabel>性別</FieldLabel>
+            <RadioGroup defaultValue="female">
+              <RadioGroupItem value="male" label="男性" />
+              <RadioGroupItem value="female" label="女性" />
+              <RadioGroupItem value="other" label="其他" />
+            </RadioGroup>
+            <FieldDescription>會用於統計報表,可隨時修改</FieldDescription>
+          </Field>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-body font-bold mb-2">Horizontal:label 第一行對齊第一個 option 中線</h3>
+        <p className="text-caption text-fg-muted mb-4 max-w-xl">
+          horizontal 模式下,label 的 padding-top 公式不變,
+          control area 的 padding-top 也用同一條公式——兩者「第一行中線」都落在 field-height/2,
+          所以 label 文字精確對齊第一個 Radio 的文字中線,後續 option 往下流。
+        </p>
+        <Field orientation="horizontal" labelWidth="120px">
+          <FieldLabel>性別</FieldLabel>
+          <RadioGroup defaultValue="female">
+            <RadioGroupItem value="male" label="男性" />
+            <RadioGroupItem value="female" label="女性" />
+            <RadioGroupItem value="other" label="其他" />
+          </RadioGroup>
+        </Field>
+      </div>
+
+      <div>
+        <h3 className="text-body font-bold mb-2">Inline + Block 並排:FieldGroup 韻律不斷</h3>
+        <p className="text-caption text-fg-muted mb-4 max-w-xl">
+          同一個 FieldGroup 內混用 inline(Input)和 block(RadioGroup),每個 Field 的 label
+          第一行中線都落在同一條視覺基準上——Input 的中線、Option A 的中線、Email 的中線。
+          這就是 field-height 韻律。
+        </p>
+        <FieldGroup>
+          <Field orientation="horizontal" labelWidth="120px" required>
+            <FieldLabel>姓名</FieldLabel>
+            <Input placeholder="請輸入姓名" />
+          </Field>
+          <Field orientation="horizontal" labelWidth="120px" required>
+            <FieldLabel>性別</FieldLabel>
+            <RadioGroup defaultValue="female">
+              <RadioGroupItem value="male" label="男性" />
+              <RadioGroupItem value="female" label="女性" />
+              <RadioGroupItem value="other" label="其他" />
+            </RadioGroup>
+          </Field>
+          <Field orientation="horizontal" labelWidth="120px">
+            <FieldLabel>Email</FieldLabel>
+            <Input placeholder="name@example.com" />
+          </Field>
+        </FieldGroup>
+      </div>
+    </div>
+  ),
+}
+
+// ── Button as Data Input Affordance ─────────────────────────────────────
+
+export const ButtonAsControl: Story = {
+  name: 'Button 作為 control(upload / picker)',
+  render: () => (
+    <div className="flex flex-col gap-8 max-w-3xl">
+      <div>
+        <h3 className="text-body font-bold mb-2">Upload Button 作為附件欄位的 control</h3>
+        <p className="text-caption text-fg-muted mb-4 max-w-xl">
+          Button 是「承載 file value 的輸入介面」——點擊開檔案選擇器,結果寫回 field。
+          Button 高度與 `field-height` 共用同一組 token,放進 inline control area 自然對齊
+          Input 中線,horizontal label 公式也直接套用,不需要任何特例。
+        </p>
+        <FieldGroup>
+          <Field orientation="horizontal" labelWidth="120px" required>
+            <FieldLabel>專案名稱</FieldLabel>
+            <Input placeholder="如:Q2 行銷活動" />
+          </Field>
+          <Field orientation="horizontal" labelWidth="120px">
+            <FieldLabel>合約附件</FieldLabel>
+            <Button startIcon={Upload} variant="secondary">上傳檔案</Button>
+            <FieldDescription>PDF / DOCX,最大 10 MB</FieldDescription>
+          </Field>
+          <Field orientation="horizontal" labelWidth="120px">
+            <FieldLabel>備註</FieldLabel>
+            <Input placeholder="選填" />
+          </Field>
+        </FieldGroup>
+      </div>
+
+      <div>
+        <h3 className="text-body font-bold mb-2">判斷標準:點擊是否產生此欄位的 value?</h3>
+        <p className="text-caption text-fg-muted mb-4 max-w-xl">
+          ✅ 上傳檔案、開選人對話框、Connect OAuth——Button 是 control。<br/>
+          ❌ 表單 submit / cancel、頁面導覽、刪除整筆資料——這些是 form / page action,
+          不是 field control,要放在 form footer 或 page header。
+        </p>
+      </div>
     </div>
   ),
 }

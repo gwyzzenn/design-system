@@ -65,7 +65,7 @@ export const DisplayMode: Story = {
       <div className="flex flex-col gap-6 max-w-xs">
         <div>
           <h3 className="text-body font-bold text-foreground mb-2">text（預設）</h3>
-          <p className="text-caption text-fg-muted mb-2">純文字，readonly/disabled 跟 TextField 一致</p>
+          <p className="text-caption text-fg-muted mb-2">純文字，readonly/disabled 跟 Input 一致</p>
           <Select options={statusOptions} value={value} onChange={setValue} />
           <div className="mt-2"><Select mode="readonly" options={statusOptions} value={value} /></div>
         </div>

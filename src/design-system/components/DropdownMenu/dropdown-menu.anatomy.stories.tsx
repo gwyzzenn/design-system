@@ -408,7 +408,7 @@ const InspectorInner = () => {
               </div>
             </div>
             <p className="text-[10px] text-fg-muted">
-              py = (field-height − 一行文字高度) / 2 — 單行時總高度等於同 size 的 Button / TextField
+              py = (field-height − 一行文字高度) / 2 — 單行時總高度等於同 size 的 Button / Input
             </p>
           </div>
         </div>

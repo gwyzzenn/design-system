@@ -4,7 +4,7 @@
 
 ## Field Height
 
-Button、TextField、Checkbox/Radio SelectionItem 等互動元件。
+Button、Input、Checkbox/Radio SelectionItem 等互動元件。
 
 | Token | md density | lg density |
 |-------|-----------|-----------|
@@ -44,7 +44,7 @@ DataTable 行高。density 切換統一 +0.5rem (+8px)。
 
 ### 元件高度地板
 
-**field-height-xs（24px）是獨立互動元件的最小高度。** 任何可獨立存在的互動元件（Button、TextField 等）不得使用比 field-height-xs 更小的高度。若空間不足以容納 24px，應重新檢視容器佈局，而非縮小元件。
+**field-height-xs（24px）是獨立互動元件的最小高度。** 任何可獨立存在的互動元件（Button、Input 等）不得使用比 field-height-xs 更小的高度。若空間不足以容納 24px，應重新檢視容器佈局，而非縮小元件。
 
 比 24px 更小的互動區域只存在於元件內部的 Inline Action（如 Tag dismiss、Field endAction），由宿主元件的 spec 定義規格。
 
@@ -107,6 +107,16 @@ Tag 有自己的尺寸定義（見 `tag.spec.md`），與 Field 的配對透過 
 | Tag md/lg (24px) | 16px | 18px | rounded-sm | 16px |
 | Field sm/md | 16px | 18px | rounded-sm | 16px |
 | Field lg | 20px | 22px | rounded-md | 20px |
+| TreeItem sm/md | 16px | 18px | rounded-sm | 16px |
+| TreeItem lg | 20px | 22px | rounded-md | 20px |
+
+### 多個 Inline Action 並排
+
+當一個宿主有多個 inline action(如 Select 的 clear X + ChevronDown,或 TreeItem 的 ⋯ + ＋)時:
+
+- **間距**:`gap-2`(8px)——跟 fieldWrapperStyles 的元素間距一致(Select 的 clear X 和 ChevronDown 就是 gap-2)
+- **對齊**:全部垂直置中在同一行(`flex items-center`)
+- **出現時機**:全部一起出現(TreeItem 的 hover-reveal 是同時淡入所有 action,不逐個)
 
 ### API 設計
 
@@ -114,10 +124,10 @@ Inline action 由宿主元件渲染，消費者只需宣告 intent：
 
 ```tsx
 // ❌ 舊：消費者自行決定 Button size、icon size
-<TextField endAction={<Button size="xs" iconOnly startIcon={X} aria-label="清除" onClick={...} />} />
+<Input endAction={<Button size="xs" iconOnly startIcon={X} aria-label="清除" onClick={...} />} />
 
 // ✅ 新：宣告式，Field 自己根據 size tier 渲染
-<TextField endAction={{ icon: X, label: '清除', onClick: handleClear }} />
+<Input endAction={{ icon: X, label: '清除', onClick: handleClear }} />
 ```
 
 Field 內部根據自己的 size 決定 icon 尺寸、hover 背景大小、視覺層級。消費者不需要知道這些。

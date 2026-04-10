@@ -19,7 +19,11 @@ const RadioGroup = React.forwardRef<
     ref={ref}
   />
 ))
-RadioGroup.displayName = RadioGroupPrimitive.Root.displayName
+RadioGroup.displayName = 'RadioGroup'
+// Field layout 宣告：RadioGroup 是 block primitive（多項堆疊），
+// 進入 <Field> 時 control area 自動切 items-start + padding-top 公式對齊。
+// Convention 詳見 components/Field/field.spec.md「Inline vs Block Control」段落。
+;(RadioGroup as unknown as { fieldLayout: 'block' }).fieldLayout = 'block'
 
 // ── RadioGroupItem Variants ─────────────────────────────────────────────────
 // 與 Checkbox 完全對齊：sm/md=16px, lg=20px。差異只有形狀（rounded-full）和指示器（filled dot）。
@@ -154,6 +158,6 @@ const RadioGroupItem = React.forwardRef<
     )
   }
 )
-RadioGroupItem.displayName = RadioGroupPrimitive.Item.displayName
+RadioGroupItem.displayName = 'RadioGroupItem'
 
 export { RadioGroup, RadioGroupItem, radioItemVariants }

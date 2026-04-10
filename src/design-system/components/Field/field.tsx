@@ -49,6 +49,26 @@ import { cn } from '@/lib/utils'
 export type FieldMode = 'edit' | 'readonly' | 'disabled'
 export type FieldOrientation = 'vertical' | 'horizontal'
 export type FieldSize = 'sm' | 'md' | 'lg'
+/**
+ * Field control area 的佈局模型。
+ *
+ * - `inline`：control 自身高度 = `field-height`（如 Input、Button、Select、Checkbox）。
+ *   control area 套 `min-h-field-{size} + items-center`，control 中線對齊 field-height 中線。
+ *
+ * - `block`：control 是多項堆疊或任意高度的區塊（如 RadioGroup、CheckboxGroup、FileDropzone、
+ *   RichTextEditor）。control area 不設 min-h，改用 `padding-top: calc((field-height - 1lh) / 2)`
+ *   讓**第一行內容的中線**仍落在 field-height 中線上，後續內容自然往下流。
+ *
+ * 兩種模式的「第一行中線」都錨在 `field-height/2`，跟 FieldLabel 的 horizontal padding-top
+ * 公式產生的 label 第一行中線完全對齊——維持 FieldGroup 的垂直韻律。
+ *
+ * Convention：block primitive 在自己的元件檔案掛 `static fieldLayout = 'block'`，
+ * Field 自動偵測,consumer 完全無感。
+ *
+ *   const RadioGroup = React.forwardRef(...)
+ *   ;(RadioGroup as any).fieldLayout = 'block'
+ */
+export type FieldControlLayout = 'inline' | 'block'
 
 // ── Context ─────────────────────────────────────────────────────────────────
 
@@ -62,6 +82,8 @@ interface FieldContextValue {
   invalid: boolean
   size: FieldSize
   orientation: FieldOrientation
+  /** Control area 的佈局模型——FieldLabel 不需要這個資訊（label 公式 inline/block 共用），但保留給未來可能的 layout-aware 子元件 */
+  controlLayout: FieldControlLayout
   /** Primitive 讀到此旗標時應該忽略自己的 label/description prop，由 FieldLabel/FieldDescription 接管 */
   hasFieldWrapper: true
 }
@@ -104,6 +126,25 @@ function resolveSlotKind(node: React.ReactNode): SlotKind {
   return 'control'
 }
 
+/**
+ * 偵測 control children 的 fieldLayout——任一 control 宣告為 'block' 即整個 area 切 block 模式。
+ *
+ * Convention：block primitive 在自己的元件檔案掛 static `fieldLayout = 'block'` 屬性,
+ * Field 在 render 時讀 `child.type.fieldLayout`。預設 'inline'。
+ *
+ * 為什麼是「任一」而非「全部」：實務上 Field 一個 control area 通常只有一個 control,
+ * 但若 consumer 同時放多個 child(例如 RadioGroup + 一段補充文字節點),只要其中有 block
+ * primitive,整個 area 就應該以 block 模式佈局,確保第一行對齊正確。
+ */
+function detectControlLayout(controlNodes: React.ReactNode[]): FieldControlLayout {
+  for (const node of controlNodes) {
+    if (!React.isValidElement(node)) continue
+    const layout = (node.type as { fieldLayout?: FieldControlLayout } | null | undefined)?.fieldLayout
+    if (layout === 'block') return 'block'
+  }
+  return 'inline'
+}
+
 // ── Field ───────────────────────────────────────────────────────────────────
 
 export interface FieldProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'id'> {
@@ -119,6 +160,17 @@ export interface FieldProps extends Omit<React.HTMLAttributes<HTMLDivElement>, '
    * 預設 'auto' 由 label 內容撐開。
    */
   labelWidth?: string
+  /**
+   * Control area 佈局模型(逃生艙)。
+   *
+   * 預設由 Field 自動偵測——讀第一個 control child 的 `type.fieldLayout` static 屬性,
+   * primitive 沒宣告時視為 `'inline'`。
+   *
+   * 只有兩種情況需要手動指定:
+   * 1. consumer 把自己手寫的 JSX(`<div>` / 函式元件)當 control,系統無法偵測——強制 `'block'`
+   * 2. 想覆寫 primitive 的預設(如把 RadioGroup 強制 inline 呈現,罕見)
+   */
+  controlLayout?: FieldControlLayout
 }
 
 const Field = React.forwardRef<HTMLDivElement, FieldProps>(
@@ -132,6 +184,7 @@ const Field = React.forwardRef<HTMLDivElement, FieldProps>(
       disabled: disabledProp = false,
       invalid = false,
       labelWidth,
+      controlLayout: controlLayoutProp,
       className,
       style,
       children,
@@ -147,22 +200,6 @@ const Field = React.forwardRef<HTMLDivElement, FieldProps>(
     // mode=disabled 與 disabled prop 任一為 true 即視為 disabled
     const disabled = disabledProp || mode === 'disabled'
 
-    const contextValue = React.useMemo<FieldContextValue>(
-      () => ({
-        id,
-        descriptionId,
-        errorId,
-        mode,
-        disabled,
-        required,
-        invalid,
-        size,
-        orientation,
-        hasFieldWrapper: true,
-      }),
-      [id, descriptionId, errorId, mode, disabled, required, invalid, size, orientation]
-    )
-
     // 把 children 依 slot 類型分組
     const labelNodes: React.ReactNode[] = []
     const controlNodes: React.ReactNode[] = []
@@ -177,17 +214,55 @@ const Field = React.forwardRef<HTMLDivElement, FieldProps>(
       else controlNodes.push(child)
     })
 
-    // Control area：統一 min-h-field-* + items-center。
-    // Input 等 field-height primitive 自然填滿；
-    // Checkbox / Switch / Radio 等小尺寸 primitive 垂直置中於此 box。
-    const controlArea = (
-      <div
-        className={cn('flex items-center', MIN_H_CLASS[size])}
-        data-field-slot="control"
-      >
-        {controlNodes}
-      </div>
+    // 解析 control layout：consumer 顯式指定 > primitive 自我宣告 > 預設 inline
+    const controlLayout: FieldControlLayout =
+      controlLayoutProp ?? detectControlLayout(controlNodes)
+
+    const contextValue = React.useMemo<FieldContextValue>(
+      () => ({
+        id,
+        descriptionId,
+        errorId,
+        mode,
+        disabled,
+        required,
+        invalid,
+        size,
+        orientation,
+        controlLayout,
+        hasFieldWrapper: true,
+      }),
+      [id, descriptionId, errorId, mode, disabled, required, invalid, size, orientation, controlLayout]
     )
+
+    // Control area：兩種佈局模型,「第一行內容中線」都錨在 field-height/2,
+    // 跟 FieldLabel 在 horizontal 模式下的 padding-top 公式自然對齊。
+    //
+    // - inline: min-h-field-{size} + items-center
+    //   單行 control(Input、Button 等)中線置中於 min-h box。
+    //
+    // - block:  flex-col + items-start + padding-top: calc((field-height - 1lh) / 2)
+    //   多行 control(RadioGroup 等),第一行往下推到 field-height 中線,
+    //   後續 item 自然往下流。不設 min-h(內容自己決定高度)。
+    const controlArea =
+      controlLayout === 'block' ? (
+        <div
+          className="flex flex-col items-start min-w-0"
+          style={{ paddingTop: `calc((${FIELD_HEIGHT_VAR[size]} - 1lh) / 2)` }}
+          data-field-slot="control"
+          data-field-control-layout="block"
+        >
+          {controlNodes}
+        </div>
+      ) : (
+        <div
+          className={cn('flex items-center min-w-0', MIN_H_CLASS[size])}
+          data-field-slot="control"
+          data-field-control-layout="inline"
+        >
+          {controlNodes}
+        </div>
+      )
 
     // Horizontal：grid 兩欄，label 在左、content 欄堆疊（control → description → error）
     if (orientation === 'horizontal') {

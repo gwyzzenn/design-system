@@ -233,6 +233,7 @@ const InspectorInner = () => {
   const [interaction, setInteraction] = useState<InteractionState>('default')
   const [size, setSize] = useState<SizeKey>('md')
   const [withLabel, setWithLabel] = useState(false)
+  const [withDescription, setWithDescription] = useState(false)
 
   const colors = TOKEN_MAP[checkedState][interaction]
   const spec = SIZE_SPECS[size]
@@ -267,6 +268,16 @@ const InspectorInner = () => {
           </div>
           <span className="text-[11px] text-fg-muted">搭配 SelectionItem</span>
         </div>
+        {withLabel && (
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-fg-muted w-16 shrink-0">Description</span>
+            <div className="flex gap-1.5">
+              <Tab active={!withDescription} onClick={() => setWithDescription(false)}>off</Tab>
+              <Tab active={withDescription} onClick={() => setWithDescription(true)}>on</Tab>
+            </div>
+            <span className="text-[11px] text-fg-muted">label 下方的次要說明</span>
+          </div>
+        )}
       </div>
 
       {/* Preview + Panel */}
@@ -286,6 +297,7 @@ const InspectorInner = () => {
                   />
                 }
                 label="Label text"
+                description={withDescription ? '次要說明文字,給使用者更多 context' : undefined}
                 htmlFor="inspector-cb"
                 disabled={interaction === 'disabled'}
               />
@@ -543,7 +555,7 @@ export const StateBehavior = {
       {/* Vertical Group */}
       <div className="flex flex-col gap-3">
         <span className="text-caption font-medium text-fg-secondary">垂直排列 — Item 間距由 padding 處理，不加 gap</span>
-        <Desc>每個 SelectionItem 的 py = (field-height − 一行文字高度) / 2，單行高度剛好等於同 size 的 TextField，多行時 padding 不變自然撐高。</Desc>
+        <Desc>每個 SelectionItem 的 py = (field-height − 一行文字高度) / 2，單行高度剛好等於同 size 的 Input，多行時 padding 不變自然撐高。</Desc>
         <div className="flex gap-8">
           {(['md', 'lg'] as const).map((sz) => (
             <div key={sz} className="flex flex-col gap-1">

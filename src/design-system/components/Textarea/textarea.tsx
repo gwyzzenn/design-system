@@ -8,15 +8,15 @@ import { useFieldContext } from '@/design-system/components/Field/field'
  * Textarea — 多行文字輸入
  *
  * ── 定位 ────────────────────────────────────────────────────────────────
- * 多行版本的 Input，edit / readonly / disabled 三態與 TextField 邏輯一致。
- * 不同於 TextField：
+ * 多行版本的 Input，edit / readonly / disabled 三態與 Input 邏輯一致。
+ * 不同於 Input：
  *   - 沒有固定 field-height（高度由 rows 或 min-h 決定）
  *   - 沒有 startIcon / endAction（textarea 慣例不放 icon）
  *   - readonly 呈現保留邊框與 padding，只改底色，讓多行文字有合理閱讀區
  *
  * ── Padding 規則 ───────────────────────────────────────────────────────
- * 多行內容必須有上下內距才能閱讀舒適。不沿用 TextField 的 items-center，
- * 改用 py-2（8px）固定上下內距 + px-3 左右內距（與 TextField 一致）。
+ * 多行內容必須有上下內距才能閱讀舒適。不沿用 Input 的 items-center，
+ * 改用 py-2（8px）固定上下內距 + px-3 左右內距（與 Input 一致）。
  *
  * ── Size ────────────────────────────────────────────────────────────────
  * sm / md → text-body（14px）

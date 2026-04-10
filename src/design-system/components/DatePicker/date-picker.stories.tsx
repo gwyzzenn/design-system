@@ -10,7 +10,7 @@ const meta: Meta<typeof DatePicker> = {
   parameters: {
     docs: {
       description: {
-        component: '日期選擇元件。外觀同 SelectField，Calendar icon 取代 ChevronDown。支援 clearable 和格式化選項。',
+        component: '日期選擇元件。外觀同 Select，Calendar icon 取代 ChevronDown。支援 clearable 和格式化選項。',
       },
     },
   },

@@ -111,6 +111,43 @@ export interface SelectMenuItemProps
   disabled?: boolean
   /** 作為群組標題（不可選，font-medium，fg-muted） */
   header?: boolean
+  /**
+   * Label 最大行數(line-clamp 截斷,超過顯示 ellipsis)。
+   *
+   * - `undefined`(預設 prop 值未傳)→ 套用元件預設 `1`(單行截斷,符合選單快速掃視需求)
+   * - 數字 → 截斷到該行數
+   * - `'none'` → **明確**不截斷,自然 wrap 任意行數
+   *
+   * 為什麼用 `'none'` 而不是 `undefined` 表達不截斷?React props 的 destructure default
+   * 在 `undefined` 時會接管,所以 `<SelectMenuItem labelMaxLines={undefined}>` 等同沒傳,
+   * 會 fallback 到預設 `1`。要明確覆寫成「不截斷」,必須用一個非 undefined 的 sentinel。
+   */
+  labelMaxLines?: number | 'none'
+  /**
+   * Description 最大行數。
+   *
+   * - `undefined`(預設 prop 值未傳)→ 套用元件預設 `1`(跟 label 對稱,維持掃視節奏)
+   * - 數字 → 截斷到該行數
+   * - `'none'` → 明確不截斷
+   *
+   * 為什麼預設 1?SelectMenu 的設計目的是「快速掃視多個選項挑一個」,垂直空間是
+   * 寶貴的——一個過高的 item 會破壞 row rhythm,讓使用者眼睛重新校準。description
+   * 跟 label 對稱地截到 1 行,確保所有 item 高度一致(無 desc / 有 desc 兩種高度)。
+   * Consumer 若有合理理由要 2 行 description,可顯式 override。
+   */
+  descMaxLines?: number | 'none'
+}
+
+/** 把 maxLines 轉成 line-clamp class;'none' / 0 → 空字串 */
+function lineClampClass(maxLines: number | 'none'): string {
+  if (maxLines === 'none' || !maxLines) return ''
+  if (maxLines === 1) return 'line-clamp-1'
+  if (maxLines === 2) return 'line-clamp-2'
+  if (maxLines === 3) return 'line-clamp-3'
+  if (maxLines === 4) return 'line-clamp-4'
+  if (maxLines === 5) return 'line-clamp-5'
+  if (maxLines === 6) return 'line-clamp-6'
+  return ''
 }
 
 const SelectMenuItem = React.forwardRef<HTMLDivElement, SelectMenuItemProps>(
@@ -128,12 +165,16 @@ const SelectMenuItem = React.forwardRef<HTMLDivElement, SelectMenuItemProps>(
       disabled,
       header,
       size,
+      labelMaxLines = 1,
+      descMaxLines = 1,
       className,
       ...props
     },
     ref
   ) => {
     const sizeKey = size ?? 'md'
+    const labelClampClass = lineClampClass(labelMaxLines)
+    const descClampClass = lineClampClass(descMaxLines)
     const iconPx = ICON_SIZE[sizeKey]
 
     // ── 決定 avatar 容器尺寸 + 對齊模式 ──
@@ -220,25 +261,49 @@ const SelectMenuItem = React.forwardRef<HTMLDivElement, SelectMenuItemProps>(
         {/* Content */}
         <div className="flex flex-col min-w-0 flex-1">
           <span className={cn(
-            'truncate',
+            // 預設 line-clamp-1(原本是 truncate);consumer 可透過 labelMaxLines 改為多行或不截
+            labelClampClass || 'break-words',
             disabled && 'text-fg-disabled',
           )}>
             {children}
           </span>
           {description && (
-            <span className={cn(
-              'mt-0.5',
-              sizeKey === 'lg' ? 'text-body leading-compact' : 'text-caption',
-              disabled ? 'text-fg-disabled' : 'text-fg-secondary',
-            )}>
+            <span
+              className={cn(
+                'mt-0.5 leading-compact',
+                descClampClass || 'break-words',
+                disabled ? 'text-fg-disabled' : 'text-fg-secondary',
+              )}
+              // ── 為什麼用 inline style 而非 text-body / text-caption utility ──
+              // tailwind-merge 會把 text-body(font-size)和 text-fg-secondary(color)
+              // 在 cn() chain 裡誤判成同組衝突,strip 掉 text-body,導致 description 失去
+              // 自己的 font-size、從父層 text-body-lg 繼承 16px。改用 CSS variable inline
+              // style 從根本繞過 utility class 衝突——值仍然是 design token,沒有硬寫 px。
+              style={{
+                fontSize: sizeKey === 'lg' ? 'var(--font-body-size)' : 'var(--font-caption-size)',
+              }}
+            >
               {description}
             </span>
           )}
         </div>
 
-        {/* Suffix：tag / endContent，靠右對齊，跟 prefix 同對齊高度 */}
+        {/*
+          Suffix:tag / endContent,靠右對齊。
+
+          ── 對齊規則(item-layout.spec.md「Suffix:永遠對齊第一行 label」) ──
+          Suffix **永遠**用 `h-[1lh]`,**跟 prefix 解耦**。即使 prefix 是 block-aligned 的
+          大 avatar,suffix 仍然對齊 label 第一行——因為 suffix 是 label 的 metadata
+          (Tag / Chevron / Time / Badge),不是整個 item 的。
+
+          業界 convention 全部如此:Apple Mail / Gmail / iOS Settings / Material / Polaris
+          的 trailing 元素都對齊 label 第一行,沒有任何一個對齊到 avatar 中心或文字塊中心。
+        */}
         {(tag || endContent) && (
-          <div className={cn(prefixAlignVariants({ align: prefixAlign }), 'ml-auto gap-2', disabled && 'opacity-disabled')}>
+          <div className={cn(
+            'flex items-center gap-2 shrink-0 h-[1lh] ml-auto',
+            disabled && 'opacity-disabled',
+          )}>
             {tag}
             {endContent}
           </div>

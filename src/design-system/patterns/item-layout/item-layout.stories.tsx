@@ -9,6 +9,7 @@ import { SelectionItem } from '@/design-system/components/SelectionControl/selec
 import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
 import { Tag } from '@/design-system/components/Tag/tag'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
+import { cn } from '@/lib/utils'
 
 const meta: Meta = {
   title: 'Design System/Patterns/Item Layout',
@@ -39,6 +40,24 @@ interface ConsumerPreset {
   gapDesc: string
   suffixGap: string
   suffixGapDesc: string
+  /**
+   * Label / description 的截斷政策(per-consumer 設計決定)。
+   * `undefined` = 不截斷(自然 wrap 到任意行數)。
+   * `1` = line-clamp-1(用 truncate / line-clamp css 截斷,顯示 ellipsis)。
+   * `2` = line-clamp-2(最多兩行)。
+   */
+  labelMaxLines: number | undefined
+  descMaxLines: number | undefined
+  /** 預留最少行數(避免 layout shift)。預設 0(完全不預留,內容沒有就高度為 0) */
+  labelMinLines: number
+  descMinLines: number
+}
+
+/** Consumer tab 顯示名(情境導向,不用元件名) */
+const CONSUMER_DISPLAY: Record<ConsumerKey, { tab: string; sub: string }> = {
+  SelectMenuItem: { tab: '選單', sub: 'SelectMenuItem · 浮層內快速掃視' },
+  SelectionItem:  { tab: '表單選項', sub: 'SelectionItem · Checkbox / Radio' },
+  ListItem:       { tab: '列表', sub: 'ListItem · 頁面內瀏覽' },
 }
 
 const CONSUMERS: Record<ConsumerKey, ConsumerPreset> = {
@@ -54,6 +73,11 @@ const CONSUMERS: Record<ConsumerKey, ConsumerPreset> = {
     gapDesc: 'prefix-content 間距',
     suffixGap: 'gap-1 (4px)',
     suffixGapDesc: 'value + ChevronRight 更緊湊',
+    // Source: select-menu-item.tsx — label / description 都截到 1 行,維持掃視節奏
+    labelMaxLines: 1,
+    descMaxLines: 1,
+    labelMinLines: 0,
+    descMinLines: 0,
   },
   SelectionItem: {
     label: 'SelectionItem',
@@ -67,6 +91,11 @@ const CONSUMERS: Record<ConsumerKey, ConsumerPreset> = {
     gapDesc: '控件與 label 間距',
     suffixGap: '--',
     suffixGapDesc: '無 suffix',
+    // Source: selection-item.tsx — 兩者皆無 clamp,form 欄位允許任意長度
+    labelMaxLines: undefined,
+    descMaxLines: undefined,
+    labelMinLines: 0,
+    descMinLines: 0,
   },
   ListItem: {
     label: 'ListItem',
@@ -80,6 +109,11 @@ const CONSUMERS: Record<ConsumerKey, ConsumerPreset> = {
     gapDesc: '適合較大的 avatar',
     suffixGap: 'gap-2 (8px)',
     suffixGapDesc: '後綴元素間距',
+    // Convention: label 截到 1 行,description 截到 2 行(觸控列表常見做法)
+    labelMaxLines: 1,
+    descMaxLines: 2,
+    labelMinLines: 0,
+    descMinLines: 0,
   },
 }
 
@@ -162,11 +196,19 @@ const PropRow = ({ label, dot, children }: { label: string; dot?: string; childr
 /** Blueprint zone colors */
 const Z = {
   pad:     { bg: 'rgba(194,225,154,0.6)', border: 'rgba(139,179,91,0.9)', text: '#5a7a2e' },
+  /** Control slot(SelectionItem 的 Checkbox / RadioGroupItem,永遠 inline) */
+  control: { bg: 'rgba(170,222,180,0.6)', border: 'rgba(85,165,110,0.9)', text: '#2f6a40' },
   icon:    { bg: 'rgba(166,208,245,0.6)', border: 'rgba(80,145,210,0.9)', text: '#2d6a9f' },
   gap:     { bg: 'rgba(253,218,158,0.6)', border: 'rgba(218,165,60,0.9)', text: '#8a6010' },
   label:   { bg: 'rgba(199,178,230,0.6)', border: 'rgba(138,103,190,0.9)', text: '#6035a8' },
   dim:     { text: '#d04040' },
   suffix:  { bg: 'rgba(253,186,186,0.5)', border: 'rgba(210,80,80,0.7)', text: '#a03030' },
+  /** flex-1 spacer:把 suffix 推到右邊的可擴展區域。用斜紋背景表達「會撐開」的性質,跟其他固定寬度的彩色區塊區隔 */
+  spacer:  {
+    bg: 'repeating-linear-gradient(45deg, rgba(160,160,160,0.12) 0 6px, rgba(160,160,160,0.22) 6px 12px)',
+    border: 'rgba(140,140,140,0.6)',
+    text: '#666666',
+  },
 }
 
 /** Menu container */
@@ -180,14 +222,25 @@ const MenuFrame = ({ children, width = 320 }: { children: React.ReactNode; width
 )
 
 
+/** 把 maxLines 轉成 line-clamp class;'none' / 0 → 空字串 */
+function lineClampClass(maxLines: number | 'none'): string {
+  if (maxLines === 'none' || !maxLines) return ''
+  if (maxLines === 1) return 'line-clamp-1'
+  if (maxLines === 2) return 'line-clamp-2'
+  if (maxLines === 3) return 'line-clamp-3'
+  return ''
+}
+
 /** ListItem preview (simulated — component not yet built) */
-const ListItemPreview = ({ size, startIcon: StartIcon, avatar, label, description, suffix }: {
+const ListItemPreview = ({ size, startIcon: StartIcon, avatar, label, description, suffix, labelMaxLines = 1, descMaxLines = 2 }: {
   size: SizeKey
   startIcon?: React.ComponentType<{ size: number; className?: string }>
   avatar?: React.ReactNode
   label: string
   description?: string
   suffix?: React.ReactNode
+  labelMaxLines?: number | 'none'
+  descMaxLines?: number | 'none'
 }) => {
   const iconPx = size === 'lg' ? 20 : 16
   const hasBlockPrefix = !!avatar && !!description
@@ -208,13 +261,26 @@ const ListItemPreview = ({ size, startIcon: StartIcon, avatar, label, descriptio
         </div>
       )}
       <div className="flex flex-col min-w-0 flex-1">
-        <span className="truncate">{label}</span>
+        <span className={cn('break-words', lineClampClass(labelMaxLines))}>{label}</span>
         {description && (
-          <p className="mt-0.5 text-fg-secondary">{description}</p>
+          <p
+            className={cn('mt-0.5 text-fg-secondary break-words', lineClampClass(descMaxLines))}
+            // ── 規則(item-layout.spec.md 閱讀模式) ──
+            // ListItem 是 reading mode:description 字體**最小 14px**(spec「14→14px, 16→14px」)。
+            // sm/md/lg 全部 14px,行高跟 label 同(預設 1.5,不套 leading-compact)。
+            //
+            // ── 為什麼用 inline style ──
+            // tailwind-merge 會把 font-size utility(text-body)和 color utility
+            // (text-fg-secondary)誤判成同組衝突,strip 掉 text-body。inline style 直接繞過。
+            style={{ fontSize: 'var(--font-body-size)' }}
+          >
+            {description}
+          </p>
         )}
       </div>
+      {/* Suffix: 24px 閾值獨立於 prefix。ChevronRight ≤24px → 永遠 h-[1lh] 對齊 label 第一行 */}
       {suffix && (
-        <div className={`${alignClass} flex items-center ml-auto`}>
+        <div className="h-[1lh] flex items-center ml-auto shrink-0">
           {suffix}
         </div>
       )}
@@ -226,39 +292,130 @@ const ListItemPreview = ({ size, startIcon: StartIcon, avatar, label, descriptio
    1. 檢閱器
    ═══════════════════════════════════════════════════════════════════════════ */
 
+type ContentLength = 'short' | 'medium' | 'long'
+type DescContent = 'none' | ContentLength
+type ClampOverride = 'preset' | 'unbounded' | 1 | 2 | 3
+
+/**
+ * 真實內容字串——長度遞增,放進固定寬度的容器後 wrap 行為是 emergent 的。
+ * 容器寬度約 200px(藍圖) / 300px(live preview),md size text-body(14px)。
+ * - short:約 6 字 → 1 行
+ * - medium:約 14 字 → 2 行
+ * - long:約 28 字 → 3+ 行
+ *
+ * 注意:**不指定行數**——行數由「容器寬度 + 內容長度 + clamp 政策」共同決定。
+ */
+const LABEL_TEXT: Record<ContentLength, string> = {
+  short: '電子郵件通知',
+  medium: '電子郵件通知與每週重點摘要信件',
+  long: '電子郵件通知與每週重點摘要信件以及帳戶異常即時警示提醒功能',
+}
+const DESC_TEXT: Record<ContentLength, string> = {
+  short: '每日摘要',
+  medium: '每日寄送摘要信件到您的電子信箱',
+  long: '每日寄送摘要信件到您的電子信箱,可在帳戶設定中隨時調整或關閉此功能',
+}
+
+/**
+ * 解析 clamp override → 顯示用的 effective value(`undefined` = ∞,for inspect panel display)。
+ */
+function resolveClamp(override: ClampOverride, presetVal: number | undefined): number | undefined {
+  if (override === 'preset') return presetVal
+  if (override === 'unbounded') return undefined
+  return override
+}
+
+/**
+ * 解析 clamp override → 傳給元件 prop 的值(永遠是 `number | 'none'`,絕不傳 undefined)。
+ *
+ * 為什麼不能傳 undefined?React props 的 destructure default 在 undefined 時會接管,
+ * 例如 `<SelectMenuItem labelMaxLines={undefined}>` 等同沒傳,fallback 到元件預設。
+ * 要明確覆寫成「不截斷」,必須傳 `'none'` 這個非 undefined 的 sentinel。
+ */
+function resolveClampProp(override: ClampOverride, presetVal: number | undefined): number | 'none' {
+  if (override === 'preset') return presetVal ?? 'none'
+  if (override === 'unbounded') return 'none'
+  return override
+}
+
 const InspectorInner = () => {
   const [consumer, setConsumer] = useState<ConsumerKey>('SelectMenuItem')
   const [size, setSize] = useState<SizeKey>('md')
   const [hasPrefix, setHasPrefix] = useState(true)
   const [prefixType, setPrefixType] = useState<PrefixType>('icon')
-  const [hasDescription, setHasDescription] = useState(true)
+  // (SelectionItem 沒有 block 模式,prefix 永遠 inline)
+  const [labelLength, setLabelLength] = useState<ContentLength>('short')
+  const [descContent, setDescContent] = useState<DescContent>('short')
+  const [labelClampOverride, setLabelClampOverride] = useState<ClampOverride>('preset')
+  const [descClampOverride, setDescClampOverride] = useState<ClampOverride>('preset')
   const [hasSuffix, setHasSuffix] = useState(false)
+
+  const hasDescription = descContent !== 'none'
 
   const preset = CONSUMERS[consumer]
   const spec = preset.mode === 'scanning' ? SCANNING_SPECS[size] : READING_SPECS[size]
-  const isBlockAlign = prefixType === 'avatar' && hasDescription
-  const alignContainer = isBlockAlign ? '= label行高 + 2px + desc行高' : '= 一行文字高度'
-  const alignDesc = isBlockAlign ? 'prefix > 24px → 對齊 label + description 文字塊' : 'prefix ≤ 24px → 對齊第一行 label'
 
-  // Blueprint sizing
-  const bpH = hasDescription ? 80 : 60
+  // SelectionItem 也支援 icon/avatar prefix(在 control 之後、label 之前),
+  // 套用同樣的 24px 閾值對齊規則。所以這幾個 toggle 對 SelectionItem 完全有效。
+  // SelectionItem 沒有 suffix(form 欄位通常不用 suffix),強制 hasSuffix=false。
+  const effectiveHasPrefix = hasPrefix
+  const effectivePrefixType: PrefixType = prefixType
+  const effectiveHasSuffix = consumer === 'SelectionItem' ? false : hasSuffix
+
+  // Control slot 只有 SelectionItem 有(Checkbox/RadioGroupItem),其他 consumer 無
+  const hasControl = consumer === 'SelectionItem'
+
+  // 解析有效的 clamp:
+  // - effective*Clamp:用於 inspect panel 顯示(undefined = ∞)
+  // - prop*Clamp:直接傳給元件 prop(用 'none' sentinel,避免 undefined 觸發 destructure default)
+  const effectiveLabelClamp = resolveClamp(labelClampOverride, preset.labelMaxLines)
+  const effectiveDescClamp = resolveClamp(descClampOverride, preset.descMaxLines)
+  const propLabelClamp = resolveClampProp(labelClampOverride, preset.labelMaxLines)
+  const propDescClamp = resolveClampProp(descClampOverride, preset.descMaxLines)
+
+  // Block 對齊規則:所有 consumer 統一——avatar + desc → block。
+  // SelectionItem 的差異:block 時 control 也跟著走 block 高度(跟 prefix 同步),不會歪斜。
+  const isBlockAlign = effectivePrefixType === 'avatar' && hasDescription
+  const alignContainer = isBlockAlign ? '= label 文字塊 + 2px + desc 文字塊' : '= 一行文字高度'
+  const alignDesc = isBlockAlign
+    ? consumer === 'SelectionItem'
+      ? 'avatar + desc → block;**control 跟 prefix 同高度**(都在 text block center,不歪斜)'
+      : 'prefix > 24px(avatar)+ description → 對齊 label + description 文字塊中心'
+    : 'prefix ≤ 24px(或無 description)→ 對齊第一行 label 中線'
+
+  // 真實內容字串
+  const labelText = LABEL_TEXT[labelLength]
+  const descText = hasDescription ? DESC_TEXT[descContent as ContentLength] : ''
+
+  const PY_ZONE = 20
   const hasPx = consumer !== 'SelectionItem'
   const gapLabel = consumer === 'ListItem' ? 'gap-3' : 'gap-2'
   const gapPx = consumer === 'ListItem' ? '12px' : '8px'
   const pxLabel = consumer === 'ListItem' ? 'px-4' : 'px-3'
   const pxPx = consumer === 'ListItem' ? '16px' : '12px'
 
+  // line-clamp 產生的 CSS class
+  const labelClampClass =
+    effectiveLabelClamp === 1 ? 'line-clamp-1' :
+    effectiveLabelClamp === 2 ? 'line-clamp-2' :
+    effectiveLabelClamp === 3 ? 'line-clamp-3' : ''
+  const descClampClass =
+    effectiveDescClamp === 1 ? 'line-clamp-1' :
+    effectiveDescClamp === 2 ? 'line-clamp-2' :
+    effectiveDescClamp === 3 ? 'line-clamp-3' : ''
+
   return (
     <div className="flex flex-col gap-6">
       {/* Controls */}
       <div className="flex flex-col gap-2.5">
         <div className="flex items-center gap-2">
-          <span className="text-[11px] text-fg-muted w-24 shrink-0">Consumer</span>
+          <span className="text-[11px] text-fg-muted w-24 shrink-0">情境</span>
           <div className="flex gap-1.5">
             {(Object.keys(CONSUMERS) as ConsumerKey[]).map((c) => (
-              <Tab key={c} active={consumer === c} onClick={() => setConsumer(c)}>{c}</Tab>
+              <Tab key={c} active={consumer === c} onClick={() => setConsumer(c)}>{CONSUMER_DISPLAY[c].tab}</Tab>
             ))}
           </div>
+          <span className="text-[10px] text-fg-muted font-mono">{CONSUMER_DISPLAY[consumer].sub}</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-[11px] text-fg-muted w-24 shrink-0">Size</span>
@@ -272,6 +429,11 @@ const InspectorInner = () => {
             <Tab active={hasPrefix} onClick={() => setHasPrefix(true)}>on</Tab>
             <Tab active={!hasPrefix} onClick={() => setHasPrefix(false)}>off</Tab>
           </div>
+          {consumer === 'SelectionItem' && (
+            <span className="text-[11px] text-fg-muted">
+              SelectionItem 的 prefix 是<strong>除了 control 之外</strong>的視覺輔助
+            </span>
+          )}
         </div>
         {hasPrefix && (
           <div className="flex items-center gap-2">
@@ -282,13 +444,48 @@ const InspectorInner = () => {
             </div>
           </div>
         )}
+        {/* SelectionItem avatar 沒有 block 模式(left checkbox + block avatar = 歪斜) */}
         <div className="flex items-center gap-2">
-          <span className="text-[11px] text-fg-muted w-24 shrink-0">hasDescription</span>
+          <span className="text-[11px] text-fg-muted w-24 shrink-0">label 內容長度</span>
           <div className="flex gap-1.5">
-            <Tab active={hasDescription} onClick={() => setHasDescription(true)}>on</Tab>
-            <Tab active={!hasDescription} onClick={() => setHasDescription(false)}>off</Tab>
+            <Tab active={labelLength === 'short'} onClick={() => setLabelLength('short')}>short</Tab>
+            <Tab active={labelLength === 'medium'} onClick={() => setLabelLength('medium')}>medium</Tab>
+            <Tab active={labelLength === 'long'} onClick={() => setLabelLength('long')}>long</Tab>
           </div>
         </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-fg-muted w-24 shrink-0">label clamp</span>
+          <div className="flex gap-1.5">
+            <Tab active={labelClampOverride === 'preset'} onClick={() => setLabelClampOverride('preset')}>
+              preset({preset.labelMaxLines ?? '∞'})
+            </Tab>
+            <Tab active={labelClampOverride === 1} onClick={() => setLabelClampOverride(1)}>1</Tab>
+            <Tab active={labelClampOverride === 2} onClick={() => setLabelClampOverride(2)}>2</Tab>
+            <Tab active={labelClampOverride === 'unbounded'} onClick={() => setLabelClampOverride('unbounded')}>∞</Tab>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-fg-muted w-24 shrink-0">description</span>
+          <div className="flex gap-1.5">
+            <Tab active={descContent === 'none'} onClick={() => setDescContent('none')}>none</Tab>
+            <Tab active={descContent === 'short'} onClick={() => setDescContent('short')}>short</Tab>
+            <Tab active={descContent === 'medium'} onClick={() => setDescContent('medium')}>medium</Tab>
+            <Tab active={descContent === 'long'} onClick={() => setDescContent('long')}>long</Tab>
+          </div>
+        </div>
+        {hasDescription && (
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-fg-muted w-24 shrink-0">desc clamp</span>
+            <div className="flex gap-1.5">
+              <Tab active={descClampOverride === 'preset'} onClick={() => setDescClampOverride('preset')}>
+                preset({preset.descMaxLines ?? '∞'})
+              </Tab>
+              <Tab active={descClampOverride === 1} onClick={() => setDescClampOverride(1)}>1</Tab>
+              <Tab active={descClampOverride === 2} onClick={() => setDescClampOverride(2)}>2</Tab>
+              <Tab active={descClampOverride === 'unbounded'} onClick={() => setDescClampOverride('unbounded')}>∞</Tab>
+            </div>
+          </div>
+        )}
         <div className="flex items-center gap-2">
           <span className="text-[11px] text-fg-muted w-24 shrink-0">hasSuffix</span>
           <div className="flex gap-1.5">
@@ -308,12 +505,14 @@ const InspectorInner = () => {
               <MenuFrame width={360}>
                 <SelectMenuItem
                   size={size}
-                  startIcon={hasPrefix && prefixType === 'icon' ? Mail : undefined}
-                  avatar={hasPrefix && prefixType === 'avatar' ? <Avatar alt="Alice" color="indigo" size="fill" /> : undefined}
-                  description={hasDescription ? '每日寄送摘要信件' : undefined}
-                  tag={hasSuffix ? <Tag size={size} variant="blue">Pro</Tag> : undefined}
+                  startIcon={effectiveHasPrefix && effectivePrefixType === 'icon' ? Mail : undefined}
+                  avatar={effectiveHasPrefix && effectivePrefixType === 'avatar' ? <Avatar alt="Alice" color="indigo" size="fill" /> : undefined}
+                  description={hasDescription ? descText : undefined}
+                  tag={effectiveHasSuffix ? <Tag size={size} variant="blue">Pro</Tag> : undefined}
+                  labelMaxLines={propLabelClamp}
+                  descMaxLines={propDescClamp}
                 >
-                  電子郵件通知
+                  {labelText}
                 </SelectMenuItem>
               </MenuFrame>
             )}
@@ -322,8 +521,12 @@ const InspectorInner = () => {
                 <SelectionItem
                   size={size}
                   control={<Checkbox size={size} checked={true} />}
-                  label="電子郵件通知"
-                  description={hasDescription ? '每日寄送摘要信件到您的電子信箱' : undefined}
+                  icon={effectiveHasPrefix && effectivePrefixType === 'icon' ? Mail : undefined}
+                  avatar={effectiveHasPrefix && effectivePrefixType === 'avatar' ? <Avatar alt="Alice" color="indigo" size="fill" /> : undefined}
+                  label={labelText}
+                  description={hasDescription ? descText : undefined}
+                  labelMaxLines={propLabelClamp}
+                  descMaxLines={propDescClamp}
                 />
               </div>
             )}
@@ -331,11 +534,13 @@ const InspectorInner = () => {
               <div className="w-[360px] rounded-lg border border-divider overflow-hidden bg-surface">
                 <ListItemPreview
                   size={size}
-                  startIcon={hasPrefix && prefixType === 'icon' ? Mail : undefined}
-                  avatar={hasPrefix && prefixType === 'avatar' ? <Avatar alt="Alice" color="indigo" size="fill" /> : undefined}
-                  label="電子郵件通知"
-                  description={hasDescription ? '每日寄送摘要信件到您的電子信箱' : undefined}
-                  suffix={hasSuffix ? <ChevronRight size={spec.iconPx} className="text-fg-muted" /> : undefined}
+                  startIcon={effectiveHasPrefix && effectivePrefixType === 'icon' ? Mail : undefined}
+                  avatar={effectiveHasPrefix && effectivePrefixType === 'avatar' ? <Avatar alt="Alice" color="indigo" size="fill" /> : undefined}
+                  label={labelText}
+                  description={hasDescription ? descText : undefined}
+                  suffix={effectiveHasSuffix ? <ChevronRight size={spec.iconPx} className="text-fg-muted" /> : undefined}
+                  labelMaxLines={propLabelClamp}
+                  descMaxLines={propDescClamp}
                 />
               </div>
             )}
@@ -344,13 +549,15 @@ const InspectorInner = () => {
           {/* Blueprint */}
           <div className="flex flex-col gap-3">
             {/* Legend */}
-            <div className="flex items-center gap-4 text-[11px]">
+            <div className="flex items-center gap-4 text-[11px] flex-wrap">
               {[
                 ...(hasPx ? [{ c: Z.pad, l: 'Padding' }] : []),
-                ...(hasPrefix ? [{ c: Z.icon, l: 'Prefix' }] : []),
+                ...(hasControl ? [{ c: Z.control, l: 'Control' }] : []),
+                ...(effectiveHasPrefix ? [{ c: Z.icon, l: 'Prefix' }] : []),
                 { c: Z.gap, l: 'Gap' },
                 { c: Z.label, l: 'Content' },
-                ...(hasSuffix ? [{ c: Z.suffix, l: 'Suffix' }] : []),
+                { c: Z.spacer, l: 'flex-1 spacer' },
+                ...(effectiveHasSuffix ? [{ c: Z.suffix, l: 'Suffix' }] : []),
               ].map(({ c, l }) => (
                 <span key={l} className="inline-flex items-center gap-1.5">
                   <span className="w-3 h-3 rounded-sm" style={{ background: c.bg, border: `1.5px dashed ${c.border}` }} />
@@ -359,89 +566,219 @@ const InspectorInner = () => {
               ))}
             </div>
 
-            {/* Diagram — 2D: vertical padding + horizontal zones */}
-            <div className="flex items-center">
-              <div className="flex flex-col rounded-lg overflow-hidden" style={{ width: 'fit-content', outline: `2px solid ${Z.dim.text}22` }}>
-                {/* Top padding zone — width controlled by content row */}
+            {/*
+              Diagram — 2D: vertical padding-y + horizontal zones
+              ────────────────────────────────────────────────────
+              Container 寬度固定 520px,讓 flex-1 spacer 真的能撐開,
+              如實反映真實元件的 layout 行為(避免 fit-content 造成的視覺混淆)。
+
+              Row 結構:
+                [px] [prefix] [gap] [Label/desc, 220px 固定寬] [flex-1 spacer] [suffix] [px]
+
+              Label box 高度由「真實字串 + 容器寬 + line-clamp」共同決定,
+              padding-y 區域固定 PY_ZONE(20px),演示「padding 不變,內容自然撐高」的 calc() 公式。
+            */}
+            <div className="flex items-start">
+              <div className="flex flex-col rounded-lg overflow-hidden" style={{ width: 520, outline: `2px solid ${Z.dim.text}22` }}>
+                {/* Top padding zone */}
                 <div className="flex items-center justify-center"
-                  style={{ height: 20, background: Z.pad.bg, borderBottom: `1.5px dashed ${Z.pad.border}` }}>
+                  style={{ height: PY_ZONE, background: Z.pad.bg, borderBottom: `1.5px dashed ${Z.pad.border}` }}>
                   <span className="text-[10px] font-mono font-bold" style={{ color: Z.pad.text }}>padding-y</span>
                 </div>
-                {/* Horizontal content row */}
-                <div className="flex items-stretch" style={{ height: bpH - 40 }}>
-                {hasPx && (
-                  <div className="flex items-center justify-center shrink-0"
-                    style={{ width: 52, height: '100%', background: Z.pad.bg, borderRight: `1.5px dashed ${Z.pad.border}` }}>
-                    <span className="text-[13px] font-mono font-bold" style={{ color: Z.pad.text }}>{pxLabel}</span>
-                  </div>
-                )}
-                {hasPrefix && (
-                  <>
+                {/*
+                  Horizontal content row — 高度由 Label box 內容決定(text 自然 wrap)
+                  items-stretch:讓 prefix / spacer / suffix / px 都跟 Label box 同高
+                */}
+                <div className="flex items-stretch">
+                  {hasPx && (
                     <div className="flex items-center justify-center shrink-0"
-                      style={{ width: 56, height: '100%', background: Z.icon.bg, borderLeft: `1.5px dashed ${Z.icon.border}`, borderRight: `1.5px dashed ${Z.icon.border}` }}>
-                      <span className="text-[13px] font-mono font-bold" style={{ color: Z.icon.text }}>
-                        {prefixType === 'icon' ? `${spec.iconPx}px` : 'avatar'}
-                      </span>
+                      style={{ width: 48, background: Z.pad.bg, borderRight: `1.5px dashed ${Z.pad.border}` }}>
+                      <span className="text-[12px] font-mono font-bold" style={{ color: Z.pad.text }}>{pxLabel}</span>
                     </div>
-                    <div className="flex items-center justify-center shrink-0"
-                      style={{ width: 44, height: '100%', background: Z.gap.bg, borderRight: `1.5px dashed ${Z.gap.border}` }}>
-                      <span className="text-[13px] font-mono font-bold" style={{ color: Z.gap.text }}>{gapLabel}</span>
-                    </div>
-                  </>
-                )}
-                <div className="flex flex-col items-center justify-center flex-1 min-w-[80px]"
-                  style={{ height: '100%', background: Z.label.bg, borderLeft: `1.5px dashed ${Z.label.border}`, borderRight: `1.5px dashed ${Z.label.border}` }}>
-                  <span className="text-[14px] font-mono font-bold" style={{ color: Z.label.text }}>Label</span>
-                  {hasDescription && (
+                  )}
+                  {hasControl && (
                     <>
-                      <span className="text-[10px] font-mono mt-1 opacity-60" style={{ color: Z.gap.text }}>mt-0.5 (2px)</span>
-                      <span className="text-[12px] font-mono opacity-80" style={{ color: Z.label.text }}>description</span>
+                      <div
+                        className="flex shrink-0 items-center justify-center"
+                        style={{
+                          width: 50,
+                          background: Z.control.bg,
+                          borderLeft: `1.5px dashed ${Z.control.border}`,
+                          borderRight: `1.5px dashed ${Z.control.border}`,
+                        }}
+                      >
+                        <span className="text-[11px] font-mono font-bold text-center leading-tight" style={{ color: Z.control.text, whiteSpace: 'pre-line' }}>
+                          {`control\n${spec.iconPx}px`}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-center shrink-0"
+                        style={{ width: 32, background: Z.gap.bg, borderRight: `1.5px dashed ${Z.gap.border}` }}>
+                        <span className="text-[10px] font-mono font-bold" style={{ color: Z.gap.text }}>gap-2</span>
+                      </div>
                     </>
                   )}
-                </div>
-                {hasSuffix && (
-                  <>
-                    <div className="flex items-center justify-center shrink-0"
-                      style={{ width: 36, height: '100%' }}>
-                      <span className="text-[10px] font-mono text-fg-muted">flex-1</span>
-                    </div>
-                    <div className="flex items-center justify-center shrink-0"
-                      style={{ width: 56, height: '100%', background: Z.suffix.bg, borderLeft: `1.5px dashed ${Z.suffix.border}`, borderRight: `1.5px dashed ${Z.suffix.border}` }}>
-                      <span className="text-[13px] font-mono font-bold" style={{ color: Z.suffix.text }}>suffix</span>
-                    </div>
-                  </>
-                )}
-                {hasPx && (
-                  <div className="flex items-center justify-center shrink-0"
-                    style={{ width: 52, height: '100%', background: Z.pad.bg, borderLeft: `1.5px dashed ${Z.pad.border}` }}>
-                    <span className="text-[13px] font-mono font-bold" style={{ color: Z.pad.text }}>{pxLabel}</span>
+                  {effectiveHasPrefix && (
+                    <>
+                      <div
+                        className="flex shrink-0 items-center justify-center"
+                        style={{
+                          width: 52,
+                          background: Z.icon.bg,
+                          borderLeft: `1.5px dashed ${Z.icon.border}`,
+                          borderRight: `1.5px dashed ${Z.icon.border}`,
+                        }}
+                      >
+                        <span className="text-[11px] font-mono font-bold text-center leading-tight" style={{ color: Z.icon.text, whiteSpace: 'pre-line' }}>
+                          {effectivePrefixType === 'icon'
+                            ? `icon\n${spec.iconPx}px`
+                            : isBlockAlign
+                              ? `avatar\n${size === 'lg' ? '40' : '32'}px`
+                              : `avatar\n${size === 'sm' ? '20' : '24'}px`}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-center shrink-0"
+                        style={{ width: 38, background: Z.gap.bg, borderRight: `1.5px dashed ${Z.gap.border}` }}>
+                        <span className="text-[11px] font-mono font-bold" style={{ color: Z.gap.text }}>{gapLabel}</span>
+                      </div>
+                    </>
+                  )}
+                  {/*
+                    Label / description box:固定寬度 220px,**渲染真實字串**讓 wrap 自然發生。
+                    行數是 emergent(內容長度 + 容器寬度 + clamp 三者決定),不是寫死的離散值。
+                    line-clamp class 演示 max-lines 截斷;若內容超過 clamp,瀏覽器自動加 ellipsis。
+                  */}
+                  <div
+                    className="flex flex-col shrink-0 justify-center py-1"
+                    style={{
+                      width: 220,
+                      background: Z.label.bg,
+                      borderLeft: `1.5px dashed ${Z.label.border}`,
+                      borderRight: `1.5px dashed ${Z.label.border}`,
+                    }}
+                  >
+                    <span
+                      className={cn('text-[12px] font-mono font-bold leading-snug px-2 break-words', labelClampClass)}
+                      style={{ color: Z.label.text }}
+                    >
+                      {labelText}
+                    </span>
+                    {hasDescription && (
+                      <>
+                        <div className="h-0.5" />
+                        <span
+                          className={cn('text-[10px] font-mono leading-snug px-2 opacity-80 break-words', descClampClass)}
+                          style={{ color: Z.label.text }}
+                        >
+                          {descText}
+                        </span>
+                      </>
+                    )}
                   </div>
-                )}
+                  {/* flex-1 spacer:斜紋背景,撐開 Label 與 suffix(或右 padding)之間的剩餘寬度 */}
+                  <div
+                    className="flex items-center justify-center"
+                    style={{
+                      flex: '1 1 0',
+                      minWidth: 24,
+                      background: Z.spacer.bg,
+                      borderRight: `1.5px dashed ${Z.spacer.border}`,
+                    }}
+                  >
+                    <span className="text-[10px] font-mono font-bold text-center leading-tight" style={{ color: Z.spacer.text, whiteSpace: 'pre-line' }}>
+                      {'flex-1\npush →'}
+                    </span>
+                  </div>
+                  {effectiveHasSuffix && (
+                    <div className="flex items-center justify-center shrink-0"
+                      style={{ width: 50, background: Z.suffix.bg, borderRight: `1.5px dashed ${Z.suffix.border}` }}>
+                      <span className="text-[12px] font-mono font-bold" style={{ color: Z.suffix.text }}>suffix</span>
+                    </div>
+                  )}
+                  {hasPx && (
+                    <div className="flex items-center justify-center shrink-0"
+                      style={{ width: 48, background: Z.pad.bg, borderLeft: `1.5px dashed ${Z.pad.border}` }}>
+                      <span className="text-[12px] font-mono font-bold" style={{ color: Z.pad.text }}>{pxLabel}</span>
+                    </div>
+                  )}
                 </div>
                 {/* Bottom padding zone */}
                 <div className="flex items-center justify-center"
-                  style={{ height: 20, background: Z.pad.bg, borderTop: `1.5px dashed ${Z.pad.border}` }}>
+                  style={{ height: PY_ZONE, background: Z.pad.bg, borderTop: `1.5px dashed ${Z.pad.border}` }}>
                   <span className="text-[10px] font-mono font-bold" style={{ color: Z.pad.text }}>padding-y</span>
                 </div>
               </div>
 
-              {/* Height annotation */}
-              <div className="ml-4 flex items-center" style={{ height: bpH }}>
-                <svg width="10" height={bpH} className="shrink-0">
-                  <line x1="5" y1="2" x2="5" y2={bpH - 2} stroke={Z.dim.text} strokeWidth="1" />
-                  <line x1="1" y1="2" x2="9" y2="2" stroke={Z.dim.text} strokeWidth="1.5" />
-                  <line x1="1" y1={bpH - 2} x2="9" y2={bpH - 2} stroke={Z.dim.text} strokeWidth="1.5" />
-                </svg>
-                <div className="ml-2">
-                  <TkVal token={`--field-height-${size}`} value={`${FIELD_HEIGHTS[size]} (single-line)`} />
+              {/* Height annotation — 文字版,不再需要精確 px(高度由 Label box 內容決定) */}
+              <div className="ml-4 flex items-start pt-2">
+                <div className="text-[10px] font-mono text-fg-muted leading-relaxed">
+                  <div className="text-fg-secondary font-bold mb-1">高度公式</div>
+                  <div>= padding-y × 2</div>
+                  <div>+ label content height</div>
+                  {hasDescription && <div>+ 2px(label-desc gap)</div>}
+                  {hasDescription && <div>+ desc content height</div>}
+                  <div className="mt-2 text-fg-muted">內容多行 → 自然撐高</div>
+                  <div className="text-fg-muted">padding-y 不變</div>
                 </div>
+              </div>
+            </div>
+
+            {/* 對齊規則 annotation */}
+            {effectiveHasPrefix && (
+              <div
+                className="rounded-md px-3 py-2 text-[11px] flex items-start gap-2"
+                style={{
+                  background: isBlockAlign ? 'rgba(166,208,245,0.18)' : 'rgba(199,178,230,0.18)',
+                  border: `1px dashed ${isBlockAlign ? Z.icon.border : Z.label.border}`,
+                }}
+              >
+                <span className="font-mono font-bold mt-0.5 shrink-0" style={{ color: isBlockAlign ? Z.icon.text : Z.label.text }}>
+                  {isBlockAlign ? '◫ Block 對齊' : '— Inline 對齊'}
+                </span>
+                <span className="text-fg-secondary leading-relaxed">{alignDesc}</span>
+              </div>
+            )}
+
+            {/* Clamp 政策說明 */}
+            <div className="rounded-md px-3 py-2 text-[11px] bg-neutral-2 border border-divider flex flex-col gap-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-bold text-fg-secondary">Clamp 政策</span>
+                <span className="text-fg-muted">由 consumer 透過 prop 決定(每個 consumer 有預設,可 per-instance override)</span>
+              </div>
+              <div className="flex flex-wrap gap-x-4 font-mono text-[10px] text-fg-secondary">
+                <span>
+                  <code>labelMaxLines</code> = <strong>{effectiveLabelClamp ?? '∞ (unbounded)'}</strong>
+                  {labelClampOverride !== 'preset' && <span className="text-error-text"> · override</span>}
+                  {labelClampOverride === 'preset' && <span className="text-fg-muted"> · {preset.label} default</span>}
+                </span>
+                <span>
+                  <code>labelMinLines</code> = <strong>{preset.labelMinLines}</strong>
+                  {preset.labelMinLines === 0 && <span className="text-fg-muted"> · 不預留(內容空 → 高度 0)</span>}
+                </span>
+              </div>
+              {hasDescription && (
+                <div className="flex flex-wrap gap-x-4 font-mono text-[10px] text-fg-secondary">
+                  <span>
+                    <code>descMaxLines</code> = <strong>{effectiveDescClamp ?? '∞ (unbounded)'}</strong>
+                    {descClampOverride !== 'preset' && <span className="text-error-text"> · override</span>}
+                    {descClampOverride === 'preset' && <span className="text-fg-muted"> · {preset.label} default</span>}
+                  </span>
+                  <span>
+                    <code>descMinLines</code> = <strong>{preset.descMinLines}</strong>
+                  </span>
+                </div>
+              )}
+              <div className="text-[10px] text-fg-muted leading-relaxed">
+                行數是 <strong>內容長度 + 容器寬 + clamp</strong> 三者共同決定的 emergent 結果,**不是離散設定值**。
+                左側 live preview 和右側藍圖**同步**反映相同的 clamp—改 toggle 兩邊一起變。
+                <br />
+                ※ <code>minLines</code> 概念目前在所有 consumer 都是 0,保留欄位是為了將來「避免 layout shift」的需求(例如 grid 列表需要每個 item 等高)
               </div>
             </div>
 
             {/* Annotations below the blueprint */}
             <div className="flex flex-wrap gap-x-6 gap-y-1 text-[10px] font-mono text-fg-muted">
               {hasPx && <span><strong style={{ color: Z.pad.text }}>padding-x</strong> = {pxPx}</span>}
-              {hasPrefix && <span><strong style={{ color: Z.icon.text }}>prefix-content gap</strong> = {gapPx}</span>}
+              {effectiveHasPrefix && <span><strong style={{ color: Z.icon.text }}>prefix-content gap</strong> = {gapPx}</span>}
               <span><strong style={{ color: Z.label.text }}>py</strong> = {preset.py.includes('calc') ? `calc((field-height-${size} − 一行文字高度) / 2)` : preset.py}</span>
               {hasDescription && <span>label-desc gap = mt-0.5 (2px)</span>}
             </div>
@@ -472,12 +809,12 @@ const InspectorInner = () => {
             {hasDescription && (
               <PropRow label="label-desc" dot={Z.gap.text}><TkVal token="mt-0.5" value="2px" /></PropRow>
             )}
-            {hasSuffix && (
+            {effectiveHasSuffix && (
               <PropRow label="suffix gap" dot={Z.suffix.text}>
                 <TkVal token={preset.suffixGap} value={preset.suffixGapDesc} />
               </PropRow>
             )}
-            {hasPrefix && (
+            {effectiveHasPrefix && (
               <PropRow label="icon size" dot={Z.icon.text}>{spec.iconPx}px</PropRow>
             )}
           </div>
@@ -487,9 +824,27 @@ const InspectorInner = () => {
             <div className="py-2 border-b border-divider"><span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider">Typography</span></div>
             <PropRow label="Label"><TkVal token={spec.labelFont} value={spec.labelSize} /></PropRow>
             <PropRow label="Label lh"><TkVal token={preset.mode === 'scanning' ? 'leading-compact' : 'default'} value={spec.labelLh} /></PropRow>
+            <PropRow label="Label content">
+              <TkVal token={labelLength} value={`${labelText.length} 字`} />
+            </PropRow>
+            <PropRow label="Label maxLines">
+              <TkVal
+                token={effectiveLabelClamp ? `line-clamp-${effectiveLabelClamp}` : 'unbounded'}
+                value={labelClampOverride === 'preset' ? `${preset.label} default` : 'override'}
+              />
+            </PropRow>
             {hasDescription && (
               <>
                 <PropRow label="Desc"><TkVal token={spec.descFont} value={spec.descSize} /></PropRow>
+                <PropRow label="Desc content">
+                  <TkVal token={descContent as string} value={`${descText.length} 字`} />
+                </PropRow>
+                <PropRow label="Desc maxLines">
+                  <TkVal
+                    token={effectiveDescClamp ? `line-clamp-${effectiveDescClamp}` : 'unbounded'}
+                    value={descClampOverride === 'preset' ? `${preset.label} default` : 'override'}
+                  />
+                </PropRow>
                 <PropRow label="Desc color">
                   <span className="inline-flex items-center gap-2"><Swatch value="--fg-secondary" /><span>fg-secondary</span></span>
                 </PropRow>
@@ -501,10 +856,12 @@ const InspectorInner = () => {
           <div className="px-4 py-1 pb-3">
             <div className="py-2 border-b border-divider"><span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider">Alignment</span></div>
             <PropRow label="outer"><TkVal token="flex items-start" /></PropRow>
-            <PropRow label="align container"><TkVal token={alignContainer} value={alignDesc} /></PropRow>
-            <PropRow label="threshold"><TkVal token="24px" value="prefix > 24px triggers block align" /></PropRow>
-            {hasSuffix && (
-              <PropRow label="suffix align"><TkVal token={alignContainer} value="shares prefix container height" /></PropRow>
+            <PropRow label="prefix align"><TkVal token={alignContainer} value={alignDesc} /></PropRow>
+            <PropRow label="prefix threshold"><TkVal token="24px" value="prefix > 24px triggers block align" /></PropRow>
+            {effectiveHasSuffix && (
+              <PropRow label="suffix align">
+                <TkVal token="h-[1lh]" value="永遠對齊第一行 label,跟 prefix 解耦" />
+              </PropRow>
             )}
           </div>
         </div>
@@ -538,11 +895,14 @@ export const AlignmentThreshold = {
   render: () => (
     <div className="flex flex-col gap-10">
       <div className="flex flex-col gap-1">
-        <H3>對齊容器 — 24px 閾值</H3>
+        <H3>對齊規則 — Prefix 與 Suffix 各自獨立</H3>
         <Desc>
-          prefix 和 suffix 共用相同的對齊容器高度，由 prefix 內容物決定。
-          &le; 24px → 對齊容器 = 一行文字高度（inline），&gt; 24px → 對齊容器 = label行高 + 2px + desc行高（block）。
-          Suffix 永遠跟 prefix 使用相同的容器高度。
+          <strong>Prefix</strong> 對齊容器由 prefix 內容物大小決定:&le; 24px → 一行文字高度(inline);
+          &gt; 24px(avatar + desc)→ label行高 + 2px + desc行高(block,對齊文字塊中心)。
+          <br />
+          <strong>Suffix</strong> 永遠用一行文字高度,**對齊第一行 label**,跟 prefix 解耦。
+          理由:suffix 內容(Tag、Chevron、時間、計數)是 label 的 metadata,不是整個 item 的——
+          業界 convention(Apple Mail / Gmail / iOS Settings / Material / Polaris)全部如此。
         </Desc>
       </div>
 
@@ -557,7 +917,7 @@ export const AlignmentThreshold = {
 
           {/* Blueprint diagram — LARGE */}
           <div className="flex flex-col gap-3">
-            <div className="inline-flex items-stretch rounded-lg overflow-hidden" style={{ height: 88, outline: `2px solid ${Z.dim.text}22` }}>
+            <div className="inline-flex items-stretch self-start rounded-lg overflow-hidden" style={{ height: 88, outline: `2px solid ${Z.dim.text}22` }}>
               <div className="flex items-center justify-center shrink-0"
                 style={{ width: 72, height: '100%', background: Z.icon.bg, borderRight: `1.5px dashed ${Z.icon.border}` }}>
                 <div className="flex flex-col items-center gap-1">
@@ -606,7 +966,7 @@ export const AlignmentThreshold = {
 
           {/* Blueprint diagram — LARGE */}
           <div className="flex flex-col gap-3">
-            <div className="inline-flex items-stretch rounded-lg overflow-hidden" style={{ height: 88, outline: `2px solid ${Z.dim.text}22` }}>
+            <div className="inline-flex items-stretch self-start rounded-lg overflow-hidden" style={{ height: 88, outline: `2px solid ${Z.dim.text}22` }}>
               <div className="flex items-center justify-center shrink-0"
                 style={{ width: 72, height: '100%', background: Z.icon.bg, borderRight: `1.5px dashed ${Z.icon.border}` }}>
                 <div className="flex flex-col items-center gap-0.5">
@@ -625,16 +985,19 @@ export const AlignmentThreshold = {
                 <span className="text-[10px] font-mono mt-1 opacity-60" style={{ color: Z.gap.text }}>mt-0.5</span>
                 <span className="text-[12px] font-mono opacity-80" style={{ color: Z.label.text }}>description</span>
               </div>
-              <div className="flex items-center justify-center shrink-0"
+              <div className="flex items-start justify-center shrink-0 pt-3"
                 style={{ width: 72, height: '100%', background: Z.suffix.bg, borderLeft: `1.5px dashed ${Z.suffix.border}` }}>
-                <div className="flex flex-col items-center gap-0.5">
+                <div className="flex flex-col items-center gap-1">
                   <span className="text-[14px] font-mono font-bold" style={{ color: Z.suffix.text }}>suffix</span>
-                  <span className="text-[9px] font-mono" style={{ color: Z.suffix.text }}>label行高</span>
-                  <span className="text-[9px] font-mono" style={{ color: Z.suffix.text }}>+2px+desc行高</span>
+                  <span className="text-[10px] font-mono font-semibold" style={{ color: Z.suffix.text }}>一行文字高度</span>
+                  <span className="text-[9px] font-mono opacity-80" style={{ color: Z.suffix.text }}>對齊第一行 label</span>
                 </div>
               </div>
             </div>
-            <span className="text-[11px] text-fg-muted">prefix center = label + description 文字塊中心，suffix 使用相同的 calc</span>
+            <span className="text-[11px] text-fg-muted">
+              prefix center = label + description 文字塊中心(block);
+              <strong>suffix 永遠對齊第一行 label,跟 prefix 解耦</strong>
+            </span>
           </div>
 
           {/* Live example */}
@@ -649,34 +1012,46 @@ export const AlignmentThreshold = {
         </div>
       </div>
 
-      {/* Threshold table */}
+      {/* Rules table */}
       <div className="flex flex-col gap-3">
-        <span className="text-caption font-medium text-fg-secondary">對齊容器規則總覽</span>
+        <span className="text-caption font-medium text-fg-secondary">對齊規則總覽</span>
         <div className="overflow-x-auto">
           <table className="border-collapse text-caption">
-            <thead><tr><Th>條件</Th><Th>對齊容器</Th><Th>對齊目標</Th><Th>適用場景</Th></tr></thead>
+            <thead><tr><Th>對象</Th><Th>條件</Th><Th>對齊容器</Th><Th>對齊目標</Th></tr></thead>
             <tbody>
               <tr>
-                <Td>prefix &le; 24px</Td>
+                <Td><strong>Prefix</strong></Td>
+                <Td>≤ 24px(icon / checkbox / 小 avatar)</Td>
                 <Td mono>一行文字高度</Td>
                 <Td>第一行 label 垂直中心</Td>
-                <Td>icon (16/20px), checkbox (16/20px)</Td>
               </tr>
               <tr>
-                <Td>prefix &gt; 24px + 有 desc</Td>
+                <Td><strong>Prefix</strong></Td>
+                <Td>&gt; 24px(avatar)+ 有 description</Td>
                 <Td mono>label行高 + 2px + desc行高</Td>
                 <Td>label + gap + desc 文字塊中心</Td>
-                <Td>avatar (32/40px) with description</Td>
               </tr>
               <tr>
+                <Td><strong>Prefix</strong></Td>
                 <Td>無 description</Td>
                 <Td mono>一行文字高度</Td>
-                <Td>強制 inline（prefix 上限 24px）</Td>
-                <Td>所有無 description 的情況</Td>
+                <Td>強制 inline(prefix 上限 24px)</Td>
+              </tr>
+              <tr>
+                <Td><strong>Suffix</strong></Td>
+                <Td>**所有情況**</Td>
+                <Td mono>一行文字高度</Td>
+                <Td>第一行 label 垂直中心(跟 prefix 解耦)</Td>
               </tr>
             </tbody>
           </table>
         </div>
+        <p className="text-[11px] text-fg-muted max-w-[720px]">
+          ※ Suffix 不跟 prefix 同步是有意的設計:suffix 是 label 的 metadata
+          (Tag / Chevron / 時間 / 計數),不是整個 item 的。對齊 label 第一行讓使用者
+          眼睛從 label 自然往右掃到 suffix,不被打斷。Apple Mail / Gmail / iOS Settings /
+          Material / Polaris 全部如此。
+        </p>
       </div>
     </div>
   ),

@@ -144,14 +144,14 @@ export const UISize: Story = {
   parameters: {
     docs: {
       description: {
-        story: '元件高度 semantic token。Field height 用於 Button、TextField 等互動元件。Table row 用於 DataTable。',
+        story: '元件高度 semantic token。Field height 用於 Button、Input 等互動元件。Table row 用於 DataTable。',
       },
     },
   },
   render: () => (
     <div className="max-w-2xl space-y-6">
       <div>
-        <p className="mb-2 text-caption font-medium text-fg-muted">Field Height（Button、TextField、SelectionItem）</p>
+        <p className="mb-2 text-caption font-medium text-fg-muted">Field Height（Button、Input、SelectionItem）</p>
         <ColHeader />
         <TokenRow attr="data-ui-size" token="--field-height-xs" md="24px" lg="24px" />
         <TokenRow attr="data-ui-size" token="--field-height-sm" md="28px" lg="32px" />

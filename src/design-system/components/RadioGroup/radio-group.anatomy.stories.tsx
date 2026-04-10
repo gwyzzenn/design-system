@@ -1,10 +1,10 @@
 import type { Meta } from '@storybook/react'
 import { useState } from 'react'
-import { RadioGroup, RadioGroupItem } from './radio'
+import { RadioGroup, RadioGroupItem } from './radio-group'
 import { SelectionItem } from '@/design-system/components/SelectionControl/selection-item'
 
 const meta: Meta = {
-  title: 'Design System/Components/Radio/設計規格',
+  title: 'Design System/Components/RadioGroup/設計規格',
   parameters: { layout: 'padded' },
 }
 export default meta
@@ -236,6 +236,7 @@ const InspectorInner = () => {
   const [checked, setChecked] = useState<CheckedKey>('checked')
   const [state, setState] = useState<StateKey>('default')
   const [size, setSize] = useState<SizeKey>('md')
+  const [withDescription, setWithDescription] = useState(false)
 
   const colors = TOKEN_MAP[checked][state]
   const s = SIZE_SPECS[size]
@@ -262,6 +263,14 @@ const InspectorInner = () => {
             {SIZES.map((sz) => <Tab key={sz} active={size === sz} onClick={() => setSize(sz)}>{sz}</Tab>)}
           </div>
         </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-fg-muted w-16 shrink-0">Description</span>
+          <div className="flex gap-1.5">
+            <Tab active={!withDescription} onClick={() => setWithDescription(false)}>off</Tab>
+            <Tab active={withDescription} onClick={() => setWithDescription(true)}>on</Tab>
+          </div>
+          <span className="text-[11px] text-fg-muted">label 下方的次要說明</span>
+        </div>
       </div>
 
       {/* Preview + Panel */}
@@ -275,6 +284,7 @@ const InspectorInner = () => {
                 size={size}
                 control={<RadioGroupItem value="preview" id="preview-radio" size={size} disabled={state === 'disabled'} />}
                 label="選項 A"
+                description={withDescription ? '次要說明文字,給使用者更多 context' : undefined}
                 htmlFor="preview-radio"
                 disabled={state === 'disabled'}
               />
@@ -282,6 +292,7 @@ const InspectorInner = () => {
                 size={size}
                 control={<RadioGroupItem value="other" id="preview-other" size={size} disabled={state === 'disabled'} />}
                 label="選項 B"
+                description={withDescription ? '另一個選項的補充說明' : undefined}
                 htmlFor="preview-other"
                 disabled={state === 'disabled'}
               />
@@ -461,7 +472,7 @@ export const SizeMatrix = {
         <H3>Size Token 對照</H3>
         <Desc>
           三種尺寸（sm/md = 16px, lg = 20px）。sm 和 md 視覺相同，純粹是命名 mapping 讓消費者直接傳同一個 size prop。
-          搭配 SelectionItem 時，item 高度自動對齊同 size 的 TextField。
+          搭配 SelectionItem 時，item 高度自動對齊同 size 的 Input。
         </Desc>
       </div>
 

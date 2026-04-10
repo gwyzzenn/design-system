@@ -1,0 +1,326 @@
+import * as React from 'react'
+import type { Meta, StoryObj } from '@storybook/react'
+import {
+  Folder, FileText, FileCode, Image, Settings, Users,
+  LayoutDashboard, ShieldCheck, Bell, MoreHorizontal, Plus, Trash2,
+  CheckCircle2, Circle, Minus,
+} from 'lucide-react'
+import { TreeView, TreeItem } from './tree-view'
+import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
+
+/**
+ * Inline action button for tree items.
+ * 遵循 uiSize.spec inline action 規範:
+ * - Icon 16px,hover bg 18px(icon + 2px),rounded-sm
+ * - fg-muted → hover foreground + neutral-hover bg
+ * - 排版佔位 16px(hover bg 用 absolute 溢出,不影響排版)
+ */
+const TreeAction = ({ icon: Icon, label }: { icon: React.ComponentType<{ size: number; className?: string }>; label: string }) => (
+  <button
+    type="button"
+    className="relative flex items-center justify-center w-4 h-4 text-fg-muted hover:text-foreground transition-colors before:absolute before:inset-[-1px] before:rounded-sm before:bg-transparent hover:before:bg-neutral-hover before:transition-colors"
+    aria-label={label}
+    onClick={(e) => e.stopPropagation()}
+  >
+    <Icon size={16} className="relative" />
+  </button>
+)
+
+const meta: Meta = {
+  title: 'Design System/Components/TreeView/展示',
+  parameters: { layout: 'padded' },
+}
+export default meta
+
+type Story = StoryObj
+
+// ── Sidebar Navigation ─────────────────────────────────────────────────
+
+export const SidebarNav: Story = {
+  name: 'Sidebar 導覽',
+  render: () => (
+    <div className="flex flex-col gap-2">
+      <p className="text-caption text-fg-muted max-w-xl">
+        hover 每一列查看右側 inline action(⋯ 和 ＋ 按鈕)。
+      </p>
+      <div className="w-[260px] border border-divider rounded-lg bg-surface overflow-hidden">
+        <TreeView aria-label="側邊導覽" defaultExpandedIds={['team', 'settings']}>
+          {/* Leaf node:只有 ⋯ */}
+          <TreeItem id="dashboard" icon={LayoutDashboard} label="Dashboard" actions={<TreeAction icon={MoreHorizontal} label="更多" />} />
+          {/* 有 children 的 node:⋯ + ＋(統一) */}
+          <TreeItem
+            id="team"
+            icon={Users}
+            label="Team"
+            actions={<><TreeAction icon={Plus} label="新增" /><TreeAction icon={MoreHorizontal} label="更多" /></>}
+          >
+            {/* 子 node 全有 icon(icon 一致性原則:有用就全面用) */}
+            <TreeItem id="members" icon={Users} label="Members" actions={<TreeAction icon={MoreHorizontal} label="更多" />} />
+            <TreeItem id="roles" icon={ShieldCheck} label="Roles" actions={<TreeAction icon={MoreHorizontal} label="更多" />} />
+          </TreeItem>
+          <TreeItem id="notifications" icon={Bell} label="Notifications" actions={<TreeAction icon={MoreHorizontal} label="更多" />} />
+          <TreeItem
+            id="settings"
+            icon={Settings}
+            label="Settings"
+            actions={<><TreeAction icon={Plus} label="新增" /><TreeAction icon={MoreHorizontal} label="更多" /></>}
+          >
+            <TreeItem id="general" icon={Settings} label="General" actions={<TreeAction icon={MoreHorizontal} label="更多" />} />
+            <TreeItem id="security" icon={ShieldCheck} label="Security" actions={<TreeAction icon={MoreHorizontal} label="更多" />} />
+            <TreeItem id="billing" icon={FileText} label="Billing" actions={<TreeAction icon={MoreHorizontal} label="更多" />} />
+          </TreeItem>
+        </TreeView>
+      </div>
+    </div>
+  ),
+}
+
+// ── File Browser ────────────────────────────────────────────────────────
+
+export const FileBrowser: Story = {
+  name: 'File Browser',
+  render: () => (
+    <div className="w-[300px] border border-divider rounded-lg bg-surface overflow-hidden">
+      <TreeView aria-label="檔案瀏覽" defaultExpandedIds={['src', 'components']}>
+        <TreeItem id="src" icon={Folder} label="src">
+          <TreeItem id="components" icon={Folder} label="components">
+            <TreeItem id="button" icon={FileCode} label="Button.tsx" />
+            <TreeItem id="input" icon={FileCode} label="Input.tsx" />
+            <TreeItem id="dialog" icon={FileCode} label="Dialog.tsx" />
+          </TreeItem>
+          <TreeItem id="utils" icon={Folder} label="utils">
+            <TreeItem id="cn" icon={FileCode} label="cn.ts" />
+          </TreeItem>
+          <TreeItem id="app" icon={FileCode} label="App.tsx" />
+          <TreeItem id="main" icon={FileCode} label="main.tsx" />
+        </TreeItem>
+        <TreeItem id="public" icon={Folder} label="public">
+          <TreeItem id="favicon" icon={Image} label="favicon.svg" />
+        </TreeItem>
+        <TreeItem id="pkg" icon={FileText} label="package.json" />
+        <TreeItem id="readme" icon={FileText} label="README.md" />
+      </TreeView>
+    </div>
+  ),
+}
+
+// ── Stepper ─────────────────────────────────────────────────────────────
+
+const StepDone = () => <CheckCircle2 size={16} className="text-success" />
+const StepActive = () => <Circle size={16} className="text-primary" />
+const StepPending = () => <Minus size={16} className="text-fg-muted" />
+
+export const Stepper: Story = {
+  name: 'Stepper（步驟）',
+  render: () => (
+    <div className="w-[300px] border border-divider rounded-lg bg-surface overflow-hidden">
+      <TreeView
+        aria-label="申請流程"
+        expandOnSelect
+        defaultExpandedIds={['step1', 'step2']}
+        defaultSelectedIds={['step2-card']}
+      >
+        <TreeItem id="step1" indicator={<StepDone />} label="1. 個人資料">
+          <TreeItem id="step1-name" indicator={<StepDone />} label="姓名" />
+          <TreeItem id="step1-addr" indicator={<StepDone />} label="地址" />
+          <TreeItem id="step1-contact" indicator={<StepDone />} label="聯絡方式" />
+        </TreeItem>
+        <TreeItem id="step2" indicator={<StepActive />} label="2. 付款方式">
+          <TreeItem id="step2-card" indicator={<StepActive />} label="信用卡號碼" />
+          <TreeItem id="step2-billing" indicator={<StepPending />} label="帳單地址" />
+        </TreeItem>
+        <TreeItem id="step3" indicator={<StepPending />} label="3. 確認送出" />
+      </TreeView>
+    </div>
+  ),
+}
+
+// ── Multi-select with Checkbox ───────────────────────────────────────────
+
+const CheckboxTree = () => {
+  const [checked, setChecked] = React.useState<Record<string, boolean>>({
+    'read': true, 'read-docs': true, 'read-media': true,
+    'write': false, 'write-docs': true, 'write-media': false,
+  })
+
+  const toggle = (id: string) => {
+    setChecked((prev) => ({ ...prev, [id]: !prev[id] }))
+  }
+
+  // parent 的 indeterminate 邏輯
+  const readAll = checked['read-docs'] && checked['read-media']
+  const readNone = !checked['read-docs'] && !checked['read-media']
+  const writeAll = checked['write-docs'] && checked['write-media']
+  const writeNone = !checked['write-docs'] && !checked['write-media']
+
+  return (
+    <div className="w-[300px] border border-divider rounded-lg bg-surface overflow-hidden">
+      <TreeView selectionMode="multiple" aria-label="權限選擇" defaultExpandedIds={['read', 'write']}>
+        <TreeItem
+          id="read"
+          icon={Folder}
+          label="讀取權限"
+          checkbox={<Checkbox size="md" checked={readAll ? true : readNone ? false : 'indeterminate'} />}
+          onClick={() => { const next = !readAll; setChecked((p) => ({ ...p, read: next, 'read-docs': next, 'read-media': next })) }}
+        >
+          <TreeItem id="read-docs" icon={FileText} label="文件" checkbox={<Checkbox size="md" checked={checked['read-docs']} />} onClick={() => toggle('read-docs')} />
+          <TreeItem id="read-media" icon={Image} label="媒體檔案" checkbox={<Checkbox size="md" checked={checked['read-media']} />} onClick={() => toggle('read-media')} />
+        </TreeItem>
+        <TreeItem
+          id="write"
+          icon={Folder}
+          label="寫入權限"
+          checkbox={<Checkbox size="md" checked={writeAll ? true : writeNone ? false : 'indeterminate'} />}
+          onClick={() => { const next = !writeAll; setChecked((p) => ({ ...p, write: next, 'write-docs': next, 'write-media': next })) }}
+        >
+          <TreeItem id="write-docs" icon={FileText} label="文件" checkbox={<Checkbox size="md" checked={checked['write-docs']} />} onClick={() => toggle('write-docs')} />
+          <TreeItem id="write-media" icon={Image} label="媒體檔案" checkbox={<Checkbox size="md" checked={checked['write-media']} />} onClick={() => toggle('write-media')} />
+        </TreeItem>
+      </TreeView>
+    </div>
+  )
+}
+
+export const WithCheckbox: Story = {
+  name: '多選(Checkbox)',
+  render: () => <CheckboxTree />,
+}
+
+// ── Long label (wrap test) ──────────────────────────────────────────────
+
+export const LongLabel: Story = {
+  name: '長 label（truncate vs wrap）',
+  render: () => (
+    <div className="flex gap-8 items-start">
+      <div className="flex flex-col gap-2">
+        <span className="text-caption font-medium text-fg-muted">預設 truncate</span>
+        <div className="w-[220px] border border-divider rounded-lg bg-surface overflow-hidden">
+          <TreeView aria-label="truncate test" defaultExpandedIds={['proj']}>
+            <TreeItem id="proj" icon={Folder} label="這是一個很長的專案名稱會被截斷">
+              <TreeItem id="f1" icon={FileText} label="這是一個很長的檔案名稱也會被截斷.tsx" />
+              <TreeItem id="f2" icon={FileText} label="短檔名.ts" />
+            </TreeItem>
+          </TreeView>
+        </div>
+      </div>
+      <div className="flex flex-col gap-2">
+        <span className="text-caption font-medium text-fg-muted">label 換行（移除 truncate）</span>
+        <div className="w-[220px] border border-divider rounded-lg bg-surface overflow-hidden">
+          <TreeView aria-label="wrap test" defaultExpandedIds={['proj2']}>
+            <TreeItem id="proj2" icon={Folder} label={<span className="break-words whitespace-normal">這是一個很長的專案名稱會自然換行到下一行</span>}>
+              <TreeItem id="f3" icon={FileText} label={<span className="break-words whitespace-normal">這是一個很長的檔案名稱也會自然換行到下一行顯示完整內容.tsx</span>} />
+              <TreeItem id="f4" icon={FileText} label="短檔名.ts" />
+            </TreeItem>
+          </TreeView>
+        </div>
+      </div>
+    </div>
+  ),
+}
+
+// ── Drag and Drop ───────────────────────────────────────────────────────
+
+export const DragAndDrop: Story = {
+  name: 'Drag & Drop',
+  render: () => {
+    const [log, setLog] = React.useState<string[]>([])
+    return (
+      <div className="flex gap-6 items-start">
+        <div className="flex flex-col gap-2">
+          <p className="text-caption text-fg-muted max-w-xs">
+            hover 出現 grip handle,拖曳到其他 node 上方 / 下方 / 中間。
+            Consumer 透過 onDragEnd 接收 reorder 事件(右側 log)。
+          </p>
+          <div className="w-[280px] border border-divider rounded-lg bg-surface overflow-hidden">
+            <TreeView
+              aria-label="拖曳排序"
+              draggable
+              defaultExpandedIds={['pages', 'docs']}
+              onDragEnd={(e) =>
+                setLog((prev) => [`${e.sourceId} → ${e.targetId} (${e.position})`, ...prev].slice(0, 8))
+              }
+            >
+              <TreeItem id="pages" icon={Folder} label="Pages">
+                <TreeItem id="home" icon={FileText} label="Home" />
+                <TreeItem id="about" icon={FileText} label="About" />
+                <TreeItem id="contact" icon={FileText} label="Contact" />
+              </TreeItem>
+              <TreeItem id="docs" icon={Folder} label="Docs">
+                <TreeItem id="intro" icon={FileCode} label="Introduction" />
+                <TreeItem id="guide" icon={FileCode} label="Getting Started" />
+              </TreeItem>
+              <TreeItem id="settings" icon={Settings} label="Settings" />
+            </TreeView>
+          </div>
+        </div>
+        <div className="w-[240px]">
+          <p className="text-caption font-medium text-fg-muted mb-2">Drag log</p>
+          <div className="flex flex-col gap-1 text-[11px] font-mono text-fg-secondary">
+            {log.length === 0 && <span className="text-fg-muted">拖曳後這裡會顯示事件</span>}
+            {log.map((l, i) => <span key={i}>{l}</span>)}
+          </div>
+        </div>
+      </div>
+    )
+  },
+}
+
+// ── Size Comparison ─────────────────────────────────────────────────────
+
+export const Sizes: Story = {
+  name: 'Size 對比（sm / md / lg）',
+  render: () => (
+    <div className="flex gap-8 items-start">
+      {(['sm', 'md', 'lg'] as const).map((sz) => (
+        <div key={sz} className="flex flex-col gap-2">
+          <span className="text-caption font-medium text-fg-muted">{sz}</span>
+          <div className="w-[220px] border border-divider rounded-lg bg-surface overflow-hidden">
+            <TreeView size={sz} aria-label={`${sz} tree`} defaultExpandedIds={['docs']}>
+              <TreeItem id="docs" icon={Folder} label="Documents">
+                <TreeItem id="resume" icon={FileText} label="Resume.pdf" />
+                <TreeItem id="photos" icon={Folder} label="Photos">
+                  <TreeItem id="beach" icon={Image} label="beach.jpg" />
+                </TreeItem>
+              </TreeItem>
+              <TreeItem id="settings" icon={Settings} label="Settings" />
+            </TreeView>
+          </div>
+        </div>
+      ))}
+    </div>
+  ),
+}
+
+// ── Indent 結構對齊驗證 ─────────────────────────────────────────────────
+
+export const IndentAlignment: Story = {
+  name: 'Indent 結構對齊驗證',
+  render: () => (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1">
+        <h3 className="text-h6 font-semibold">indentStep = chevronSize + gap-2</h3>
+        <p className="text-caption text-fg-muted max-w-xl">
+          子 chevron 應對齊父 icon 的起始位置,子 icon 應對齊父 label 的起始位置。
+          這裡用有 icon / 無 icon 混合的 tree 來驗證 placeholder 佔位是否正確。
+        </p>
+      </div>
+      <div className="w-[300px] border border-divider rounded-lg bg-surface overflow-hidden">
+        <TreeView aria-label="對齊驗證" defaultExpandedIds={['a', 'b', 'c']}>
+          <TreeItem id="a" icon={Folder} label="有 icon + 有 children">
+            <TreeItem id="a1" icon={FileText} label="有 icon leaf" />
+            <TreeItem id="a2" label="無 icon leaf（應有 icon 佔位）" />
+          </TreeItem>
+          <TreeItem id="b" label="無 icon + 有 children">
+            <TreeItem id="b1" label="子 leaf" />
+          </TreeItem>
+          <TreeItem id="c" icon={Folder} label="3 層深度驗證">
+            <TreeItem id="c1" icon={Folder} label="Level 1">
+              <TreeItem id="c1a" icon={FileCode} label="Level 2 leaf" />
+              <TreeItem id="c1b" label="Level 2 無 icon" />
+            </TreeItem>
+          </TreeItem>
+        </TreeView>
+      </div>
+    </div>
+  ),
+}

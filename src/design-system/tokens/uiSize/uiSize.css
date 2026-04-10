@@ -6,7 +6,7 @@
    透過 data-density 切換 md / lg 模式。
 
    ┌─ Field Height ────────────────────────────────────────────────────┐
-   │  Button、TextField、Checkbox/Radio SelectionItem 等互動元件      │
+   │  Button、Input、Checkbox/Radio SelectionItem 等互動元件      │
    │  xs 固定不隨 density 縮放（密集 UI、Button xs）                   │
    │  sm / md / lg 隨 density 響應                                    │
    └─────────────────────────────────────────────────────────────────┘
@@ -18,7 +18,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* Field Height — Button、TextField、SelectionItem */
+  /* Field Height — Button、Input、SelectionItem */
   --field-height-xs: 1.5rem;    /* 24px — 固定，不隨 density 縮放 */
   --field-height-sm: 1.75rem;   /* 28px */
   --field-height-md: 2rem;      /* 32px */

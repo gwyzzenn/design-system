@@ -170,6 +170,22 @@ element.style.backgroundColor = 'var(--primary)'
 - 若缺少元件，請明確指出，不要假裝元件已存在
 - 使用 `cn()` 合併 Tailwind class（來自 `@/lib/utils`）
 
+## 新增數值前必須先查既有 pattern（舉一反三原則）
+
+**寫任何 gap、padding、font-size、line-height、icon size、border-radius 等數值之前,必須先 grep 系統內同類型的值,確認是否有既有 pattern 可以直接套用。不要憑直覺發明新值。**
+
+檢查清單：
+- `gap` → 查 `fieldWrapperStyles`（gap-2）、SelectMenuItem cva、SelectionItem cva
+- `padding` → 查 `--layout-space-loose/tight`、fieldWrapperStyles `px-3`
+- `font-size` → 查 `typography.css` utilities + `item-layout.spec.md` reading/scanning 模式規則
+- `line-height` → 查 `typography.css`（scanning = leading-compact 1.3,reading = default 1.5）
+- `icon size` → 查 `ICON_SIZE` 常數（sm/md=16, lg=20）
+- `inline action` → 查 `uiSize.spec.md`（icon size、hover bg size=icon+2、gap-2 between actions、fg-muted → hover foreground）
+
+**舉一反三**：如果 Select 的 inline action gap 是 gap-2,那所有元件的 inline action gap 都是 gap-2——不需要每個元件都被糾正一次。同理,如果 SelectMenuItem 的 description 是 reading mode min 14px,那所有 reading mode consumer 的 description 都是 min 14px。
+
+**如果確實需要新值**,先提出理由讓使用者確認,不要自己決定後寫進去。
+
 
 # Tailwind 使用規則
 
@@ -188,6 +204,51 @@ element.style.backgroundColor = 'var(--primary)'
 | `rounded-md`   | 4px（--radius-md）    |
 | `rounded-lg`   | 8px（--radius-lg）    |
 | `rounded-full` | 9999px（--radius-full）|
+
+## tailwind-merge 自訂 utility 註冊規則(必讀)
+
+`cn()`(`src/lib/utils.ts`)用 `tailwind-merge` 解決 class 衝突。tailwind-merge 看到 `text-{xxx}` 類 utility 時會用 heuristic 猜分組——猜錯就會把不該衝突的 class 誤判為衝突,strip 掉其中一個。
+
+**已發生過的 bug**:`text-body`(font-size 14px)和 `text-fg-secondary`(color)被誤判為同組,tailwind-merge 把 `text-body` 吃掉,description 失去自己的 font-size、從父層繼承 16px。
+
+### 規則:任何新增的 `text-*` 自訂 utility 都必須在 `lib/utils.ts` 顯式註冊
+
+**font-size 類**(影響 `--font-{xxx}-size`)→ 註冊到 `font-size` group:
+```ts
+'font-size': ['text-h1', ..., 'text-body-lg', 'text-body', 'text-caption', 'text-footnote', 'text-你的新size']
+```
+
+**color 類**(影響 `color`)→ 註冊到 `text-color` group:
+```ts
+'text-color': [
+  'text-foreground', 'text-fg-secondary', 'text-fg-muted', 'text-fg-disabled',
+  'text-inverse-fg', 'text-error-text', 'text-success-text', ...,
+  'text-你的新色'
+]
+```
+
+**判斷法**:你新增的 utility 是設 font-size 還是 color?寫進對應的 group。**兩個 group 都要顯式列舉,不能讓 tailwind-merge 用 heuristic 自動猜**。
+
+### 不只是 text-*。其他可能誤判的 utility prefix
+
+| Utility 類型 | tailwind-merge 預設 group |
+|---|---|
+| `text-{xxx}` | `font-size` 或 `text-color` |
+| `bg-{xxx}` | `background-color` 或 `background-image` |
+| `border-{xxx}` | `border-color` 或 `border-width` 或 `border-style` |
+| `ring-{xxx}` | `ring-color` 或 `ring-width` |
+
+新增**任何**自訂 `{prefix}-{semantic-name}` utility 後,先確認它落在哪個 group。如果 cn() 後 class 不見了,99% 是 tailwind-merge 誤判,去 `lib/utils.ts` 註冊。
+
+### 終極逃生艙:inline style + CSS variable
+
+若 utility class 真的無法解決(例如同 element 同 cn() chain 必定衝突),改用 inline style + CSS variable,**仍然是 design token,沒有硬寫 px**:
+
+```tsx
+<span style={{ fontSize: 'var(--font-body-size)' }}>
+```
+
+inline style 的 specificity 高過 utility class,絕對不會被 strip。但這是逃生艙,不是預設做法——優先讓 utility 正確 work。
 
 
 # Token 命名原則

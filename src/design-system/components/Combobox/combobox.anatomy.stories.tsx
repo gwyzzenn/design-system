@@ -525,7 +525,7 @@ export const ColorMatrix = {
       <div className="flex flex-col gap-8">
         <div className="flex flex-col gap-1">
           <H3>Mode x State 色彩對照</H3>
-          <Desc>橫向看同 mode 的 state 變化，色塊即時渲染，切 dark mode 自動更新。wrapper 色彩與 SelectField 共用同一套 fieldWrapperStyles。</Desc>
+          <Desc>橫向看同 mode 的 state 變化，色塊即時渲染，切 dark mode 自動更新。wrapper 色彩與 Select 共用同一套 fieldWrapperStyles。</Desc>
         </div>
 
         {/* edit mode */}

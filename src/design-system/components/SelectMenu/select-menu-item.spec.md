@@ -2,7 +2,7 @@
 
 ## 定位
 
-SelectMenu 是下拉選單的浮層元件。由 SelectField / MultiSelectField 內部觸發，不單獨使用。
+SelectMenu 是下拉選單的浮層元件。由 Select / Combobox 內部觸發，不單獨使用。
 
 ---
 
@@ -114,7 +114,7 @@ block（有 description）= `floor₈(1lh + 2px + desc_1lh)`：
 
 ## Size
 
-單行高度對齊 field-height token，與 Button、TextField 等互動元件等高。
+單行高度對齊 field-height token，與 Button、Input 等互動元件等高。
 
 | Size | 高度 | Label | Description | Icon | Checkbox |
 |---|---|---|---|---|---|
@@ -125,6 +125,49 @@ block（有 description）= `floor₈(1lh + 2px + desc_1lh)`：
 所有文字使用 `leading-compact` (1.3)——選單選項是短文字，不需要閱讀行距。
 
 description 降一級：sm/md 的 label 14px → description 12px；lg 的 label 16px → description 14px。
+
+---
+
+## Suffix 對齊(實作限制)
+
+依 `item-layout.spec.md` 的對齊規則,suffix 應該套用 24px 閾值公式(跟 prefix 同公式但獨立判斷)。但 **SelectMenuItem 的實作把 suffix 寫死成 `h-[1lh]` inline 對齊**——只支援 ≤24px 的小 suffix(Tag、ChevronRight、Badge、計數)。
+
+### 為什麼 hardcode
+
+選單選項的 suffix 99% 是小元素,不會超過 24px。為了避免每個 consumer 都要思考 suffix 對齊規則,SelectMenuItem 直接套用最常見的 inline 對齊。
+
+### 限制
+
+如果你要塞大塊 suffix(thumbnail 40px、stacked badge、multi-line text),**SelectMenuItem 會把它對齊到 label 第一行而不是文字塊中心**,視覺上會跟它修飾的對象失聯。
+
+### 解法
+
+需要大塊 suffix 的場景應該:
+
+1. **重新評估這個東西是不是 menu item**——如果 suffix 是大塊內容,可能需要 ListItem(列表行)而非 menu item
+2. **包一個 wrapper 元件**——consumer 自己組合 prefix + content + 大塊 suffix,套用 item-layout.spec.md 的完整 4-slot 規則
+3. 不要 hack `endContent` 塞大東西進去——layout 會壞
+
+---
+
+## Clamp 政策(Label / Description 行數)
+
+| Prop | 預設 | 理由 |
+|---|---|---|
+| `labelMaxLines` | `1` | 選項是供快速掃視的短文字，必須在一行內辨識完 |
+| `descMaxLines` | `1` | 與 label 對稱，維持掃視節奏；description 是補充說明，不是閱讀內容 |
+
+**為什麼 description 也預設 1 行?**
+
+SelectMenu 的設計目的是「**快速掃視多個選項挑一個**」。垂直空間是寶貴的——選單通常要塞 5–20 個選項。如果 description 沒有 clamp,一個過長的 description 會把 item 撐高,破壞 row rhythm,使用者眼睛要重新校準。
+
+整個 SelectMenu 應該只有「**兩種 row 高度**」:
+- 無 description → `field-height`(單行 label)
+- 有 description → `field-height` + 2px + 一行 desc 高度
+
+不能讓 row 高度變成「label 1 行 + desc 1~N 行」這種不可預測的範圍。**「若有就完整顯示」是錯的設計**——既然知道 description 不該長,就應該強制截斷,而不是允許 consumer 塞長 description 然後破壞 layout。
+
+**Per-instance override**:consumer 若有合理理由(例如 settings 選單想顯示 2 行說明),可以顯式 `<SelectMenuItem descMaxLines={2} ...>` 覆寫。要顯示完整不截,傳 `descMaxLines="none"`(不能傳 `undefined`,React props 的 destructure default 在 undefined 時會接管,fallback 到預設 `1`)。
 
 ---
 

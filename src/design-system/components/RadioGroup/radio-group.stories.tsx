@@ -1,10 +1,10 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
-import { RadioGroup, RadioGroupItem } from './radio'
+import { RadioGroup, RadioGroupItem } from './radio-group'
 import { SelectionItem } from '@/design-system/components/SelectionControl/selection-item'
 
 const meta: Meta<typeof RadioGroupItem> = {
-  title: 'Design System/Components/Radio/展示',
+  title: 'Design System/Components/RadioGroup/展示',
   component: RadioGroupItem,
   tags: ['autodocs'],
 }

@@ -47,8 +47,45 @@ Checkbox/Radio 不內建 label。Label 組合使用 `SelectionItem` 元件。
 | Item 間距 | 0（padding 處理） | 24px（gap-6） |
 | Item padding | `py = (field-height - 1lh) / 2` | 同左 |
 | Label ↔ Description | 2px（`mt-0.5`） | 同左 |
-| 單行高度 | = field-height（對齊 TextField） | 同左 |
+| 單行高度 | = field-height（對齊 Input） | 同左 |
 | 多行高度 | padding 不變，自然撐高 | — |
+
+---
+
+## Clamp 政策(Label / Description 行數)
+
+| Prop | 預設 | 理由 |
+|---|---|---|
+| `labelMaxLines` | `'none'`(∞) | Form 欄位的選項標籤可能很長,絕不可截斷 |
+| `descMaxLines` | `'none'`(∞) | Form 欄位的補充說明、條款、隱私聲明必須完整呈現 |
+
+**為什麼預設不截斷?**
+
+Checkbox / Radio 在 form 內承載的常常是:
+- **法律條款**(「我同意服務條款 + 隱私政策...」)
+- **隱私聲明**(「允許 Cookie 用於...」)
+- **複雜條件描述**(「啟用此功能會...」)
+
+**任何截斷都是違法或誤導**——使用者必須完整看到他正在同意什麼。SelectMenuItem 的「掃視優先」不適用,SelectionItem 的核心訴求是「**完整閱讀後同意**」。
+
+### Per-instance override
+
+若 consumer 有合理理由(例如 settings 頁的選項列表想截斷過長 label 維持掃視節奏),可以顯式覆寫:
+
+```tsx
+<SelectionItem labelMaxLines={1} descMaxLines={2} ... />
+```
+
+**注意:不能傳 `undefined` 表達「不截」**——React 的 destructure default 會把 undefined 當「沒傳」、fallback 到預設值。要明確表達「不截」傳 `'none'`(雖然語意等同預設,但更明確)。
+
+### 為什麼不像 SelectMenuItem 強制截斷?
+
+| | SelectMenuItem | SelectionItem |
+|---|---|---|
+| 使用情境 | 浮層選單,挑一個 | Form 內,**同意**或**選擇**內容本身 |
+| 內容性質 | 選項名稱(短) | 條款 / 聲明 / 條件描述(可長) |
+| 截斷後果 | 失去 context,但可重開選單看完 | **法律或道德問題**(同意了沒看到的內容) |
+| 預設政策 | label / desc 都 `1`(掃視優先) | label / desc 都 `'none'`(完整閱讀優先) |
 
 ---
 
