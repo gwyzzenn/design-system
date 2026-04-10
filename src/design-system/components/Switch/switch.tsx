@@ -3,7 +3,7 @@ import * as SwitchPrimitives from '@radix-ui/react-switch'
 import { Check } from 'lucide-react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
-import { useFieldContext } from '@/design-system/components/Field/field'
+import { useFieldContext } from '@/design-system/components/Field/field-context'
 
 /**
  * Switch — 開關控件

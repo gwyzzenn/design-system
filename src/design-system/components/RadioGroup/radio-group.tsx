@@ -4,7 +4,7 @@ import { Circle } from "lucide-react"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
-import { useFieldContext } from "@/design-system/components/Field/field"
+import { useFieldContext } from "@/design-system/components/Field/field-context"
 import { SelectionItem } from "@/design-system/components/SelectionControl/selection-item"
 
 // ── RadioGroup ──────────────────────────────────────────────────────────────

@@ -44,56 +44,18 @@ import { cn } from '@/lib/utils'
  * 時降為 fg-disabled。也可在個別 FieldLabel 覆寫。
  */
 
-// ── Types ───────────────────────────────────────────────────────────────────
+// ── Types & Context (從 field-context.ts re-export,打斷 circular import) ──
+// Button / Input / Checkbox 等都需要 useFieldContext,直接 import field.tsx 會造成
+// circular dependency(Field stories → Button → field.tsx → ...)。
+// 把 context 抽到 field-context.ts,所有 consumer 從那裡 import。
 
-export type FieldMode = 'edit' | 'readonly' | 'disabled'
-export type FieldOrientation = 'vertical' | 'horizontal'
-export type FieldSize = 'sm' | 'md' | 'lg'
-/**
- * Field control area 的佈局模型。
- *
- * - `inline`：control 自身高度 = `field-height`（如 Input、Button、Select、Checkbox）。
- *   control area 套 `min-h-field-{size} + items-center`，control 中線對齊 field-height 中線。
- *
- * - `block`：control 是多項堆疊或任意高度的區塊（如 RadioGroup、CheckboxGroup、FileDropzone、
- *   RichTextEditor）。control area 不設 min-h，改用 `padding-top: calc((field-height - 1lh) / 2)`
- *   讓**第一行內容的中線**仍落在 field-height 中線上，後續內容自然往下流。
- *
- * 兩種模式的「第一行中線」都錨在 `field-height/2`，跟 FieldLabel 的 horizontal padding-top
- * 公式產生的 label 第一行中線完全對齊——維持 FieldGroup 的垂直韻律。
- *
- * Convention：block primitive 在自己的元件檔案掛 `static fieldLayout = 'block'`，
- * Field 自動偵測,consumer 完全無感。
- *
- *   const RadioGroup = React.forwardRef(...)
- *   ;(RadioGroup as any).fieldLayout = 'block'
- */
-export type FieldControlLayout = 'inline' | 'block'
+export type { FieldMode, FieldOrientation, FieldSize, FieldControlLayout, FieldContextValue } from './field-context'
+export { useFieldContext } from './field-context'
 
-// ── Context ─────────────────────────────────────────────────────────────────
+import type { FieldMode, FieldOrientation, FieldSize, FieldControlLayout, FieldContextValue } from './field-context'
+import { FieldContext, useFieldContext } from './field-context'
 
-interface FieldContextValue {
-  id: string
-  descriptionId: string
-  errorId: string
-  mode: FieldMode
-  disabled: boolean
-  required: boolean
-  invalid: boolean
-  size: FieldSize
-  orientation: FieldOrientation
-  /** Control area 的佈局模型——FieldLabel 不需要這個資訊（label 公式 inline/block 共用），但保留給未來可能的 layout-aware 子元件 */
-  controlLayout: FieldControlLayout
-  /** Primitive 讀到此旗標時應該忽略自己的 label/description prop，由 FieldLabel/FieldDescription 接管 */
-  hasFieldWrapper: true
-}
-
-const FieldContext = React.createContext<FieldContextValue | null>(null)
-
-/** 讓 primitive（Checkbox/Switch/Radio 等）讀 Field context，決定是否忽略自己的 label/description prop */
-export function useFieldContext(): FieldContextValue | null {
-  return React.useContext(FieldContext)
-}
+// (以下 FieldContextValue 改用 import 版本，不再重複定義)
 
 // ── Internal helpers ────────────────────────────────────────────────────────
 
