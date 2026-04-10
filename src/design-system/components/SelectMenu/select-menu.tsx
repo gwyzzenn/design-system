@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Plus, Search, Check } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import type { AvatarData } from '@/design-system/components/Avatar/avatar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/design-system/components/Popover/popover'
 import { Command, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandSeparator } from '@/design-system/components/Command/command'
 import { Command as CommandPrimitive } from 'cmdk'
@@ -31,7 +32,7 @@ export interface SelectMenuOption {
   label: string
   description?: string
   icon?: LucideIcon
-  avatar?: React.ReactNode
+  avatar?: AvatarData
   disabled?: boolean
   group?: string
 }

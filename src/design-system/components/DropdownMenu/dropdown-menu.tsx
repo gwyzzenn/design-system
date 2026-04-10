@@ -3,6 +3,7 @@ import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
 import { ChevronRight, type LucideIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import type { AvatarData } from "@/design-system/components/Avatar/avatar"
 import { SelectMenuItem } from "@/design-system/components/SelectMenu/select-menu-item"
 
 /**
@@ -141,8 +142,8 @@ interface DropdownMenuItemProps
   children: React.ReactNode
   /** 左側 icon */
   startIcon?: LucideIcon
-  /** 左側頭像/視覺元素（ReactNode），與 startIcon 互斥 */
-  avatar?: React.ReactNode
+  /** 左側頭像資料（AvatarData），與 startIcon 互斥 */
+  avatar?: AvatarData
   /** 次要說明文字 */
   description?: React.ReactNode
   /** 後綴 Tag（ReactNode） */

@@ -8,7 +8,7 @@ import { SelectMenuItem } from '@/design-system/components/SelectMenu/select-men
 import { SelectionItem } from '@/design-system/components/SelectionControl/selection-item'
 import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
 import { Tag } from '@/design-system/components/Tag/tag'
-import { Avatar } from '@/design-system/components/Avatar/avatar'
+import { Avatar, type AvatarData } from '@/design-system/components/Avatar/avatar'
 import { cn } from '@/lib/utils'
 
 const meta: Meta = {
@@ -235,7 +235,7 @@ function lineClampClass(maxLines: number | 'none'): string {
 const ListItemPreview = ({ size, startIcon: StartIcon, avatar, label, description, suffix, labelMaxLines = 1, descMaxLines = 2 }: {
   size: SizeKey
   startIcon?: React.ComponentType<{ size: number; className?: string }>
-  avatar?: React.ReactNode
+  avatar?: AvatarData
   label: string
   description?: string
   suffix?: React.ReactNode
@@ -254,9 +254,12 @@ const ListItemPreview = ({ size, startIcon: StartIcon, avatar, label, descriptio
         <div className={`${alignClass} flex items-center shrink-0`}>
           {StartIcon && <StartIcon size={iconPx} aria-hidden />}
           {avatar && (
-            <div className={`shrink-0 rounded-full overflow-hidden ${hasBlockPrefix ? (size === 'lg' ? 'w-10 h-10' : 'w-8 h-8') : 'w-6 h-6'}`}>
-              {avatar}
-            </div>
+            <Avatar
+              src={avatar.src}
+              alt={avatar.alt}
+              color={avatar.color}
+              size={hasBlockPrefix ? (size === 'lg' ? 40 : 32) : 24}
+            />
           )}
         </div>
       )}
@@ -506,7 +509,7 @@ const InspectorInner = () => {
                 <SelectMenuItem
                   size={size}
                   startIcon={effectiveHasPrefix && effectivePrefixType === 'icon' ? Mail : undefined}
-                  avatar={effectiveHasPrefix && effectivePrefixType === 'avatar' ? <Avatar alt="Alice" color="indigo" size="fill" /> : undefined}
+                  avatar={effectiveHasPrefix && effectivePrefixType === 'avatar' ? { alt: "Alice", color: "indigo" as const } : undefined}
                   description={hasDescription ? descText : undefined}
                   tag={effectiveHasSuffix ? <Tag size={size} variant="blue">Pro</Tag> : undefined}
                   labelMaxLines={propLabelClamp}
@@ -522,7 +525,7 @@ const InspectorInner = () => {
                   size={size}
                   control={<Checkbox size={size} checked={true} />}
                   icon={effectiveHasPrefix && effectivePrefixType === 'icon' ? Mail : undefined}
-                  avatar={effectiveHasPrefix && effectivePrefixType === 'avatar' ? <Avatar alt="Alice" color="indigo" size="fill" /> : undefined}
+                  avatar={effectiveHasPrefix && effectivePrefixType === 'avatar' ? { alt: "Alice", color: "indigo" as const } : undefined}
                   label={labelText}
                   description={hasDescription ? descText : undefined}
                   labelMaxLines={propLabelClamp}
@@ -535,7 +538,7 @@ const InspectorInner = () => {
                 <ListItemPreview
                   size={size}
                   startIcon={effectiveHasPrefix && effectivePrefixType === 'icon' ? Mail : undefined}
-                  avatar={effectiveHasPrefix && effectivePrefixType === 'avatar' ? <Avatar alt="Alice" color="indigo" size="fill" /> : undefined}
+                  avatar={effectiveHasPrefix && effectivePrefixType === 'avatar' ? { alt: "Alice", color: "indigo" as const } : undefined}
                   label={labelText}
                   description={hasDescription ? descText : undefined}
                   suffix={effectiveHasSuffix ? <ChevronRight size={spec.iconPx} className="text-fg-muted" /> : undefined}
@@ -1002,10 +1005,10 @@ export const AlignmentThreshold = {
 
           {/* Live example */}
           <MenuFrame width={360}>
-            <SelectMenuItem size="md" avatar={<Avatar alt="Alice" color="indigo" size="fill" />} description="Design team lead">
+            <SelectMenuItem size="md" avatar={{ alt: "Alice", color: "indigo" as const }} description="Design team lead">
               Alice Chen
             </SelectMenuItem>
-            <SelectMenuItem size="md" avatar={<Avatar alt="Bob" color="yellow" size="fill" />} description="Backend engineer">
+            <SelectMenuItem size="md" avatar={{ alt: "Bob", color: "yellow" as const }} description="Backend engineer">
               Bob Wang
             </SelectMenuItem>
           </MenuFrame>

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Avatar, type AvatarData } from '@/design-system/components/Avatar/avatar'
 
 // ── Selection Item Styles ───────────────────────────────────────────────────
 // Checkbox 和 RadioGroup 共用的 item 佈局。
@@ -84,7 +85,7 @@ export interface SelectionItemProps extends React.HTMLAttributes<HTMLDivElement>
    */
   icon?: LucideIcon
   /**
-   * 可選的左側 avatar(在 control 之後、label 之前)。`ReactNode` 接受任意內容。
+   * 可選的左側 avatar(在 control 之後、label 之前)。`AvatarData` 資料型別,元件內部渲染 Avatar。
    * 尺寸由 `description` 自動決定(跟 SelectMenuItem 同 convention):
    * - 無 desc → inline(20/24/24px),跟 control 同步在 label 第一行
    * - 有 desc → block(32/32/40px),跟 control 同步在 text block center
@@ -92,7 +93,7 @@ export interface SelectionItemProps extends React.HTMLAttributes<HTMLDivElement>
    * Block 模式時 **control(checkbox/radio)也一起走 block 高度**——兩者都在
    * text block center,不會歪斜。與 `icon` 互斥。
    */
-  avatar?: React.ReactNode
+  avatar?: AvatarData
   /** htmlFor（label 指向 control 的 id） */
   htmlFor?: string
   /** disabled 狀態影響 label 顏色 */
@@ -187,9 +188,12 @@ const SelectionItem = React.forwardRef<HTMLDivElement, SelectionItemProps>(
               />
             )}
             {!Icon && avatar && (
-              <div className={cn('shrink-0 rounded-full overflow-hidden', avatarSizeClasses[avatarPx])}>
-                {avatar}
-              </div>
+              <Avatar
+                src={avatar.src}
+                alt={avatar.alt}
+                color={avatar.color}
+                size={avatarPx}
+              />
             )}
           </div>
         )}

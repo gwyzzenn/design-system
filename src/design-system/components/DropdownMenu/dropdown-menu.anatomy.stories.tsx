@@ -233,7 +233,7 @@ export const Overview = {
                 ['Content', 'minWidth', 'number', 'max(180px, trigger-width)', '浮層最小寬度 (px)'],
                 ['Content', 'maxHeight', 'number', '—', '浮層最大高度，超過時捲動'],
                 ['Item', 'startIcon', 'LucideIcon', '—', '左側 icon，與 label 同色'],
-                ['Item', 'avatar', 'ReactNode', '—', '左側頭像，與 startIcon 互斥'],
+                ['Item', 'avatar', 'AvatarData', '—', '左側頭像資料，與 startIcon 互斥'],
                 ['Item', 'description', 'ReactNode', '—', '次要說明文字'],
                 ['Item', 'tag', 'ReactNode', '—', '後綴 Tag'],
                 ['Item', 'badge', 'ReactNode', '—', '後綴 Badge'],

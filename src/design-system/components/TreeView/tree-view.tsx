@@ -262,6 +262,10 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
     // ── Drag state ──
     const [draggingId, setDraggingId] = React.useState<string | null>(null)
     const [dropTarget, setDropTarget] = React.useState<{ id: string; position: DropPosition; depth: number } | null>(null)
+    const autoExpandTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+    // Ref for toggleExpand — handleDragOver 定義在 toggleExpand 之前(hook 順序限制),
+    // 用 ref 打斷 temporal dead zone。
+    const toggleExpandRef = React.useRef<(id: string) => void>(() => {})
 
     const sensors = useSensors(
       useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
@@ -286,6 +290,7 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
     const handleDragOver = React.useCallback((event: DragOverEvent) => {
       const { over, active } = event
       if (!over || over.id === active.id) {
+        if (autoExpandTimerRef.current) { clearTimeout(autoExpandTimerRef.current); autoExpandTimerRef.current = null }
         setDropTarget(null)
         return
       }
@@ -352,12 +357,23 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
       }
 
       setDropTarget({ id: String(over.id), position, depth: finalDepth })
-    }, [])
+
+      // Auto-expand collapsed folder after 500ms hover (Figma behavior)
+      if (position === 'inside' && hasChildren && !expandedIds.has(String(over.id))) {
+        if (autoExpandTimerRef.current) clearTimeout(autoExpandTimerRef.current)
+        autoExpandTimerRef.current = setTimeout(() => {
+          toggleExpandRef.current(String(over.id))
+        }, 500)
+      } else {
+        if (autoExpandTimerRef.current) { clearTimeout(autoExpandTimerRef.current); autoExpandTimerRef.current = null }
+      }
+    }, [expandedIds])
 
     const dropTargetRef = React.useRef(dropTarget)
     dropTargetRef.current = dropTarget
 
     const handleDragEnd = React.useCallback((event: DragEndEvent) => {
+      if (autoExpandTimerRef.current) { clearTimeout(autoExpandTimerRef.current); autoExpandTimerRef.current = null }
       const { active, over } = event
       const dt = dropTargetRef.current
       if (over && active.id !== over.id && dt) {
@@ -372,6 +388,7 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
     }, [onDragEndProp])
 
     const handleDragCancel = React.useCallback(() => {
+      if (autoExpandTimerRef.current) { clearTimeout(autoExpandTimerRef.current); autoExpandTimerRef.current = null }
       setDraggingId(null)
       setDropTarget(null)
     }, [])
@@ -391,6 +408,7 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
       },
       [setExpandedIds]
     )
+    toggleExpandRef.current = toggleExpand
 
     const select = React.useCallback(
       (id: string) => {

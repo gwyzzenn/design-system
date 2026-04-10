@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { Mail, Bell, Settings, FileText, Folder, Plus } from 'lucide-react'
 import { SelectMenuItem, SelectMenuGroup, SelectMenuFooter } from './select-menu-item'
 import { Tag } from '@/design-system/components/Tag/tag'
-import { Avatar } from '@/design-system/components/Avatar/avatar'
+// Avatar is now passed as AvatarData (data object), rendered internally by SelectMenuItem
 
 const meta: Meta = {
   title: 'Design System/Components/SelectMenu/設計規格',
@@ -394,7 +394,7 @@ const InspectorInner = () => {
                 <SelectMenuItem
                   size={size}
                   startIcon={hasIcon ? Mail : undefined}
-                  avatar={hasAvatar ? <Avatar alt="Alice" color="indigo" size="fill" /> : undefined}
+                  avatar={hasAvatar ? { alt: "Alice", color: "indigo" as const } : undefined}
                   description={hasDesc ? '每日摘要信件到信箱' : undefined}
                   checkbox={isMulti}
                   checked={isMulti ? selected : undefined}
@@ -746,10 +746,10 @@ export const SizeMatrix = {
                   <SelectMenuItem size={sz} startIcon={Mail} description="每日摘要信件">
                     電子郵件通知
                   </SelectMenuItem>
-                  <SelectMenuItem size={sz} avatar={<Avatar alt="Alice" color="indigo" size="fill" />}>
+                  <SelectMenuItem size={sz} avatar={{ alt: "Alice", color: "indigo" as const }}>
                     Alice Chen
                   </SelectMenuItem>
-                  <SelectMenuItem size={sz} avatar={<Avatar alt="Bob" color="magenta" size="fill" />} description="工程部門">
+                  <SelectMenuItem size={sz} avatar={{ alt: "Bob", color: "magenta" as const }} description="工程部門">
                     Bob Wang
                   </SelectMenuItem>
                   <SelectMenuItem size={sz} checkbox checked={true} startIcon={Bell}>

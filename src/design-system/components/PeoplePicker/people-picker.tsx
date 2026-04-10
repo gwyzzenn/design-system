@@ -3,7 +3,7 @@ import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { FieldMode } from '@/design-system/components/fields/field-types'
 import { fieldWrapperStyles, EMPTY_DISPLAY } from '@/design-system/components/fields/field-wrapper'
-import { PersonDisplay, MultiPersonDisplay, Avatar, type PersonValue } from '@/design-system/components/DataTable/person-display'
+import { PersonDisplay, MultiPersonDisplay, type PersonValue } from '@/design-system/components/DataTable/person-display'
 import { SelectMenu, type SelectMenuOption } from '@/design-system/components/SelectMenu/select-menu'
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
@@ -18,13 +18,9 @@ function personToMenuOption(person: PersonValue): SelectMenuOption {
     value: p.name,
     label: p.name,
     description: (person as { description?: string }).description,
-    // avatar size="fill"——填滿 SelectMenuItem 的 container。
-    // SelectMenuItem 根據 description 有無自動決定 inline(24) / block(32/40)。
-    // 有 description → block mode → avatar ≈ floor₈(1lh + 2px + desc_1lh) = 32px(md)
-    // checkbox + avatar 都在 prefixAlignVariants 的 block 高度內 centered。
-    avatar: (
-      <Avatar person={p} size="fill" />
-    ),
+    // avatar 傳資料，SelectMenuItem 內部用 Avatar 元件渲染。
+    // SelectMenuItem 根據 description 有無自動決定 inline(24) / block(32/40) 尺寸。
+    avatar: { src: p.avatarUrl, alt: p.name },
   }
 }
 

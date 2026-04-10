@@ -3,6 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
+import { Avatar, type AvatarData } from '@/design-system/components/Avatar/avatar'
 
 /**
  * SelectMenuItem — Select Menu 的選項元件
@@ -95,8 +96,8 @@ export interface SelectMenuItemProps
   description?: React.ReactNode
   /** 左側 icon（LucideIcon），與 avatar 互斥 */
   startIcon?: LucideIcon
-  /** 左側頭像/視覺元素（ReactNode），與 startIcon 互斥 */
-  avatar?: React.ReactNode
+  /** 左側頭像資料（AvatarData），元件內部渲染 Avatar。與 startIcon 互斥 */
+  avatar?: AvatarData
   /** 顯示 checkbox（多選模式由父層控制） */
   checkbox?: boolean
   /** Checkbox 選中狀態 */
@@ -246,14 +247,12 @@ const SelectMenuItem = React.forwardRef<HTMLDivElement, SelectMenuItemProps>(
               />
             )}
             {avatar && (
-              <div
-                className={cn(
-                  'shrink-0 rounded-full overflow-hidden',
-                  avatarSizeClasses[avatarPx],
-                )}
-              >
-                {avatar}
-              </div>
+              <Avatar
+                src={avatar.src}
+                alt={avatar.alt}
+                color={avatar.color}
+                size={avatarPx}
+              />
             )}
           </div>
         )}

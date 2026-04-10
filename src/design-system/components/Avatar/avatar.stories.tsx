@@ -235,14 +235,14 @@ export const InContext = {
         <div className="flex flex-col gap-2">
           <span className="text-caption font-medium text-fg-secondary">無 description（inline）</span>
           <div className="w-[280px] border border-divider rounded-lg py-1 bg-surface">
-            <SelectMenuItem avatar={<Avatar size={24} src="https://i.pravatar.cc/48?u=a1" alt="Alice" />}>
+            <SelectMenuItem avatar={{ src: "https://i.pravatar.cc/48?u=a1", alt: "Alice" }}>
               Alice Chen
             </SelectMenuItem>
-            <SelectMenuItem avatar={<Avatar size={24} alt="Bob" color="blue" />}>
+            <SelectMenuItem avatar={{ alt: "Bob", color: "blue" }}>
               Bob Wang
             </SelectMenuItem>
-            <SelectMenuItem avatar={<Avatar size={24} icon={Globe} color="purple" shape="square" />}>
-              全球團隊
+            <SelectMenuItem avatar={{ alt: "Carol", color: "purple" }}>
+              Carol Lee
             </SelectMenuItem>
           </div>
         </div>
@@ -250,22 +250,22 @@ export const InContext = {
           <span className="text-caption font-medium text-fg-secondary">有 description（block）</span>
           <div className="w-[320px] border border-divider rounded-lg py-1 bg-surface">
             <SelectMenuItem
-              avatar={<Avatar size={32} src="https://i.pravatar.cc/64?u=a2" alt="Alice" />}
+              avatar={{ src: "https://i.pravatar.cc/64?u=a2", alt: "Alice" }}
               description="前端工程師"
             >
               Alice Chen
             </SelectMenuItem>
             <SelectMenuItem
-              avatar={<Avatar size={32} alt="Carol" color="magenta" />}
+              avatar={{ alt: "Carol", color: "magenta" }}
               description="產品設計師"
             >
               Carol Lee
             </SelectMenuItem>
             <SelectMenuItem
-              avatar={<Avatar size={32} icon={Rocket} color="turquoise" shape="square" />}
+              avatar={{ alt: "Dave", color: "turquoise" }}
               description="跨部門協作專案"
             >
-              Project Alpha
+              Dave Lin
             </SelectMenuItem>
           </div>
         </div>

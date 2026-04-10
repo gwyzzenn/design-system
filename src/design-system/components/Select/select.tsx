@@ -146,6 +146,7 @@ const NativeSelect = React.forwardRef<HTMLSelectElement, SelectProps>(
     const selectedOpt = options?.find(o => o.value === value)
     const label = selectedOpt?.label ?? value
     const nativeTagVariant = selectedOpt?.tagVariant as 'blue' | 'green' | 'red' | 'yellow' | 'neutral' | undefined
+    const SelectedOptIcon = selectedOpt?.icon
 
     if (!isTextDisplay) {
       return (
@@ -166,6 +167,7 @@ const NativeSelect = React.forwardRef<HTMLSelectElement, SelectProps>(
         error && ['border-error hover:border-error-hover', 'focus-within:border-error focus-within:hover:border-error'], className)}
         data-field-mode="edit" data-error={error ? '' : undefined}>
         {StartIcon && <StartIcon size={iconSize} className="shrink-0 text-fg-muted pointer-events-none" aria-hidden />}
+        {!StartIcon && SelectedOptIcon && value && <SelectedOptIcon size={iconSize} className="shrink-0 pointer-events-none" aria-hidden />}
         {selectEl}
         {clearEl}
         {chevronEl}

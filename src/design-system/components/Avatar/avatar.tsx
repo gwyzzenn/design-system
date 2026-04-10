@@ -150,4 +150,17 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
 )
 Avatar.displayName = 'Avatar'
 
+// ── AvatarData ─────────────────────────────────────────────────────────────
+// 資料型別，讓 consumer 傳資料而非 ReactNode。
+// 接收端內部用 Avatar 元件渲染，統一控制尺寸與 fallback。
+
+export interface AvatarData {
+  /** 圖片 URL */
+  src?: string
+  /** 替代文字（圖片失敗時取首字作 fallback） */
+  alt: string
+  /** Icon / text fallback 的背景色，預設 neutral */
+  color?: ColorKey
+}
+
 export { Avatar }
