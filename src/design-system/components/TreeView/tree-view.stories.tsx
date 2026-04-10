@@ -218,46 +218,99 @@ export const LongLabel: Story = {
   ),
 }
 
-// ── Drag and Drop ───────────────────────────────────────────────────────
+// ── Drag and Drop (functional — items actually move) ────────────────────
+
+interface DemoNode { id: string; label: string; icon: React.ComponentType<{ size: number; className?: string }>; children?: DemoNode[] }
+
+function removeNode(nodes: DemoNode[], id: string): [DemoNode[], DemoNode | null] {
+  let removed: DemoNode | null = null
+  const result = nodes.filter(n => {
+    if (n.id === id) { removed = n; return false }
+    return true
+  }).map(n => {
+    if (!n.children) return n
+    const [newChildren, found] = removeNode(n.children, id)
+    if (found) removed = found
+    return { ...n, children: newChildren }
+  })
+  return [result, removed]
+}
+
+function insertNode(nodes: DemoNode[], targetId: string, node: DemoNode, position: 'before' | 'after' | 'inside'): DemoNode[] {
+  if (position === 'inside') {
+    return nodes.map(n => {
+      if (n.id === targetId) return { ...n, children: [...(n.children ?? []), node] }
+      if (!n.children) return n
+      return { ...n, children: insertNode(n.children, targetId, node, position) }
+    })
+  }
+  const result: DemoNode[] = []
+  for (const n of nodes) {
+    if (n.id === targetId && position === 'before') result.push(node)
+    result.push(n.children ? { ...n, children: insertNode(n.children, targetId, node, position) } : n)
+    if (n.id === targetId && position === 'after') result.push(node)
+  }
+  return result
+}
+
+function renderNodes(nodes: DemoNode[]) {
+  return nodes.map(n => (
+    <TreeItem key={n.id} id={n.id} icon={n.icon} label={n.label}>
+      {n.children && n.children.length > 0 && renderNodes(n.children)}
+    </TreeItem>
+  ))
+}
+
+const INITIAL_TREE: DemoNode[] = [
+  { id: 'pages', label: 'Pages', icon: Folder, children: [
+    { id: 'home', label: 'Home', icon: FileText },
+    { id: 'about', label: 'About', icon: FileText },
+    { id: 'contact', label: 'Contact', icon: FileText },
+  ]},
+  { id: 'docs', label: 'Docs', icon: Folder, children: [
+    { id: 'intro', label: 'Introduction', icon: FileCode },
+    { id: 'guide', label: 'Getting Started', icon: FileCode },
+  ]},
+  { id: 'settings', label: 'Settings', icon: Settings },
+]
 
 export const DragAndDrop: Story = {
   name: 'Drag & Drop',
   render: () => {
+    const [tree, setTree] = React.useState(INITIAL_TREE)
     const [log, setLog] = React.useState<string[]>([])
+
     return (
       <div className="flex gap-6 items-start">
         <div className="flex flex-col gap-2">
           <p className="text-caption text-fg-muted max-w-xs">
-            Figma 風格:整列可拖曳(click = select,拖動 5px 後 = drag)。
-            拖到其他 node 上方(before) / 下方(after) / 中間(inside)。
-            Consumer 透過 onDragEnd 接收 reorder 事件(右側 log)。
+            Figma 風格:整列拖曳,items 真的會移動。拖到其他 node 上方(before) / 下方(after) / 中間(inside 成為子項)。
           </p>
           <div className="w-[280px] border border-divider rounded-lg bg-surface overflow-hidden">
             <TreeView
               aria-label="拖曳排序"
               draggable
               defaultExpandedIds={['pages', 'docs']}
-              onDragEnd={(e) =>
-                setLog((prev) => [`${e.sourceId} → ${e.targetId} (${e.position})`, ...prev].slice(0, 8))
-              }
+              onDragEnd={(e) => {
+                setTree(prev => {
+                  const [without, node] = removeNode(prev, e.sourceId)
+                  if (!node) return prev
+                  return insertNode(without, e.targetId, node, e.position)
+                })
+                setLog(prev => [`${e.sourceId} → ${e.targetId} (${e.position})`, ...prev].slice(0, 10))
+              }}
             >
-              <TreeItem id="pages" icon={Folder} label="Pages">
-                <TreeItem id="home" icon={FileText} label="Home" />
-                <TreeItem id="about" icon={FileText} label="About" />
-                <TreeItem id="contact" icon={FileText} label="Contact" />
-              </TreeItem>
-              <TreeItem id="docs" icon={Folder} label="Docs">
-                <TreeItem id="intro" icon={FileCode} label="Introduction" />
-                <TreeItem id="guide" icon={FileCode} label="Getting Started" />
-              </TreeItem>
-              <TreeItem id="settings" icon={Settings} label="Settings" />
+              {renderNodes(tree)}
             </TreeView>
           </div>
+          <button type="button" onClick={() => setTree(INITIAL_TREE)} className="text-caption text-primary hover:underline cursor-pointer self-start">
+            重設
+          </button>
         </div>
         <div className="w-[240px]">
-          <p className="text-caption font-medium text-fg-muted mb-2">Drag log</p>
+          <p className="text-caption font-medium text-fg-muted mb-2">移動紀錄</p>
           <div className="flex flex-col gap-1 text-[11px] font-mono text-fg-secondary">
-            {log.length === 0 && <span className="text-fg-muted">拖曳後這裡會顯示事件</span>}
+            {log.length === 0 && <span className="text-fg-muted">拖曳 node 後這裡會顯示</span>}
             {log.map((l, i) => <span key={i}>{l}</span>)}
           </div>
         </div>

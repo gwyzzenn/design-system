@@ -24,6 +24,10 @@ const tagPadding: Record<string, string> = {
 export interface SelectOption {
   value: string
   label: string
+  /** Tag 模式的顏色。只在 display='tag' 時生效,對應 Tag 的 variant */
+  tagVariant?: string
+  /** 代表 value 的 prefix icon。觸發器和 dropdown 都會顯示。顏色跟 label 同(foreground) */
+  icon?: LucideIcon
 }
 
 function SelectDisplay({ value, options, size }: { value?: string | null; options?: SelectOption[]; size?: 'sm' | 'md' | 'lg' }) {
@@ -184,7 +188,9 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
       return <ReadonlyDisplay mode={resolvedMode} size={size} options={options} value={value} display={display} startIcon={StartIcon} className={className} />
     }
 
-    const selectedLabel = options?.find(o => o.value === value)?.label ?? ''
+    const selectedOpt = options?.find(o => o.value === value)
+    const selectedLabel = selectedOpt?.label ?? ''
+    const SelectedIcon = selectedOpt?.icon
 
     const handleSelect = (optValue: string) => {
       onChange?.(optValue)
@@ -224,17 +230,24 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
         />
       </>
     ) : isTextDisplay ? (
-      // Text display: 純文字
+      // Text display: 純文字 + optional value icon
       <>
+        {/* startIcon(field 用途 icon)或 option.icon(value icon) */}
         {StartIcon && <StartIcon size={iconSize} className="shrink-0 text-fg-muted pointer-events-none" aria-hidden />}
+        {!StartIcon && SelectedIcon && value && <SelectedIcon size={iconSize} className="shrink-0 pointer-events-none" aria-hidden />}
         <span className={cn('flex-1 min-w-0 truncate', !value && 'text-fg-muted')}>
           {value ? selectedLabel : (placeholder ?? '選擇…')}
         </span>
       </>
     ) : (
-      // Tag display
+      // Tag display: 用 option 的 tagVariant
       <>
-        {value ? <Tag size={size} className="shrink-0 pointer-events-none">{selectedLabel}</Tag> : <span className="text-fg-muted">{placeholder ?? '選擇…'}</span>}
+        {value && selectedOpt?.tagVariant
+          ? <Tag size={size} variant={selectedOpt.tagVariant as 'blue' | 'green' | 'red' | 'yellow' | 'neutral'} className="shrink-0 pointer-events-none">{selectedLabel}</Tag>
+          : value
+            ? <Tag size={size} className="shrink-0 pointer-events-none">{selectedLabel}</Tag>
+            : <span className="text-fg-muted">{placeholder ?? '選擇…'}</span>
+        }
         <span className="flex-1" />
       </>
     )
@@ -289,21 +302,28 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
                 沒有符合的選項
               </CommandEmpty>
               <CommandGroup className="p-0 py-2">
-                {filteredOptions.map((opt) => (
-                  <CommandItem
-                    key={opt.value}
-                    value={opt.label}
-                    onSelect={() => handleSelect(opt.value)}
-                    className="p-0 rounded-none data-[selected=true]:bg-transparent"
-                  >
-                    <SelectMenuItem
-                      size={size}
-                      selected={value === opt.value}
+                {filteredOptions.map((opt) => {
+                  const OptIcon = opt.icon
+                  return (
+                    <CommandItem
+                      key={opt.value}
+                      value={opt.label}
+                      onSelect={() => handleSelect(opt.value)}
+                      className="p-0 rounded-none data-[selected=true]:bg-transparent"
                     >
-                      {opt.label}
-                    </SelectMenuItem>
-                  </CommandItem>
-                ))}
+                      <SelectMenuItem
+                        size={size}
+                        selected={value === opt.value}
+                        startIcon={isTextDisplay && OptIcon ? OptIcon : undefined}
+                      >
+                        {/* tag mode: 選項也用 Tag 顯示(跟 trigger 一致) */}
+                        {!isTextDisplay && opt.tagVariant
+                          ? <Tag size={size} variant={opt.tagVariant as 'blue' | 'green' | 'red' | 'yellow' | 'neutral'}>{opt.label}</Tag>
+                          : opt.label}
+                      </SelectMenuItem>
+                    </CommandItem>
+                  )
+                })}
               </CommandGroup>
             </CommandList>
           </Command>
