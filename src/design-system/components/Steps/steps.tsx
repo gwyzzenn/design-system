@@ -377,6 +377,7 @@ const StepItem = React.forwardRef<HTMLLIElement, StepItemProps>(
           className={cn(
             stepItemVariants({ orientation: steps.orientation, size: steps.size }),
             isVertical && !__isLast && 'pb-6',
+            !clickable && 'cursor-not-allowed',
             className,
           )}
           {...props}
