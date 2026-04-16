@@ -10,6 +10,7 @@ import { OverflowIndicator } from '@/design-system/components/OverflowIndicator/
 import { Popover, PopoverContent, PopoverTrigger } from '@/design-system/components/Popover/popover'
 import { Command, CommandList, CommandEmpty, CommandGroup, CommandItem } from '@/design-system/components/Command/command'
 import { SelectMenuItem, SelectMenuGroup, SelectMenuFooter } from '@/design-system/components/SelectMenu/select-menu-item'
+import { Empty } from '@/design-system/components/Empty/empty'
 import { useIsMobile } from '@/design-system/hooks/use-is-mobile'
 
 // ── constants ───────────────────────────────────────────────────────────────
@@ -360,7 +361,9 @@ function CustomCombobox({
             </div>
           )}
           <CommandList>
-            <CommandEmpty className="py-4 text-center text-caption text-fg-muted">沒有符合的選項</CommandEmpty>
+            <CommandEmpty className="py-4 flex items-center justify-center">
+              <Empty description="沒有符合的選項" className="py-6" />
+            </CommandEmpty>
             <CommandGroup className="p-0 py-2">
               {filteredOptions.map((opt) => (
                 <CommandItem key={opt.value} value={opt.label} onSelect={() => handleToggle(opt.value)}

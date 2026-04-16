@@ -4,6 +4,7 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { Pencil, Trash2, Copy, MoreVertical } from 'lucide-react'
 import { DataTable } from './data-table'
 import { Button } from '@/design-system/components/Button/button'
+import { Empty } from '@/design-system/components/Empty/empty'
 import './column-types' // ColumnMeta declaration merging
 
 // ── Sample Data ──────────────────────────────────────────────────────────────
@@ -217,10 +218,7 @@ export const EmptyState: Story = {
           columns={baseColumns}
           data={[]}
           emptyState={
-            <div className="text-center">
-              <p className="text-body text-fg-muted mb-1">尚無商品</p>
-              <p className="text-caption text-fg-muted">點擊上方「新增」開始建立</p>
-            </div>
+            <Empty title="尚無商品" description="點擊上方「新增」開始建立" />
           }
         />
       </div>

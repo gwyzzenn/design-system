@@ -8,6 +8,7 @@ import { Command, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandS
 import { Command as CommandPrimitive } from 'cmdk'
 import { SelectMenuItem, SelectMenuGroup, SelectMenuFooter } from './select-menu-item'
 import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
+import { Empty } from '@/design-system/components/Empty/empty'
 import { RowSizeProvider } from '@/design-system/patterns/item-layout/item-layout'
 
 /**
@@ -247,11 +248,8 @@ export function SelectMenu({
             }}
           >
             {/* 空狀態:absolute 填滿 CommandList,文案垂直 + 水平居中 */}
-            <CommandEmpty className={cn(
-              'absolute inset-0 flex items-center justify-center leading-compact text-fg-muted',
-              size === 'lg' ? 'text-body-lg' : 'text-body',
-            )}>
-              {emptyText}
+            <CommandEmpty className="absolute inset-0 flex items-center justify-center">
+              <Empty description={emptyText} className="py-6" />
             </CommandEmpty>
 
             {groupedOptions.map((group, gi) => (

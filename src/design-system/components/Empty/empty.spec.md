@@ -56,6 +56,23 @@ Outer padding 由 **consumer 容器** 決定:
 
 Description **不加 max-width**。文字撐滿容器,由容器 padding 控制行寬。文案設計者自己規劃換行(文案長度 = 設計的一部分),Empty 不該強制截斷。
 
+## 垂直定位(Consumer 容器的責任)
+
+Empty 只管**水平居中**。垂直定位由 consumer 的容器決定:
+
+| 容器類型 | 垂直定位 | 做法 |
+|---|---|---|
+| **有框**(Table / Dialog / Card,有明確 border 或 shadow 包圍) | **垂直置中** | 容器 `flex items-center justify-center min-h-[...]` |
+| **無框**(Page section,沒有外框線) | **頂部對齊 + generous padding** | 容器 `py-[calc(var(--layout-space-bottom)*2)]`(= 96px) |
+
+### 為什麼有框置中、無框不置中
+
+有框容器有明確的視覺邊界——使用者知道「這個框裡面是空的」。居中把 Empty 放在框的視覺重心,安定。
+
+無框容器沒有邊界——如果居中,Empty 會「飄在頁面中間」,使用者不知道空的範圍有多大。頂部對齊 + 96px padding 讓 Empty 有固定位置,96px 的留白(= `--layout-space-bottom` × 2)用空間本身創造「這裡是空的」的視覺重量,取代框線的作用。
+
+---
+
 ## 消費範例
 
 ```tsx

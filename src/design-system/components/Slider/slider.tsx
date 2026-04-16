@@ -31,7 +31,7 @@ const sliderRootVariants = cva(
   //
   // 詳細判準見 `slider.spec.md` 的「Disabled 策略」章節。
   [
-    'relative flex items-center w-full touch-none select-none',
+    'relative flex items-center w-full min-w-0 touch-none select-none',
     'data-[disabled]:cursor-not-allowed',
   ],
   {
