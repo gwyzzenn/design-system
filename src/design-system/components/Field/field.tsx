@@ -296,14 +296,42 @@ const FieldLabel = React.forwardRef<HTMLLabelElement, FieldLabelProps>(
     const disabled = ctx?.disabled ?? false
     const htmlFor = htmlForProp ?? ctx?.id
     const isHorizontal = ctx?.orientation === 'horizontal'
+    const controlLayout = ctx?.controlLayout ?? 'inline'
     const size: FieldSize = ctx?.size ?? 'md'
 
-    // Horizontal 模式：label 與 input 中線對齊公式
-    //   padding-top = (field-height - 1lh) / 2
-    // 單行 label → 文字置中於 input；多行 label → 第一行對齊 input 中線，其餘往下流
-    const horizontalStyle: React.CSSProperties | undefined = isHorizontal
-      ? { paddingTop: `calc((${FIELD_HEIGHT_VAR[size]} - 1lh) / 2)` }
-      : undefined
+    // Horizontal 模式對齊策略 — 依 controlLayout 分兩套 (CSS-only, 不需 JS 測量)
+    //
+    // ── Inline control (Input / Button / Switch / SegmentedControl) ──
+    //   Control 有固定單行高度 = field-height,可以對齊中線。
+    //   策略: min-h-field-{size} + flex flex-col + justify-content: center
+    //
+    //   1) 短 label (總高 ≤ field-height):
+    //      min-h 生效 → 容器 = field-height → justify-center 把 label 垂直置中
+    //      第一行 top = (field-height - 1lh)/2 → 第一行中線對齊 control 中線 ✓
+    //   2) 長 label (總高 > field-height):
+    //      min-h 被內容撐大 → 容器 = label 總高 → justify-center 無作用(內容已填滿)
+    //      第一行 top = 0 → label top 對齊 control top ✓
+    //
+    // ── Block control (RadioGroup / CheckboxGroup) ──
+    //   Control 是多行群組,沒有「整體中線」可以對齊;錨點是「第一個 item 的第一行
+    //   中線永遠在 field-height/2」,由 SelectionItem 的 py 維持。
+    //   策略: padding-top = (field-height - 1lh)/2 — 把 label 第一行推到同樣位置。
+    //
+    //   這個策略對任何 label 長度都正確:label 第一行永遠與第一個 item 第一行對齊,
+    //   label 超出 control 時往下流(因為 block control 通常本來就很高,不會有
+    //   inline 模式那種「label 比 control 高」的視覺問題)。
+    //
+    // 內層 <span>: 只有 inline 策略需要(flex-col 會把 * 星號和 label 文字縱向堆疊,
+    // 必須包一層讓兩者 inline 同行)。block 策略可以不包,但為了 DOM 一致性一律包。
+    const horizontalInlineClass =
+      isHorizontal && controlLayout === 'inline'
+        ? cn('flex flex-col justify-center', MIN_H_CLASS[size])
+        : undefined
+
+    const horizontalBlockStyle: React.CSSProperties | undefined =
+      isHorizontal && controlLayout === 'block'
+        ? { paddingTop: `calc((${FIELD_HEIGHT_VAR[size]} - 1lh) / 2)` }
+        : undefined
 
     return (
       <label
@@ -313,22 +341,25 @@ const FieldLabel = React.forwardRef<HTMLLabelElement, FieldLabelProps>(
           FIELD_TEXT_CLASS[size],
           'font-normal select-none',
           disabled ? 'text-fg-disabled' : 'text-foreground',
+          horizontalInlineClass,
           className
         )}
-        style={{ ...horizontalStyle, ...style }}
+        style={{ ...horizontalBlockStyle, ...style }}
         data-field-slot="label"
         data-field-disabled={disabled ? '' : undefined}
         {...props}
       >
-        {required && (
-          <span
-            aria-hidden="true"
-            className={disabled ? 'text-fg-disabled' : 'text-fg-muted'}
-          >
-            *
-          </span>
-        )}
-        {children}
+        <span>
+          {required && (
+            <span
+              aria-hidden="true"
+              className={disabled ? 'text-fg-disabled' : 'text-fg-muted'}
+            >
+              *
+            </span>
+          )}
+          {children}
+        </span>
       </label>
     )
   }

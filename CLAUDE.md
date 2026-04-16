@@ -78,6 +78,8 @@ src/
 ├── lib/
 │   └── utils.ts                       ← cn() 工具（clsx + tailwind-merge）
 ├── design-system/
+│   ├── hooks/
+│   │   └── useOverflowItems.ts        ← 水平溢出追蹤（useScrollEdges + useOverflowIndices），Tabs / ChipGroup 共用
 │   ├── tokens/
 │   │   ├── color/
 │   │   │   ├── primitives.css         ← 原始色票（靜態 CSS）
@@ -125,6 +127,10 @@ src/
 │   │   │   ├── dropdown-menu.tsx      ← Radix DropdownMenu + 設計系統 token
 │   │   │   └── dropdown-menu.spec.md
 │   │   ├── TreeView/                  ← 階層結構遞迴元件（expand/collapse + drag + keyboard）
+│   │   ├── Breadcrumb/                ← 階層位置指示器（nav + ol/li，link hover 用 primary-hover）
+│   │   ├── Tabs/                      ← 切 view 的頁籤（Radix Tabs + underline + primary-hover + overflow scroll/menu）
+│   │   ├── SegmentedControl/          ← 切 value 的互斥選擇器（Radix ToggleGroup type="single"）
+│   │   ├── Chip/                      ← Material Filter Chip（Radix ToggleGroup + wrap/scroll/menu overflow）
 │   │   ├── Sidebar/                   ← 佈局外殼（Provider + Header + Content + Footer + Trigger）
 │   │   ├── Field/                     ← shadcn Field（Label + Control + Description + Message）
 │   │   │   ├── field.tsx
@@ -296,17 +302,20 @@ rg "group/action.*relative grid place-content-center" src/design-system
 
 ### 清 unused imports 後**必須**跑 storybook 驗證
 
-`tsc --noEmit` clean ≠ runtime clean。曾發生過:
+`tsc --noEmit` clean ≠ runtime clean。曾發生過兩類 bug,都是 tsc 漏抓、runtime 才炸:
 
-> 清 SidebarMenuButton 的 unused imports 時,順手把 `ItemInlineAction` 從 import 砍掉,但這個 identifier 還在 JSX 渲染裡用(`{inlineActions.map(...<ItemInlineAction>...)}`)。tsc 因為 JSX 內 identifier resolution 的特定規則沒抓到(JSX `<X>` 在某些 transformer 下不會被當成嚴格 reference),storybook runtime 才爆 `ItemInlineAction is not defined`。
+> **Case A — 刪 import 但 JSX 還在用**:清 SidebarMenuButton 的 unused imports 時,順手把 `ItemInlineAction` 從 import 砍掉,但這個 identifier 還在 JSX 渲染裡用(`{inlineActions.map(...<ItemInlineAction>...)}`)。tsc 因為 JSX 內 identifier resolution 的特定規則沒抓到,storybook runtime 才爆 `ItemInlineAction is not defined`。
 
-**規則**:任何「import 清理」/「rename」/「刪 export」之後,必須:
+> **Case B — 刪 symbol 但 export list 還在引用**:重構 Tabs 時把 `tabsListVariants` cva 定義拿掉(因為 TabsList 改走 branch 不再需要統一 cva),但底部 `export { ..., tabsListVariants, ... }` 還留著。tsc 沒抓到未宣告的 export identifier,runtime 時 Vite ESM 解析失敗整個 module 標記為 failed,Storybook 報「Failed to fetch dynamically imported module」,看起來像網路錯誤實則是 ESM 解析錯誤。
+
+**規則**:任何「import 清理」/「rename」/「刪 export」/「刪 helper / const / cva」之後,必須:
 
 1. `npx tsc --noEmit` 通過(必要但不充分)
-2. **`npm run dev` 或 `npm run storybook` 跑起來,實際載入動到的 story** ——這才是 runtime truth
-3. 對動到的元件至少切一次互動(點 button、開 collapsible)確保動態 path 也通過
+2. **grep export list 跟當前檔案定義比對**:確認 `export { A, B, C }` 裡每個 identifier 都還真的存在定義
+3. **`npm run dev` 或 `npm run storybook` 跑起來,實際載入動到的 story** ——這才是 runtime truth
+4. 對動到的元件至少切一次互動(點 button、開 collapsible)確保動態 path 也通過
 
-第 2、3 步不能省。
+第 2、3、4 步不能省。特別是第 2 步,tsc 的 `--noEmit` 在某些配置下不會警告 "export 一個不存在的 symbol",必須人眼檢查。
 
 ### Predicate:什麼算 inline action
 
@@ -509,6 +518,72 @@ Token 命名 = `--{namespace}-{role}-{variant?}`
 - slot 接受任意視覺元素 → 命名描述內容類型（如 `avatar`），型別用 `ReactNode`
 - slot 是行為 → 用 callback（如 `onDismiss`），元件內部渲染互動元素並控制尺寸與樣式
 - ❌ 不用 `prefix` / `suffix` / `left` / `right` 等純位置名——這些不傳達內容本質，也無法約束型別
+
+
+# 選擇 / 狀態視覺必須對齊既有 canonical
+
+這一節是我曾經連續犯錯的類別,兩條互補規則。
+
+## 規則 A: 用元件既有的 state prop,不要用 className 發明樣式
+
+**任何元件既有的狀態 prop(`selected` / `checked` / `disabled` / `pressed` / `active` / `invalid` / `loading` 等),消費端必須用 prop,禁止用 `className` 疊加自創樣式表達同一個狀態**。
+
+理由:
+- 既有 prop 背後綁定 **canonical token**(`bg-neutral-selected` / `border-primary-hover` 等),一改全系統同步
+- `className` 自創樣式繞過 canonical,導致「同一狀態在不同元件看起來不同」的視覺漂移
+- 既有 prop 通常也綁 ARIA attributes(`aria-selected` / `aria-checked` 等),自創樣式會丟失 a11y 語意
+
+### 真實犯錯紀錄
+
+> **Case**: Tabs overflow menu 的 active 項目。`DropdownMenuItem` 本來就有 `selected` prop 對應 `bg-neutral-selected`(跟 SelectMenu 單選 canonical 視覺完全一致),但我繞過 prop 直接寫 `className={cn(isActive && 'font-medium text-primary-hover')}` 發明一套「粗體藍字」樣式。結果跟 SelectMenu 同類別的單選視覺完全不一致,使用者一眼看出「為什麼這個 dropdown 跟那個 dropdown 不一樣」。
+
+### 正確做法
+
+```tsx
+// ✅ 對: 用 DropdownMenuItem 的 selected prop(canonical bg-neutral-selected)
+<DropdownMenuItem selected={isActive} onSelect={...}>{label}</DropdownMenuItem>
+
+// ❌ 錯: 用 className 自創樣式
+<DropdownMenuItem className={cn(isActive && 'font-medium text-primary-hover')}>{label}</DropdownMenuItem>
+
+// ❌ 錯: 用錯 semantic 的 prop
+<DropdownMenuCheckboxItem checked={isActive}>{label}</DropdownMenuCheckboxItem>
+```
+
+### 檢查法(寫任何 selection / state 樣式前必做)
+
+1. **grep 元件 props interface**,看它有沒有相關的 state prop(`selected`、`checked`、`disabled`、`active`、`pressed`、`invalid`...)
+2. 有 → **一定用那個 prop**,不用 className
+3. 沒有 → 先暫停,問「是不是該補這個 prop 到元件本身」,不要直接在 consumer 用 className 繞過
+4. 確認沒必要補 prop 才用 className
+
+## 規則 B: 選擇語意必須對應指示器視覺
+
+Selection control(Dropdown / Menu / List / SegmentedControl / Chip)的 item 視覺指示器,必須對應該 control 的 selection model。使用者看一眼就應該能判斷「我可以選多個 vs 我只能選一個」。
+
+| Selection Model | Canonical 視覺 | 禁止 |
+|---|---|---|
+| **多選**(checkbox semantic) | `DropdownMenuCheckboxItem`(方塊勾)、SelectionItem checkbox | radio 圓圈、bg 高亮(無方塊會誤以為單選) |
+| **單選 in dropdown / menu** | `DropdownMenuItem` 的 `selected` prop → `bg-neutral-selected` 持續選中背景(跟 SelectMenu 單選同一套) | **checkbox 方塊**(暗示多選)、**radio 圓圈**(dropdown 不用 radio 指示器,RadioGroup 才用) |
+| **單選 as always-visible form control** | `RadioGroup` + `RadioGroupItem`(圓圈) | — |
+
+### 為什麼 dropdown 單選不用 radio 圓圈
+
+本系統(跟 macOS / Chrome / VS Code 一致)在「隱藏在 dropdown 內的單選」統一用**持續高亮背景**(`bg-neutral-selected`),不用 radio 圓圈指示器。radio 圓圈只用在**永遠可見的 form RadioGroup**。
+兩者視覺完全不同但都是單選,差異來自「使用場景」:
+- **Dropdown 單選(隱藏)**: 打開時視覺極簡,只高亮 current,點了就關、切換 context → SelectMenu / DropdownMenu 單選
+- **Form RadioGroup(常駐)**: 永遠展開,使用者在填表時掃視所有選項 → radio 圓圈讓「這是一組互斥選項」一眼可辨
+
+### 新元件檢查法
+
+設計或審查 selection control 時:
+1. **單選 or 多選?** → 選對 primitive
+2. **隱藏型(dropdown)or 常駐型(form control)?** → 選對視覺語言
+3. **看 consumer 要用什麼 state prop,不要繞過 prop 用 className**(跟上面規則 A 合用)
+
+---
+
+**這兩條規則是我曾經連續犯錯的原因**。違反規則 A 會造成「同狀態不同視覺」,違反規則 B 會造成「視覺誤導 mental model」。寫新元件或審查現有元件時兩條都檢查。
 
 
 # shadcn 元件規範

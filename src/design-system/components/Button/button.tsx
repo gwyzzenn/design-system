@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
-import { Loader2 } from 'lucide-react'
+import { Spinner } from '@/design-system/components/Spinner/spinner'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useFieldContext } from '@/design-system/components/Field/field-context'
@@ -206,6 +206,23 @@ export interface ButtonProps
   fullWidth?: boolean
 }
 
+/**
+ * Icon-only padding — calc `(field-height - icon-size) / 2` per size。
+ *
+ * 設計:startIcon 到左邊距離 = padding = `(height - icon) / 2`。
+ * 純 icon-only 時 width = 2*padding + icon = height → **自然正方形**,不需要 aspect-square。
+ * 有 suffix(badge / endIcon)時 width = 2*pad + icon + gap + suffix > height → **自然長方形**。
+ * StartIcon 到左邊距離始終不變,形狀自動適應內容。
+ *
+ * 用 CSS var 讓 density 切換時 padding 自動跟著算(field-height 會變)。
+ */
+const ICON_ONLY_PX: Record<string, string> = {
+  xs: 'px-[calc((var(--field-height-xs)-16px)/2)]',
+  sm: 'px-[calc((var(--field-height-sm)-16px)/2)]',
+  md: 'px-[calc((var(--field-height-md)-16px)/2)]',
+  lg: 'px-[calc((var(--field-height-lg)-20px)/2)]',
+}
+
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
@@ -268,7 +285,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <Comp
         className={cn(
           buttonVariants({ variant: resolvedVariant, danger: resolvedDanger, size: resolvedSize, className }),
-          iconOnly && 'aspect-square p-0 min-w-0',
+          iconOnly && cn(ICON_ONLY_PX[resolvedSize], 'min-w-0 gap-1'),
           resolvedFullWidth && 'w-full',
         )}
         ref={ref}
@@ -280,7 +297,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...restProps}
       >
         {loading
-          ? <Loader2 size={iconSize} className="animate-spin" aria-hidden />
+          ? <Spinner size={iconSize} />
           : StartIcon && <StartIcon size={iconSize} aria-hidden />
         }
         {children != null && <span className="px-1">{children}</span>}

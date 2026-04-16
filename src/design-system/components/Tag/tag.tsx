@@ -30,7 +30,7 @@ const tagVariants = cva(
       variant: {
         // 直接引用 primitive（bg=step-1, text=step-7），不經過語義層
         // step-1 在 dark mode 用 alpha 公式，step-7 用 lighter 公式——兩個 mode 都正確
-        neutral:   "bg-muted text-foreground",
+        neutral:   "bg-secondary text-foreground",
         blue:      "bg-[var(--color-blue-1)] text-[var(--color-blue-7)]",
         red:       "bg-[var(--color-deep-orange-1)] text-[var(--color-deep-orange-7)]",
         green:     "bg-[var(--color-green-1)] text-[var(--color-green-7)]",

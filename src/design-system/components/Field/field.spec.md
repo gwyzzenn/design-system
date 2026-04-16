@@ -95,26 +95,62 @@ Horizontal 模式下 label 的欄寬由 `labelWidth` prop 控制（任何 CSS le
 
 ## Horizontal 模式的 label 垂直對齊（重要）
 
-### 規則
+### 規則（依 controlLayout 分兩套策略）
 
-Label 文字的**第一行**永遠與 control 的文字中線對齊。單行 label 視覺上置中於 control；多行 label 的第一行仍對齊 control 中線，其餘行往下流。
+Label 的對齊策略依 `controlLayout`（Field 自動偵測 / consumer 可覆寫）分兩套，分別對應 control 語意模型的差異：
 
-### 實作公式
+#### A. Inline control（`Input` / `Button` / `Switch` / `SegmentedControl` 等）
+
+Control 有固定單行高度 = `--field-height-{size}`，可以談「中線對齊」。依 label 總高度分兩段：
+
+| 情境 | 對齊方式 |
+|---|---|
+| **label 總高 ≤ field-height**（單行或很短）| label 第一行中線對齊 control 中線（視覺置中於 control）|
+| **label 總高 > field-height**（多行超出 control）| label **齊頂**對齊 control top——整個 label 從 control 上緣往下長 |
+
+切換點自動發生在 label 高度 = field-height 時。
+
+**實作**：`min-h-field-{size} + flex flex-col + justify-content: center`
 
 ```css
-padding-top: calc((var(--field-height-{size}) - 1lh) / 2);
+min-height: var(--field-height-{size});
+display: flex;
+flex-direction: column;
+justify-content: center;
 ```
 
-- `--field-height-{size}` 跟隨 Field 的 size prop（sm / md / lg）
-- `1lh` 是 CSS line-height unit，取當前元素的 line-height
-- 整個公式等於「控制容器高度與一行文字之間的垂直空間的一半」
+原理：
 
-### 為什麼這個公式是對的
-
-| Label 行數 | 行為 |
+| Label 高度 | 容器行為 |
 |---|---|
-| 1 行（短 label） | padding-top 把 label 向下推到第一行中線與 control 中線對齊 → 視覺置中 ✓ |
-| 多行（長 label） | 第一行仍在同一位置（與 control 中線對齊），後續行往下流，label 總高度超過 control → 視覺上「label 從 control 中線往下長」，對齊 control 內容基準線 |
+| 1 行 21px in min-h 32px | min-h 生效容器固定 32px，`justify-center` 把 label 垂直置中 → 第一行 top 在 `(32-21)/2 = 5.5px` → 第一行中線對齊 control 中線 ✓ |
+| 2 行 42px in min-h 32px | 內容超過 min-h，容器被撐大到 42px，`justify-center` 沒有多餘空間 → label top 在 0 → 對齊 control top ✓ |
+
+#### B. Block control（`RadioGroup` / `CheckboxGroup`）
+
+Control 是多行群組，**沒有「整體中線」可以對齊**；錨點是「第一個 item 的第一行中線永遠在 `field-height/2`」，由 SelectionItem 的 `py = calc((field-height - 1lh)/2)` 維持。
+
+**對齊策略**：label 第一行永遠與第一個 item 第一行對齊，不論 label 長短。
+
+**實作**：`padding-top: calc((field-height - 1lh)/2)`（把 label 第一行推到跟第一個 item 第一行同位置）
+
+這個策略對任何 label 長度都正確：短 label 視覺置中於第一個 item；長 label 從第一個 item 的位置往下延伸超過 control，不會出現 inline 情境那種「label 卡在下半部」的問題，因為 block control 本身就多行。
+
+### 為什麼不能只用一套策略
+
+曾經嘗試用 `min-h + flex-center` 統一處理所有情境，**在 block + 長 label 的組合下會 regression**：label 被撐大超過 min-h 後 `justify-center` 失效、label top 跳到 y=0；但第一個 radio item 仍在 `y = (field-height - 1lh)/2 = 5.5px` 位置，兩者錯開 5.5px 不對齊。
+
+根因：inline 和 block control 是**不同的對齊語意模型**（control 中線 vs 第一個 item 第一行中線），必須分兩套策略。
+
+### 為什麼不用 JS 測量
+
+- 兩套策略都是純 CSS，size / density / 字體切換時自動連動，不需 ResizeObserver
+- 符合 CLAUDE.md「可推導的值用 `calc()` 或公式表達，不硬寫結果」原則
+
+### 為什麼不用 JS 測量
+
+- 策略純 CSS，size / density / 字體切換時自動連動，不需 ResizeObserver
+- 符合 CLAUDE.md「可推導的值用 calc() 或公式表達，不硬寫結果」原則
 
 ### 為什麼不用 JS 測量
 

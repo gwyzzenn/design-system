@@ -1,0 +1,437 @@
+import * as React from 'react'
+import type { Meta, StoryObj } from '@storybook/react'
+import { Check } from 'lucide-react'
+import {
+  Steps,
+  StepItem,
+  StepLabel,
+  StepDescription,
+  StepContent,
+  type StepsSize,
+} from './steps'
+import { Button } from '@/design-system/components/Button/button'
+
+const meta: Meta<typeof Steps> = {
+  title: 'Design System/Components/Steps/展示',
+  component: Steps,
+  parameters: { layout: 'padded' },
+}
+export default meta
+
+type Story = StoryObj<typeof Steps>
+
+// ── 典型 wizard ──────────────────────────────────────────────────────────
+
+export const Default: Story = {
+  name: '預設(垂直 / 線性 / md / Pattern A)',
+  render: () => {
+    const [value, setValue] = React.useState('info')
+    const [completed, setCompleted] = React.useState<string[]>([])
+    const [submitted, setSubmitted] = React.useState(false)
+
+    const advance = () => {
+      const nextMap: Record<string, string> = { info: 'account', account: 'review' }
+      setCompleted(prev => Array.from(new Set([...prev, value])))
+      const next = nextMap[value]
+      if (next) setValue(next)
+    }
+    const back = () => {
+      const prevMap: Record<string, string> = { account: 'info', review: 'account' }
+      const prev = prevMap[value]
+      if (prev) setValue(prev)
+    }
+    const submit = () => {
+      setCompleted(prev => Array.from(new Set([...prev, 'review'])))
+      setSubmitted(true)
+    }
+    const reset = () => {
+      setValue('info')
+      setCompleted([])
+      setSubmitted(false)
+    }
+
+    // ── Pattern A:submit 在最後一步,送出後整個 wizard 替換成 success banner ──
+    // 世界級 wizard UX(Ant / Linear / Stripe 常見):最後一步的 submit 按下後,
+    // stepper 不再顯示,改成一個 success card(+ 重置 button for demo 用)。
+    if (submitted) {
+      return (
+        <div className="w-[480px] flex flex-col gap-4 p-6 bg-muted rounded-md border border-border">
+          <div className="flex items-center gap-3">
+            <span className="h-8 w-8 rounded-full bg-primary flex items-center justify-center shrink-0">
+              <Check className="text-white" size={20} strokeWidth={2.5} aria-hidden />
+            </span>
+            <span className="text-body-lg font-medium text-foreground">
+              已成功送出申請
+            </span>
+          </div>
+          <p className="text-body text-fg-secondary">
+            我們會盡快處理,結果將寄送至您的電子信箱。
+          </p>
+          <div>
+            <Button variant="secondary" onClick={reset}>
+              重新開始 demo
+            </Button>
+          </div>
+        </div>
+      )
+    }
+
+    return (
+      <div className="w-[480px]">
+        <Steps
+          value={value}
+          onValueChange={setValue}
+          completedValues={completed}
+        >
+          <StepItem value="info">
+            <StepLabel>基本資料</StepLabel>
+            <StepDescription>填寫姓名與聯絡方式</StepDescription>
+            <StepContent>
+              <div className="flex flex-col gap-3">
+                <p className="text-body text-fg-secondary">
+                  請輸入你的姓名、電子郵件與電話。
+                </p>
+                <div className="flex gap-2">
+                  <Button onClick={advance}>下一步</Button>
+                </div>
+              </div>
+            </StepContent>
+          </StepItem>
+
+          <StepItem value="account">
+            <StepLabel>帳號設定</StepLabel>
+            <StepDescription>選擇使用者名稱與密碼</StepDescription>
+            <StepContent>
+              <div className="flex flex-col gap-3">
+                <p className="text-body text-fg-secondary">
+                  設定登入帳號。使用者名稱至少 3 個字元。
+                </p>
+                <div className="flex gap-2">
+                  <Button onClick={advance}>下一步</Button>
+                  <Button variant="secondary" onClick={back}>
+                    上一步
+                  </Button>
+                </div>
+              </div>
+            </StepContent>
+          </StepItem>
+
+          <StepItem value="review">
+            <StepLabel>確認並送出</StepLabel>
+            <StepDescription>送出前最後檢查</StepDescription>
+            <StepContent>
+              <div className="flex flex-col gap-3">
+                <p className="text-body text-fg-secondary">
+                  請確認所有欄位正確,按下送出後系統會建立您的帳號。
+                </p>
+                <div className="flex gap-2">
+                  <Button onClick={submit}>送出</Button>
+                  <Button variant="secondary" onClick={back}>
+                    上一步
+                  </Button>
+                </div>
+              </div>
+            </StepContent>
+          </StepItem>
+        </Steps>
+      </div>
+    )
+  },
+}
+
+// ── Sizes ────────────────────────────────────────────────────────────────
+
+export const Sizes: Story = {
+  name: '尺寸(sm / md / lg)',
+  render: () => (
+    <div className="flex gap-12">
+      {(['sm', 'md', 'lg'] as const).map(size => (
+        <div key={size} className="w-[240px]">
+          <div className="text-caption text-fg-muted mb-4">size = {size}</div>
+          <Steps
+            defaultValue="step-2"
+            completedValues={['step-1']}
+            size={size}
+          >
+            <StepItem value="step-1">
+              <StepLabel>基本資料</StepLabel>
+              <StepDescription>已填寫</StepDescription>
+            </StepItem>
+            <StepItem value="step-2">
+              <StepLabel>帳號設定</StepLabel>
+              <StepDescription>進行中</StepDescription>
+            </StepItem>
+            <StepItem value="step-3">
+              <StepLabel>確認資料</StepLabel>
+              <StepDescription>待處理</StepDescription>
+            </StepItem>
+            <StepItem value="step-4">
+              <StepLabel>完成</StepLabel>
+            </StepItem>
+          </Steps>
+        </div>
+      ))}
+    </div>
+  ),
+}
+
+// ── All content states ──────────────────────────────────────────────────
+
+export const AllStates: Story = {
+  name: '所有狀態(upcoming / current / completed / error)',
+  render: () => (
+    <div className="flex gap-12">
+      {(['sm', 'md', 'lg'] as StepsSize[]).map(size => (
+        <div key={size} className="w-[240px]">
+          <div className="text-caption text-fg-muted mb-4">size = {size}</div>
+          <Steps
+            value="s-current"
+            completedValues={['s-completed']}
+            errorValues={['s-error']}
+            size={size}
+            linear={false}
+          >
+            <StepItem value="s-upcoming">
+              <StepLabel>Upcoming</StepLabel>
+              <StepDescription>還沒走到</StepDescription>
+            </StepItem>
+            <StepItem value="s-current">
+              <StepLabel>Current</StepLabel>
+              <StepDescription>當前 focused(有 ring)</StepDescription>
+            </StepItem>
+            <StepItem value="s-completed">
+              <StepLabel>Completed</StepLabel>
+              <StepDescription>已完成</StepDescription>
+            </StepItem>
+            <StepItem value="s-error">
+              <StepLabel>Error</StepLabel>
+              <StepDescription>失敗,需要重做</StepDescription>
+            </StepItem>
+          </Steps>
+        </div>
+      ))}
+    </div>
+  ),
+}
+
+// ── Focus marker 的正交示範 ─────────────────────────────────────────────
+// Ring 跟 content state 正交:任何 state + focused 都能組合
+
+export const FocusRingCombinations: Story = {
+  name: 'Ring 正交示範(value 指向不同 state 的 step)',
+  render: () => {
+    const [value, setValue] = React.useState('step-2')
+    return (
+      <div className="flex flex-col gap-4 w-[420px]">
+        <p className="text-caption text-fg-secondary">
+          點任何 step 看看 ring 如何獨立於底色——ring 表達「使用者在這步」,底色
+          表達「這步的狀態」。兩者正交。
+        </p>
+        <div className="flex gap-2">
+          {['step-1', 'step-2', 'step-3', 'step-4'].map(v => (
+            <Button
+              key={v}
+              size="sm"
+              variant={value === v ? 'primary' : 'secondary'}
+              onClick={() => setValue(v)}
+            >
+              value={v}
+            </Button>
+          ))}
+        </div>
+        <Steps
+          value={value}
+          onValueChange={setValue}
+          completedValues={['step-1', 'step-3']}
+          errorValues={['step-4']}
+          linear={false}
+        >
+          <StepItem value="step-1">
+            <StepLabel>Completed</StepLabel>
+            <StepDescription>藍底 ✓ + ring(若 focused)</StepDescription>
+          </StepItem>
+          <StepItem value="step-2">
+            <StepLabel>Current</StepLabel>
+            <StepDescription>藍底數字 + ring(若 focused)</StepDescription>
+          </StepItem>
+          <StepItem value="step-3">
+            <StepLabel>Completed</StepLabel>
+            <StepDescription>藍底 ✓ + ring(若 focused)</StepDescription>
+          </StepItem>
+          <StepItem value="step-4">
+            <StepLabel>Error</StepLabel>
+            <StepDescription>紅底 ✕ + 紅 ring(若 focused)</StepDescription>
+          </StepItem>
+        </Steps>
+      </div>
+    )
+  },
+}
+
+// ── Non-linear ──────────────────────────────────────────────────────────
+
+export const NonLinear: Story = {
+  name: '非線性(可任意跳)',
+  render: () => {
+    const [value, setValue] = React.useState('overview')
+    return (
+      <div className="w-[360px]">
+        <Steps
+          value={value}
+          onValueChange={setValue}
+          completedValues={['overview']}
+          linear={false}
+        >
+          <StepItem value="overview">
+            <StepLabel>總覽</StepLabel>
+            <StepDescription>可隨時回看</StepDescription>
+          </StepItem>
+          <StepItem value="members">
+            <StepLabel>成員管理</StepLabel>
+            <StepDescription>新增 / 移除團隊成員</StepDescription>
+          </StepItem>
+          <StepItem value="billing">
+            <StepLabel>計費設定</StepLabel>
+            <StepDescription>付款方式</StepDescription>
+          </StepItem>
+          <StepItem value="integrations">
+            <StepLabel>整合</StepLabel>
+            <StepDescription>連接第三方服務</StepDescription>
+          </StepItem>
+        </Steps>
+      </div>
+    )
+  },
+}
+
+// ── Horizontal ──────────────────────────────────────────────────────────
+
+export const Horizontal: Story = {
+  name: '水平(horizontal)',
+  render: () => {
+    const [value, setValue] = React.useState('shipping')
+    return (
+      <div className="w-full max-w-3xl">
+        <Steps
+          value={value}
+          onValueChange={setValue}
+          completedValues={['cart', 'address']}
+          orientation="horizontal"
+        >
+          <StepItem value="cart">
+            <StepLabel>購物車</StepLabel>
+            <StepDescription>已確認</StepDescription>
+          </StepItem>
+          <StepItem value="address">
+            <StepLabel>寄送地址</StepLabel>
+            <StepDescription>已填寫</StepDescription>
+          </StepItem>
+          <StepItem value="shipping">
+            <StepLabel>運送方式</StepLabel>
+            <StepDescription>選擇配送</StepDescription>
+          </StepItem>
+          <StepItem value="payment">
+            <StepLabel>付款</StepLabel>
+            <StepDescription>信用卡 / Apple Pay</StepDescription>
+          </StepItem>
+          <StepItem value="done">
+            <StepLabel>完成</StepLabel>
+          </StepItem>
+        </Steps>
+      </div>
+    )
+  },
+}
+
+// ── Multiple expansion ─────────────────────────────────────────────────
+
+export const MultipleExpansion: Story = {
+  name: 'Multiple 展開模式(可同時展開多個)',
+  render: () => (
+    <div className="w-[480px]">
+      <p className="text-caption text-fg-secondary mb-4">
+        點 step header 切換展開。預設 `all` = 全部展開起手。
+      </p>
+      <Steps
+        defaultValue="b"
+        completedValues={['a']}
+        expansion="multiple"
+        defaultExpanded="all"
+        linear={false}
+      >
+        <StepItem value="a">
+          <StepLabel>安裝套件</StepLabel>
+          <StepDescription>執行 npm install</StepDescription>
+          <StepContent>
+            <div className="max-w-full overflow-x-auto rounded-md bg-muted">
+              <pre className="text-caption p-3 whitespace-pre w-max">
+              npm install @your-org/design-system
+            </pre>
+            </div>
+          </StepContent>
+        </StepItem>
+        <StepItem value="b">
+          <StepLabel>匯入元件</StepLabel>
+          <StepDescription>從 design-system 引入</StepDescription>
+          <StepContent>
+            <div className="max-w-full overflow-x-auto rounded-md bg-muted">
+              <pre className="text-caption p-3 whitespace-pre w-max">
+              {"import { Steps } from '@/design-system/components/Steps/steps'"}
+            </pre>
+            </div>
+          </StepContent>
+        </StepItem>
+        <StepItem value="c">
+          <StepLabel>設定 provider</StepLabel>
+          <StepDescription>包在 App 最外層</StepDescription>
+          <StepContent>
+            <div className="max-w-full overflow-x-auto rounded-md bg-muted">
+              <pre className="text-caption p-3 whitespace-pre w-max">
+              {"<TooltipProvider>{children}</TooltipProvider>"}
+            </pre>
+            </div>
+          </StepContent>
+        </StepItem>
+      </Steps>
+    </div>
+  ),
+}
+
+// ── Without description ─────────────────────────────────────────────────
+// 驗證 column rhythm:混用有/無 description 的 step,indicator y 位置不變
+
+export const MixedDescription: Story = {
+  name: 'Column rhythm 驗證(部分有 description 部分無)',
+  render: () => (
+    <div className="flex gap-12">
+      {(['md', 'lg'] as const).map(size => (
+        <div key={size} className="w-[280px]">
+          <div className="text-caption text-fg-muted mb-4">size = {size}</div>
+          <Steps
+            defaultValue="step-3"
+            completedValues={['step-1', 'step-2']}
+            size={size}
+          >
+            <StepItem value="step-1">
+              <StepLabel>只有 label</StepLabel>
+            </StepItem>
+            <StepItem value="step-2">
+              <StepLabel>Label + 單行 description</StepLabel>
+              <StepDescription>這是一行說明</StepDescription>
+            </StepItem>
+            <StepItem value="step-3">
+              <StepLabel>Label + 長 description</StepLabel>
+              <StepDescription>
+                這是一段比較長的說明文字,會自動換行到第二行,驗證 indicator 對齊
+                行為不受影響
+              </StepDescription>
+            </StepItem>
+            <StepItem value="step-4">
+              <StepLabel>最後一步</StepLabel>
+            </StepItem>
+          </Steps>
+        </div>
+      ))}
+    </div>
+  ),
+}

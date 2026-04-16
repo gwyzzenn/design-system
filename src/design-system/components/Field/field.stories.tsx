@@ -7,6 +7,9 @@ import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
 import { Switch } from '@/design-system/components/Switch/switch'
 import { Button } from '@/design-system/components/Button/button'
 import { RadioGroup, RadioGroupItem } from '@/design-system/components/RadioGroup/radio-group'
+import { SegmentedControl, SegmentedControlItem } from '@/design-system/components/SegmentedControl/segmented-control'
+import { Slider } from '@/design-system/components/Slider/slider'
+import { NumberInput } from '@/design-system/components/NumberInput/number-input'
 
 const meta: Meta = {
   title: 'Design System/Components/Field/展示',
@@ -111,7 +114,7 @@ export const HorizontalLabelAlignment: Story = {
       <div>
         <h3 className="text-body font-bold mb-2">驗證：size 切換時 label 自動跟隨</h3>
         <p className="text-caption text-fg-muted mb-4 max-w-xl">
-          公式用 `var(--field-height-{size})`，size 切換時 padding-top 自動重算，
+          公式用 <code>var(--field-height-&#123;size&#125;)</code>，size 切換時 padding-top 自動重算，
           無需 JS 測量。
         </p>
         <div className="flex flex-col gap-3">
@@ -198,6 +201,92 @@ export const MixedControlAlignment: Story = {
             <Switch />
           </Field>
         </FieldGroup>
+      </div>
+    </div>
+  ),
+}
+
+// ── SegmentedControl 在 Field 內 ────────────────────────────────────────
+
+export const SegmentedControlInField: Story = {
+  name: 'SegmentedControl 作為 Field control',
+  render: () => (
+    <div className="flex flex-col gap-8 max-w-3xl">
+      <div>
+        <h3 className="text-body font-bold mb-2">Vertical：SegmentedControl 自動繼承 Field size</h3>
+        <p className="text-caption text-fg-muted mb-4 max-w-xl">
+          SegmentedControl 在 Field 內透過 useFieldContext() 讀取 size，不需重複傳——跟 Button / Input 同機制。
+          整個 Field 改 size 時，SegmentedControl 跟著一起縮放。
+        </p>
+        <FieldGroup>
+          <Field size="sm">
+            <FieldLabel>檢視模式（sm）</FieldLabel>
+            <SegmentedControl defaultValue="list">
+              <SegmentedControlItem value="list">清單</SegmentedControlItem>
+              <SegmentedControlItem value="board">看板</SegmentedControlItem>
+              <SegmentedControlItem value="calendar">行事曆</SegmentedControlItem>
+            </SegmentedControl>
+            <FieldDescription>切換內容呈現方式</FieldDescription>
+          </Field>
+          <Field size="md">
+            <FieldLabel>檢視模式（md）</FieldLabel>
+            <SegmentedControl defaultValue="list">
+              <SegmentedControlItem value="list">清單</SegmentedControlItem>
+              <SegmentedControlItem value="board">看板</SegmentedControlItem>
+              <SegmentedControlItem value="calendar">行事曆</SegmentedControlItem>
+            </SegmentedControl>
+          </Field>
+          <Field size="lg">
+            <FieldLabel>檢視模式（lg）</FieldLabel>
+            <SegmentedControl defaultValue="list">
+              <SegmentedControlItem value="list">清單</SegmentedControlItem>
+              <SegmentedControlItem value="board">看板</SegmentedControlItem>
+              <SegmentedControlItem value="calendar">行事曆</SegmentedControlItem>
+            </SegmentedControl>
+          </Field>
+        </FieldGroup>
+      </div>
+
+      <div>
+        <h3 className="text-body font-bold mb-2">Horizontal：label 與 SegmentedControl 中線對齊</h3>
+        <p className="text-caption text-fg-muted mb-4 max-w-xl">
+          Horizontal Field 內 SegmentedControl 跟其他 control（Input / Checkbox / Switch）一樣
+          參與 field-height 韻律，label 第一行對齊 control 中線。
+        </p>
+        <FieldGroup>
+          <Field orientation="horizontal" labelWidth="120px">
+            <FieldLabel>名稱</FieldLabel>
+            <Input placeholder="text input" />
+          </Field>
+          <Field orientation="horizontal" labelWidth="120px">
+            <FieldLabel>檢視模式</FieldLabel>
+            <SegmentedControl defaultValue="list">
+              <SegmentedControlItem value="list">清單</SegmentedControlItem>
+              <SegmentedControlItem value="board">看板</SegmentedControlItem>
+              <SegmentedControlItem value="calendar">行事曆</SegmentedControlItem>
+            </SegmentedControl>
+          </Field>
+          <Field orientation="horizontal" labelWidth="120px">
+            <FieldLabel>訂閱通知</FieldLabel>
+            <Switch />
+          </Field>
+        </FieldGroup>
+      </div>
+
+      <div>
+        <h3 className="text-body font-bold mb-2">Disabled：Field disabled 時 SegmentedControl 跟著 disabled</h3>
+        <p className="text-caption text-fg-muted mb-4 max-w-xl">
+          跟 Button / Input 相同——Field 的 disabled state 透過 context 傳給 SegmentedControl，
+          consumer 不需要在 SegmentedControl 上重複傳 disabled。
+        </p>
+        <Field disabled>
+          <FieldLabel>檢視模式</FieldLabel>
+          <SegmentedControl defaultValue="list">
+            <SegmentedControlItem value="list">清單</SegmentedControlItem>
+            <SegmentedControlItem value="board">看板</SegmentedControlItem>
+            <SegmentedControlItem value="calendar">行事曆</SegmentedControlItem>
+          </SegmentedControl>
+        </Field>
       </div>
     </div>
   ),
@@ -390,4 +479,116 @@ export const LabelWidth: Story = {
       </Field>
     </div>
   ),
+}
+
+// ── Slider in Field ──────────────────────────────────────────────────────
+
+export const WithSlider: Story = {
+  name: '包 Slider(垂直對齊驗證)',
+  render: () => {
+    const [volume, setVolume] = React.useState([60])
+    const [priceRange, setPriceRange] = React.useState([2000, 8000])
+    return (
+      <div className="max-w-sm">
+        <FieldGroup>
+          <Field>
+            <FieldLabel>音量</FieldLabel>
+            <Slider value={volume} onValueChange={setVolume} />
+            <FieldDescription>目前 {volume[0]}%</FieldDescription>
+          </Field>
+
+          <Field>
+            <FieldLabel>價格區間</FieldLabel>
+            <Slider
+              value={priceRange}
+              onValueChange={setPriceRange}
+              min={0}
+              max={10000}
+              step={100}
+            />
+            <FieldDescription>
+              NT$ {priceRange[0].toLocaleString()} – NT${' '}
+              {priceRange[1].toLocaleString()}
+            </FieldDescription>
+          </Field>
+
+          <Field>
+            <FieldLabel>已鎖定</FieldLabel>
+            <Slider defaultValue={[40]} disabled />
+            <FieldDescription>不可調整的範例</FieldDescription>
+          </Field>
+        </FieldGroup>
+      </div>
+    )
+  },
+}
+
+// ── Slider 跟 Input 並排:驗證 field-height 對齊 ─────────────────────────
+
+export const SliderAlignsWithOtherFields: Story = {
+  name: 'Slider 跟 Input / NumberInput 並排(size 對齊)',
+  render: () => (
+    <div className="flex flex-col gap-8">
+      <p className="text-caption text-fg-secondary max-w-[560px]">
+        把 Slider、Input、NumberInput 並排在同一個 Field 行裡,會看到三者的高度
+        完全對齊(`h-field-*`)——Slider 的 track/thumb 視覺身分不變,只有容器
+        外高跟著 Field size 變。
+      </p>
+      {(['sm', 'md', 'lg'] as const).map(size => (
+        <div key={size}>
+          <div className="text-caption text-fg-muted mb-3">size = {size}</div>
+          <FieldGroup>
+            <Field orientation="horizontal" labelWidth="96px">
+              <FieldLabel>文字</FieldLabel>
+              <Input size={size} placeholder="Input" />
+            </Field>
+            <Field orientation="horizontal" labelWidth="96px">
+              <FieldLabel>數字</FieldLabel>
+              <NumberInput size={size} placeholder="NumberInput" />
+            </Field>
+            <Field orientation="horizontal" labelWidth="96px">
+              <FieldLabel>音量</FieldLabel>
+              <Slider size={size} defaultValue={[50]} />
+            </Field>
+          </FieldGroup>
+        </div>
+      ))}
+    </div>
+  ),
+}
+
+// ── Slider 配 NumberInput(常見雙向綁定 pattern)──────────────────────
+
+export const SliderWithLiveNumberInput: Story = {
+  name: 'Slider + NumberInput 雙向綁定',
+  render: () => {
+    const [value, setValue] = React.useState(50)
+    return (
+      <div className="max-w-sm">
+        <Field>
+          <FieldLabel>縮放比例</FieldLabel>
+          <div className="flex items-center gap-3">
+            <Slider
+              className="flex-1"
+              value={[value]}
+              onValueChange={v => setValue(v[0])}
+              min={0}
+              max={200}
+            />
+            <NumberInput
+              className="w-[96px]"
+              value={value}
+              onChange={v => setValue(v ?? 0)}
+              min={0}
+              max={200}
+            />
+          </div>
+          <FieldDescription>
+            Slider 跟 NumberInput 同步——拖曳 slider 即時更新數字,改數字即時更新
+            slider。兩個元件高度透過 `h-field-md` 對齊。
+          </FieldDescription>
+        </Field>
+      </div>
+    )
+  },
 }
