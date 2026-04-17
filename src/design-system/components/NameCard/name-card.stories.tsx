@@ -13,74 +13,56 @@ export default meta
 
 const noop = () => {}
 
-export const Full = {
-  name: '完整',
+const actionButtons = <>
+  <Button variant="tertiary" size="sm" startIcon={MessageCircle} className="flex-1">Chat</Button>
+  <Button variant="tertiary" size="sm" startIcon={Phone} endIcon={ChevronDown} className="flex-1">Audio call</Button>
+</>
+
+function NameCardHover({ name, src, subtitle, minimal }: { name: string; src: string; subtitle: string; minimal?: boolean }) {
+  return (
+    <HoverCard openDelay={300} closeDelay={200}>
+      <HoverCardTrigger asChild>
+        <button type="button" className="inline-flex items-center gap-2 cursor-pointer">
+          <Avatar src={src} alt={name} size={32} />
+          <span className="text-body">{name}</span>
+        </button>
+      </HoverCardTrigger>
+      <HoverCardContent className="bg-surface-raised rounded-lg border border-border" style={{ boxShadow: 'var(--elevation-200)' }}>
+        <NameCard
+          name={name}
+          avatar={{ src, alt: name }}
+          subtitle={subtitle}
+          status="available"
+          {...(!minimal && {
+            statusMessage: 'Out of Office: Back on Monday! For urgent matters please contact @Wei-Lun Cheng in the meantime.',
+            actions: actionButtons,
+            fields: [
+              { label: 'ID', value: 'YHANAX' },
+              { label: 'Employee number', value: '1234567' },
+            ],
+            onViewMore: noop,
+          })}
+        />
+      </HoverCardContent>
+    </HoverCard>
+  )
+}
+
+export const Basic = {
+  name: '完整（hover 觸發）',
   render: () => (
-    <div className="p-8">
-      <NameCard
-        name="Hanamizuki Yukinome 花水木雪乃芽"
-        avatar={{ src: 'https://i.pravatar.cc/128?u=hana', alt: 'Hanamizuki' }}
-        subtitle="{Org} | {ID} | {Employee number}"
-        status="available"
-        statusMessage="Out of Office: Back on Monday! For urgent matters please contact @Wei-Lun Cheng in the meantime."
-        actions={<>
-          <Button variant="tertiary" size="sm" startIcon={MessageCircle} className="flex-1">Chat</Button>
-          <Button variant="tertiary" size="sm" startIcon={Phone} endIcon={ChevronDown} className="flex-1">Audio call</Button>
-        </>}
-        fields={[
-          { label: 'ID', value: 'YHANAX' },
-          { label: 'Employee number', value: '1234567' },
-        ]}
-        onViewMore={noop}
-      />
+    <div className="p-16 flex flex-col gap-6">
+      <NameCardHover name="Hanamizuki Yukinome 花水木雪乃芽" src="https://i.pravatar.cc/128?u=hana" subtitle="{Org} | {ID} | {Employee number}" />
+      <NameCardHover name="Alice Chen" src="https://i.pravatar.cc/128?u=alice" subtitle="Design｜D-0042｜EMP-1001" />
     </div>
   ),
 }
 
 export const Minimal = {
-  name: '精簡',
+  name: '精簡（hover 觸發）',
   render: () => (
-    <div className="p-8">
-      <NameCard
-        name="Alice Chen"
-        avatar={{ src: 'https://i.pravatar.cc/128?u=alice', alt: 'Alice' }}
-        subtitle="Design｜D-0042｜EMP-1001"
-        status="available"
-      />
-    </div>
-  ),
-}
-
-export const WithHoverCard = {
-  name: 'HoverCard 觸發',
-  render: () => (
-    <div className="p-16 flex items-center gap-4">
-      <HoverCard openDelay={300} closeDelay={200}>
-        <HoverCardTrigger asChild>
-          <button type="button" className="cursor-pointer">
-            <Avatar src="https://i.pravatar.cc/128?u=hana" alt="Hanamizuki" size={40} />
-          </button>
-        </HoverCardTrigger>
-        <HoverCardContent className="bg-surface-raised rounded-lg border border-border" style={{ boxShadow: 'var(--elevation-200)' }}>
-          <NameCard
-            name="Hanamizuki Yukinome 花水木雪乃芽"
-            avatar={{ src: 'https://i.pravatar.cc/128?u=hana', alt: 'Hanamizuki' }}
-            subtitle="{Org} | {ID} | {Employee number}"
-            status="available"
-            statusMessage="Out of Office: Back on Monday!"
-            actions={<>
-              <Button variant="tertiary" size="sm" startIcon={MessageCircle} className="flex-1">Chat</Button>
-              <Button variant="tertiary" size="sm" startIcon={Phone} endIcon={ChevronDown} className="flex-1">Audio call</Button>
-            </>}
-            fields={[
-              { label: 'ID', value: 'YHANAX' },
-              { label: 'Employee number', value: '1234567' },
-            ]}
-            onViewMore={noop}
-          />
-        </HoverCardContent>
-      </HoverCard>
-      <span className="text-body text-fg-secondary">← hover 頭像</span>
+    <div className="p-16 flex flex-col gap-6">
+      <NameCardHover name="Bob Lin" src="https://i.pravatar.cc/128?u=bob" subtitle="Engineering｜E-0087｜EMP-1002" minimal />
     </div>
   ),
 }
