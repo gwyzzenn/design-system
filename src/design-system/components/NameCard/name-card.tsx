@@ -2,26 +2,23 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 import { Avatar, type AvatarData } from '@/design-system/components/Avatar/avatar'
 import { Button } from '@/design-system/components/Button/button'
+import { DescriptionList, DescriptionItem } from '@/design-system/components/DescriptionList/description-list'
 
 /**
  * NameCard — 人員 HoverCard 的內容元件
  *
- * 放在 HoverCardContent 內使用。Consumer 用 HoverCard 包 avatar/name。
- *
  * ── Padding ──
- * 用 layout-space token（px=loose, py=tight）：
- *   HoverCard（md density）→ loose=16, tight=12
- *   Modal（lg density）→ loose=24, tight=16
- *   同一個 NameCard 在不同容器自動適配。
+ * px-4 (16px) py-2 (8px) 固定——compact hover card 不需要大 padding。
  *
- * ── Avatar 狀態指示 ──
- * status dot 程式化在 Avatar 上（Avatar status prop），不獨立擺放。
- *
- * ── Status message ──
- * 最多 2 行（line-clamp-2）。
+ * ── Avatar 對齊 ──
+ * 跟 FileItem detail 統一：右側 text column 用 justify-center + minHeight=avatar。
+ * 短文字置中於 avatar，長文字（多行名字）自然撐高。
  *
  * ── View more ──
- * Button link 填滿容器寬度（w-full），不左對齊。
+ * Button link w-full——card footer 的 action 填滿容器。
+ *
+ * ── DataField ──
+ * Status message、ID、Employee number 都用 DataField（label + value 統一規格）。
  */
 
 const AVATAR_SIZE = 64
@@ -46,11 +43,6 @@ function StatusDot({ status, className }: { status: StatusType; className?: stri
   return <span className={cn('inline-block w-2 h-2 rounded-full shrink-0', STATUS_COLOR[status], className)} />
 }
 
-export interface NameCardField {
-  label: string
-  value: string
-}
-
 export interface NameCardProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string
   avatar?: AvatarData
@@ -58,7 +50,7 @@ export interface NameCardProps extends React.HTMLAttributes<HTMLDivElement> {
   status?: StatusType
   statusMessage?: React.ReactNode
   actions?: React.ReactNode
-  fields?: NameCardField[]
+  fields?: { label: string; value: string }[]
   onViewMore?: () => void
   viewMoreLabel?: string
 }
@@ -85,8 +77,8 @@ const NameCard = React.forwardRef<HTMLDivElement, NameCardProps>(
 
     return (
       <div ref={ref} className={cn('w-[320px]', className)} {...props}>
-        {/* ── Profile header ── */}
-        <div className="flex items-start gap-3 px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]">
+        {/* ── Profile header: avatar + name ── */}
+        <div className="flex items-start gap-3 px-4 py-2">
           <Avatar
             src={avatar?.src}
             alt={avatar?.alt ?? name}
@@ -95,7 +87,10 @@ const NameCard = React.forwardRef<HTMLDivElement, NameCardProps>(
             status={status}
             className="shrink-0"
           />
-          <div className="flex flex-col min-w-0 flex-1 pt-0.5">
+          <div
+            className="flex flex-col justify-center min-w-0 flex-1"
+            style={{ minHeight: AVATAR_SIZE }}
+          >
             <span className="text-body-lg font-medium text-foreground">{name}</span>
             {subtitle && (
               <span className="text-body text-fg-secondary mt-0.5">{subtitle}</span>
@@ -105,22 +100,23 @@ const NameCard = React.forwardRef<HTMLDivElement, NameCardProps>(
 
         {/* ── Action buttons ── */}
         {actions && (
-          <div className="flex items-center gap-2 px-[var(--layout-space-loose)] pb-[var(--layout-space-tight)]">
+          <div className="flex items-center gap-2 px-4 pb-2">
             {actions}
           </div>
         )}
 
-        {/* ── Status + message ── */}
+        {/* ── Status ── */}
         {hasStatus && (
-          <div className="border-t border-divider px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]">
+          <div className="border-t border-divider px-4 py-2">
             <div className="flex items-center gap-1.5 text-body">
               <StatusDot status={status!} />
               <span>{STATUS_LABEL[status!]}</span>
             </div>
             {statusMessage && (
               <div className="mt-2">
-                <span className="text-caption text-fg-muted">Status message</span>
-                <p className="text-body mt-0.5 line-clamp-2">{statusMessage}</p>
+                <DescriptionItem label="Status message">
+                  <span className="line-clamp-2">{statusMessage}</span>
+                </DescriptionItem>
               </div>
             )}
           </div>
@@ -128,21 +124,18 @@ const NameCard = React.forwardRef<HTMLDivElement, NameCardProps>(
 
         {/* ── Info fields ── */}
         {hasFields && (
-          <div className="border-t border-divider px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]">
-            <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+          <div className="border-t border-divider px-4 py-2">
+            <DescriptionList cols={2}>
               {fields!.map((f) => (
-                <div key={f.label} className="flex flex-col">
-                  <span className="text-caption text-fg-muted">{f.label}</span>
-                  <span className="text-body">{f.value}</span>
-                </div>
+                <DescriptionItem key={f.label} label={f.label}>{f.value}</DescriptionItem>
               ))}
-            </div>
+            </DescriptionList>
           </div>
         )}
 
         {/* ── View more ── */}
         {onViewMore && (
-          <div className="border-t border-divider px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]">
+          <div className="border-t border-divider px-4 py-2">
             <Button variant="link" size="sm" onClick={onViewMore} className="w-full">{viewMoreLabel}</Button>
           </div>
         )}
