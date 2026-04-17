@@ -21,12 +21,14 @@ const actionButtons = <>
 function NameCardHover({ name, src, subtitle, minimal }: { name: string; src: string; subtitle: string; minimal?: boolean }) {
   return (
     <HoverCard openDelay={300} closeDelay={200}>
-      <HoverCardTrigger asChild>
-        <button type="button" className="inline-flex items-center gap-2 cursor-pointer">
-          <Avatar src={src} alt={name} size={32} />
-          <span className="text-body">{name}</span>
-        </button>
-      </HoverCardTrigger>
+      <span className="inline-flex items-center gap-2">
+        <HoverCardTrigger asChild>
+          <button type="button" className="cursor-pointer">
+            <Avatar src={src} alt={name} size={32} />
+          </button>
+        </HoverCardTrigger>
+        <span className="text-body">{name}</span>
+      </span>
       <HoverCardContent className="bg-surface-raised rounded-lg border border-border" style={{ boxShadow: 'var(--elevation-200)' }}>
         <NameCard
           name={name}
