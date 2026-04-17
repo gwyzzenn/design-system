@@ -29,7 +29,7 @@ function NameCardHover({ name, src, subtitle, minimal }: { name: string; src: st
         </HoverCardTrigger>
         <span className="text-body">{name}</span>
       </span>
-      <HoverCardContent className="bg-surface-raised rounded-lg border border-border" style={{ boxShadow: 'var(--elevation-200)' }}>
+      <HoverCardContent align="start" className="bg-surface-raised rounded-lg border border-border" style={{ boxShadow: 'var(--elevation-200)' }}>
         <NameCard
           name={name}
           avatar={{ src, alt: name }}
