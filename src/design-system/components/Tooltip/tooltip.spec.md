@@ -63,5 +63,5 @@ Tooltip 底色是深色，子元素永遠套用 dark theme token（透過 `data-
 
 ## 相關
 
-- `../HoverCard/hover-card.spec.md` — hover 觸發的可互動浮層（適合需要按鈕 / 連結的場景）
+- `../HoverCard/hover-card.spec.md` — hover 觸發的可互動浮層（**Tooltip vs HoverCard 的分界 SSOT 在 HoverCard spec**「與 Tooltip 的分界」段落）
 - `../Button/button.spec.md` — `iconOnly` 模式自動產生 tooltip（由 aria-label 驅動）
