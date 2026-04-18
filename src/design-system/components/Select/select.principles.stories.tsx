@@ -98,11 +98,19 @@ export const ComponentChoiceRule: Story = {
         </Rule>
 
         <Rule
-          title="❌ 2-5 個全可見選項：用 RadioGroup"
-          note="RadioGroup 所有選項一次看完，不用兩次點擊。視覺掃視比 Select 快很多。適合表單中重要、需仔細評估的選擇（付款方式、方案等級）"
+          title="❌ 決策節點（使用者需要對比評估）：用 RadioGroup"
+          note="付款方式、訂閱方案、票種、權限角色——使用者必須看完所有選項才能決定，通常連帶 description / 價格 / feature list。RadioGroup 全露選項支援對比；Select 把選項藏起來，強迫使用者打開 → 讀 → 收起 → 再打開才能比較。判準不是數量，是「選擇本身是不是決策動作」，完整對照見 select.spec.md 的「與 RadioGroup 的分界」"
         >
-          <Select options={statusOptions} value={status} onChange={setStatus} />
-          <Label warn>↑ 只有 3 個選項還收進 dropdown → 使用者多花一次點擊才看到全貌</Label>
+          <Select
+            options={[
+              { value: 'credit', label: '信用卡（手續費 2.5%，即時）' },
+              { value: 'bank', label: '銀行轉帳（無手續費，1-2 工作日）' },
+              { value: 'cash', label: '貨到付款（手續費 NT$30，到貨時付）' },
+            ]}
+            value="credit"
+            onChange={() => {}}
+          />
+          <Label warn>↑ 付款方式是決策節點 + 需要對比手續費 / 處理時間 → 用 RadioGroup 讓選項全露</Label>
         </Rule>
 
         <Rule
@@ -190,6 +198,50 @@ export const ImmediateVsSubmitRule: Story = {
       </div>
     )
   },
+}
+
+export const SearchableRule: Story = {
+  name: 'Searchable 開啟判斷',
+  render: () => (
+    <div>
+      <Rule
+        title="主判準：label 性質——獨特關鍵字 / 代碼 / 非自然語言 → 開 searchable"
+        note="使用者無法靠眼睛或 type-to-jump 快速定位時才需要搜尋。產品代碼（SKU-4837）、機場代碼（TPE / NRT）、使用者 ID、ticket number——這類 label 沒有記憶點，必須輸入才能找"
+      >
+        <Select
+          searchable
+          options={[
+            { value: 'sku-4837', label: 'SKU-4837' },
+            { value: 'sku-8210', label: 'SKU-8210' },
+            { value: 'sku-9104', label: 'SKU-9104' },
+          ]}
+          value="sku-4837"
+          onChange={() => {}}
+        />
+        <Label>↑ 即使只有 3 個選項，產品代碼 label 仍需要 searchable</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 流暢自然語言 label：不開 searchable"
+        note="Electronics / Furniture / Food 這類 label，native select 的 type-to-jump（按 E 跳到 Electronics）夠快。多加 searchable 等於多一層不必要的互動"
+      >
+        <Select
+          searchable
+          options={categoryOptions}
+          value="electronics"
+          onChange={() => {}}
+        />
+        <Label warn>↑ 3 個自然語言 label 加 searchable → 使用者必須打字或再點擊才能選</Label>
+      </Rule>
+
+      <Rule
+        title="次要啟發：數量 > 50 幾乎必開（但仍看 label 性質）"
+        note="100 個 a/b/c 不需要搜尋（type-to-jump 直達），5 個產品代碼需要搜尋。純數量 threshold 會誤判這兩端，詳見 spec"
+      >
+        <Label>判斷優先序：label 性質 → 數量次要啟發</Label>
+      </Rule>
+    </div>
+  ),
 }
 
 export const NativeSelectRule: Story = {
