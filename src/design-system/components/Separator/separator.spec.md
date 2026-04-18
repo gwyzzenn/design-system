@@ -8,7 +8,7 @@ Separator 是語意分隔元件，用於標示內容群組之間的邊界。
 
 **Separator 只用於 consumer 手動放置的分隔線。** 元件固定結構（header/footer 邊框）和裝飾性邊框不使用 Separator。
 
-## 何時使用（判斷法）
+## 何時用 / 何時不用（判斷法）
 
 判斷核心：**誰決定「這裡要分隔」？**
 
@@ -62,10 +62,11 @@ Consumer 在 JSX 裡明確放置分隔線的場景：
 - ❌ 用 `--border` token 做分隔線（應該用 `--divider`）
 - ❌ 用 `bg-border` 做 ButtonDivider 等 consumer 放置的分隔線
 
-## 反向引用
+## 相關
 
-- Token 定義：`color.spec.md`「邊框 / 分隔」節
-- ButtonDivider：`Button/button-group.tsx`
-- Radix Separator 消費者：`Sidebar/sidebar.tsx`（SidebarSeparator）
-- Radix Menu Separator：`DropdownMenu/dropdown-menu.tsx`（DropdownMenuSeparator）
-- 自動分隔 CSS pattern：`Menu/menu-item.tsx`（MenuGroup）、`Sidebar/sidebar.tsx`（SidebarGroup）
+- `../../tokens/color/color.spec.md` — `--divider` / `--border` token 定義（「邊框 / 分隔」節）
+- `../Button/button-group.tsx` — ButtonDivider 實作
+- `../Sidebar/sidebar.tsx` — SidebarSeparator（Radix Separator 消費者）
+- `../DropdownMenu/dropdown-menu.tsx` — DropdownMenuSeparator（Radix Menu Separator）
+- `../Menu/menu-item.tsx` — MenuGroup 自動分隔 CSS pattern（`[&+&]:border-t`）
+- `../Sidebar/sidebar.tsx` — SidebarGroup 自動分隔 pseudo-element pattern

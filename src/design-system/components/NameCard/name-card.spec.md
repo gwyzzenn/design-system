@@ -4,6 +4,24 @@
 
 **實作基礎**：組合元件——Avatar + Text + Button 配 HoverCard 浮層。NameCard 本身不含觸發或定位邏輯（那是 HoverCard 的職責），只是 HoverCard content 的標準人員模板。
 
+---
+
+## 何時用
+
+- **Avatar hover 顯示人員詳情**：留言者 / 指派者 / 成員列表 hover 彈出詳細資訊
+- **@提及互動**：`@username` hover 顯示該使用者的 card
+- **團隊 / 成員快速預覽**：Settings 頁的成員列表、PR reviewer 清單的 hover 預覽
+- **需要快速動作的人員資訊**：NameCard 可放 CTA button（Message / Invite / Follow）
+
+## 何時不用
+
+| 場景 | 改用 | 原因 |
+|------|------|------|
+| 點擊進入人員 profile 頁 | `<a>` 或 Link | Navigation 不需 hover card 的浮層 |
+| 人員清單 row（不需要 hover 展開詳情）| `Avatar` + inline text | NameCard 是 hover content，list row 不需要 |
+| 單純顯示一個名字 | `Avatar` + `Text` | NameCard 是完整資訊卡，單名字用更輕量元件 |
+| 複雜人員表單（編輯角色 / 權限）| `Dialog` 或專用頁面 | NameCard 是快速預覽，不承載複雜互動 |
+
 ## 結構
 
 ```
@@ -64,3 +82,13 @@ NameCard (w-320px)
 - **固定寬度而非 min/max**：HoverCard 內容量可預期，固定寬度避免不同人員 card 寬度跳動
 - **Section 用 border-t 分隔**：清晰的資訊分區，每個 section 獨立存在或不存在
 - **Status badge 用 muted 而非 interactive 色**：狀態是展示資訊，不可點擊，不應暗示互動性
+
+---
+
+## 相關
+
+- `../HoverCard/hover-card.spec.md` — NameCard 的浮層容器（觸發與定位由 HoverCard 負責）
+- `../Avatar/avatar.spec.md` — Profile header 的身份視覺（Avatar 的 `hoverCard` prop 自動整合 NameCard）
+- `../Tooltip/tooltip.spec.md` — 純文字 hover 提示（NameCard 是可互動 hover content）
+- `../DescriptionList/description-list.spec.md` — Info fields 的 label / value 佈局
+- `../Button/button.spec.md` — Action button（Message / Invite 等 CTA）

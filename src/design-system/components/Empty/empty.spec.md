@@ -8,7 +8,23 @@
 
 預設只有 description——icon / title / action 全部可選。
 
-## 結構
+---
+
+## 何時用
+
+- **Table / list / grid 空狀態**：DataTable 查無資料、搜尋無結果
+- **SelectMenu / Combobox 下拉空**：「無選項」「找不到符合的項目」
+- **Page section 無內容**：dashboard widget 暫無資料、設定頁未建立任何項目
+- **初次引導**：讓使用者首次使用時知道「這裡會放什麼」+ 有 CTA 建立
+
+## 何時不用
+
+| 場景 | 改用 | 原因 |
+|------|------|------|
+| Loading 中（資料還沒來）| `Skeleton`（未來）/ `Spinner` | Empty 是「確定沒有」，Loading 是「還沒確定」 |
+| 錯誤 / 失敗狀態 | `Alert` + 重試按鈕 | Error 需要明確告知「發生什麼問題」+ 解決途徑，Empty 是中性提示 |
+| 整頁級別的 404 / 無權限 | 專屬錯誤頁面 | Empty 是容器內提示，整頁錯誤需要完整頁面佈局 |
+| Disabled 狀態 | 禁用元件本身 | Empty 是「沒東西」，disabled 是「不能操作」 |
 
 ```
          [Avatar 48px neutral + icon]     ← 可選
@@ -114,9 +130,11 @@ Empty 只管**水平居中**。垂直定位由 consumer 的容器決定:
 | SelectMenu | — | `<Empty description="無選項" className="py-6" />` |
 | Combobox | — | `<Empty description="找不到結果" className="py-6" />` |
 
-## 反向引用
+## 相關
 
-- Avatar 渲染 icon → `components/Avatar/avatar.tsx`
-- Typography tier → `tokens/typography/typography.spec.md`
-- Layout-space token → `tokens/layoutSpace/layoutSpace.spec.md`
-- Item-layout label→desc gap(mt-0.5) → `patterns/item-layout/item-layout.spec.md`
+- `../Avatar/avatar.tsx` — Icon 渲染實作
+- `../Spinner/spinner.spec.md` — Loading 狀態（非「空」而是「還沒來」）
+- `../Alert/alert.spec.md` — Error 狀態（非中性空，是需處理的問題）
+- `../../tokens/typography/typography.spec.md` — Typography tier
+- `../../tokens/layoutSpace/layoutSpace.spec.md` — Layout-space token
+- `../../patterns/item-layout/item-layout.spec.md` — label → desc gap `mt-0.5`

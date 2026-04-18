@@ -4,6 +4,26 @@
 
 **實作基礎**：組合元件——Icon + Text + Progress + Button，無 external primitive base。
 
+---
+
+## 何時用
+
+- **檔案上傳清單**：drag-drop upload、multiple file selector 的選中檔案列表
+- **附件展示**：email / comment / ticket 的附件列表（detail mode 顯示縮圖 + 檔名）
+- **批次處理進度**：CSV / JSON 匯入的逐檔進度追蹤（compact mode）
+- **上傳錯誤回報**：顯示哪些檔案失敗 + 重試按鈕
+
+## 何時不用
+
+| 場景 | 改用 | 原因 |
+|------|------|------|
+| 只是顯示已上傳檔名（純連結）| `LinkInput` / plain `<a>` | FileItem 承載 upload 狀態，靜態連結不需要 |
+| 下載進度（不是上傳）| 自訂 download 元件 | FileItem 專為 upload 流程設計，下載有不同 UX（瀏覽器原生）|
+| 照片 / 影片 gallery | Grid / Carousel | Gallery 需要預覽 grid 佈局，FileItem 是 list 單行 |
+| 資料夾階層 | `TreeView` | FileItem 是平面列表，階層用 tree |
+
+---
+
 ## Mode
 
 | Mode | Prefix | Typography | 適用場景 |
@@ -83,8 +103,10 @@ Consumer 自行組合：
 | detail | Button sm = 28px > 24px | block | `h-[calc(1lh+2px+desc_lh)]` |
 | compact | Button xs = 24px ≤ 24px | — | `h-[1lh]` inline |
 
-## 反向引用
+## 相關
 
-- item-layout 閱讀模式 → `patterns/item-layout/item-layout.spec.md`
-- Avatar shape → `components/Avatar/avatar.spec.md`
-- Track 底色 → `tokens/color/color.spec.md`（bg-secondary 使用原則）
+- `../../patterns/item-layout/item-layout.spec.md` — 閱讀模式（detail / compact）
+- `../Avatar/avatar.spec.md` — Avatar shape（detail mode 的 icon 容器）
+- `../LinkInput/link-input.spec.md` — 純連結（非 upload 流程）替代
+- `../TreeView/tree-view.spec.md` — 階層 file structure 場景
+- `../../tokens/color/color.spec.md` — Track 底色（`bg-secondary` 使用原則）
