@@ -2,6 +2,8 @@
 
 **檔案上傳列表項目**——顯示檔案名稱、上傳進度、狀態（uploading / completed / error）。
 
+**實作基礎**：組合元件——Icon + Text + Progress + Button，無 external primitive base。
+
 ## Mode
 
 | Mode | Prefix | Typography | 適用場景 |

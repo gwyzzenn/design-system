@@ -6,6 +6,8 @@ Field 是**表單欄位的佈局容器**。只負責排版（label / control / d
 
 與資料相關的一切（格式化、驗證、readonly 呈現、DataTable cell 顯示）住在各個資料型別的 Control 元件本身（Input、NumberInput、Checkbox、Switch 等）。Field 不 wrap、不代理、不轉換它們的行為。
 
+**實作基礎**：自建——本 DS 的 form layout 設計。shadcn 的 `Form` 元件走 react-hook-form + Zod + 自己的 Field primitive（含 Controller），本 DS 不採用這套耦合設計：Field 只做 layout + context，驗證由 consumer 自選（本 DS 建議 zod，見 `form-validation.spec.md`），保持更輕量、更獨立的定位。
+
 ---
 
 ## 與 Field Controls 的職責切分

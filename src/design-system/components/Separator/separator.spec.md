@@ -2,6 +2,8 @@
 
 Separator 是語意分隔元件，用於標示內容群組之間的邊界。
 
+**實作基礎**：基於 Radix Separator（shadcn passthrough）——提供正確的 ARIA `role="separator"` + orientation 語意。
+
 ## 定位
 
 **Separator 只用於 consumer 手動放置的分隔線。** 元件固定結構（header/footer 邊框）和裝飾性邊框不使用 Separator。

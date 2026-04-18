@@ -3,6 +3,7 @@
 ## 定位
 
 Tooltip 是 hover 或 focus 時出現的短文字提示，用於補充畫面上未能清楚傳達的資訊。
+基於 Radix Tooltip（shadcn 包裝）+ 橋接 DS token。
 
 ## 何時使用
 

@@ -4,6 +4,8 @@
 
 **應用程式的主導覽外殼**——頁面固定的側邊導覽容器，支援展開 / 收合、桌機與行動裝置的不同形態、扁平選單與階層樹兩種內容。
 
+**實作基礎**：基於 Radix Collapsible + Radix Slot（shadcn Sidebar 模式改寫）+ 橋接 DS token。
+
 **不是**：NavigationMenu（水平導覽）、Tabs（同層切換）、Command Palette（跨頁搜尋）、Sheet / Drawer（暫時性面板）。Sidebar 是**持續存在**的主骨架。
 
 ---

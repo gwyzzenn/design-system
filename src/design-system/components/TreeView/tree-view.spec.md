@@ -4,6 +4,8 @@
 
 TreeView 是**階層結構的遞迴元件**。一個 TreeItem 就是一個 node——有 children 就可展開,沒有就是 leaf。沒有第二個概念。
 
+**實作基礎**：基於 Radix Collapsible 實作展開 / 收合，自建 tree 結構與 ARIA tree 鍵盤導覽（Radix 沒有 Tree primitive）。
+
 TreeView 本身只負責三件事:
 1. **遞迴渲染** + indent
 2. **展開/收合**狀態管理

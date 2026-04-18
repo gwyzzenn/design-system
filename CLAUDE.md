@@ -276,6 +276,7 @@ element.style.backgroundColor = 'var(--primary)'
 - **編輯 spec.md 時，必須交叉比對所有相關的 spec.md 與 Storybook 範例**，確認無矛盾、無術語不一致、無重複定義
 - **若結論與既有 spec.md 有邏輯衝突或概念混淆，必須主動提出討論**，不默默修改、不迴避矛盾
 - **所有元件必須遵循 shadcn 框架**，確保保留 shadcn 的結構優勢（forwardRef、Slot、data-* attributes、cva 等），不從零重寫
+- **每個元件 spec 的「定位」段落必須明確宣告實作基礎**——`基於 Radix X`、`基於 cmdk` / `sonner` / `@tanstack/react-table` / native HTML element、或 `自建 + 理由`。自建必須說明為什麼不用現有 primitive（通常是「選 native 保留 mobile / a11y」這類設計選擇）。本規則是為了讓任何人讀 spec 第一段就知道這個元件的 shadcn / Radix / 自建 屬性,不需要去看 code
 - **spec.md 與 .tsx 的職責分離**：spec 只記錄設計原則（「為什麼」和「何時用」），讓 AI 能舉一反三推導邊緣情況；可程式化的規則（具體 token class name、pixel 值、條件邏輯）寫進元件 .tsx，不寫在 spec 裡。判斷標準：「這條規則能直接變成 code 嗎？」能 → .tsx；不能、需要人類判斷 → spec
 - **可推導的值用 `calc()` 或公式表達，不硬寫結果**——讓依賴關係留在 code 裡，上游值變動時下游自動跟著算。例：divider 內縮 = `(行高 - 文字行高) / 2`，改行高時 divider 自動調整，不需要有人記得去改
 
@@ -571,6 +572,7 @@ Provider 是**應用層配置**（delay、theme、portal target、toast position
 
 **定義**
 - 元件定位一句話說清楚（是什麼、不是什麼）
+- **定位段落明確宣告實作基礎**（`基於 Radix X`、`基於 cmdk/sonner/tanstack-table`、`native HTML element`、`自建 + 理由`）——讀 spec 第一段就知 shadcn/Radix/自建 屬性
 - 所有 props / variants 都有明確的「何時用 / 何時不用」
 - 互斥規則寫清楚（哪些 props 不能並用、哪些組合無效）
 - 每個規則都有「為什麼」，不只寫「怎麼做」

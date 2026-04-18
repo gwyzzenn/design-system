@@ -4,6 +4,8 @@
 
 Tag 是 inline label，用於分類標籤、狀態標記、多選已選值。不是 overlay 通知圓點（那是 Badge / Notification indicator）。
 
+**實作基礎**：純視覺 atom——styled span + 可選 dismiss button，無 external primitive base。
+
 ---
 
 ## Variant
