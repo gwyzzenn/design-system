@@ -17,7 +17,7 @@
 
 | 任務類型 | 必讀章節（按順序） |
 |---------|-----------------|
-| **新增元件** | **`/new-component <Name>`**（slash command,會帶你跑 Layout Family 判斷 + 命名三重 test + scaffold 5 files）|
+| **新增元件** | `# 建立 UI 前必讀` → `# shadcn 元件規範` → `# Spec 規則` → `# Story` → `# 元件完成清單` |
 | **修改元件 variant / size / state** | 該元件 `spec.md` → `# Story` → 連動更新規則 → `# 失敗記憶索引` |
 | **改 cva `defaultVariants`** | `# Story` → 高風險漂移點 + `# 失敗記憶索引` → 三方漂移 |
 | **新增 / 修改 token** | `# Token 系統運作方式` → `# Token 命名原則` → 對應 `tokens/xxx.spec.md` |
@@ -119,7 +119,7 @@
 - **輕量 user-invokable shortcut**（單步 action,無 workflow / checkpoints）
 - 跟 Skill 的差別:Skill 是多步驟 workflow + user 決策點;Command 是一次性 scaffold / 單步觸發
 - **判斷法**:這是「一次性 scaffold 或單步 action」嗎? 是且**重複使用 ≥ 3 次** → Command;否 → 需要 workflow → Skill
-- **當前 commands (1 個)**:`/new-component <Name>` — scaffold 新元件(tsx / spec.md / 3 stories)+ 跑 Layout Family 判斷 + 命名三重 test + 完成清單對照
+- **當前狀態**:無 commands(評估後認為 scaffold 流程太僵化,改回用 CLAUDE.md 清單 + AI 判斷。未來如有真正適合的 single-step shortcut 再加）
 
 ### 已知但未採納的 Claude Code 能力（future-ready）
 
