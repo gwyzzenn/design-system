@@ -8,19 +8,28 @@
 
 ---
 
-## 不是什麼
+## 何時用
+
+- **多步驟表單 / 精靈流程**:註冊流程、訂單結帳、設定引導(step 1 → 2 → 3)
+- **訂單 / 任務進度**:物流追蹤(已下單 → 揀貨 → 出貨 → 送達)、審批流程
+- **入職 / onboarding 進度**:教學性流程,明確告知使用者「還剩幾步」
+- **CI / build 的 pipeline 狀態**:有序步驟且每步有明確完成 / 進行中 / 失敗狀態
+- **步驟數量有限且已知**(3–7 個最佳;超過 7 個考慮改為 section + progress bar)
+
+**判斷準則**:有**順序**、有**離散進度狀態**、步驟數量**有限且已知** → Steps;否則用其他元件。
+
+## 何時不用
 
 Steps 只解決「有順序、有進度、步數有限且明確」的場景。下列情境**都不該用 Steps**:
 
-| 場景 | 該用 |
-|---|---|
-| 跳頁面 / 切 view | `Tabs` / `Breadcrumb` |
-| 選一個值 | `Radio` / `SegmentedControl` / `SelectMenu` |
-| 時間軸歷史事件 | `Timeline`(獨立元件,跟 Steps 在語意上不同——Steps 表達「任務進度」,Timeline 表達「時序紀錄」)|
-| 分段表單佈局 | Form layout pattern,不是進度指示 |
-| 無限 / 動態步數 | Progress bar + 步驟計數文字 |
-
-**判斷準則**:有**順序**、有**離散進度狀態**、步驟數量**有限且已知** → Steps;否則用其他元件。
+| 場景 | 改用 | 原因 |
+|------|------|------|
+| 跳頁面 / 切 view | `Tabs` / `Breadcrumb` | Tabs 平行切換、Breadcrumb 表達位置,Steps 表達進度 |
+| 選一個值 | `RadioGroup` / `SegmentedControl` / `Select` | Steps 不是選擇器,是進度指示 |
+| 時間軸歷史事件 | `Timeline`(未來獨立元件)| Steps 表達「任務進度」,Timeline 表達「時序紀錄」,語意不同 |
+| 分段表單佈局(不需進度感)| Form layout pattern + heading | 純分段不等於有進度順序 |
+| 無限 / 動態步數 | Progress bar + 步驟計數文字 | Steps 需步數有限且已知 |
+| 使用者可自由跳步（非線性流程）| Tabs | Steps 強調線性順序,跳步破壞 mental model |
 
 ---
 
@@ -372,11 +381,13 @@ Description 在 error state 下維持 `text-fg-secondary`(跟其他 state 一樣
 
 ---
 
-## 反向引用
+## 相關
 
-- **字體 / icon tier / row primitive 繼承規則** → `patterns/item-layout/item-layout.spec.md`
-- **Selection 視覺規則(為什麼 Steps 不用 `bg-neutral-selected` / 不用 radio 圓圈)** → `CLAUDE.md`「選擇 / 狀態視覺必須對齊既有 canonical」章節(規則 B)
-- **Indicator 32px 尺寸依據** → `components/Avatar/avatar.tsx`(`AVATAR_SIZE.block.sm/md = 32`)
-- **`field-height-xs` 24px 地板規則** → `tokens/uiSize/uiSize.spec.md`「元件高度地板」段
-- **Icon tier(16px / 20px 配對字體 tier)** → `tokens/uiSize/uiSize.spec.md`「Icon 尺寸 Tier」段
-- **Primary 色彩 token(`bg-primary` / `border-primary` / `ring-primary`)** → `tokens/color/color.spec.md`
+- `../../patterns/item-layout/item-layout.spec.md` — Row primitive 繼承規則（字體 / icon tier / hit area 地板）
+- `../Tabs/tabs.spec.md` — 平行視圖切換（非進度場景）
+- `../Breadcrumb/breadcrumb.spec.md` — 位置路徑（非進度場景）
+- `../RadioGroup/radio-group.spec.md` — 選值（非進度場景）
+- `../Avatar/avatar.tsx` — Indicator 32px 尺寸依據（`AVATAR_SIZE.block.sm/md = 32`）
+- `../../tokens/uiSize/uiSize.spec.md` — `field-height-xs` 地板規則 + Icon 尺寸 Tier
+- `../../tokens/color/color.spec.md` — Primary token
+- CLAUDE.md「選擇 / 狀態視覺必須對齊既有 canonical」— Steps 不用 `bg-neutral-selected` 的理由

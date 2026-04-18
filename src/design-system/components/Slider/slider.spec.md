@@ -10,21 +10,24 @@
 
 使用者沿著一條軌道拖曳 thumb 選擇一個數值(single)或一段範圍(range)。適合**連續或密集離散的數值選取**,當使用者在意「相對位置」勝過「精確數字」時使用。
 
-### 何時用
+---
 
-- 亮度 / 音量 / 縮放 / 透明度等「感受性」連續值
-- 價格區間、日期區間等「範圍」選取
-- 搭配顯示值(如 thumb 旁標籤、或輸入框同步)讓使用者掌握精確值
+## 何時用
 
-### 何時不用
+- **「感受性」連續值**:亮度 / 音量 / 縮放 / 透明度
+- **範圍選取**:價格區間、日期區間、分數區間
+- **使用者在意「相對位置」勝過「精確數字」**:粗略調整 > 精確輸入
+- **搭配顯示值**:thumb 旁標籤或同步 NumberInput 讓使用者掌握精確數字
 
-| 場景 | 該用 |
-|---|---|
-| 離散且少量選項(3–5 個) | `SegmentedControl` / `RadioGroup` |
-| 精確數字輸入 | `NumberInput` |
-| 布林切換 | `Switch` |
-| 「多少」而非「哪裡」 | `NumberInput` + `Stepper` |
-| 純篩選布林 | `Checkbox` |
+## 何時不用
+
+| 場景 | 改用 | 原因 |
+|------|------|------|
+| 離散且少量選項(3–5 個) | `SegmentedControl` / `RadioGroup` | Slider 為連續值設計,離散少量用分段控件視覺更清楚 |
+| 精確數字輸入 | `NumberInput` | Slider 難以拖到精確值,打字更快 |
+| 布林切換 | `Switch` | 布林不是數值 |
+| 「多少」而非「哪裡」(計數) | `NumberInput`(含 ±step) | Slider 傳達 position,不是 quantity |
+| 純篩選布林 | `Checkbox` | 非數值型篩選 |
 
 ---
 
@@ -267,11 +270,12 @@ Slider 的 `readonly` 等同於 `disabled`——一個不能操作的 slider 本
 
 ---
 
-## 反向引用
+## 相關
 
-- **Radix Slider primitive API** — `@radix-ui/react-slider`
-- **Field height tier** — `tokens/uiSize/uiSize.spec.md` 的 `field-height-*` family
-- **Elevation hover / active 語意** — `tokens/elevation/elevation.spec.md`
-- **Primary / muted / fg-disabled token** — `tokens/color/color.spec.md`
-- **Field 容器整合規則** — `components/Field/field.spec.md`
-- **禁止用 Tailwind `shadow-*`,陰影一律用 CSS var** — `CLAUDE.md` 的「陰影一律用 `--elevation-*` token」章節
+- `../NumberInput/number-input.spec.md` — 精確數字輸入的對應元件
+- `../SegmentedControl/segmented-control.spec.md` — 離散少量選項的對應元件
+- `../../tokens/uiSize/uiSize.spec.md` — `field-height-*` token family
+- `../../tokens/elevation/elevation.spec.md` — Elevation hover / active 語意
+- `../../tokens/color/color.spec.md` — Primary / muted / fg-disabled token
+- `../Field/field.spec.md` — Field 容器整合規則
+- Radix Slider primitive API — `@radix-ui/react-slider`
