@@ -611,6 +611,30 @@ Provider 是**應用層配置**（delay、theme、portal target、toast position
 
 ## Stories（`{name}.stories.tsx` + `{name}.principles.stories.tsx`）
 
+**範例選擇原則（世界級標準）**——寫任何 story 範例前先對照這條
+
+每個範例必須同時滿足**兩個 test**：
+1. **「人」test**：任何設計師 / 開發者 / PM 打開 Storybook，**不看任何 label 和說明**，只看範例的文字和情境，就能懂這個元件在做什麼。範例場景必須取自**真實產品情境**（Jira task status、Slack DM、Notion settings、電商付款流程、Figma 工具列），不是抽象佔位符
+2. **舉一反三 test**：讀者看完這幾個範例能**推出類似情境該怎麼用**——範例選擇必須涵蓋「教學性」而非「展示性」。5 個具代表性的真實場景 > 20 個重複的 placeholder
+
+### ✅ 好範例（世界級）
+- 「付款方式」（信用卡 / 銀行轉帳 / 現金，附手續費 / 處理時間 description）
+- 「儲存草稿 / 放棄變更」（真實表單按鈕配對）
+- 「Task status 即時切換」（Jira / Linear style）
+- 「全部 / 進行中 / 已完成」（真實 filter tab）
+
+### ❌ 爛範例（避免）
+- 「Option A / Option B / Option C」（完全無意義，無法舉一反三）
+- 「Lorem ipsum / Test value / foo bar」（佔位符，沒有情境）
+- 「按鈕一 / 按鈕二」（已明確禁止）
+- 內部代號（「Rule A」、「Variant X」）
+- 抽象符號表達式（`│─ 業務 ─│`、`A → B`）
+
+### 自我檢查
+寫完範例後問自己：**「新加入的設計師打開 Storybook,能不能不看我的說明文字、光看範例就懂?」** 不能就回去改——範例是公開文件,受眾是任何打開 Storybook 的人,不是只有寫這個 story 的作者。
+
+---
+
 **範例正確性**
 - 每個範例的 variant / props 語意正確（不為了填版面而用錯 variant）
 - 同類型場景的 icon 維持一致順序
