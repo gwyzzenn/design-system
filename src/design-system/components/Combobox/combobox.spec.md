@@ -2,9 +2,37 @@
 
 ## 定位
 
-Combobox 是多選的輸入與顯示元件。選中值以 Tag 陣列呈現，支援單行溢出和多行換行兩種版面。
+Combobox 是**多選下拉**的輸入與顯示元件。選中值以 Tag 陣列呈現，支援單行溢出與多行換行兩種版面。底層走原生 `<select>`（配合 Tag 疊層 overlay）。
 
-共用規則見 `field.spec.md`。本文件只記錄 Combobox 特有的原則。
+共用規則見 `../Field/field-controls.spec.md`。本文件只記錄 Combobox 特有的原則。
+
+---
+
+## 何時用
+
+- **多選場景**（使用者可選 0 個或多個）：Tag、分類、協作成員、通知訂閱
+- **選項數 6+**（少於 6 且 2-5 可見的多選，用 Checkbox stack 更有效）
+- **空間受限**：Table cell、toolbar filter、窄欄位 Form
+- **需要搜尋或大量選項**：searchable 後可處理 50+ 選項
+
+## 何時不用
+
+| 場景 | 改用 | 原因 |
+|------|------|------|
+| 單選 | `Select` | Combobox 永遠多選；單選場景強迫使用者每次手動清除再選新的 |
+| 2-5 個選項且全部可見 | Checkbox stack（`SelectionItem` 垂直排列）| 全可見 + 掃視快 + 支援描述文字 |
+| 階層結構（父/子節點）| `TreeView` | Combobox 是平面選項，沒有層級概念 |
+| 布林群組（多個獨立 on/off） | 多個 `Switch` | 每個開關是獨立功能，不是「從清單選」 |
+
+### 與 Checkbox stack 的分界
+
+兩者都能「2-5 個選項裡多選」，判斷與 Select vs RadioGroup 同構（詳見 `../Select/select.spec.md`「與 RadioGroup 的分界」），核心三角度：
+
+- **Progressive disclosure 成本**：Combobox 藏（多一次點擊），Checkbox stack 全露
+- **視覺重量**：Combobox O(1)，Checkbox stack O(n) 每個選項各一行
+- **評估深度**：Checkbox stack 適合「需要仔細讀選項 / 連帶 description」（權限授予、條款勾選），Combobox 適合「label 自帶語意、快速添加」（tag、分類）
+
+**Fallback**：表單中法律 / 權限類多選一律 Checkbox stack（完整閱讀優先，見 `../Checkbox/checkbox.spec.md`「Clamp 政策」）；Tag / 分類 / 協作成員用 Combobox。
 
 ---
 
@@ -53,3 +81,15 @@ Combobox 是多選的輸入與顯示元件。選中值以 Tag 陣列呈現，支
 - ❌ 不在已選中的選項上再顯示 dismiss 以外的互動——Tag 只能被移除，不能被編輯或重新排序
 - ❌ 溢出指示器 `+N` 不可省略——使用者需要知道有多少被隱藏的項目
 - ❌ 不自建 dropdown——使用原生 `<select>` 保證無障礙
+- ❌ 單選場景用 Combobox——使用者每次需手動清除再選新的，改用 `Select`
+- ❌ 法律 / 權限類多選用 Combobox——完整閱讀優先，改用 Checkbox stack（見 Checkbox spec「Clamp 政策」）
+
+---
+
+## 相關
+
+- `../Select/select.spec.md` — 單選對應元件；「與 RadioGroup 的分界」是 Combobox vs Checkbox stack 的 framework 來源
+- `../Checkbox/checkbox.spec.md` — Checkbox stack（多選全可見場景）
+- `../TreeView/tree-view.spec.md` — 階層式選擇
+- `../Switch/switch.spec.md` — 布林開關群組
+- `../Field/field-controls.spec.md` — Field Control 共用規則（mode / size / endAction / error）

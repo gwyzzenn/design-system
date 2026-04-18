@@ -1,0 +1,213 @@
+import React from 'react'
+import type { Meta, StoryObj } from '@storybook/react'
+import { Checkbox } from './checkbox'
+import { Switch } from '@/design-system/components/Switch/switch'
+import { RadioGroup, RadioGroupItem } from '@/design-system/components/RadioGroup/radio-group'
+
+const meta: Meta = {
+  title: 'Design System/Components/Checkbox/設計原則',
+  parameters: { layout: 'padded' },
+}
+export default meta
+type Story = StoryObj
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+const Rule = ({
+  title, note, children,
+}: {
+  title: string; note?: string; children: React.ReactNode
+}) => (
+  <div className="mb-14">
+    <h3 className="text-body font-bold text-foreground mb-1">{title}</h3>
+    {note && <p className="text-caption text-fg-muted mb-5 max-w-[720px] leading-relaxed">{note}</p>}
+    <div className="flex flex-col gap-3 max-w-md">{children}</div>
+  </div>
+)
+
+const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }) => (
+  <p className={`text-footnote leading-normal ${warn ? 'text-error font-medium' : 'text-fg-muted'}`}>{children}</p>
+)
+
+// ── Stories ───────────────────────────────────────────────────────────────────
+
+export const VsSwitchRule: Story = {
+  name: '與 Switch 的分界',
+  render: () => {
+    const [agree, setAgree] = React.useState(false)
+    const [notif, setNotif] = React.useState<'checked' | 'unchecked'>('unchecked')
+    const [bluetooth, setBluetooth] = React.useState(true)
+    const [wifi, setWifi] = React.useState(true)
+    return (
+      <div>
+        <Rule
+          title="Checkbox — 表單內、隨 submit 才生效、可反悔"
+          note="勾選不代表立刻生效——使用者按「儲存」前都可以反悔。心智模型是「選擇 / 同意」，視覺語言強調「尚未確定」"
+        >
+          <div className="border border-border rounded-lg p-4 space-y-3">
+            <Checkbox
+              label="我同意服務條款與隱私政策"
+              checked={agree}
+              onCheckedChange={(v) => setAgree(v === true)}
+            />
+            <Checkbox
+              label="訂閱行銷訊息"
+              description="每月最多 2 封，可隨時取消"
+              checked={notif === 'checked'}
+              onCheckedChange={(v) => setNotif(v ? 'checked' : 'unchecked')}
+            />
+            <div className="flex gap-2 pt-2">
+              <button className="h-field-md px-3 text-body rounded-md bg-primary text-inverse-fg">儲存</button>
+              <button className="h-field-md px-3 text-body rounded-md border border-border">取消</button>
+            </div>
+          </div>
+          <Label>↑ 同意條款、訂閱選擇——form 內、有 submit / cancel button</Label>
+        </Rule>
+
+        <Rule
+          title="Switch — 獨立 inline、切換即生效、無 submit 流程"
+          note="使用者按下那刻 Bluetooth / Wi-Fi / 通知 就已經開 / 關。心智模型是物理開關（真實世界的 light switch），視覺語言強調「現在就是這樣」"
+        >
+          <div className="border border-border rounded-lg p-4 space-y-3">
+            <Switch label="Bluetooth" checked={bluetooth} onCheckedChange={setBluetooth} />
+            <Switch label="Wi-Fi" description="2.4 GHz + 5 GHz" checked={wifi} onCheckedChange={setWifi} />
+          </div>
+          <Label>↑ 系統設定類——獨立 inline control、旁邊沒有 submit 流程</Label>
+        </Rule>
+
+        <Rule
+          title="❌ 用 Switch 做 form 同意"
+          note="「我同意條款」是「勾選 → 送出 → 法律成立」的書面行為。Switch 的物理開關隱喻暗示「我打開了接受條款這個功能」——心智錯位且違反約定俗成"
+        >
+          <div className="border border-border rounded-lg p-4 space-y-3">
+            <Switch label="我同意服務條款" />
+            <div className="flex gap-2 pt-2">
+              <button className="h-field-md px-3 text-body rounded-md bg-primary text-inverse-fg">送出</button>
+            </div>
+          </div>
+          <Label warn>↑ 同意條款用 Switch → 心智模型錯誤 + 與產業共識背離（全球沒有 form 用 Switch 同意條款）</Label>
+        </Rule>
+
+        <Rule
+          title="❌ 用 Checkbox 做即時系統設定"
+          note="按下 Checkbox 在使用者心智裡還是「尚未確定」——但 Bluetooth 已經開了。視覺語言和實際行為脫節，使用者會困惑「我需要再按個儲存嗎？」"
+        >
+          <Checkbox label="Bluetooth" />
+          <Label warn>↑ 即時套用用 Checkbox → 缺少「按下即生效」的視覺指示</Label>
+        </Rule>
+
+        <Rule
+          title="Fallback 判斷法"
+          note="不確定時問：這個值旁邊有 submit / cancel button 嗎？有 → Checkbox；沒有、是獨立 inline control → Switch"
+        >
+          <Label>完整情境對照表見 checkbox.spec.md「與 Switch 的分界」</Label>
+        </Rule>
+      </div>
+    )
+  },
+}
+
+export const CheckboxVsRadioRule: Story = {
+  name: 'Checkbox vs Radio',
+  render: () => {
+    const [selected, setSelected] = React.useState('credit')
+    const [perms, setPerms] = React.useState({ read: true, write: false, admin: false })
+    return (
+      <div>
+        <Rule
+          title="Checkbox — 獨立 toggle（多選 或 單一 agreement）"
+          note="每個 Checkbox 是獨立 boolean——可同時勾多個。也用於單一「我同意 X」agreement"
+        >
+          <div className="space-y-2">
+            <Checkbox
+              label="讀取權限"
+              description="可查看資料"
+              checked={perms.read}
+              onCheckedChange={(v) => setPerms({ ...perms, read: v === true })}
+            />
+            <Checkbox
+              label="寫入權限"
+              description="可新增 / 修改資料"
+              checked={perms.write}
+              onCheckedChange={(v) => setPerms({ ...perms, write: v === true })}
+            />
+            <Checkbox
+              label="管理權限"
+              description="可管理成員與設定"
+              checked={perms.admin}
+              onCheckedChange={(v) => setPerms({ ...perms, admin: v === true })}
+            />
+          </div>
+          <Label>↑ 權限可以任意組合——多選用 Checkbox</Label>
+        </Rule>
+
+        <Rule
+          title="Radio — 互斥單選（必須在 RadioGroup 內）"
+          note="N 個選項中只能選一個，其他自動變 unchecked。必須有 default value（radio 的語意不允許「都沒選」）"
+        >
+          <RadioGroup value={selected} onValueChange={setSelected}>
+            <RadioGroupItem value="credit" label="信用卡" description="手續費 2.5%，即時" />
+            <RadioGroupItem value="bank" label="銀行轉帳" description="無手續費，1-2 工作日" />
+            <RadioGroupItem value="cash" label="貨到付款" description="手續費 NT$30，到貨時付" />
+          </RadioGroup>
+          <Label>↑ 付款方式互斥——選一個自動取消其他</Label>
+        </Rule>
+
+        <Rule
+          title="❌ 多選一用 Checkbox"
+          note="使用者可以同時勾 3 個 → 邏輯錯誤，破壞互斥語意"
+        >
+          <div className="space-y-2">
+            <Checkbox label="信用卡" />
+            <Checkbox label="銀行轉帳" />
+            <Checkbox label="貨到付款" />
+          </div>
+          <Label warn>↑ 付款方式只能一個，卻用 Checkbox 允許多選 → 用 RadioGroup</Label>
+        </Rule>
+
+        <Rule
+          title="❌ 單一 toggle 用 Radio"
+          note="Radio 必須在 RadioGroup 內，且至少兩個選項。單一「我同意條款」用 Checkbox"
+        >
+          <Label warn>（Radio 元件層級禁止單獨使用——在 TypeScript 層強制）</Label>
+        </Rule>
+      </div>
+    )
+  },
+}
+
+export const ClampPolicyRule: Story = {
+  name: 'Clamp 政策',
+  render: () => (
+    <div>
+      <Rule
+        title="Label / Description 預設不截斷（'none'）"
+        note="Checkbox / Radio 常承載法律條款、隱私聲明、條件描述——任何截斷都可能讓使用者同意沒看到的內容，是法律或道德問題。與 MenuItem 的「掃視優先」完全相反，SelectionItem 的核心訴求是「完整閱讀後同意」"
+      >
+        <Checkbox
+          label="我同意網站使用 Cookie 以改善瀏覽體驗"
+          description="包含但不限於：分析使用行為以優化內容、個人化廣告推薦、第三方服務整合（Google Analytics、Meta Pixel 等）、以及符合歐盟 GDPR 規範的使用者同意記錄。詳細條款請見隱私政策。"
+        />
+        <Label>↑ 即使文字很長也完整顯示——使用者必須看完才能勾選</Label>
+      </Rule>
+
+      <Rule
+        title="❌ 絕不預設截斷 agreement 類 Label"
+        note="若 consumer 有合理理由（如 settings 頁掃視節奏）可以顯式覆寫 labelMaxLines / descMaxLines，但這應該是例外，不是預設"
+      >
+        <Checkbox
+          label="我同意非常長的服務條款與隱私政策以及所有使用規範這段文字被截斷了你看不到剩下的部分"
+          labelMaxLines={1}
+        />
+        <Label warn>↑ 截斷同意條款 → 使用者可能同意了看不到的內容</Label>
+      </Rule>
+
+      <Rule
+        title="Per-instance override：傳 'none' 不是 undefined"
+        note="React destructure default 會把 undefined 當「沒傳」→ fallback 到預設。要明確表達「不截」請傳 'none'"
+      >
+        <Label>labelMaxLines='none' / labelMaxLines={1} / labelMaxLines={2}（1-10 的數字）</Label>
+      </Rule>
+    </div>
+  ),
+}

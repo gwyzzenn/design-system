@@ -2,13 +2,82 @@
 
 ## 定位
 
-Checkbox 和 Radio 是選擇控件，視覺語言完全一致，差異只有形狀和語意。
+Checkbox 和 Radio 是**表單內的選擇控件**，視覺語言完全一致，差異只有形狀和語意。兩者都綁在 form state、隨 submit 才生效（非即時套用——這是與 Switch 的根本差異，見下「與 Switch 的分界」）。
 
 | | Checkbox | Radio |
 |---|---|---|
 | 形狀 | `rounded-md`（方） | `rounded-full`（圓） |
 | 指示器 | Check icon | Filled dot |
 | 語意 | 獨立 toggle（多選） | 互斥選擇（單選，必須在 RadioGroup 內） |
+
+---
+
+## 何時用 Checkbox
+
+- **表單多選**：通知類型、權限授予、標籤群組
+- **單一同意**：服務條款、隱私政策、訂閱行銷訊息（勾選才送出表單）
+- **indeterminate 半選**：階層式表格的「全選」checkbox 反映部分子項已選
+- **部分綁定的布林欄位**：form 裡的 is_public / is_featured（**但若是即時套用 → 用 Switch**）
+
+## 何時用 Radio
+
+- **表單單選且 2-5 個選項全部可見**：付款方式、訂閱方案、權限角色、票種
+- **選項需要描述文字**（法律條款、方案比較、feature list）
+- **決策節點**（使用者需要對比評估才能選）
+
+**Radio vs Select 的分界詳見 `../Select/select.spec.md`「與 RadioGroup 的分界」**（SSOT 在 Select spec）。
+
+## 何時不用（Checkbox / Radio 皆不適合）
+
+| 場景 | 改用 | 原因 |
+|------|------|------|
+| 布林且即時套用（bluetooth、notification enable）| `Switch` | 見下「與 Switch 的分界」 |
+| 單選但 6+ 選項 / 空間受限 | `Select` | Radio 全可見會佔滿頁面 |
+| 多選但 6+ 選項 / 空間受限 | `Combobox` | Checkbox stack 全可見會佔滿頁面 |
+| 階層結構（部門 / 資料夾）| `TreeView` | Checkbox 是平面選項 |
+| 純視覺切換（側欄收合）| `Button pressed` | 切換狀態屬於介面行為，不是 form value |
+
+---
+
+## 與 Switch 的分界
+
+兩者都是布林 on/off，常被誤用互換。判斷**不是視覺形狀**，而是以下三個角度——**任何一個明確傾向哪邊就選哪邊**：
+
+### 1. 套用時機
+
+- **Checkbox**：值隨 form submit 才套用。使用者勾選 → 按「儲存」→ 生效。中途可反悔
+- **Switch**：值即時套用。使用者切換 → 立刻生效（呼叫 API / 改 URL / 觸發副作用）。沒有「取消」
+
+### 2. 心智模型
+
+- **Checkbox**：選擇 / 同意——「我選這個項目」、「我同意這個條件」。與書面表單類比
+- **Switch**：開啟 / 關閉——「這個功能我要開」、「這個設定我要關」。與物理開關（牆上 light switch、iPhone settings 開關）類比
+
+### 3. 結果可逆性的即時感
+
+- **Checkbox**：勾選不代表生效——送出前可反悔。視覺語言強調「尚未確定」
+- **Switch**：切換即結果——使用者按下那刻就改變系統狀態。視覺語言強調「現在是這樣」
+
+### Fallback heuristic
+
+- 在 form 裡、旁邊有 submit button / cancel button → **Checkbox**
+- 獨立的 inline control、旁邊沒有 submit 流程 → **Switch**
+
+### 情境對照表
+
+| 場景 | 選哪個 | 原因 |
+|------|-------|------|
+| 我同意服務條款 | Checkbox | 隨 form submit 才成立 |
+| 通知類型勾選（email / SMS / push）| Checkbox | form 設定，按儲存才套用 |
+| Bluetooth on/off | Switch | 立刻開 / 關，不經 submit |
+| Wi-Fi on/off | Switch | 立刻生效 |
+| Dark mode 切換 | Switch | 即時套用 |
+| Push 通知開關（settings 頁）| Switch | 立刻生效 |
+| 訂閱行銷訊息 | Checkbox | form 內，按儲存才套用 |
+| is_public / is_featured（編輯表單）| Checkbox | form field，送出才生效 |
+| is_public（admin 即時切換）| Switch | 切換立刻套用 |
+
+**本節是 Checkbox vs Switch 的 SSOT**，未來 Switch 建立 spec 時用一行 pointer 指回本節。
 
 ---
 
@@ -132,3 +201,15 @@ Indeterminate 是由父層邏輯控制的狀態，Checkbox 本身不會自動進
 - ❌ Checkbox 不內建 label——label 組合用 SelectionItem
 - ❌ 垂直排列不加 gap——padding 已處理間距
 - ❌ 多選一不用 Checkbox——用 Radio 或 Select
+- ❌ 即時套用的布林開關用 Checkbox——用 Switch（見「與 Switch 的分界」）
+- ❌ Form 內同意條款用 Switch——條款是「勾選送出才成立」的書面行為，用 Checkbox
+
+---
+
+## 相關
+
+- `../Switch/switch.spec.md` — 即時套用的布林開關（Checkbox vs Switch SSOT 在本 spec「與 Switch 的分界」）
+- `../Select/select.spec.md` — 單選下拉（Radio vs Select SSOT 在 Select spec）
+- `../Combobox/combobox.spec.md` — 多選下拉（Checkbox stack vs Combobox 對照在 Combobox spec）
+- `../RadioGroup/radio-group.spec.md` — Radio 的 group 容器（共用規則在本 spec）
+- `../Field/field-controls.spec.md` — Field Control 共用規則
