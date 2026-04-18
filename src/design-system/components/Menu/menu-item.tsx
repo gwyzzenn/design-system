@@ -287,6 +287,16 @@ const MenuItem = React.forwardRef<HTMLDivElement, MenuItemProps>(
 MenuItem.displayName = 'MenuItem'
 
 // ── Group ──
+// MenuGroup — Menu-like group primitive(跨元件設計語言統一,SSOT 見
+// `patterns/item-layout/item-layout.spec.md`「Group auto-separation」)
+//
+// 設計語言:每個 group 上下 8px + 相鄰 group 間 border-divider + 視覺 gap 16px
+//
+// 本元件用 Pattern A:`py-2 [&+&]:border-t [&+&]:border-divider`
+// (適用外層容器無 py-2 的情境,例 Command.List——Group 自帶邊界 padding)
+//
+// **視覺必須跟 DropdownMenuGroup 等價**(見 dropdown-menu.tsx Pattern B 對照)。
+// 改動前先讀 item-layout.spec.md「Group auto-separation」確認視覺不漂移。
 
 export interface MenuGroupProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode

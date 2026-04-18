@@ -60,19 +60,30 @@ const DropdownMenuTrigger = React.forwardRef<
   />
 ))
 DropdownMenuTrigger.displayName = DropdownMenuPrimitive.Trigger.displayName
-// DropdownMenuGroup — 對齊 MenuGroup 的 auto-separation CSS pattern
-// ([&+&]:border-t [&+&]:border-divider),讓相鄰 DropdownMenuGroup 自動分隔
-// consumer 用 Group 組織 items 時無需手動加 Separator。
+// DropdownMenuGroup — 對齊 MenuGroup 的 group separation 設計語言
 //
-// 注意:不套 `py-2`(MenuGroup 有)——因為 DropdownMenuContent 已有 `py-2`,
-// 再套會 double padding。MenuGroup 在 Command.List 下不會有這個問題所以有 py-2。
+// 設計語言(跨 Menu-like 元件統一,SSOT 見 item-layout.spec.md
+// 「Group auto-separation」):
+//   每個 group 上下各 8px padding,相鄰 group 之間用 border-divider 分隔
+//   兩個 group 之間視覺 gap = 8px(上一個 bottom)+ 8px(下一個 top)= 16px + border
+//
+// MenuGroup(menu-item.tsx)實作:`py-2 [&+&]:border-t [&+&]:border-divider`
+//   (在 Command.List 下提供 Content 邊界 8px + group 間 16px gap)
+//
+// DropdownMenuGroup(本元件)實作:`[&+&]:mt-2 [&+&]:pt-2 [&+&]:border-t
+// [&+&]:border-divider`(因為 DropdownMenuContent 已有 py-2 提供 Content 邊界
+// 的 8px,只需在第二個起的 group 加 8+8 = 16px gap + border)
+//
+// **視覺結果等同**:兩種實作的 visual output 一致,只是「padding 住在哪層」
+// 不同。不強制統一 CSS 表達式——DropdownMenuContent 的 py-2 是既有 Radix
+// 期望的行為,移除會影響 trigger 鍵盤導覽的 focus offset。
 const DropdownMenuGroup = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Group>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Group>
 >(({ className, ...props }, ref) => (
   <DropdownMenuPrimitive.Group
     ref={ref}
-    className={cn('[&+&]:border-t [&+&]:border-divider [&+&]:mt-1 [&+&]:pt-1', className)}
+    className={cn('[&+&]:border-t [&+&]:border-divider [&+&]:mt-2 [&+&]:pt-2', className)}
     {...props}
   />
 ))

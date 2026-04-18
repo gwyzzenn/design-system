@@ -49,13 +49,22 @@ DropdownMenu                    ← Radix Root，管理開關狀態
 
 ### DropdownMenuGroup 的自動分隔
 
-`DropdownMenuGroup` 對齊 `MenuGroup` 的 auto-separation 理念——相鄰的 Group 自動透過 `border-divider` 分隔，**consumer 不需要自己加 `DropdownMenuSeparator`**。
+`DropdownMenuGroup` 對齊 `MenuGroup` 的 group separation 設計語言——相鄰的 Group 自動透過 `border-divider` 分隔，**consumer 不需要自己加 `DropdownMenuSeparator`**。
 
-**實作差異（與 MenuGroup 對照）**：
-- **MenuGroup**（`menu-item.tsx`）：`py-2 [&+&]:border-t [&+&]:border-divider`——每個 Group 都有 8px 上下 padding
-- **DropdownMenuGroup**：`[&+&]:border-t [&+&]:border-divider [&+&]:mt-1 [&+&]:pt-1`——不套 `py-2`（會跟 `DropdownMenuContent` 既有 `py-2` 產生 double padding），改用 `mt-1 pt-1` 只在第二個 Group 起加上下間距
+**設計語言**（跨 Menu-like 元件統一，SSOT 見 `../../patterns/item-layout/item-layout.spec.md`「Group auto-separation」）：
+- 每個 group 上下各 **8px padding**
+- 相鄰 group 之間用 **border-divider** 分隔
+- 兩個 group 之間視覺 gap = 8（上一 bottom）+ 8（下一 top）= **16px + border**
 
-視覺結果類似——相鄰 Group 間都有 border-divider 分隔線，不同只是具體間距公式。
+**MenuGroup vs DropdownMenuGroup CSS 實作對照**（視覺結果 100% 等價，差別只是 padding 住在哪層）：
+
+| | MenuGroup | DropdownMenuGroup |
+|---|---|---|
+| CSS | `py-2 [&+&]:border-t [&+&]:border-divider` | `[&+&]:mt-2 [&+&]:pt-2 [&+&]:border-t [&+&]:border-divider` |
+| 邊界 padding 來源 | 每個 Group 自己的 py-2（Command.List 無 py） | Content 的 py-2（Group 不套 py-2 避免 double） |
+| Group 間 gap | 8 + 8 = 16 + border | 0 + 8 + 8 = 16 + border |
+
+**為什麼不直接套 `py-2`**：`DropdownMenuContent` 已有 `py-2` 提供 Content 邊界 padding（Radix 預期行為，移除會影響 trigger focus offset）。若 Group 再套 `py-2` 會 double padding。改用 `mt-2 pt-2` 只加在第二個 Group 起，視覺等價但不 double。
 
 兩種分隔機制的選擇：
 - **用 `DropdownMenuGroup` 包裝同類 items** → 自動分隔（零手動，跟 MenuGroup 理念一致）

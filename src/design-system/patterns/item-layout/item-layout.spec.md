@@ -115,6 +115,53 @@ Row 集合是**內容(content)**,不是區段(region)。加 py 到 row 集合會
 
 ---
 
+## Group auto-separation（跨 Menu-like 元件統一設計語言）
+
+**SSOT 段落**:`MenuGroup` / `DropdownMenuGroup` / 未來的 `ContextMenuGroup` 等 row group primitives 共享此設計語言。
+
+### 設計語言
+
+- **每個 group 上下各 8px padding**
+- **相鄰 group 之間用 `border-divider` 分隔**
+- **兩個 group 之間視覺 gap = 8(上 bottom)+ 8(下 top)= 16px + border**
+
+Consumer 不需手動插 Separator——把同類 items 包進 Group,自動分隔。
+
+### 兩種 CSS 實作(視覺等價,差別在 padding 住哪層)
+
+| | **Pattern A**(Group 自帶 padding) | **Pattern B**(Container 提供邊界 padding) |
+|---|---|---|
+| 典型案例 | `MenuGroup`(menu-item.tsx) | `DropdownMenuGroup`(dropdown-menu.tsx) |
+| 何時用 | 外層容器**無** `py-2`（例:`Command.List`) | 外層容器**已有** `py-2`（例:`DropdownMenuContent`) |
+| CSS | `py-2 [&+&]:border-t [&+&]:border-divider` | `[&+&]:mt-2 [&+&]:pt-2 [&+&]:border-t [&+&]:border-divider` |
+| 邊界 padding 來源 | Group 自己的 py-2 | Container 的 py-2 |
+| Group 間 gap | 8 + 8 = 16 + border | 0 + 8 + 8 = 16 + border |
+
+**視覺結果 100% 等價**——都是 Content 邊界 8px + 相鄰 group 間 16px + border。
+
+### 為什麼不強制統一 CSS
+
+不同外層容器(`Command.List` vs `DropdownMenuPrimitive.Content`)對 padding 的預期不同(Radix 的 Content 自帶 `py-2` 是為了鍵盤導覽 focus offset,移除會破壞行為)。**強行統一 CSS 會破壞外層 primitive 的預期**——所以允許兩種 Pattern,但**視覺結果必須等價**(16px gap + border)。
+
+### 新增 group primitive 的檢查清單
+
+建立新的 Menu-like group 元件(例 `ContextMenuGroup`、`CommandGroup` 擴充)時:
+
+1. **確認外層容器有沒有 `py-2`**
+   - 有 → 用 Pattern B(`[&+&]:mt-2 [&+&]:pt-2 [&+&]:border-t [&+&]:border-divider`)
+   - 沒有 → 用 Pattern A(`py-2 [&+&]:border-t [&+&]:border-divider`)
+2. **視覺驗證**:兩個相鄰 group 之間 gap **必須** = 16px + border。不可多、不可少
+3. **加 cross-reference 註解**:tsx 檔裡指向本 spec 段落,讓未來維護者知道這是跨元件 SSOT
+4. **不創新 CSS**:只能從 Pattern A / B 二選一,不自己發明第三種公式
+
+### 歷史錯誤
+
+本 session 曾寫過 `[&+&]:mt-1 [&+&]:pt-1`(只有 4+4 = 8px gap)——**錯誤**,少於設計語言的 16px。後修正為 `mt-2 pt-2`。
+
+**避免方式**:新增 group primitive 時先檢查 MenuGroup 的視覺 gap,用同樣距離。
+
+---
+
 ## 結構:四個獨立 slot
 
 所有 item layout 元件共用一個 4-slot 結構,**每個 slot 各自獨立決定對齊**:
