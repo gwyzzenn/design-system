@@ -95,8 +95,8 @@ export const SizeMatrix: Story = {
             <thead><tr><Th>Size</Th><Th>md density</Th><Th>lg density</Th><Th>Padding</Th><Th>字體</Th><Th>Icon</Th></tr></thead>
             <tbody>
               <tr><Td mono>xs</Td><Td mono>24</Td><Td mono>24(固定)</Td><Td mono>px-2</Td><Td>text-caption(12)</Td><Td mono>14</Td></tr>
-              <tr><Td mono>sm ★default</Td><Td mono>28</Td><Td mono>32</Td><Td mono>px-3</Td><Td>text-body(14)</Td><Td mono>16</Td></tr>
-              <tr><Td mono>md</Td><Td mono>32</Td><Td mono>36</Td><Td mono>px-3</Td><Td>text-body(14)</Td><Td mono>16</Td></tr>
+              <tr><Td mono>sm</Td><Td mono>28</Td><Td mono>32</Td><Td mono>px-3</Td><Td>text-body(14)</Td><Td mono>16</Td></tr>
+              <tr><Td mono>md ★default</Td><Td mono>32</Td><Td mono>36</Td><Td mono>px-3</Td><Td>text-body(14)</Td><Td mono>16</Td></tr>
               <tr><Td mono>lg</Td><Td mono>36</Td><Td mono>40</Td><Td mono>px-3</Td><Td>text-body-lg(16)</Td><Td mono>20</Td></tr>
             </tbody>
           </table>

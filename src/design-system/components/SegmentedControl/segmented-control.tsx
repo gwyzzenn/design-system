@@ -16,10 +16,10 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/design-system/compone
  *   切 value（不是切 view）。塞得進 Field，Tabs 不行。
  *   切 view → Tabs；單一 on/off → Button pressed；>5 個選項 → Select。
  *
- * ── Size（對齊 field-height / Button）──
+ * ── Size（對齊 field-height / Button 系列）──
  *   xs   h-field-xs（24 固定）
- *   sm   h-field-sm（28/32）★ 預設
- *   md   h-field-md（32/36）
+ *   sm   h-field-sm（28/32）
+ *   md   h-field-md（32/36）★ 預設（跟 Button / Input / 所有 field-height 系列一致）
  *   lg   h-field-lg（36/40）
  *
  * ── fullWidth ──

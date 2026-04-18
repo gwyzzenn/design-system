@@ -92,9 +92,11 @@ SegmentedControl 必須能塞進 `Field` 容器（就像 `Input` / `Button` / `S
 | Size | md density | lg density | token | padding | 字體 |
 |------|-----------|-----------|-------|---------|------|
 | `xs` | 24 | 24（固定）| `h-field-xs` | `px-2` | `text-caption` (12) |
-| `sm` ★default | 28 | 32 | `h-field-sm` | `px-3` | `text-body` (14) |
-| `md` | 32 | 36 | `h-field-md` | `px-3` | `text-body` (14) |
+| `sm` | 28 | 32 | `h-field-sm` | `px-3` | `text-body` (14) |
+| `md` ★default | 32 | 36 | `h-field-md` | `px-3` | `text-body` (14) |
 | `lg` | 36 | 40 | `h-field-lg` | `px-3` | `text-body-lg` (16) |
+
+**為什麼 default 是 md 不是 sm**：跟 Button / Input / Select / Checkbox 等所有 field-height 系列元件的 default size 一致——consumer 在表單場景裡一組並排的 control 才能自動對齊而不用手動傳 size。違反這個一致性會讓「放著不管就對齊」的 consumer 體驗破功。
 
 **在 Field 內自動讀 size**：透過 `useFieldContext()`，SegmentedControl 在 Field 內時 size 跟著 Field 的 size 走，不需 consumer 重複指定——機制與 Button 完全相同。
 
