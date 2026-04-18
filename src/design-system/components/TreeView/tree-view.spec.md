@@ -497,6 +497,10 @@ TreeItem 透過 props 提供 slots,讓不同 consumer 決定 node 的視覺:
 </TreeView>
 ```
 
+### Drag preview label 最大寬度 `max-w-[200px]`（documented constant）
+
+拖曳中的 preview label 以 `truncate max-w-[200px]` 截斷——避免拖長檔名時 preview 遮蔽 drop target 視線。200px 是 TreeView 專用 layout 常數（非跨元件 token）,跟 Tag 的 max-w-40（160px）相關但不同:tree item 標籤通常比 tag 長,需要稍寬。
+
 ---
 
 ## 禁止事項

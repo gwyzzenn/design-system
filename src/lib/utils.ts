@@ -29,8 +29,7 @@ const twMerge = extendTailwindMerge({
         'text-fg-muted',
         'text-fg-disabled',
         'text-inverse-fg',
-        'text-inverse-fg-secondary',
-        'text-inverse-fg-muted',
+        // 未來需 text-inverse-fg-secondary/muted 時,先在 semantic.css 加 token 再註冊這裡,避免 ghost registration
         'text-error-text',
         'text-success-text',
         'text-warning-text',
