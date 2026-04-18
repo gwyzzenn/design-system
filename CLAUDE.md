@@ -59,54 +59,116 @@
 若缺少上述檔案，請先建立再進行其他修改。
 
 
-# 規則分層（寫新規則前先決定位置）
+# 規則分層（7 個 home，寫任何新規則前先決定位置）
 
-設計系統的規則分四層，**寫任何新規則前先決定它屬於哪一層**，不要全部塞進 CLAUDE.md。
+設計系統的知識分 7 個 home。**寫任何新規則、新文件、新協議前,先跑下方「放哪裡 decision flowchart」——不要全部塞進 CLAUDE.md**。
 
-**Level 1 — `CLAUDE.md`（專案層，跨元件）**
-- 技術棧、檔案結構
-- 跨元件架構原則的**判斷框架**（如何決定 Props 命名、如何決定用 Inline Action vs Button）
-- AI 會反覆踩的**技術陷阱**（Tailwind v4 `var()` 語法、tailwind-merge 註冊、陰影用 elevation、Provider 放置）
-- 品質閘門、Story 結構規範
-- 指向詳細 spec 的**指標**（一行連結，不展開細節）
-- 「如何寫 spec / story / code」的 meta 規則
+## 7 個 home + 各自的 scope
 
-**CLAUDE.md 的判斷法**：問「這是 AI 每次執行都需要的提醒，還是查閱特定 spec 就能找到的設計規則？」前者留，後者搬到 spec 並留指標。
+### 設計規則層（DS 設計知識，按影響範圍分層）
 
-不適合：具體設計規則（超過 5 行的對照表、場景列舉、公式推導）——那是 spec 的工作。CLAUDE.md 只放判斷框架 + 指向 spec 的指標。
+**Level 1 — `CLAUDE.md`（專案層跨元件設計規則 SSOT）**
+- 跨元件架構判斷框架（Props 命名、Family 分類、token 消費紀律）
+- AI 反覆踩的**技術陷阱**（Tailwind v4 `var()`、tailwind-merge、Provider 放置、shadcn alias 回流）
+- 系統級 meta 規則（命名三重 test、cva 適用範圍、Story 三層定位）
+- **短指標**指向 spec 深度細節（一行連結不展開）
+- **判斷法**：AI 每次執行都需要的提醒 → CLAUDE.md;查閱特定 spec 就找得到 → spec
+- **不適合**:超過 5 行的對照表 / 場景列舉 / 公式推導
 
-**Level 2 — 元件 `spec.md`（單一元件）**
-- 元件定位一句話
+**Level 2 — 元件 `spec.md`（單元件設計規則）**
+- 元件定位 + Layout Family 宣告（第一段必含）
 - variant / size / state 的「何時用 / 不用」與理由
-- 元件特有的設計決策
-- do / don't 原則（由 stories 視覺化）
-- 對 cross-cutting 規則的**例外**
-- 指向 CLAUDE.md 或 pattern spec 的反向引用
+- 元件特有的設計決策 + do/don't 原則
+- 對 cross-cutting 規則的**例外**（documented 理由）
+- 指向 CLAUDE.md / pattern spec 的反向引用
+- **不適合**:適用多個元件的規則(應升級到 pattern spec 或 CLAUDE.md)
 
-不適合：適用多個元件的規則（應升級到 pattern spec 或 CLAUDE.md）。
+**Level 3 — Pattern `spec.md`（跨元件佈局 / 互動公式）**
+- 多元件共用的基礎設計規則
+- pattern rationale + 公式 + token 結構
+- **明列 pattern 的 consumers**
+- 例:`item-layout.spec.md` (4-Family Model 的 Family 1+2 SSOT)
 
-**Level 3 — Pattern `spec.md`（跨元件共享的佈局 / 互動公式，如 `item-layout.spec.md`）**
-- 多個元件必須遵守的基礎設計規則
-- pattern 的 rationale（為什麼是這個公式 / 結構）
-- 公式與 token 結構
-- **列出哪些元件是該 pattern 的消費者**
-- 元件在 pattern 內的互動規則
+**Level 4 — Code（`.tsx` / `.css`）**
+- 被強制執行的 variant type (cva)、TS 型別約束
+- **不需人類判斷**的實作細節
+- 行內註解解釋微妙實作決策（**不是**設計理由——那去 spec）
 
-**Level 4 — Code（`.tsx`）**
-- 被強制執行的 variant type（cva）
-- TypeScript 型別約束、required props
-- 不需人類判斷的實作細節
-- 說明微妙實作決策的行內註解（**不是**設計理由——設計理由去 spec）
+### 執行與狀態層（DS 設計之外的知識）
 
-### 判斷法（寫規則前問自己）
+**Level 5 — Skill (`.claude/skills/*/SKILL.md` + `references/`)**
+- **Audit / 稽核協議**（如 `design-system-audit` 的 18 個 audits）
+- **AI↔user 對話 protocol**（checkpoint 範本:「先不管」vs tech debt / 新 rule 提議 / 分類模糊等）
+- **特定工作流 playbook**（only-when-invoked 的多步驟流程）
+- **判斷法**:這條規則是否「只在某個 invoke 情境才需要」? 是 → Skill;否（每次都要）→ CLAUDE.md
+- **不適合**:設計規則（放 CLAUDE.md / spec）、session 狀態（放 memory）
 
-1. **影響幾個元件？** 1 個 → 元件 spec；2+ 但屬同一 pattern → pattern spec；全系統 → CLAUDE.md
-2. **能直接變成 code 嗎？** 能 → 寫進 tsx，spec 指向 tsx；不能 → spec
-3. **是「為什麼 / 何時」還是「是什麼 / 多少」？** 前者 → spec；後者 → code
+**Level 6 — Memory (`~/.claude/projects/.../memory/*.md`)**
+- **跨 session 狀態**（audit progress、tech debt 清單、決策紀錄）
+- user 偏好 / 角色 / 專案 goal
+- **每次 session 開啟時載入**
+- **判斷法**:這是「會變化的狀態」還是「固定的規則」? state → memory;rule → CLAUDE.md/spec/skill
+- **不適合**:固定規則、跑得出的資訊（git log / 現行 code 有就不用記）、user 明確「先不管」的事項
 
-### 搬動規則的雙向處理
+**Level 7 — Hook (`.claude/hooks/*.sh` / `*.py`)**
+- **Pre/post-tool 自動化**（邊界守衛、sync check 提醒、import guard）
+- **判斷法**:這條規則能「機械化在 tool 執行前後自動跑」嗎? 是 → hook;否 → CLAUDE.md 或 spec
 
-把規則從 CLAUDE.md 搬到 spec 時，**CLAUDE.md 必須留下一行指標**（「詳見 `xxx.spec.md`」）；反之亦然。**規則有家、也有路標**，不可只搬走不留索引。
+## 放哪裡 decision flowchart
+
+**從 Q1 開始回答,第一個 YES 就是家**:
+
+```
+Q1. 是設計規則嗎?(如何寫 spec / code / token / story / pattern)
+    → YES: 進 Level 1-4(按影響範圍 + 判斷法)
+    → NO: 繼續 Q2
+
+Q2. 只在「特定 invoke 情境」才需要嗎?(audit / code review / setup 等)
+    → YES: Skill(SKILL.md 主流程,references/ 細節)
+    → NO: 繼續 Q3
+
+Q3. 是「隨時間變化的狀態」嗎?(已完成 / 待辦 / 決策紀錄 / user 偏好)
+    → YES: Memory
+    → NO: 繼續 Q4
+
+Q4. 能用 script「機械化自動執行」嗎?(pre/post tool)
+    → YES: Hook
+    → NO: 繼續 Q5
+
+Q5. 是 CLAUDE.md / SKILL.md 已有項目的「深層細節」嗎?
+    → YES: Skill `references/*.md` 或 spec.md(視上層所在)
+    → NO: **不合任何 home——重新思考 scope 或 ask user**
+```
+
+## CLAUDE.md vs Skill 的 signal-to-noise 原則
+
+- **CLAUDE.md 每次對話都載入**——每加一條規則都增加 AI 掃描成本。**只放每次都需要 signal 的 DS 規則**。
+- **Skill 只在 invoke 時載入**——audit / workflow / interaction protocols 放這裡不污染每次對話。
+- **不對家**:把 audit protocol 放 CLAUDE.md → 每次對話都讀 audit-only 內容 = 噪音;把 DS 規則放 Skill → audit 以外的 session 讀不到 = 遺失 signal。
+
+## 判斷法（寫規則前問自己）
+
+1. **影響幾個元件？** 1 個 → 元件 spec;2+ 但屬同一 pattern → pattern spec;全系統 → CLAUDE.md
+2. **能直接變成 code 嗎？** 能 → 寫進 tsx/css,spec 指向 tsx;不能 → spec
+3. **是「為什麼 / 何時」還是「是什麼 / 多少」？** 前者 → spec;後者 → code
+4. **每次對話都要載入嗎？** 要 → CLAUDE.md;不要 → Skill
+5. **是「規則」還是「狀態」？** 規則 → CLAUDE.md/spec/skill;狀態 → memory
+
+## 搬動規則的雙向處理
+
+把規則從任一 home 搬到另一 home 時,**原位置必須留下一行指標**（「詳見 X」）;反之亦然。**規則有家、也有路標**,不可只搬走不留索引。
+
+## 本 session 明確案例（佐證分家原則）
+
+| 規則 | 原本想放 | 最終放 | 理由 |
+|------|---------|--------|------|
+| 命名三重 test | CLAUDE.md ✓ | CLAUDE.md | 每次新 variant/prop 都觸發,Level 1 |
+| cva 適用範圍 | CLAUDE.md ✓ | CLAUDE.md | 寫元件 code 的 pattern 決策,Level 1 |
+| 4-Family Model | CLAUDE.md + item-layout SSOT ✓ | 兩處 | 頂層 framework 在 CLAUDE.md,深度規格在 pattern spec |
+| 「先不管」語意區分 | CLAUDE.md (❌ 錯放) | **Skill Checkpoint 7** | AI↔user 對話 protocol,不是設計規則;只在 audit triage 情境需要 |
+| 18 個 audits | CLAUDE.md (❌ 若放這會污染) | **Skill** | 只在 `/design-system-audit` invoke 時需要 |
+| Tech debt 清單 | CLAUDE.md (❌ 會過期變誤導) | **Memory** | 隨時間變化的 session 狀態 |
+| Spec 寫作要交叉比對 | CLAUDE.md 或 spec 或 Hook | **Hook `check_sync_update.sh`** | 能機械化在 Edit 後自動提醒 |
 
 
 # 遇不確定時的協議（Ambiguity Protocol）
