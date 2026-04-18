@@ -33,9 +33,11 @@ NameCard 為固定寬度的垂直 section 堆疊：
 
 Section 之間用 `border-t border-divider` 固定分隔（見 `separator.spec.md`「元件固定結構 → CSS border-t/b」）。詳細 class / padding token 見 `name-card.tsx`。
 
-## 寬度
+## 寬度（元件級常數）
 
-固定寬度（見 `.tsx` 常數）。HoverCard 浮層寬度由 NameCard 決定，不隨內容伸縮——避免 hover 時浮層寬度跳動。
+NameCard 固定 **320px 寬**（見 `.tsx` 的 `w-[320px]`）——HoverCard 浮層寬度由 NameCard 決定，不隨內容伸縮（避免 hover 時浮層寬度跳動）。
+
+對照世界級：Material Snackbar 固定 344px、Slack message modal 固定寬度——**單一元件的 canonical 寬度屬於該元件自己的 design spec，不抽為跨元件 token**。Token 系統只管共享值（如 `--field-height-*`、`--layout-space-*`）；單一元件獨有的結構常數留在 component code + 本 spec。
 
 ## Profile Header
 

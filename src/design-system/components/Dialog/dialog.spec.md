@@ -106,6 +106,30 @@ Dialog 是容器，無整體 disabled / loading / empty 狀態——這些屬於
 
 ---
 
+## 禁止事項
+
+- ❌ **不在 Dialog 內 nested Dialog**：modal 疊 modal 會形成焦點陷阱地獄（使用者無法預測 Esc 關哪一層），複雜多步驟流程改用單一 Dialog + 內部步驟切換
+- ❌ **不用 Dialog 顯示非阻斷訊息**：成功 / 失敗的短暫回饋用 Toast；持續性系統狀態用 Alert。Dialog 的阻斷成本過高
+- ❌ **不把長 form wizard 塞 Dialog**：超過 3 步驟或表單高度接近全螢幕的流程改用獨立頁面或 Sheet，Dialog 不適合長時間停留
+- ❌ **不在 Dialog footer 把 primary action 放左側**：CTA 靠右（`justify-end`）是跨平台使用者期待（macOS / Windows / Web 主流皆如此），反向放置會降低可用性
+
+---
+
+## A11y 預設
+
+Radix Dialog 自動處理：
+
+- **Modal 語意**：`role="dialog"` + `aria-modal="true"`
+- **標題綁定**：`<DialogTitle>` 自動成為 `aria-labelledby` 指向對象，screen reader 開啟時讀出標題
+- **Focus trap**：焦點鎖在 Dialog 內，Tab 循環不逃出
+- **Esc 關閉**：按 Esc 自動關閉
+- **Focus return**：關閉時焦點返回 trigger 元素
+- **Overlay click**：點擊 overlay 關閉（可透過 `onPointerDownOutside` 阻止）
+
+Consumer 必須保留 `<DialogTitle>`——即使視覺不顯示，也要用 `VisuallyHidden` 包裹提供給 screen reader。
+
+---
+
 ## 相關
 
 - `../Sheet/sheet.spec.md` — 側邊滑入的輕量替代（共用 Radix Dialog base）
