@@ -1,6 +1,6 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
-import { Popover, PopoverTrigger, PopoverContent } from './popover'
+import { Popover, PopoverTrigger, PopoverContent, PopoverHeader, PopoverBody, PopoverFooter, PopoverTitle } from './popover'
 import { Button } from '@/design-system/components/Button/button'
 import { H3, Desc, Td, Th, Swatch, TokenCell } from '@/design-system/components/_anatomy/anatomy-utils'
 
@@ -24,18 +24,18 @@ export const Overview: Story = {
               <Button variant="tertiary">篩選設定</Button>
             </PopoverTrigger>
             <PopoverContent>
-              <div className="flex flex-col gap-3">
-                <div className="text-body font-medium">依類型篩選</div>
+              <PopoverHeader><PopoverTitle>依類型篩選</PopoverTitle></PopoverHeader>
+              <PopoverBody>
                 <div className="flex flex-col gap-1.5 text-caption text-fg-secondary">
                   <label className="flex items-center gap-2"><input type="checkbox" defaultChecked /> 待處理</label>
                   <label className="flex items-center gap-2"><input type="checkbox" defaultChecked /> 進行中</label>
                   <label className="flex items-center gap-2"><input type="checkbox" /> 已完成</label>
                 </div>
-                <div className="flex gap-2 pt-2 border-t border-divider">
-                  <Button variant="tertiary" size="sm" className="flex-1">清除</Button>
-                  <Button variant="primary" size="sm" className="flex-1">套用</Button>
-                </div>
-              </div>
+              </PopoverBody>
+              <PopoverFooter>
+                <Button variant="tertiary" size="sm" className="flex-1">清除</Button>
+                <Button variant="primary" size="sm" className="flex-1">套用</Button>
+              </PopoverFooter>
             </PopoverContent>
           </Popover>
         </div>
@@ -77,7 +77,7 @@ export const PlacementMatrix: Story = {
                     <Button variant="tertiary" size="sm" className="font-mono">{side}/{align}</Button>
                   </PopoverTrigger>
                   <PopoverContent side={side} align={align}>
-                    <div className="text-caption">side=<span className="font-mono">{side}</span>, align=<span className="font-mono">{align}</span></div>
+                    <PopoverBody><div className="text-caption">side=<span className="font-mono">{side}</span>, align=<span className="font-mono">{align}</span></div></PopoverBody>
                   </PopoverContent>
                 </Popover>
               </div>
@@ -104,9 +104,10 @@ export const VisualTokens: Story = {
               <tr><Td>邊框</Td><Td><TokenCell token="--border" display="border-border" /></Td><Td>標準邊框</Td></tr>
               <tr><Td>文字</Td><Td><TokenCell token="--foreground" display="text-foreground" /></Td><Td>主要文字色</Td></tr>
               <tr><Td>次要文字</Td><Td><TokenCell token="--fg-secondary" display="text-fg-secondary" /></Td><Td>說明 / 次要資訊</Td></tr>
-              <tr><Td>圓角</Td><Td mono>rounded-md(4px)</Td><Td>對齊浮層 radius 標準</Td></tr>
+              <tr><Td>圓角</Td><Td mono>rounded-lg(8px)</Td><Td>對齊 Dialog radius(浮層視覺語言一致)</Td></tr>
               <tr><Td>陰影</Td><Td mono>--elevation-200</Td><Td>浮層級 elevation(見 `elevation.spec.md`)</Td></tr>
-              <tr><Td>內間距</Td><Td mono>p-4</Td><Td>預設內容 padding;內容複雜時 consumer 可自訂</Td></tr>
+              <tr><Td>Density</Td><Td mono>data-density="md"</Td><Td>Popover 永遠鎖 md,不隨頁面 density 放大(lightweight)</Td></tr>
+              <tr><Td>Header/Body/Footer padding</Td><Td mono>px-[loose] py-[tight]</Td><Td>結構化 sub-components 採 Dialog 同一套 padding token</Td></tr>
               <tr><Td>Portal z-index</Td><Td mono>z-50</Td><Td>Radix Portal 統一層級,避開一般頁面內容</Td></tr>
             </tbody>
           </table>
@@ -127,13 +128,13 @@ export const SizeBehavior: Story = {
           <div className="flex items-center gap-3 border border-dashed border-divider rounded-md p-3">
             <span className="text-caption font-mono w-20">w-72(預設)</span>
             <Popover><PopoverTrigger asChild><Button variant="tertiary" size="sm">開啟</Button></PopoverTrigger>
-              <PopoverContent><div className="text-caption">預設寬度 w-72</div></PopoverContent>
+              <PopoverContent><PopoverBody><div className="text-caption">預設寬度 w-72</div></PopoverBody></PopoverContent>
             </Popover>
           </div>
           <div className="flex items-center gap-3 border border-dashed border-divider rounded-md p-3">
             <span className="text-caption font-mono w-20">w-96</span>
             <Popover><PopoverTrigger asChild><Button variant="tertiary" size="sm">開啟</Button></PopoverTrigger>
-              <PopoverContent className="w-96"><div className="text-caption">自訂 w-96</div></PopoverContent>
+              <PopoverContent className="w-96"><PopoverBody><div className="text-caption">自訂 w-96</div></PopoverBody></PopoverContent>
             </Popover>
           </div>
         </div>

@@ -2,7 +2,7 @@
 
 這 5 條是本專案所有規則背後的**態度**。接到任務先複習一遍，再看具體規則。
 
-1. **對標世界級**——每個設計決策都要能回答「Polaris / Material / Atlassian / Ant / Carbon / Apple HIG 怎麼做？我們為什麼一樣 / 為什麼不同？」。沒對齊又說不出不同的理由 = 設計 bug。
+1. **對標世界級**——每個設計決策都要能回答「Polaris / Material / Atlassian / Ant / Carbon / Apple HIG 怎麼做？我們為什麼一樣 / 為什麼不同？」。沒對齊又說不出不同的理由 = 設計 bug。**視覺上也必須跟世界級一樣整齊**：用我們的 token / 元件換掉第三方樣式時，不能讓視覺比原版鬆散、錯位、比例失調——「符合我們的設計語言」和「視覺整齊度不輸原版」是**同時成立**的要求，不是二選一。
 2. **不憑直覺發明**——新增任何值 / 名 / pattern 前先 `grep` 既有。專案已有的 gap、padding、font-size、命名慣例優先沿用；不是「看起來順」就能造新值。
 3. **改一處必看三處**——code / spec / story 三方聯動是常態，不是例外。改 cva `defaultVariants`、改 variant、改 token 前先 grep 該元件所有檔案，一次改完。
 4. **範例必須是真實業務場景**——Jira / Stripe / Notion / Figma 等可辨識的情境；禁止 `Option A/B/C`、「按鈕一」、極端不現實、ASCII art。Storybook 的受眾是任何打開它的人，不是作者。
