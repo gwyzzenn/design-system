@@ -391,3 +391,32 @@ Button 的 height 與 `field-height` 共用同一組 token,放進 inline control
 ## Field Controls 共用設計原則
 
 Field 內的資料輸入控件（Input / NumberInput / DatePicker / Select / Combobox / LinkInput / PeoplePicker / Textarea）共用的三 mode、size、focus、endAction、Display 規則，詳見 `Field/field-controls.spec.md`。
+
+---
+
+## 何時用
+
+- **表單欄位的 label + control + description + error 標準佈局**：登入表單、設定頁、建立對話框
+- **需要 required 星號、disabled 狀態、invalid 驗證的統一行為**
+- **需要 `horizontal` / `vertical` 排版切換**：設定頁常用 horizontal（label 左 / control 右）
+- **多欄位垂直堆疊**：搭配 `FieldGroup` 管理 density-aware 間距
+
+## 何時不用
+
+| 場景 | 改用 | 原因 |
+|------|------|------|
+| 唯讀資訊展示 | `DescriptionList` | Field 是表單容器，純展示用 `dl/dt/dd` 語義 |
+| 單一 Checkbox（勾選同意）without label 結構 | 直接 Checkbox + label prop | 單個 Checkbox 是 inline primitive，不需要 Field 佈局 |
+| DataTable cell 編輯（inline editable）| 直接放 Field Control | Field 是頁面表單佈局，table cell 空間受限 |
+| 純 action 按鈕（submit / cancel / 頁面導覽）| 頁面 footer / toolbar | Field 是資料輸入容器，不放頁面級 action |
+| 巢狀 Field | ❌ 不支援 | Field 不支援巢狀，多欄位用 FieldGroup |
+
+---
+
+## 相關
+
+- `./field-controls.spec.md` — Field Controls（Input/Select/etc.）共用規則：三 mode、size、focus、endAction、Display
+- `./form-validation.spec.md` — 表單驗證標準（blur 驗證、zod schema、error 顯示）
+- `../DescriptionList/description-list.spec.md` — 唯讀資訊展示（非表單）
+- `../../patterns/item-layout/item-layout.spec.md` — SelectionItem 佈局（Checkbox / Radio 放進 Field 時 block 模式的參照）
+- CLAUDE.md「元件 Props 命名原則」— Field 的 orientation / block control 宣告規則

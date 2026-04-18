@@ -64,8 +64,27 @@ Notice **不設** bg 和 text color。消費者在 container 設 `data-theme` + 
 
 CSS `color` 從 body 繼承的是**已解析的計算值**，不是 `var(--foreground)` 表達式。`data-theme` 改變 `--foreground` 的值，但不改 `color` 屬性。在 theme boundary 設 `text-foreground` class 強制 `color: var(--foreground)` 在正確 context 重新解析。
 
-## 反向引用
+## 何時用 / 何時不用
 
-- item-layout → `patterns/item-layout/item-layout.spec.md`
-- color tokens → `tokens/color/color.spec.md`
-- primitives nested theme → `tokens/color/primitives.css`（`:root, [data-theme]` pattern）
+**Notice 是 internal primitive**——不直接使用，透過 `Alert` / `Toast` 等外層通知元件消費。
+
+| 場景 | 正確做法 |
+|------|---------|
+| Inline / fixed 持久通知 | 用 `Alert`（內部消費 Notice）|
+| 浮動自動消失的短暫通知 | 用 `Toast`（內部消費 Notice + sonner）|
+| 直接在 JSX 中用 `<Notice>` | ❌ **禁止**——失去 Alert / Toast 外層的生命週期與定位管理 |
+
+### 消費者
+
+- `../Alert/alert.spec.md` — inline / fixed 持久通知
+- `../Toast/toast.spec.md` — 浮動非阻斷短暫通知
+
+---
+
+## 相關
+
+- `../Alert/alert.spec.md` — 主要消費者（持久通知）
+- `../Toast/toast.spec.md` — 主要消費者（短暫通知）
+- `../../patterns/item-layout/item-layout.spec.md` — Notice 的 layout 共用規則
+- `../../tokens/color/color.spec.md` — color tokens 和 variant × theme 策略
+- `../../tokens/color/primitives.css` — primitives nested theme（`:root, [data-theme]` pattern）

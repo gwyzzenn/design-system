@@ -193,16 +193,29 @@ Menu item 的 prefix icon 跟 label 同色（foreground），不是 fg-muted。P
 
 ---
 
-## 消費者
+## 何時用 / 何時不用
 
-- `SelectMenu/select-menu.tsx` — 下拉選單浮層
-- `DropdownMenu/dropdown-menu.tsx` — 操作選單
+**MenuItem 是 internal primitive**——不直接使用，透過 `SelectMenu` / `DropdownMenu` 等外層 menu 元件消費。
+
+| 場景 | 正確做法 |
+|------|---------|
+| 建立操作選單（複製 / 刪除 / 分享）| 用 `DropdownMenu` + `DropdownMenuItem`（內部消費 MenuItem）|
+| 建立選值下拉（選項 + 搜尋）| 用 `SelectMenu`（內部消費 MenuItem）|
+| 建立右鍵選單 | 用未來的 `ContextMenu`（待開發）|
+| 直接在 JSX 中用 `<MenuItem>` | ❌ **禁止**——會失去 menu 外層的 Radix 無障礙 / 鍵盤 / 焦點管理 |
+
+### 消費者
+
+- `../SelectMenu/select-menu.tsx` — 下拉選單浮層
+- `../DropdownMenu/dropdown-menu.tsx` — 操作選單
 - 未來：ContextMenu、CommandPalette
 
 ---
 
-## 反向引用
+## 相關
 
-- item-layout pattern → `patterns/item-layout/item-layout.spec.md`
-- Avatar 尺寸 → `components/Avatar/avatar.spec.md`
-- Checkbox → `components/Checkbox/checkbox.spec.md`
+- `../../patterns/item-layout/item-layout.spec.md` — MenuItem 的 row primitive 繼承規則（prefix / label / suffix 對齊）
+- `../Avatar/avatar.spec.md` — Prefix 的 Avatar 尺寸
+- `../Checkbox/checkbox.spec.md` — CheckboxItem 的視覺規則（DropdownMenu 使用）
+- `../SelectMenu/select-menu.spec.md` — 主要消費者之一
+- `../DropdownMenu/dropdown-menu.spec.md` — 另一個主要消費者
