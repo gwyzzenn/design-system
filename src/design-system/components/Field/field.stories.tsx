@@ -550,12 +550,12 @@ export const SliderAlignsWithOtherFields: Story = {
           <div className="text-caption text-fg-muted mb-3">size = {size}</div>
           <FieldGroup>
             <Field orientation="horizontal" labelWidth="96px">
-              <FieldLabel>文字</FieldLabel>
-              <Input size={size} placeholder="Input" />
+              <FieldLabel>姓名</FieldLabel>
+              <Input size={size} placeholder="請輸入姓名" />
             </Field>
             <Field orientation="horizontal" labelWidth="96px">
-              <FieldLabel>數字</FieldLabel>
-              <NumberInput size={size} placeholder="NumberInput" />
+              <FieldLabel>年齡</FieldLabel>
+              <NumberInput size={size} placeholder="0" />
             </Field>
             <Field orientation="horizontal" labelWidth="96px">
               <FieldLabel>音量</FieldLabel>

@@ -89,17 +89,17 @@ export const FullWidth: Story = {
       <div>
         <div className="text-caption text-fg-muted mb-1">父容器 w-full（跟著 story panel）</div>
         <SegmentedControl defaultValue="a" fullWidth>
-          <SegmentedControlItem value="a">選項一</SegmentedControlItem>
-          <SegmentedControlItem value="b">選項二</SegmentedControlItem>
-          <SegmentedControlItem value="c">選項三</SegmentedControlItem>
+          <SegmentedControlItem value="day">日</SegmentedControlItem>
+          <SegmentedControlItem value="week">週</SegmentedControlItem>
+          <SegmentedControlItem value="month">月</SegmentedControlItem>
         </SegmentedControl>
       </div>
       <div className="w-[320px]">
         <div className="text-caption text-fg-muted mb-1">父容器 w-[320px]（示範等分跟父容器走）</div>
         <SegmentedControl defaultValue="a" fullWidth>
-          <SegmentedControlItem value="a">選項一</SegmentedControlItem>
-          <SegmentedControlItem value="b">選項二</SegmentedControlItem>
-          <SegmentedControlItem value="c">選項三</SegmentedControlItem>
+          <SegmentedControlItem value="day">日</SegmentedControlItem>
+          <SegmentedControlItem value="week">週</SegmentedControlItem>
+          <SegmentedControlItem value="month">月</SegmentedControlItem>
         </SegmentedControl>
       </div>
     </div>

@@ -561,9 +561,9 @@ export const StateBehavior = {
             <div key={sz} className="flex flex-col gap-1">
               <span className="text-[11px] text-fg-muted font-medium">size="{sz}"</span>
               <div className="grid border border-dashed border-divider rounded-md p-2">
-                <SelectionItem size={sz} control={<Checkbox id={`vg-${sz}-a`} size={sz} />} label="Option A" htmlFor={`vg-${sz}-a`} />
-                <SelectionItem size={sz} control={<Checkbox id={`vg-${sz}-b`} size={sz} />} label="Option B" description="附帶說明文字" htmlFor={`vg-${sz}-b`} />
-                <SelectionItem size={sz} control={<Checkbox id={`vg-${sz}-c`} size={sz} />} label="Option C" htmlFor={`vg-${sz}-c`} />
+                <SelectionItem size={sz} control={<Checkbox id={`vg-${sz}-a`} size={sz} />} label="Email 通知" htmlFor={`vg-${sz}-a`} />
+                <SelectionItem size={sz} control={<Checkbox id={`vg-${sz}-b`} size={sz} />} label="SMS 通知" description="每則訊息可能有費用" htmlFor={`vg-${sz}-b`} />
+                <SelectionItem size={sz} control={<Checkbox id={`vg-${sz}-c`} size={sz} />} label="Push 通知" htmlFor={`vg-${sz}-c`} />
               </div>
             </div>
           ))}
@@ -574,9 +574,9 @@ export const StateBehavior = {
       <div className="flex flex-col gap-3">
         <span className="text-caption font-medium text-fg-secondary">水平排列 — Item 之間 gap-6（24px）</span>
         <div className="flex gap-6 border border-dashed border-divider rounded-md p-2">
-          <SelectionItem control={<Checkbox id="hg-a" />} label="Option A" htmlFor="hg-a" />
-          <SelectionItem control={<Checkbox id="hg-b" />} label="Option B" htmlFor="hg-b" />
-          <SelectionItem control={<Checkbox id="hg-c" />} label="Option C" htmlFor="hg-c" />
+          <SelectionItem control={<Checkbox id="hg-a" />} label="Email" htmlFor="hg-a" />
+          <SelectionItem control={<Checkbox id="hg-b" />} label="SMS" htmlFor="hg-b" />
+          <SelectionItem control={<Checkbox id="hg-c" />} label="Push" htmlFor="hg-c" />
         </div>
       </div>
 
