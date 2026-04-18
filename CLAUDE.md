@@ -26,6 +26,7 @@
 | **寫 anatomy story** | `# Story` → 設計規格 Story 標準 + 連動更新規則 |
 | **跨元件比較 / 加 SSOT pointer** | `# Spec 規則` → SSOT 規則與 anchors 清單 |
 | **命名新檔案 / 變數 / prop** | `# 命名與語言一致性` + `# 元件 Props 命名原則` |
+| **新元件的內部 layout 選型** | `# 系統內部 Layout — 4-Family Model` → 新元件判斷流程 |
 | **無明確前例的設計決策** | `# 遇不確定時的協議`（先 grep → 讀近親 spec → 仍不確定就問） |
 | **Tailwind / CSS 出怪事** | `# Tailwind 使用規則` + `# 失敗記憶索引` 技術陷阱表 |
 | **spec 跟 code 結論衝突** | `# Spec 規則`（主動提出討論，不默默改） |
@@ -689,6 +690,70 @@ Provider 是**應用層配置**（delay、theme、portal target、toast position
 - `patterns/` 目前保持平坦結構（一個 pattern 一個資料夾）。同一領域累積三個以上 pattern 時，再建領域子資料夾
 
 每個 pattern 可包含：`*.spec.md`、`*.stories.tsx`、`*.example.tsx`
+
+
+# 系統內部 Layout — 4-Family Model
+
+**每個元件 spec 第一段必須聲明 Layout Family**（1/2/3/4 或「非上述 family，自己的結構」）。這確保相同用途用相同 layout，遇到相同情境 AI 能舉一反三。
+
+## 4 個可繼承的 Layout Family
+
+| Family | 用途 | 結構 | SSOT |
+|--------|------|------|------|
+| **1. Menu item layout** | Menu 容器內的掃視單列（scanning mode）| `[small icon/avatar 16-20px] [content: label 單行 + desc 選用] [small suffix]`, tight density, leading-compact | `patterns/item-layout/item-layout.spec.md`「Menu item」章節 |
+| **2. List item layout** | 頁面上的閱讀式單列（reading mode）| `[larger icon/avatar 20-24px] [content: label + multi-line desc OK] [suffix action/button/counter]`, looser density, reading typography | `patterns/item-layout/item-layout.spec.md`「List item」章節 |
+| **3. Pill layout** | 單行互動 pill（action trigger / data indicator）| `[startIcon?] [<span px-1>label</span>] [suffix badge/endIcon/dismiss]`, single-line, whitespace-nowrap | `components/Button/button.spec.md`「Pill Layout」章節 |
+| **4. Field control layout** | 單行可編輯資料輸入 | `fieldWrapperStyles + [startIcon?] [<editable content>] [endAction?]`, **視覺對齊 Family 1** 讓 SelectMenu trigger + options 對齊 | `components/Field/field-controls.spec.md` |
+
+## Consumers 快速查
+
+| Family | Canonical | Consumers |
+|--------|-----------|-----------|
+| 1 Menu item | `MenuItem` | `TreeItem`, `SidebarMenuButton`, `DropdownMenuItem`（重用 MenuItem） |
+| 2 List item | (無單一 canonical) | `StepItem`（例外：indicator 對齊）, `FileItem`（icon 作邊界）, `Notice` → `Alert/Toast`（視覺一致非語意）, `SelectionItem` variant（prefix 為 selection control）→ `RadioGroup` / `Checkbox` group |
+| 3 Pill | `Button` | `SegmentedControlItem`, `Chip`, `Tag`（data indicator variant—見下） |
+| 4 Field control | `Input`（field-controls SSOT） | `NumberInput`, `DatePicker`, `Select`, `Combobox`, `LinkInput`, `PeoplePicker` |
+
+## Family 3 兩個 sub-profile（重要）
+
+同結構、不同 role、不同 padding / typography：
+
+| Sub-profile | 成員 | Padding | Typography | Cursor | 為什麼 |
+|-------------|------|---------|-----------|--------|------|
+| **Action trigger** | Button, SegmentedControl, Chip | 較鬆（xs=`px-2`, sm+=`px-3`） | 對應 size 的 font-medium | pointer | 需要命中區 + 視覺重量搶點擊焦點 |
+| **Data indicator** | Tag | 較緊（`px-1` 所有 size） | font-normal | text | Passive 讀取，不搶焦點 |
+
+## Size Pairing 規則（跨 Family）
+
+| Pairing | 意義 |
+|---------|------|
+| Tag md ↔ Field md, Tag sm ↔ Field sm | Tag 的 size 對應同名 Field size，視覺對齊 form 內字級 |
+| Button sm/md/lg ↔ Field sm/md/lg | Button 配對 Field 時 size 同名 |
+| Button xs = 獨立 utility | 不配對 Field，用於 toolbar compact button |
+| Family 4（Input/Select 等）視覺對齊 Family 1 | 讓 trigger + dropdown options 視覺連續 |
+
+## 新元件判斷流程
+
+1. **垂直列表裡？** → Family 1（menu 容器內）或 Family 2（頁面）
+2. **單行可點擊/可讀的 pill？** → Family 3（action trigger or data indicator）
+3. **單行可編輯資料？** → Family 4（必須視覺對齊 Family 1）
+4. **都不是？** → **停下來討論**——是新 family 還是 self-contained
+
+## 不進 Family Model 的元件
+
+不能舉一反三的不分類：
+- **Self-contained primitive**：Switch / Checkbox / Radio / Avatar / Badge / Spinner / Skeleton / Separator —— 各自獨立視覺，無 slot 結構
+- **Composite / multi-section**：Dialog / Sheet / NameCard / DataTable / Tabs / Sidebar / Popover / Tooltip / HoverCard / DropdownMenu / SelectMenu / Command / OverflowIndicator / Breadcrumb / Empty / DescriptionList —— 多區塊組合，各自 own 自己的 layout
+
+這些元件的 spec 直接描述自己的結構，不套 family。
+
+## 允許的跨 Family 視覺對齊（不是混 layout）
+
+Family 4 的 Input / Select 視覺對齊 Family 1 的 menu-item（高度、字體、icon size）——但兩個 family **各自 own SSOT**。這是「視覺對齊」非「結構繼承」。
+
+## Field Composition（不在 family 但相關）
+
+`components/Field/field.spec.md` 描述 **form field composition pattern**——Field 容器如何包 Family 4 control + label + help。這是不同 scope 的 pattern（composition 非 element layout），不列入 4-Family。
 
 
 # 元件完成清單

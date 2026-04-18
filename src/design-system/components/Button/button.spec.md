@@ -5,9 +5,78 @@
 Button 是最基礎的互動元件，用於觸發操作或導覽。
 基於 shadcn/ui Button，橋接設計系統 token，支援 uiSize 自動縮放。
 
+**Layout Family**：本元件是 **CLAUDE.md 4-Family Model Family 3（Pill Layout）的 SSOT 擁有者 + action trigger sub-profile canonical**。SegmentedControlItem / Chip / Tag 繼承本元件的 Pill Layout 結構。
+
 ---
 
-## 內部結構
+## Pill Layout（Family 3 SSOT）
+
+**結構**：
+
+```
+[startIcon? 16/20px] [<span px-1>label</span>] [<span gap-1>badge? + endIcon?</span>]
+```
+
+- 單行（`whitespace-nowrap`）
+- Label 包在 `<span className="px-1">` 產生 4px 隱性呼吸
+- 右側 suffix 用 `<span className="inline-flex items-center gap-1">` 包住（badge + endIcon 之間 4px）
+- 最外層 `gap-0` 或 `gap-1`（由 size 決定——詳見下）
+- Items centered (`items-center`)
+
+**為什麼 label 用 span px-1 而非外層 gap**：
+- Icon-only 模式（無 label）：外層 padding 公式 `(field-height - icon)/2` 自然對齊無需 gap
+- Has-label 模式：label 的 `px-1` 給 icon 跟文字之間的隱性 4px，同時給兩邊 suffix 也是 4px——**單一規則產生兩側 symmetric spacing**
+- 若用外層 gap-1，icon-only 時要再加條件移除 gap；用 span px-1 機制更穩
+
+### Sub-profile 1: Action trigger（canonical: Button）
+
+Members: **Button, SegmentedControlItem, Chip**。
+
+| Size | 外距 | 字體 | 字重 | 圖示 | Gap |
+|------|------|------|------|------|-----|
+| `xs` | `px-2`（8px） | `text-caption`（12px） | `font-medium` | 16px | `gap-0` |
+| `sm` | `px-3`（12px） | `text-body`（14px） | `font-medium` | 16px | `gap-1` |
+| `md` | `px-3`（12px） | `text-body`（14px） | `font-medium` | 16px | `gap-1` |
+| `lg` | `px-3`（12px） | `text-body-lg`（16px） | `font-medium` | 20px | `gap-1` |
+
+**特徵**：padding 較鬆（xs=px-2、sm+=px-3）、font-medium 強調視覺重量、`cursor: pointer`——**因為需要命中區 + 視覺重量搶點擊焦點**。
+
+### Sub-profile 2: Data indicator（canonical: Tag）
+
+Members: **Tag**。
+
+| Size | 外距 | 字體 | 字重 | 圖示 | Gap |
+|------|------|------|------|------|-----|
+| `sm` | `px-1`（4px） | `text-caption`（12px） | `font-medium` | 16px | 隱性（靠 label `px-1`） |
+| `md` | `px-1`（4px） | `text-body`（14px） | `font-normal` | 16px | 隱性（靠 label `px-1`） |
+| `lg` | `px-1`（4px） | `text-body`（14px） | `font-normal` | 16px | 隱性（靠 label `px-1`） |
+
+**特徵**：padding 較緊（全部 `px-1`）、font-normal（indicator passive 語意）、`cursor: text`——**因為是 data indicator 不是 action，視覺是配角不搶焦點**。
+
+### Action vs Indicator 為什麼不統一
+
+Tag md 和 Button xs 同 24px，但：
+- Tag md `px-1` / text-body 14px / font-normal / cursor-text
+- Button xs `px-2` / text-caption 12px / font-medium / cursor-pointer
+
+**不統一的世界級理由**（對照 Material / Polaris / Atlassian / Ant / Carbon 共識）：
+- **padding 跟著 role**：action 要大命中區 + 視覺重量；indicator 要緊湊低視覺權重
+- **font-weight 跟著 role**：action medium（吸引點擊）；indicator normal（passive 讀取）
+- **font-size 跟著 pairing**：Tag md pair Field md（14px field typography）；Button xs 是 standalone utility button（compact toolbar，用 12px）
+
+**跟 size 無關、跟 role 有關**。寫新 Family 3 元件先確認 role profile。
+
+### Size Pairing 規則
+
+| Pairing | 邏輯 |
+|---------|------|
+| Tag md ↔ Field md, Tag sm ↔ Field sm | Tag 出現在 Field 內（Combobox 已選 tag、DataTable cell）時視覺對齊 Field 字級 |
+| Button sm / md / lg ↔ Field sm / md / lg | Button 配對 Field 時同名對應 |
+| Button xs = 獨立 utility | 不配對 Field,用於 toolbar compact button |
+
+---
+
+## 內部結構（簡要，完整見 Pill Layout SSOT）
 
 ```
 [startIcon?]  [label]  [badge? + endIcon?]

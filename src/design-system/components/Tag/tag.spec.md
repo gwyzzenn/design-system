@@ -6,6 +6,21 @@ Tag 是 inline label，用於分類標籤、狀態標記、多選已選值。不
 
 **實作基礎**：純視覺 atom——styled span + 可選 dismiss button，無 external primitive base。
 
+**Layout Family**：CLAUDE.md 4-Family Model **Family 3（Pill Layout）** 的 **data indicator sub-profile**。SSOT 在 `components/Button/button.spec.md`「Pill Layout」章節；Tag 是 indicator variant（見下「與 Button 的差異」）。
+
+## 與 Button 的差異（Family 3 indicator variant）
+
+同 Family 結構 `[startIcon?] [<span px-1>label</span>] [suffix dismiss]`,但以下值不同——因為 role 是 **data indicator 非 action trigger**：
+
+| 項目 | Button（action trigger） | Tag（data indicator） | 為什麼 |
+|------|-------------------------|--------------------|-------|
+| 外距 | `xs=px-2`, `sm+=px-3` | 全部 `px-1` | indicator 緊湊 passive,不搶焦點 |
+| 字重 | `font-medium` | `font-normal` | indicator 不強調 |
+| Cursor | `pointer` | `text` | indicator 非 action（dismiss button 內部仍 pointer）|
+| 字體 pairing | Button xs 是 standalone utility（text-caption 12px） | Tag md pair Field md（text-body 14px） | size 對應 Field, Tag 出現在 Field 內需視覺連續 |
+
+**不該把 Tag 改成 Button 樣式來「統一」**——這是 world-class DS（Polaris / Material / Atlassian / Ant / Carbon）共識：action 跟 indicator padding + typography 分開。
+
 ---
 
 ## 何時用
