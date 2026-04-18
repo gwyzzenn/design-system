@@ -1,9 +1,11 @@
 import * as React from 'react'
-import { X, Calendar } from 'lucide-react'
+import { X, Calendar as CalendarIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { FieldMode } from '@/design-system/components/Field/field-types'
 import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
 import { ItemInlineAction } from '@/design-system/patterns/item-layout/item-layout'
+import { Popover, PopoverTrigger, PopoverContent } from '@/design-system/components/Popover/popover'
+import { Calendar } from './calendar'
 
 // ── Format ──────────────────────────────────────────────────────────────────
 
@@ -25,6 +27,24 @@ function formatDate(
   const date = value instanceof Date ? value : new Date(value)
   if (Number.isNaN(date.getTime())) return String(value)
   return new Intl.DateTimeFormat(locale, formatOptions).format(date)
+}
+
+// ── ISO <-> Date conversion ─────────────────────────────────────────────────
+// Value 用 ISO date string (YYYY-MM-DD),local-time 語意(不帶時區)
+
+function isoToDate(iso: string | null | undefined): Date | undefined {
+  if (!iso) return undefined
+  const [y, m, d] = iso.split('-').map(Number)
+  if (!y || !m || !d) return undefined
+  return new Date(y, m - 1, d)
+}
+
+function dateToIso(date: Date | undefined): string {
+  if (!date) return ''
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
 }
 
 // ── Display ─────────────────────────────────────────────────────────────────
@@ -56,7 +76,7 @@ export interface DatePickerProps extends DateFormatOptions {
   clearable?: boolean
 }
 
-const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
+const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
   (
     {
       mode = 'edit',
@@ -64,13 +84,12 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
       size = 'md',
       value,
       onChange,
-      placeholder,
+      placeholder = 'YYYY-MM-DD',
       className,
       disabled,
       clearable = false,
       formatOptions,
       locale,
-      ...props
     },
     ref
   ) => {
@@ -78,13 +97,8 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
     const isEditable = resolvedMode === 'edit'
     const iconSize = size === 'lg' ? 20 : 16
     const showClear = clearable && value && isEditable
-    const inputRef = React.useRef<HTMLInputElement>(null)
-    const setRef = React.useCallback((el: HTMLInputElement | null) => {
-      inputRef.current = el
-      if (typeof ref === 'function') ref(el)
-      else if (ref) (ref as React.MutableRefObject<HTMLInputElement | null>).current = el
-    }, [ref])
-    const openPicker = () => { inputRef.current?.showPicker?.(); inputRef.current?.focus() }
+    const [open, setOpen] = React.useState(false)
+    const selected = React.useMemo(() => isoToDate(value), [value])
 
     // readonly / disabled
     if (!isEditable) {
@@ -99,51 +113,73 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
               : <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
             }
           </span>
+          <CalendarIcon size={iconSize} className="shrink-0 text-fg-muted pointer-events-none" aria-hidden />
         </div>
       )
     }
 
-    // edit
+    const displayText = value
+      ? formatDate(value, { formatOptions, locale })
+      : <span className="text-fg-muted">{placeholder}</span>
+
     return (
-      <div
-        className={cn(
-          fieldWrapperStyles({ mode: 'edit', size }),
-          error && [
-            'border-error hover:border-error-hover',
-            'focus-within:border-error focus-within:hover:border-error',
-          ],
-          className,
-        )}
-        data-field-mode="edit"
-        data-error={error ? '' : undefined}
-      >
-        <input
-          ref={setRef}
-          type="date"
-          value={value ?? ''}
-          onChange={onChange ? (e) => onChange(e.target.value) : undefined}
-          disabled={disabled}
-          aria-invalid={error || undefined}
-          className={cn(
-            bareInputStyles,
-            'cursor-pointer appearance-none',
-            // 隱藏瀏覽器原生日期 icon，用我們自己的 Calendar icon
-            '[&::-webkit-calendar-picker-indicator]:hidden',
-            !value && 'text-fg-muted',
-          )}
-          {...props}
-        />
-        {showClear && (
-          <ItemInlineAction
-            size={size ?? 'md'}
-            action={{ icon: X, label: '清除日期', onClick: () => onChange?.('') }}
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <button
+            ref={ref}
+            type="button"
+            disabled={disabled}
+            aria-invalid={error || undefined}
+            aria-haspopup="dialog"
+            aria-expanded={open}
+            data-field-mode="edit"
+            data-error={error ? '' : undefined}
+            className={cn(
+              fieldWrapperStyles({ mode: 'edit', size }),
+              'text-left cursor-pointer',
+              'focus-visible:outline-none',
+              error && [
+                'border-error hover:border-error-hover',
+                'focus-within:border-error focus-within:hover:border-error',
+              ],
+              className,
+            )}
+          >
+            <span className={cn(bareInputStyles, 'truncate', !value && 'text-fg-muted')}>
+              {displayText}
+            </span>
+            {showClear && (
+              <ItemInlineAction
+                size={size ?? 'md'}
+                action={{
+                  icon: X,
+                  label: '清除日期',
+                  onClick: (e: React.MouseEvent) => {
+                    e.stopPropagation()
+                    onChange?.('')
+                  },
+                }}
+              />
+            )}
+            <CalendarIcon size={iconSize} className="shrink-0 text-fg-muted pointer-events-none" aria-hidden />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="single"
+            selected={selected}
+            onSelect={(date) => {
+              onChange?.(dateToIso(date))
+              if (date) setOpen(false)
+            }}
+            defaultMonth={selected}
+            autoFocus
           />
-        )}
-        <Calendar size={iconSize} className="shrink-0 text-fg-muted pointer-events-none" aria-hidden />
-      </div>
+        </PopoverContent>
+      </Popover>
     )
   }
 )
 DatePicker.displayName = 'DatePicker'
 
-export { DatePicker, DatePickerDisplay, formatDate }
+export { DatePicker, DatePickerDisplay, Calendar, formatDate }

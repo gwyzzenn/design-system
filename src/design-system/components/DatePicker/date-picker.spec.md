@@ -2,11 +2,16 @@
 
 ## 定位
 
-DatePicker 是**單一日期**的輸入與顯示元件。Edit 用原生 `<input type="date">`，Display 用 `Intl.DateTimeFormat`。
+DatePicker 是**單一日期**的輸入與顯示元件。Edit 用**本 DS 自建 Calendar**（基於 `react-day-picker` + 本 DS token）+ Popover 呈現；Display 用 `Intl.DateTimeFormat`。
 
 共用規則見 `../Field/field-controls.spec.md`。本文件只記錄 DatePicker 特有的原則。
 
 **Layout Family**：CLAUDE.md 4-Family Model **Family 4（Field control layout）** 消費者。結構繼承 `components/Field/field-controls.spec.md` 的 `fieldWrapperStyles + [startIcon?] [<editable>] [endAction?]` 規格,視覺對齊 Family 1（Menu item）讓 SelectMenu trigger + options 連續一致。
+
+**實作基礎**：
+- Trigger：`<button>` 包 `fieldWrapperStyles`(視覺仍是 Input wrapper,只是改為可點擊觸發浮層)
+- Popup：`Popover`(消費 overlay-surface pattern 外殼)
+- Calendar 主體：`react-day-picker@9` + 本 DS token 覆寫預設視覺（見 `./calendar.tsx`）
 
 ---
 
@@ -14,7 +19,7 @@ DatePicker 是**單一日期**的輸入與顯示元件。Edit 用原生 `<input 
 
 - **單一日期選擇**：出生日、到期日、提醒日、發佈日
 - **需要 locale-aware 顯示**（`Intl.DateTimeFormat` 自動處理年月日順序、月份語言）
-- **需要 mobile 原生 picker UX**（行動裝置會彈出系統 date wheel）
+- **需要視覺上與 Dialog / Popover / SelectMenu 一致的浮層體驗**（所有浮層都用我們的 token）
 - **DataTable 的日期欄位**（自動整合，meta.type='date'）
 
 ## 何時不用
@@ -29,17 +34,42 @@ DatePicker 是**單一日期**的輸入與顯示元件。Edit 用原生 `<input 
 
 ---
 
-## 原生 date picker
+## Calendar popup（本 DS 自建）
 
-使用瀏覽器原生的 date picker，不自建 calendar。理由：
+DatePicker 使用**本 DS 自建 Calendar** + Popover 而非瀏覽器原生 `<input type="date">`。歷史變更（2026-04-19）：原本遵守「不自建 calendar」禁令以保留 mobile 原生 wheel UX,但 CLAUDE.md Mindset #1 擴充後明確要求「視覺上也必須跟世界級一樣整齊」——原生 picker 視覺不受控、跨瀏覽器不一致,無法達成與 Dialog / SelectMenu / Combobox 等浮層的視覺連續性。遂改為自建 Calendar。
 
-- 原生 picker 自動處理 locale、無障礙、鍵盤操作
-- 行動裝置上原生 picker 體驗遠優於自建
-- 視覺由 Field wrapper 統一，原生 picker 的「外觀」被完全覆蓋
+### 架構
+
+```
+<button fieldWrapperStyles>        ← 視覺仍是 Input wrapper(不變)
+  <span>格式化的日期文字</span>
+  <ItemInlineAction X />            ← 選用,clearable=true 時顯示
+  <CalendarIcon />                   ← 右側固定
+</button>
+       │ 點擊開啟
+       ▼
+<Popover>
+  <Calendar />                      ← react-day-picker + 本 DS token
+</Popover>
+```
+
+### 視覺 token（Calendar 內部）
+
+| 區塊 | Token |
+|------|-------|
+| 月份 caption | `text-body font-medium` |
+| Nav 按鈕(prev/next) | `h-7 w-7 rounded-md text-fg-muted hover:bg-neutral-hover` |
+| 星期標頭 | `text-caption text-fg-muted` |
+| 日格 | `h-9 w-9 rounded-md text-body` |
+| Hover | `hover:bg-neutral-hover` |
+| Selected | `bg-primary text-white` |
+| Today（未選） | `ring-1 ring-primary` |
+| Outside month | `text-fg-disabled` |
+| Disabled | `text-fg-disabled opacity-50` |
 
 ### Calendar icon
 
-左側固定顯示 Calendar icon（`startIcon`），取代原生 date input 的預設指示器（原生指示器透過 CSS 隱藏）。
+右側固定顯示 Calendar icon（視覺指示這是日期輸入）。Trigger 本身是 `<button>`,點擊開啟 Popover。
 
 ---
 
@@ -50,7 +80,7 @@ DatePicker 是**單一日期**的輸入與顯示元件。Edit 用原生 `<input 
 | `formatOptions` | `Intl.DateTimeFormatOptions` | `{ year: 'numeric', month: 'short', day: 'numeric' }` |
 | `locale` | BCP 47 locale | `'zh-TW'`、`'en-US'` |
 
-Display 模式（readonly / disabled / DataTable cell）使用 `Intl.DateTimeFormat` 格式化。Edit 模式顯示原生 date input 的格式（瀏覽器 locale 決定）。
+Display 模式（readonly / disabled / DataTable cell）使用 `Intl.DateTimeFormat` 格式化。Edit 模式 trigger 顯示文字也透過 `Intl.DateTimeFormat` 格式化（與 Display 一致，`formatOptions` / `locale` prop 對兩者皆生效）。
 
 ---
 
@@ -65,8 +95,9 @@ Display 模式（readonly / disabled / DataTable cell）使用 `Intl.DateTimeFor
 
 ## 禁止事項
 
-- ❌ 不自建 calendar picker——使用原生 `<input type="date">`
 - ❌ 不在 readonly / disabled 模式顯示 clear 按鈕
+- ❌ 不改 Calendar 視覺 token 為本 DS 以外的顏色(`bg-primary` / `ring-primary` 等必須來自 semantic token,不可硬寫)
+- ❌ 不用其他 calendar library 平行實作（若有 DateRange / DateTime 未來需求,擴充本 Calendar 而非引入第二個 library）
 
 ---
 
