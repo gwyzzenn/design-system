@@ -193,7 +193,7 @@ export const Overview = {
             <thead><tr><Th>Prop</Th><Th>Type</Th><Th>Default</Th><Th>說明</Th></tr></thead>
             <tbody>
               {[
-                ['variant', "'critical'|'high'|'medium'|'low'", "'critical'", '緊急程度層級'],
+                ['variant', "'low'|'medium'|'high'|'critical'", "'low'", '緊急程度層級（default low, escalate with reason）'],
                 ['dot', 'boolean', 'false', '6×6px 純色圓點模式，無文字'],
                 ['count', 'number', '—', '顯示的數量（dot 模式下忽略）'],
                 ['max', 'number', '—', '數量上限，超過時顯示 "max+"'],
@@ -213,7 +213,7 @@ export const Overview = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const InspectorInner = () => {
-  const [variant, setVariant] = useState<VariantKey>('critical')
+  const [variant, setVariant] = useState<VariantKey>('low')
   const [mode, setMode] = useState<ModeKey>('count')
   const [count, setCount] = useState(3)
 

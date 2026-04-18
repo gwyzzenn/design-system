@@ -9,11 +9,13 @@ import { cn } from '@/lib/utils'
 //   count — 16px 高，10px 字，font-medium。個位數正圓，多位數膠囊。
 //   dot   — 6×6px 純色圓點，無文字。
 //
-// 四個層級（視覺強度由高到低）：
-//   critical — 紅底白字（bg-notification）
-//   high     — 藍底白字（bg-info）
-//   medium   — 淺藍底藍字（bg-info-subtle + text-info-text）
-//   low      — 灰底灰字（neutral-3 + neutral-7）
+// 四個層級（由 passive 到 urgent）：
+//   low（預設） — 灰底灰字（neutral-3 + neutral-7），被動計數
+//   medium      — 淺藍底藍字（bg-info-subtle + text-info-text），可延後看
+//   high        — 藍底白字（bg-info），有感影響的待辦
+//   critical    — 紅底白字（bg-notification），立即處理
+//
+// 規則：default low, escalate with reason。見 badge.spec.md「選 level 的流程」。
 
 const badgeVariants = cva(
   'inline-flex items-center justify-center rounded-full leading-none',
@@ -31,7 +33,7 @@ const badgeVariants = cva(
       },
     },
     defaultVariants: {
-      variant: 'critical',
+      variant: 'low',
       dot: false,
     },
   }
