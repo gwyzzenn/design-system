@@ -1,0 +1,151 @@
+import React from 'react'
+import type { Meta, StoryObj } from '@storybook/react'
+import {
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetFooter,
+  SheetClose,
+} from './sheet'
+import { Button } from '@/design-system/components/Button/button'
+import { Field, FieldLabel, FieldDescription } from '@/design-system/components/Field/field'
+import { Input } from '@/design-system/components/Input/input'
+import { Textarea } from '@/design-system/components/Textarea/textarea'
+import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
+
+const meta: Meta = {
+  title: 'Design System/Components/Sheet/展示',
+  parameters: { layout: 'centered' },
+}
+export default meta
+type Story = StoryObj
+
+export const CreateProjectRight: Story = {
+  name: '右側建立 project(Linear / Stripe style)',
+  render: () => (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="primary">建立新專案</Button>
+      </SheetTrigger>
+      <SheetContent side="right" className="flex flex-col sm:max-w-lg">
+        <SheetHeader>
+          <SheetTitle>建立新專案</SheetTitle>
+          <SheetDescription>建立後可從專案列表開啟。所有欄位稍後都可修改。</SheetDescription>
+        </SheetHeader>
+        <div className="flex-1 overflow-y-auto py-4 flex flex-col gap-4">
+          <Field>
+            <FieldLabel>專案名稱</FieldLabel>
+            <Input placeholder="例:Q2 產品路線圖" />
+          </Field>
+          <Field>
+            <FieldLabel>描述</FieldLabel>
+            <Textarea placeholder="簡述此專案的目標與範圍" rows={4} />
+            <FieldDescription>選填,可在建立後補上</FieldDescription>
+          </Field>
+          <Field>
+            <FieldLabel>預設通知</FieldLabel>
+            <div className="flex flex-col gap-2">
+              <label className="flex items-center gap-2 text-body"><Checkbox defaultChecked /> 新任務指派給我</label>
+              <label className="flex items-center gap-2 text-body"><Checkbox defaultChecked /> 我參與的任務有新評論</label>
+              <label className="flex items-center gap-2 text-body"><Checkbox /> 每日摘要</label>
+            </div>
+          </Field>
+        </div>
+        <SheetFooter>
+          <SheetClose asChild>
+            <Button variant="tertiary">取消</Button>
+          </SheetClose>
+          <Button variant="primary">建立專案</Button>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  ),
+}
+
+export const EditUserRight: Story = {
+  name: '右側編輯 user detail(Jira issue drawer)',
+  render: () => (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="tertiary">檢視成員詳情</Button>
+      </SheetTrigger>
+      <SheetContent side="right" className="flex flex-col">
+        <SheetHeader>
+          <SheetTitle>陳麒仁</SheetTitle>
+          <SheetDescription>Design Engineer · 加入於 2024-08-12</SheetDescription>
+        </SheetHeader>
+        <div className="flex-1 overflow-y-auto py-4 flex flex-col gap-4">
+          <Field>
+            <FieldLabel>顯示名稱</FieldLabel>
+            <Input defaultValue="陳麒仁" />
+          </Field>
+          <Field>
+            <FieldLabel>職稱</FieldLabel>
+            <Input defaultValue="Design Engineer" />
+          </Field>
+          <Field>
+            <FieldLabel>Email</FieldLabel>
+            <Input defaultValue="qijenchen@example.com" />
+          </Field>
+          <Field>
+            <FieldLabel>權限</FieldLabel>
+            <div className="flex flex-col gap-2">
+              <label className="flex items-center gap-2 text-body"><Checkbox defaultChecked /> 可管理成員</label>
+              <label className="flex items-center gap-2 text-body"><Checkbox defaultChecked /> 可編輯設定</label>
+              <label className="flex items-center gap-2 text-body"><Checkbox /> 可刪除專案</label>
+            </div>
+          </Field>
+        </div>
+        <SheetFooter>
+          <SheetClose asChild>
+            <Button variant="tertiary">取消</Button>
+          </SheetClose>
+          <Button variant="primary">儲存變更</Button>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  ),
+}
+
+export const LeftNavigation: Story = {
+  name: '左側 navigation / filter(Slack mobile nav)',
+  render: () => (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="tertiary">☰ 目錄</Button>
+      </SheetTrigger>
+      <SheetContent side="left" className="flex flex-col">
+        <SheetHeader>
+          <SheetTitle>專案</SheetTitle>
+          <SheetDescription>選擇要前往的工作區</SheetDescription>
+        </SheetHeader>
+        <div className="flex-1 overflow-y-auto py-2 flex flex-col">
+          {[
+            { name: '產品路線圖', count: 12 },
+            { name: '行銷活動', count: 5 },
+            { name: '客戶研究', count: 8 },
+            { name: '設計系統', count: 3 },
+            { name: '財務報表', count: 0 },
+          ].map(p => (
+            <button
+              key={p.name}
+              type="button"
+              className="flex items-center justify-between px-3 py-2 text-body text-left hover:bg-neutral-hover rounded-md"
+            >
+              <span>{p.name}</span>
+              {p.count > 0 && (
+                <span className="text-caption text-fg-muted">{p.count}</span>
+              )}
+            </button>
+          ))}
+        </div>
+        <SheetFooter>
+          <Button variant="tertiary" className="w-full">管理專案</Button>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  ),
+}

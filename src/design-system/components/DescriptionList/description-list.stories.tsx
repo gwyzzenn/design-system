@@ -1,0 +1,89 @@
+import type { Meta, StoryObj } from '@storybook/react'
+import { DescriptionList, DescriptionItem } from './description-list'
+
+const meta: Meta<typeof DescriptionList> = {
+  title: 'Design System/Components/DescriptionList/展示',
+  component: DescriptionList,
+  tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          '唯讀 label + value 展示(HTML `dl / dt / dd`)。層級靠色彩區分而非字體大小。`cols` 控制欄數(1 / 2 / 3)。',
+      },
+    },
+  },
+}
+export default meta
+type Story = StoryObj<typeof DescriptionList>
+
+/* ── User profile(Email / Role / Team)─────────────────────────────── */
+export const UserProfile: Story = {
+  name: 'User profile',
+  render: () => (
+    <div className="border border-border rounded-lg p-4 max-w-md">
+      <DescriptionList cols={1}>
+        <DescriptionItem label="姓名">陳麒仁</DescriptionItem>
+        <DescriptionItem label="Email">qijenchen@example.com</DescriptionItem>
+        <DescriptionItem label="職稱">Design Engineer</DescriptionItem>
+        <DescriptionItem label="團隊">Design Systems</DescriptionItem>
+        <DescriptionItem label="時區">UTC+8(台北)</DescriptionItem>
+      </DescriptionList>
+    </div>
+  ),
+}
+
+/* ── Product spec(iPhone 規格對照風格)─────────────────────────────── */
+export const ProductSpec: Story = {
+  name: 'Product spec',
+  render: () => (
+    <div className="border border-border rounded-lg p-4 max-w-2xl">
+      <DescriptionList cols={2}>
+        <DescriptionItem label="螢幕尺寸">6.7 吋 Super Retina XDR</DescriptionItem>
+        <DescriptionItem label="處理器">A18 Pro</DescriptionItem>
+        <DescriptionItem label="儲存容量">256GB / 512GB / 1TB</DescriptionItem>
+        <DescriptionItem label="主相機">48MP 廣角 + 12MP 超廣角</DescriptionItem>
+        <DescriptionItem label="電池續航">最長 29 小時影片播放</DescriptionItem>
+        <DescriptionItem label="防水等級">IP68</DescriptionItem>
+      </DescriptionList>
+    </div>
+  ),
+}
+
+/* ── 訂單明細(Stripe checkout 風格)────────────────────────────────── */
+export const OrderSummary: Story = {
+  name: '訂單明細(Stripe 風格)',
+  render: () => (
+    <div className="border border-border rounded-lg p-4 max-w-md">
+      <div className="text-body font-medium mb-3">訂單摘要</div>
+      <DescriptionList cols={1}>
+        <DescriptionItem label="訂單編號">#20260418-A241</DescriptionItem>
+        <DescriptionItem label="商品">Pro 年費方案 × 5 人</DescriptionItem>
+        <DescriptionItem label="小計">NT$ 12,000</DescriptionItem>
+        <DescriptionItem label="折扣(首年 20% off)">−NT$ 2,400</DescriptionItem>
+        <DescriptionItem label="稅金(5%)">NT$ 480</DescriptionItem>
+        <DescriptionItem label="付款方式">Visa ending 4242</DescriptionItem>
+        <DescriptionItem label="總金額">
+          <span className="font-medium">NT$ 10,080</span>
+        </DescriptionItem>
+      </DescriptionList>
+    </div>
+  ),
+}
+
+/* ── Detail panel(三欄 dense)────────────────────────────────────── */
+export const DetailPanel: Story = {
+  name: 'Detail panel(cols=3)',
+  render: () => (
+    <div className="border border-border rounded-lg p-4 max-w-3xl">
+      <DescriptionList cols={3}>
+        <DescriptionItem label="訂單狀態">已出貨</DescriptionItem>
+        <DescriptionItem label="建立時間">2026-04-18 10:35</DescriptionItem>
+        <DescriptionItem label="預計送達">2026-04-20</DescriptionItem>
+        <DescriptionItem label="配送方式">宅配</DescriptionItem>
+        <DescriptionItem label="付款方式">信用卡</DescriptionItem>
+        <DescriptionItem label="追蹤編號">FX-1234567890</DescriptionItem>
+      </DescriptionList>
+    </div>
+  ),
+}
