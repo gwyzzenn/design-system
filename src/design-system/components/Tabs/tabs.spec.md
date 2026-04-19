@@ -275,3 +275,4 @@ Size 建議在這些容器內用 `sm`（32/40），避免 header 過高。
 - SegmentedControl（`segmented-control.spec.md`）——切 value 的 radio 群組
 - Button `pressed`（`button.spec.md`）——單一按鈕的 on/off toggle
 - item-layout pattern（`item-layout.spec.md`）——gap-2 slot 間距的來源
+- Accordion（`../Accordion/accordion.spec.md`）——多段獨立收合（非互斥切換）

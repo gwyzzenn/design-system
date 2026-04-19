@@ -681,6 +681,7 @@ Dark mode 覆寫：hover/active 方向反轉（hover → step-7，active → ste
 |-------|------|
 | `--overlay` | dialog backdrop 遮罩 |
 | `--tooltip` | tooltip 深色底（不透明）|
+| `--chart-1` ~ `--chart-5` | 5 色類別標記（Chart 元件 data viz 用；固定到 primitive 而非 semantic — 避免 brand swap 污染 data viz 色義；light step-6 / dark step-5 / yellow 用 step-7 提對比）|
 | `opacity-disabled` | disabled 元件整體透明度（0.45），用於無法改寫內部色彩的第三方元件 |
 
 `opacity-disabled` 適用場景：包裝第三方元件（如圖表、地圖）的 disabled 狀態，無法逐一替換內部顏色時，直接對容器套用透明度：
