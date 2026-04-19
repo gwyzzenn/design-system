@@ -1,21 +1,66 @@
 ---
-name: design-proposal
-description: UI/UX designer's structured workflow for proposing new features. Systematically benchmarks 5+ world-class references, evaluates against DS consistency and business fit, produces 2-3 shortlisted proposals as Storybook explorations for stakeholder decision. Invoke via /design-proposal when asked to「給我幾個方案」「設計 X feature」「這個 flow 怎麼做世界級」 or when a new UI/UX decision needs structured exploration.
+name: prototype
+description: Build UI prototypes / MVPs via a structured UX workflow — benchmark world-class, evaluate against DS + business, produce 2-3 shortlisted candidates as Storybook explorations, self-audit via product-ui-audit, let stakeholders decide. Invoke via /prototype ONLY when user explicitly uses the words「prototype」「MVP」「原型」 in their message (e.g.「做 prototype」「做 MVP」「做原型」「prototype 一個 X」). **DO NOT auto-invoke on casual phrases** like「怎麼做世界級」「給我幾個方案」「比版本」「比幾個版本」「還能怎麼做」「有哪些選項」— these are ambient conversation / thought-partnering, not explicit skill requests; instead ask「要走 prototype skill 正式流程嗎?還是只想先口頭討論?」to confirm before invoking.
 ---
 
-# Design Proposal Workflow
+# Prototype Workflow
 
-Purpose: embody the UX designer's mental model — never design by gut; benchmark against world-class, filter against DS + business, build multiple shortlisted proposals, let stakeholders decide.
+Purpose: embody the UX designer's mental model for BUILDING PROTOTYPES — never design by gut; benchmark world-class, filter against DS + business, build multiple shortlisted proposals, self-audit, let stakeholders decide.
 
 This skill is the **structured version** of CLAUDE.md Mindset #1「對標世界級」+ #4「真實業務場景」+ #5「猶豫就問」,and the orchestrator for `src/explorations/` folder usage.
 
 ## When to run
 
-- User asks to design / propose a new feature or flow
-- User says「給我幾個方案」「比幾個版本」「這個怎麼做世界級」
-- User wants a new component but multiple patterns exist in world-class DS
-- Ambiguous UX decision — picking one without exploration would be憑直覺
-- Before committing to a new DS primitive or pattern that has multiple viable shapes
+**明確觸發(直接 invoke)— 必含 prototype / MVP / 原型 明確字眼**:
+- 「做 prototype」「做一個 prototype」「prototype 一個 X 功能」
+- 「做 MVP」「這個做 MVP」
+- 「做原型」「先做原型看看」
+- 「做幾個 prototype 版本 compare」(明言 prototype + multiple)
+
+**模糊觸發(**先 clarify** 再決定 invoke)**:
+以下 user 日常高頻語句,**不自動 invoke,先問**:
+
+- 「給我幾個方案」「比幾個版本」「比一下版本」
+- 「這個怎麼做世界級」「還能怎麼做」「有哪些選項」
+- 「給我看看有什麼做法」「哪家做得好可以參考」
+
+這些短語經常只是 **thought-partnering / ambient conversation**,user 想口頭討論幾個 ideas 不代表要走完整 prototype workflow。
+
+**Clarify 範本**:
+```
+要走 `/prototype` skill 正式流程嗎?(6 phases + 5 checkpoints + 建 2-3 個 exploration story)
+還是先口頭討論幾個 pattern,你決定後再動手?
+
+(a) 走正式 prototype skill
+(b) 先口頭列幾個 pattern,user 判斷後直接實作某一個
+(c) 其他: ...
+```
+
+**不觸發此 skill**:
+- User 已確定要做某一個(無需多選)feature → 直接 implement
+- 單純問「這個 pattern 怎麼做」(單一 pattern)→ 直接答
+- 已 shortlist 完剩實作 → 直接進實作
+- 產品確認要交付 → 走 `/delivery-handoff`
+- 要檢查已存在 UI 用 DS 對不對 → 走 `/product-ui-audit`
+
+**不觸發此 skill**:
+- 已確定要做某一個(無需多選)feature → 直接 implement
+- 單純問「這個 pattern 怎麼做」無需多版本比較
+- 已 shortlist 完剩實作 → 直接進實作
+- 產品確認要交付 → 走 `/delivery-handoff`
+- 要檢查已存在 UI 用 DS 對不對 → 走 `/product-ui-audit`
+
+## Skill 生態位(3-skill 生命週期)
+
+```
+  /prototype(本 skill)
+     ↓ Phase 3 建完 shortlist exploration
+  /product-ui-audit(Phase 3.5 強制 gate;也可獨立 invoke)
+     ↓ audit 過關 → Checkpoint 4 stakeholder 決定採用
+  產品正式上線
+     ↓
+  /delivery-handoff(產品確認後才 invoke — 產 UI flow + handoff doc + inventory)
+```
 
 ## Preconditions
 
@@ -141,6 +186,29 @@ Storybook title 慣例(不與 Components/ 衝突):
 - 三重命名 test 過嗎?(見 CLAUDE.md)
 
 **絕對不可**在 explorations/ 階段就偷偷 add 到 Components/,會污染 DS。
+
+### Phase 3.5 — Self-audit(強制 gate)
+
+**Input**: Phase 3 完成 + Checkpoint 3 資源決策完畢的 exploration stories
+
+**Process**: **強制** invoke `/product-ui-audit` skill 對 `src/explorations/{topic-slug}/` 目錄執行 audit。理由:Phase 3 寫的 exploration code 不該直接進 Phase 4 給 stakeholder 看——先 AI 自己掃「有沒元件亂用 / 原則亂用」,世界級設計師本人也會自我 review 才對外 present。
+
+**product-ui-audit 掃 6 維度**:
+1. **Token 紀律** — 有沒硬寫 hex / rgb / shadow-sm / shadcn alias
+2. **Layout primitive 消費** — 該用 Empty / item-layout / overlay-surface / ScrollArea / AspectRatio 的地方是否用對
+3. **元件使用正確性** — Button / Input 等 variant / size / props 合理;Field wrapper 對用;icon-only 有 aria-label
+4. **Mindset adherence** — 沒 Option A/B/C placeholder / 有對標世界級註明 / 沒憑直覺造 pattern
+5. **視覺幾何** — flex 行 box 同尺寸(gap token 不被 overflow 吃)
+6. **A11y** — aria-label / role / keyboard / color contrast
+
+**Output**: audit report(per candidate)P0 / P1 / P2 findings。
+
+**Gate 規則**:
+- P0 有 → **必修**,不修不進 Phase 4(P0 = token alias / 硬色 / 幾何違反等明確 bug)
+- P1 > 3 筆 → 建議修,user 可決定先 present 或先修
+- P1 ≤ 3 筆 + 無 P0 → 可進 Phase 4
+
+詳情見 `.claude/skills/product-ui-audit/SKILL.md` 與 `references/audit-checks.md`。
 
 ### Phase 4 — Present & stakeholder decision
 
