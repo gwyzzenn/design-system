@@ -63,10 +63,11 @@ const ScrollBar = React.forwardRef<
     )}
     {...props}
   >
-    {/* Thumb 用 fg-muted(neutral-7,foreground 灰階 tier)而非 border(語意是邊框,
-         視覺偏淡、scrollbar 可見度不足)。hover 升到 fg-secondary(neutral-8)。 */}
+    {/* Thumb 用 border/border-hover(neutral-5/-6)— 世界級 SaaS(Linear / Notion /
+         Figma / macOS)scrollbar thumb 慣例為「很淡、幾乎看不見,hover 略深」,
+         而非深色常駐塊。`--border` 在此作「UI chrome 淡灰 tier」重用,符合 subtle 視覺。 */}
     <ScrollAreaPrimitive.ScrollAreaThumb
-      className={cn('relative flex-1 rounded-full bg-fg-muted hover:bg-fg-secondary transition-colors')}
+      className={cn('relative flex-1 rounded-full bg-border hover:bg-border-hover transition-colors')}
     />
   </ScrollAreaPrimitive.ScrollAreaScrollbar>
 ))
