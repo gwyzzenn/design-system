@@ -49,7 +49,9 @@ export const Overview: Story = {
                 ['progress', 'number', '—', '上傳進度 0-100(uploading 時顯示 bar)'],
                 ['description', 'string', '—', 'rich 任意場景 / compact 只有 error 才顯示'],
                 ['thumbnailSrc', 'string', '—', 'rich mode 的縮圖 URL(圖片類檔案)'],
-                ['actions', 'ReactNode', '—', 'suffix actions(cancel / retry / download)'],
+                ['actions', 'ReactNode', '—', 'suffix actions(例:delete / cancel button)'],
+                ['onDownload', '() => void', '—', "hover-swap:status='completed' 時,row hover ✓ 換成 Download ↓ button(幾何=Button sm/xs,與 actions 對齊)"],
+                ['onRetry', '() => void', '—', "hover-swap:status='error' 時,row hover ✗ 換成 RotateCw ⟲ button(幾何同上)"],
                 ['onClick', '() => void', '—', '傳入後整個 item 變可點擊(hover bg + cursor-pointer)'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
