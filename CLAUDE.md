@@ -408,6 +408,28 @@ element.style.backgroundColor = 'var(--primary)'
   元件特有（non-inherit）的狀態表現必須展開寫；繼承自 family / token 的行為點 pointer 即可
 
 
+# Consistency Audit 原則（canonical + rationale-for-deviation）
+
+**任何宣稱「跨元件要一致的事」必須三件套齊全:**
+
+1. **Canonical 要明確指向**——CLAUDE.md 某段、某 spec.md、某 skill reference。不可只存在於口頭或直覺。
+2. **偏離 canonical 的元件要在自己 spec.md 記 rationale**——不是每個元件都必須一致，但「不一致」必須可追溯為什麼。沒寫 rationale = drift，不是故意設計。
+3. **Audit 檢查公式**：`actual == canonical OR (actual != canonical AND spec.md 有 rationale)`。任一 audit 只要它在查「X 是否跨元件一致」，都必須按這個公式走。
+
+**為什麼**：設計系統的品質不是「所有元件都長一樣」，而是「任何差異都有原因可追」。沒有 canonical 就沒有一致性可言；沒有 rationale 機制，一致性會變成僵化。
+
+**已套用 canonical 的面向**：
+- Anatomy story `export const` 名稱 → `/story-writing` anatomy-standard.md
+- Spec.md 七維度 → `# Spec 規則`
+- cva defaultVariants 三方標記 → anatomy-standard.md 高風險漂移段
+- Token 命名 namespace + role → `# Token 命名原則`
+
+**新增 consistency 類訴求前的判斷**：
+- 能在 CLAUDE.md / spec.md / skill 某處清楚指一段當 canonical?→ 可以寫成規則
+- 偏離的元件能在自己 spec.md 說清楚為什麼?→ 可以寫成規則
+- 兩者任一做不到 → 這不是 canonical，是風格偏好，不要寫進 governance
+
+
 # 建立 UI 前必讀
 
 ## Token spec（全系統基礎）

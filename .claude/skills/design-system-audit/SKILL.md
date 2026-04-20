@@ -90,11 +90,17 @@ Grouped by theme. Each runs as an independent subagent; many can parallelize.
 
 ## Workflow
 
-### Phase 0 — Setup
+### Phase 0 — Setup + Build Baseline
 
 1. Read `CLAUDE.md` completely
 2. Run `git status --short` — baseline
-3. Create TaskList entries for each audit you plan to run
+3. **Build baseline — if any fail, STOP and report (see Checkpoint 5)**:
+   - `npx tsc -b 2>&1 | grep -c "error TS"` — must be `0`
+   - `npx vite build 2>&1 | tail -3` — must show `✓ built in`
+   - `lsof -i :6006 -t` OR `npm run build-storybook 2>&1 | tail -3` — storybook must build clean
+   - `grep -rE '\.stories\.tsx$' src/design-system/components` + syntax-check each via quick `npx tsc --noEmit <file>` sample — catches stories that index but type-fail
+4. **If any baseline fails**: do NOT run the 20 dimensions yet. Audit quality assumes the code compiles. Report build status and ask user whether to fix build first OR proceed anyway (audit on broken code has limited value — many dimensions can't run meaningfully)
+5. Create TaskList entries for each audit you plan to run
 
 ### Phase 1 — Parallel audit execution
 

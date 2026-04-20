@@ -2,6 +2,26 @@
 
 以 `Button/button.anatomy.stories.tsx` 為範本。每個元件的設計規格必須包含以下 5 個 story。
 
+## Canonical `export const` 名稱(五件套)
+
+每個 `.anatomy.stories.tsx` 的 `export const` 識別名稱必須用英文且**一字不差對齊以下 canonical**:
+
+| 順序 | `export const` | 對應中文 story `name` |
+|------|--------------|---------------------|
+| 1 | `Overview` | `'元件總覽'` |
+| 2 | `Inspector` | `'元件檢閱器'` |
+| 3 | `ColorMatrix` | `'色彩對照表'` |
+| 4 | `SizeMatrix` | `'尺寸對照表'` |
+| 5 | `StateBehavior` | `'狀態行為'` |
+
+**允許的偏離(遵守 CLAUDE.md「Consistency Audit 原則」)**:
+
+1. **追加第 6+ 個元件特有 story**:OK,不需 rationale(例如 AspectRatio 的 `StandardRatios`、Chip 的 `LayoutMatrix`、Slider 的 `ColorBindingRule`)
+2. **取代 canonical 5 中的某一個**:**必須在元件 spec.md 寫一段 rationale**,說明為什麼這個元件不需要(或用別的方式呈現)該面向(例如 Chart 沒有 `ColorMatrix` 因為色彩來自 ChartConfig — 這個理由要在 chart.spec.md 寫清楚)
+3. **同概念改名(如 `VisualTokens` 取代 `ColorMatrix`)**:不允許,一律改回 canonical。視覺 token 表本質就是色彩對照的延伸,沒有獨立身分。
+
+**`/design-system-audit` Dimension 13 會強制 grep 比對**,偏離 canonical 但元件 spec.md 無 rationale 的一律報 violation。
+
 ## 1. 元件總覽
 
 - Anatomy 圖——標示所有 slot(標準版面 + iconOnly 等變體版面)

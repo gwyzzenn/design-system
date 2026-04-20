@@ -279,28 +279,47 @@ Report: `file:line — violating text — real scenario suggestion`
 End: `N files checked, V violations.` Under 600 words. Don't fix.
 ```
 
-## 13. Anatomy Figma-inspect 完整度
+## 13. Anatomy Figma-inspect 完整度 + Canonical `export const` 命名
 
 ```
-Your job: audit .anatomy.stories.tsx per CLAUDE.md `# Story` → 設計規格 Story 標準.
+Your job: audit .anatomy.stories.tsx against `/story-writing` anatomy-standard.md, enforcing CLAUDE.md 「Consistency Audit 原則」 (canonical + rationale-for-deviation).
 
-Each must have 5 sections:
-1. 元件總覽 (Anatomy + Variant 一覽 + Props table)
-2. 元件檢閱器 (controls + blueprint + Inspect panel)
-3. 色彩對照表 (Variant × State + live swatches via `style={{backgroundColor:'var(--token)'}}`)
-4. 尺寸對照表 (Size token table + Visual matrix)
-5. 狀態行為 (interaction transitions + disabled for all variants)
+**Canonical export const names** (一字不差, in order):
+1. `Overview` — 元件總覽 (Anatomy + Variant 一覽 + Props table)
+2. `Inspector` — 元件檢閱器 (controls + blueprint + Inspect panel)
+3. `ColorMatrix` — 色彩對照表 (Variant × State + live swatches via `style={{backgroundColor:'var(--token)'}}`)
+4. `SizeMatrix` — 尺寸對照表 (Size token table + Visual matrix)
+5. `StateBehavior` — 狀態行為 (interaction transitions + disabled for all variants)
 
-Flag per file:
-- Missing sections
+Additional story 6+ is allowed (component-specific, no rationale required).
+**Replacing** one of canonical 5 requires a rationale paragraph in that component's `.spec.md`.
+
+For each `src/design-system/components/*/[^.]*.anatomy.stories.tsx`:
+1. Grep `^export const ([A-Za-z]+)` — collect the actual list
+2. Check which of canonical 5 are present / missing / renamed
+3. For any MISSING or RENAMED:
+   - Open component's .spec.md
+   - Grep for rationale mentioning that section (e.g., Chart skipping ColorMatrix must have spec.md text explaining why)
+4. Flag:
+   - Missing canonical + no rationale → VIOLATION
+   - Renamed canonical (e.g., `VisualTokens` instead of `ColorMatrix`) → VIOLATION regardless of rationale (renaming not allowed per anatomy-standard.md rule 3)
+   - Canonical 5 complete but has 6+ extras → OK, note only
+   - Missing canonical WITH rationale → OK
+
+Also grep for content-level issues (only if export const canonical passes):
 - Density dual values (`md density / lg density` columns) — CLAUDE.md forbids
 - `rest` instead of `default` — dev language violation
-- Token name shown without live swatch
+- Token name shown without live swatch (`var()` inline style)
 - Raw pixels when token exists
 - Content mismatch (principles in anatomy, showcase in anatomy)
 
-Report: `ComponentName (path) — missing: [sections] | issues: [brief list with line numbers]`
-End: `N checked, I incomplete, F Figma-test fails. Top 5 worst: [list]`. Under 700 words. Don't fix.
+Report format:
+- `ComponentName: missing [Inspector, ColorMatrix] — no rationale in spec.md`
+- `ComponentName: renamed SizeBehavior→SizeMatrix — rename not allowed (any rationale invalid)`
+- `ComponentName: canonical 5 + extras [StandardRatios] — OK`
+- `ComponentName: missing ColorMatrix — rationale found at chart.spec.md:L45 ✓`
+
+End: `N checked, V canonical violations (no-rationale or renamed), I content issues. Top 5 worst: [list]`. Under 700 words. Don't fix.
 ```
 
 ---

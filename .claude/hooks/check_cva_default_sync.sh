@@ -29,6 +29,19 @@ echo "$FILE_PATH" | grep -qE '\.stories\.tsx$' && exit 0
 [ -f "$FILE_PATH" ] || exit 0
 grep -q "defaultVariants" "$FILE_PATH" || exit 0
 
+# Diff-aware: only fire if this edit actually touched cva / defaultVariants content.
+# Extract old_string + new_string (Edit / MultiEdit) or content (Write) — if none
+# mention cva(, defaultVariants, or variants: , skip noise.
+DIFF_TEXT=$(echo "$INPUT" | jq -r '
+  (.tool_input.old_string // "") + "\n" +
+  (.tool_input.new_string // "") + "\n" +
+  (.tool_input.content    // "") + "\n" +
+  ([.tool_input.edits[]? | (.old_string + "\n" + .new_string + "\n")] | join(""))
+' 2>/dev/null || echo "")
+if [ -n "$DIFF_TEXT" ] && ! echo "$DIFF_TEXT" | grep -qE 'cva\(|defaultVariants|variants:[[:space:]]*\{'; then
+  exit 0
+fi
+
 COMP_DIR=$(dirname "$FILE_PATH")
 COMP_NAME=$(basename "$COMP_DIR")
 SPEC_FILE="$COMP_DIR/$(basename "$FILE_PATH" .tsx).spec.md"
@@ -41,24 +54,7 @@ SPEC_DEFAULTS=""
 ANATOMY_DEFAULTS=""
 [ -f "$ANATOMY_FILE" ] && ANATOMY_DEFAULTS=$(grep -E "★|default|defaultVariants" "$ANATOMY_FILE" 2>/dev/null | head -5 || echo "")
 
-WARNING=$(cat <<MSG
-⚠️ cva defaultVariants edited in $COMP_NAME — verify 3-way sync across:
-
-  1. $FILE_PATH (cva)
-  2. $(basename "$SPEC_FILE") (prop table / default markers)
-  3. $(basename "$ANATOMY_FILE") (SIZE_SPECS / default marker)
-  + tokens/uiSize/uiSize.spec.md (if field-height family)
-
-Current signals (NOT authoritative, just hints):
-- cva:     $(echo "$CVA_DEFAULTS" | tr '\n' ' ')
-- spec:    $(echo "$SPEC_DEFAULTS" | head -1 | cut -c1-100)
-- anatomy: $(echo "$ANATOMY_DEFAULTS" | head -1 | cut -c1-100)
-
-Historical bug: SegmentedControl cva='md' while spec/docblock/anatomy='sm ★default' — silent drift for weeks.
-
-Action: grep "★|預設|default" $COMP_DIR/ and confirm all agree before this commit ships.
-MSG
-)
+WARNING="⚠️ $COMP_NAME cva/defaultVariants touched — verify 3-way sync: tsx cva ↔ spec.md default markers ↔ anatomy SIZE_SPECS. Ref: SegmentedControl drift bug. Grep \"★|預設|default\" in $COMP_DIR/."
 
 # Escape for JSON via jq
 ESCAPED=$(printf '%s' "$WARNING" | jq -Rs .)
