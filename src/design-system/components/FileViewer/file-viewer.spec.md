@@ -1,0 +1,281 @@
+# FileViewer 設計原則
+
+## 定位
+
+FileViewer 是**可延伸的網頁檔案預覽殼層(modal fullscreen)**——負責 overlay / toolbar / 鍵盤 / filmstrip / 詳細資訊面板一切 chrome,檔案本體由 **renderer registry** 按 file type 決定誰渲染。MVP 內建 `ImageRenderer` + `FallbackRenderer`,未來可透過 `registerFileRenderer()` 擴充 PDF / Video / Code 等 renderer 而不動 shell。
+
+**實作基礎**:自建 composite——直接消費 Radix `DialogPrimitive` 而非 DS 的 `<Dialog>` wrapper。原因:FileViewer 需要 edge-to-edge fullscreen(無 viewport inset / 無 rounded-lg / 無 maxWidth),這些全要覆寫 `<Dialog>` 預設。直接消費 Radix primitive 讓 shell 擁有完整 layout 控制權,同時保有 Radix focus trap / Esc / aria-modal 的結構優勢。內部消費 DS 元件:`<Button>` / `<Empty>` / `<Separator>` / `<AspectRatio>` / `<Textarea>` / `<Popover>` + `patterns/horizontal-overflow`。
+
+**Layout Family**:**非上述 family — composite / multi-region**(Toolbar + Viewport + 可選 InfoPanel + 可選 Filmstrip)。見下「Layout Family Rationale」段。
+
+**世界級對照**:Figma file preview / Google Drive 檢視器 / Dropbox preview / macOS Preview.app / Google Photos lightbox / Notion attachment viewer。共同行為:fullscreen modal / toolbar 含 zoom & download & close / 多檔 filmstrip / ← → 切換 / Esc 關閉 / I 切換 info panel。
+
+---
+
+## Layout Family Rationale
+
+本元件**不套用 Family 1/2/3/4 任一種**:
+
+- Family 1/2 是單列 row(menu / list item);FileViewer 是整頁 shell
+- Family 3 是單行 pill;FileViewer 是 multi-region layout
+- Family 4 是可編輯資料輸入;FileViewer 是資訊消費介面
+
+**自 own layout 合理**:世界級 file viewer(Figma / Google Drive / Dropbox / macOS Preview)皆為 fullscreen overlay + fixed toolbar strip + flex viewport + optional side panel + optional bottom strip 的結構。這是 viewer 領域 canonical,不適合塞進既有 row / pill family。
+
+Family 的 canonical 規定的是「同用途同 layout」;FileViewer 用途(fullscreen preview shell)目前系統內唯一,無共用需求。未來若新增其他 fullscreen viewer(如 `MediaGallery`),再考慮是否升為共用 family / pattern。
+
+---
+
+## Consistency Audit Rationale(偏離 canonical 說明)
+
+根據 CLAUDE.md「Consistency Audit 原則」,列出本元件偏離系統 canonical 的地方與理由:
+
+| 偏離點 | Canonical | 本元件做法 | 理由 |
+|--------|-----------|-----------|------|
+| Overlay 浮層 | 一般 modal 用 `<Dialog>` | 直接消費 `DialogPrimitive.Root/Content` | 需要 edge-to-edge fullscreen,Dialog 的 inset / rounded-lg / maxWidth 全要覆寫;直接用 Radix primitive 避免對抗 wrapper |
+| Theme 鎖定 | 一般元件繼承頁面 theme | Content 內包 `data-theme="dark"` subtree | Viewer chrome 需暗色氛圍讓圖片 / media 顯色正確(對齊 Tooltip pattern——`data-theme="dark"` subtree 是 DS 已有的 canonical 手法) |
+| Anatomy 5-story | 完整 5 件套(Overview / Inspector / ColorMatrix / SizeMatrix / StateBehavior) | 保留全部 5 件套;Inspector 以多 toggle 並列方式展示(showFilmstrip × readOnly × allowDownload × filesCount) | FileViewer 決策維度 `mode × files count × readOnly × allowDownload × showFilmstrip` 雖超過一般單維 Inspector 範圍,仍值得提供 live 可切換預覽;多 toggle 並列讓 reviewer 一次看到「配置 → 結果」關係,StateBehavior 再補場景矩陣 |
+| Layout Family | 聲明 1/2/3/4 家族 | 聲明「非 family — composite」 | 見上「Layout Family Rationale」段 |
+
+---
+
+## 何時用
+
+| 場景 | 範例 |
+|------|------|
+| 多圖集快速瀏覽 | Jira 附件檢視(screenshot pack)、活動相片集、產品截圖 gallery |
+| 設計檔案 review | Figma design review 需 zoom 看細節、Notion 配圖預覽 |
+| 教學內容檢閱 | 文件上傳流程預覽、KYC 證件檢視 |
+| 附件交互閱讀 | Gmail / Slack 多附件 lightbox 預覽 |
+
+## 何時不用
+
+| 場景 | 改用 | 原因 |
+|------|------|------|
+| 單張 inline 展示 | `<img>` / AspectRatio | 不需 fullscreen + toolbar 的 chrome overhead |
+| 檔案上傳清單列 | `FileItem` | FileItem 是 list 呈現,FileViewer 是 fullscreen preview,不同階段 |
+| 需編輯檔案 | 專屬編輯器(Figma / Canva / 內建 editor) | FileViewer 是**檢視**殼,不支援 annotation / crop / 編輯 |
+| 短說明浮層 | `Popover` / `HoverCard` | Popover 是輕量非阻斷,FileViewer 是阻斷 fullscreen |
+| 操作確認 | `Dialog` | Dialog 是 modal 確認流,FileViewer 是內容消費 |
+
+---
+
+## Anatomy
+
+```
+┌──────────────────────────────────────────────────────────┐  ← data-theme="dark" subtree
+│ Toolbar(h-14,bg-surface border-b)                        │
+│  [icon] file.name …(ellipsis)                            │
+│                           [ZoomInput] [Info] [DL] [X]    │  ← zoom→info→download→close(影響力遞增)
+├──────────────────────────────────────────────────────────┤
+│                                              ┌──────────┐│
+│  ←  (absolute,hover-fade)                   │InfoPanel ││
+│                                              │ w-80     ││
+│              <CurrentRenderer />             │ h-full   ││
+│         (ImageRenderer / Fallback / ...)     │          ││
+│                                              │ readOnly ││
+│                                   →          │  textarea││
+│                                              │  metadata││
+│                                              └──────────┘│
+├──────────────────────────────────────────────────────────┤
+│ Filmstrip(h-24,bg-surface border-t,水平捲動 thumb)       │
+│  [■][■][◼][■][■] …  ← 64×64 thumbnails + fade mask      │
+└──────────────────────────────────────────────────────────┘
+```
+
+**分區決策**:
+- **Toolbar 固定 h-14**——與 InfoPanel header 同高,視覺對齊;不隨 density 變(viewer chrome 是穩定框架,不屬 field 系統)
+- **Viewport `flex-1`**——填滿剩餘空間;InfoPanel 透過 `w-80 shrink-0` 從右側切出,不吃 viewport 自然寬
+- **Filmstrip 固定 h-24**——預留 thumb 64 + padding;只在 `showFilmstrip && files.length > 1` 時顯示
+- **Prev/Next arrows 絕對定位**——避免 layout shift,只在 `files.length > 1` 渲染
+
+---
+
+## Toolbar 按鈕順序(canonical triangulation)
+
+**順序:zoom → info → download → close**。
+
+這個順序是三份 DS canonical 交叉驗證的結果:
+
+1. **`patterns/action-bar/action-bar.spec.md`「全局排序:primary 在業務層最右」**——影響力遞增(低→高)
+2. **`components/Notice/notice.spec.md` dismiss X 永遠在最右**——關閉動作 always rightmost
+3. **`components/Dialog/dialog.spec.md` close 靠右是跨平台慣例**——macOS / Windows / Web 一致
+
+遞增邏輯:
+- **zoom** — 同一張檔案的微調(影響範圍:當前 renderer 的 transform state),影響最小
+- **info** — 切換附加資訊面板(影響範圍:layout,不破壞現有內容)
+- **download** — 把內容搬出 viewer(影響範圍:外部檔案系統,不可逆副作用)
+- **close** — 結束整個 viewing session(影響範圍:最大,unmount 所有 state)
+
+---
+
+## Renderer Registry(延伸機制)
+
+核心 extensibility:FileViewer shell 只懂 `FileRenderer` interface,不硬寫 image / pdf / video 邏輯。
+
+```ts
+interface FileRenderer {
+  id: string
+  canRender: (file: FileInfo) => boolean
+  component: React.ComponentType<FileRendererProps>
+}
+```
+
+**Resolution 順序**:
+1. User-registered renderers(依註冊順序)
+2. Built-in `ImageRenderer`
+3. `FallbackRenderer`(兜底,永遠回 true)
+
+第一個 `canRender(file)` 回 true 的 renderer 渲染。**Fallback 永遠最後**。
+
+**Capability 宣告**:Renderer 透過 `onCapabilitiesChange(caps)` 告訴 shell 當前支援哪些功能。Shell 據此動態決定 toolbar 內容。MVP 只有 `zoom: boolean`,未來擴充 `rotate` / `pageNumber` 不破壞現有 renderer。
+
+**擴充範例**:
+```ts
+registerFileRenderer({
+  id: 'pdf',
+  canRender: (f) => f.mimeType === 'application/pdf',
+  component: PDFRenderer, // 消費 react-pdf,emit pageNumber capability
+})
+```
+
+Shell 看到 `pageNumber` capability 時自動在 toolbar 顯示 page navigator(MVP 未實作,預留 interface)。
+
+---
+
+## ImageRenderer 規則
+
+- 消費 `react-zoom-pan-pinch`(zoom + pan 行為 primitive,無 UI);世界級產品 Figma / Miro / PhotoSwipe 同流派
+- Scroll wheel 縮放;`zoom > 100%` 時可拖曳 pan
+- Min scale 10%,max scale 400%
+- 雙擊重設 100%
+- 切換檔案時 shell 自動重設 zoom 到 100%(避免上一張檔案的 zoom 狀態帶到下一張)
+
+---
+
+## ZoomInput 規則
+
+- 視覺:數字輸入 + 右側 `▼` trigger 打開 preset dropdown
+- 固定寬 `w-20`(80px)、高 `h-field-sm`(viewer chrome 尺寸)
+- 直接輸入數字 + Enter 套用;輸入非法值 blur 時還原
+- 範圍 10–400(對齊 ImageRenderer 的 min/max scale)
+- Dropdown 內容:**分兩組**——Fit options 在上(Fit to width / Fit to page),preset 百分比在下(10/25/50/75/100/125/150/200/400),`<Separator>` 分組
+- 當前 zoom 在 preset 中的那項顯示 `bg-neutral-selected`
+
+**Why inline(不抽獨立 primitive)**:目前只 FileViewer 消費。當 PDF / Video viewer 也需要時,再依「建立前必查既有 pattern」原則從 FileViewer 抽出升級。
+
+---
+
+## InfoPanel 規則
+
+- **寬度固定 w-80(320px)**——對齊 Figma right panel(320)的業界慣例;Google Photos 用 360 偏寬,FileViewer 走 Figma 偏窄以讓 viewport 多一些空間
+- **Header 高度 h-14**——與 Toolbar 等高,視覺對齊
+- **內容分兩區**:
+  - 「說明」Textarea(可編輯 / readOnly 依 `readOnly` prop)
+  - 「檔案資訊」`<dl>`:檔名 / 類型 / 大小 / 自訂 metadata 條目
+- **預設關閉**,user 主動 toggle(I 鍵 or Info 按鈕);切檔案時 InfoPanel 保持同步顯示下一個 file 的資訊
+- **Description 變化持久化**:onBlur 時若 draft 與原值不同,呼叫 `onDescriptionChange(fileId, description)`;consumer 負責寫後端
+- **Readonly 時不觸發 onDescriptionChange**;placeholder 改為「尚無說明」
+
+---
+
+## Filmstrip 規則
+
+- **僅在 `showFilmstrip === true && files.length > 1` 顯示**
+- **Thumb 固定 64×64**——小到能塞 10+ 檔在畫面上,大到能辨識內容
+- **thumb gap `gap-1`(4px)**——世界級 lightbox(Google Photos / Dropbox)都用緊密 gap
+- **當前 thumb**:`ring-2 ring-primary`(明顯 outline);其他 `ring-1 ring-border` + `hover:ring-border-hover`
+- **ScrollIntoView**:切換當前 file 時 active thumb 自動 scroll 到視野中央
+- **消費 `horizontal-overflow` pattern**:隱藏 native scrollbar + fade-mask + scroll arrows(canScroll 時)
+- **Thumb 內容**:image 用 `<img object-cover>`;非 image 用 FileText icon + ext label
+- **A11y**:整個 strip `role="tablist"`,每個 thumb `role="tab" aria-selected`
+
+---
+
+## 鍵盤支援
+
+| 鍵 | 行為 | 生效條件 |
+|---|------|---------|
+| `Esc` | 關閉 viewer | Radix Dialog 預設 |
+| `ArrowLeft` | 上一個檔案 | `files.length > 1` |
+| `ArrowRight` | 下一個檔案 | `files.length > 1` |
+| `+` / `=` | zoom in(下一個 preset) | `capabilities.zoom === true` |
+| `-` | zoom out(上一個 preset) | `capabilities.zoom === true` |
+| `0` | 重設 zoom 到 100% | `capabilities.zoom === true` |
+| `F` | Fit to page | `capabilities.zoom === true` |
+| `I` | 切換 InfoPanel | 永遠 |
+
+**焦點在 input / textarea / contentEditable 時不觸發**——避免 user 打字時被快捷鍵劫持(寫入 description 打到 `-` 不應 zoom out)。
+
+---
+
+## 視覺 Token
+
+| 區塊 | Token | 說明 |
+|------|-------|------|
+| Overlay | `bg-overlay` | 與 Dialog 共用;覆蓋背景頁面 |
+| Chrome bg | `bg-canvas`(dark subtree) | dark theme 下 canvas = 近黑底,讓圖片顯色最自然 |
+| Toolbar / Panel / Filmstrip bg | `bg-surface` | 比 canvas 高一階,形成 chrome 分層 |
+| 分隔線 | `border-divider` | Toolbar 底 / InfoPanel 左 / Filmstrip 頂 |
+| 檔名文字 | `text-body-lg text-foreground` | Dialog title 同級 |
+| 按鈕 | `Button variant="text" size="sm" iconOnly` | viewer chrome 密集 UI 用 text variant(不搶焦點) |
+| Thumb 當前選中 | `ring-2 ring-primary` | 選中 canonical(與 DS 其他選中視覺一致) |
+| Thumb 預設 | `ring-1 ring-border` + hover `ring-border-hover` | |
+
+**Dark mode**:FileViewer chrome 鎖 dark(`data-theme="dark"` subtree);背景頁面的 theme 不影響 viewer chrome——viewer 是獨立沉浸式 context,類似 Tooltip / 全螢幕影片播放器的 convention。
+
+**Density**:FileViewer chrome 尺寸固定(h-14 toolbar / w-80 panel / h-24 filmstrip / 64px thumb)——viewer 是展示殼不是工作區,不隨 density 放大。Toolbar 內的 `<Button size="sm">` 與 `<ZoomInput h-field-sm>` 會隨 density 微調(sm 在 md density = 28px,lg density = 32px),在 viewer 這個尺度可忽略。
+
+---
+
+## 狀態處理的職責邊界
+
+| 狀態 | 處理方式 |
+|------|---------|
+| **Loading**(圖片載入中) | 由 renderer 自己處理(例:`<img>` 的自然 loading,未來 PDFRenderer 可在內部秀 skeleton)。shell 不提供全頁 loading state |
+| **Empty**(`files.length === 0`) | 不渲染整個 viewer(return null);consumer 透過 `open=false` 控制 |
+| **Error**(圖片載入失敗 / renderer crash) | MVP 不處理——renderer 自己處理;未來可加 error boundary 幫 Fallback 兜底 |
+| **Unknown file type** | FallbackRenderer 自動兜底,顯示 Empty + 下載提示 |
+
+**Dark mode**:整個 viewer chrome 鎖 dark,不隨頁面 theme 切。
+
+---
+
+## 禁止事項
+
+- ❌ **不 nested FileViewer**——viewer 疊 viewer 焦點陷阱崩壞;要在 viewer 內展示另一個檔案,改 filmstrip 切換
+- ❌ **不用 FileViewer 做編輯**——viewer 是**檢視**殼,需 annotate / crop / mask 改用專屬編輯器
+- ❌ **不硬寫 shadow-md/lg 等 Tailwind 預設陰影**——用 `shadow-[var(--elevation-*)]`(對齊 DS 陰影 token 系統)
+- ❌ **不繞過 registry 直接 switch file.mimeType 渲染**——破壞 extensibility,新檔案類型被迫改 shell;一律走 `registerFileRenderer`
+- ❌ **不把 toolbar 按鈕順序改成 close → zoom**——違反「影響力遞增」canonical,close always rightmost 是跨 DS 慣例
+- ❌ **不自包 TooltipProvider / ThemeProvider**——對齊 DS「元件不得自包 Provider」規則,共享 app-level Provider
+- ❌ **不讓 keyboard shortcut 在 input/textarea focus 時觸發**——`+`/`-`/`I` 等與打字衝突,必須排除
+
+---
+
+## A11y 預設
+
+Radix DialogPrimitive 自動處理:
+- `role="dialog"` + `aria-modal="true"`
+- `<DialogPrimitive.Title>`(sr-only)自動成 `aria-labelledby` 目標——screen reader 開啟時讀「檔案檢視器:{file.name}」
+- Focus trap:焦點鎖在 viewer 內
+- Esc 關閉;Overlay click 關閉(Radix 預設)
+
+自加的 a11y:
+- 所有 iconOnly button 皆有 `aria-label`(中文,跟 DS 其他元件風格一致)
+- Filmstrip `role="tablist"` + thumb `role="tab"` + `aria-selected`
+- InfoPanel 用 `<aside aria-label="檔案詳細資訊">` 語意標記
+- `onOpenAutoFocus={e => e.preventDefault()}` 避免焦點自動跑進第一個 tabbable(讓鍵盤從 viewport 開始)
+
+---
+
+## 相關
+
+- `../Dialog/dialog.spec.md` — 一般 modal 對話框(FileViewer 是 fullscreen variant,直接用 Radix primitive 而非 Dialog wrapper)
+- `../Popover/popover.spec.md` — ZoomInput dropdown 消費
+- `../Empty/empty.spec.md` — FallbackRenderer 佈局
+- `../AspectRatio/aspect-ratio.spec.md` — Filmstrip thumb 固定比例
+- `../ScrollArea/scroll-area.spec.md` — 未有 use case(filmstrip 刻意用 fade-mask 而非 scrollbar,屬 horizontal-overflow pattern)
+- `../../patterns/horizontal-overflow/horizontal-overflow.spec.md` — Filmstrip 水平捲動 + fade mask
+- `../../patterns/action-bar/action-bar.spec.md` — Toolbar 按鈕順序 canonical
+- `../FileItem/file-item.spec.md` — 上傳清單列元件(與 FileViewer 不同用途,FileItem 是 list item,FileViewer 是 fullscreen preview)

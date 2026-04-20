@@ -3,7 +3,7 @@
 這 5 條是本專案所有規則背後的**態度**。接到任務先複習一遍，再看具體規則。
 
 1. **對標世界級 + 不取巧省工**——每個設計決策都要能回答「Polaris / Material / Atlassian / Ant / Carbon / Apple HIG 怎麼做？我們為什麼一樣 / 為什麼不同？」。沒對齊又說不出不同的理由 = 設計 bug。**視覺上也必須跟世界級一樣整齊**：用我們的 token / 元件換掉第三方樣式時，不能讓視覺比原版鬆散、錯位、比例失調——「符合我們的設計語言」和「視覺整齊度不輸原版」是**同時成立**的要求，不是二選一。**遇到取捨禁止以「選較簡單」「省 N 個 edits」為由選 shortcut**——一律選最世界級做法。說到「快速修」「省工程」是 yellow flag,停下重想。權宜若真必要,明說是權宜 + 存 tech debt + 將來回來重做。
-2. **不憑直覺發明**——新增任何值 / 名 / pattern / 視覺結構前先 `grep` 既有,**也包含 layout primitive**(見 `# 建立 UI 前必讀` 的「既有 layout primitives 清單」)。若新元件的視覺結構命中既有 primitive(item-anatomy / overlay-surface / Empty 等),必消費不重寫。專案已有的 gap、padding、font-size、命名慣例優先沿用；不是「看起來順」就能造新值。
+2. **不憑直覺發明**——新增任何值 / 名 / pattern / 視覺結構前先 `grep` 既有,**也包含 layout primitive**(見 `# 建立 UI 前必讀` 的「既有 layout primitives 清單」)。若新元件的視覺結構命中既有 primitive(item-anatomy / overlay-surface / Empty 等),必消費不重寫。專案已有的 gap、padding、font-size、命名慣例優先沿用;不是「看起來順」就能造新值。**提出設計建議也算在定 pattern**——討論階段給 option A/B/C 時,每個 option 都必須同時對照「DS canonical」+「世界級 idiom」,兩邊都有才叫有根據的建議。**DS canonical 要掃哪些家** → 走 `# 任務導航表`(一次查表知道該讀哪幾個 spec / pattern / token / memory),或 `# 遇不確定時的協議` Step 1+2;**禁止自己憑印象列部分家**——任一個相關的家沒掃就是螺絲鬆(consumer 會 ship 你的建議,建議就是 pattern)。**只看世界級 = 螺絲鬆**。
 3. **改一處必看三處**——code / spec / story 三方聯動是常態，不是例外。改 cva `defaultVariants`、改 variant、改 token 前先 grep 該元件所有檔案，一次改完。
 4. **範例必須是真實業務場景**——Jira / Stripe / Notion / Figma 等可辨識的情境；禁止 `Option A/B/C`、「按鈕一」、極端不現實、ASCII art。Storybook 的受眾是任何打開它的人，不是作者。
 5. **猶豫就問，不往前推**——遇到無前例的設計決策：(a) 先 grep 既有 pattern，(b) 讀近親元件 spec，(c) 仍不確定就停下問使用者。**禁止憑直覺造新 pattern**——這是本專案最常被糾正的錯誤。
@@ -29,6 +29,7 @@
 | **新 row / item 元件的結構(Family 1+2)** | `patterns/element-anatomy/item-anatomy.spec.md`(Family 1+2 row 結構 SSOT) |
 | **新 skill / hook / command** | 對應 `.claude/{home}/README.md` charter → `design-system-audit/references/rule-placement.md` |
 | **無明確前例的設計決策** | `# 遇不確定時的協議`(先 grep → 讀近親 spec → 仍不確定就問) |
+| **提設計建議 / 給 option A/B/C** | 本表對應 task 行找到「讀 Y」→ grep 所有可能 relevant 的家(patterns / 近親元件 spec / tokens / memory feedback / `# 失敗記憶索引` / skill references),**每個 option 必含「DS canonical(spec:line 或 token name)」+「世界級對照」兩件**;只給世界級 = 螺絲鬆(memory `feedback_recommendation_must_grep_ds`) |
 | **Tailwind / CSS 出怪事** | `# Tailwind 使用規則` + `# 失敗記憶索引` → 技術陷阱 |
 | **spec 跟 code 結論衝突** | `# Spec 規則`(主動提出討論,不默默改) |
 | **在 classification-sensitive dir 建新檔** | **先 Read 該 dir 的 `README.md` charter**(硬規則,見 `# 規則分層`) |

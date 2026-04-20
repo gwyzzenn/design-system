@@ -5,11 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "predev": "node scripts/ensure-lucide-icon.mjs",
     "build": "tsc -b && vite build",
+    "prebuild": "node scripts/ensure-lucide-icon.mjs",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
+    "prestorybook": "node scripts/ensure-lucide-icon.mjs",
     "build-storybook": "storybook build --output-dir storybook-static",
-    "tokens:export": "node scripts/export-tokens.mjs"
+    "prebuild-storybook": "node scripts/ensure-lucide-icon.mjs",
+    "tokens:export": "node scripts/export-tokens.mjs",
+    "postinstall": "node scripts/ensure-lucide-icon.mjs"
   },
   "dependencies": {
     "@babel/runtime": "^7.29.2",
@@ -48,6 +53,7 @@
     "react": "^18.3.1",
     "react-day-picker": "^9.14.0",
     "react-dom": "^18.3.1",
+    "react-zoom-pan-pinch": "^4.0.3",
     "recharts": "^3.8.1",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",

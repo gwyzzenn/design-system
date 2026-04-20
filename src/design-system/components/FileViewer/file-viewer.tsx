@@ -1,0 +1,813 @@
+import * as React from 'react'
+import * as DialogPrimitive from '@radix-ui/react-dialog'
+import {
+  X,
+  Download,
+  Info,
+  ChevronLeft,
+  ChevronRight,
+  ChevronDown,
+  File as FileIcon,
+  FileText,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Button } from '@/design-system/components/Button/button'
+import { Empty } from '@/design-system/components/Empty/empty'
+import { Separator } from '@/design-system/components/Separator/separator'
+import { AspectRatio } from '@/design-system/components/AspectRatio/aspect-ratio'
+import { Textarea } from '@/design-system/components/Textarea/textarea'
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from '@/design-system/components/Popover/popover'
+import {
+  useScrollEdges,
+  useScrollByPage,
+  buildFadeMask,
+  OverflowScrollArrow,
+} from '@/design-system/patterns/horizontal-overflow/horizontal-overflow'
+import { ImageRenderer, canRenderImage } from './image-renderer'
+import type {
+  FileInfo,
+  FileRenderer,
+  FileRendererCapabilities,
+} from './file-viewer-types'
+
+/**
+ * FileViewer — 可延伸的網頁檔案 preview shell(modal fullscreen)
+ *
+ * ── 定位 ──
+ * 公開、composite 元件。consumer 傳 `files`,FileViewer 處理 overlay / toolbar /
+ * keyboard / filmstrip / info panel 一切 chrome;檔案本體由 renderer registry
+ * 按 file MIME 決定誰渲染(MVP 內建 ImageRenderer + FallbackRenderer)。
+ *
+ * ── 實作基礎 ──
+ * 自建 composite,消費 DS primitives:
+ *   - Radix DialogPrimitive(焦點 trap / Esc / aria-modal,保有 shadcn 結構優勢)
+ *   - `<Empty>` / `<Button>` / `<Separator>` / `<AspectRatio>` / `<Textarea>` / `<Popover>`
+ *   - `patterns/horizontal-overflow`(filmstrip 溢出捲動)
+ * 不用 DS 的 `<Dialog>` wrapper:因為 FileViewer 需要 edge-to-edge fullscreen
+ * (無 viewport inset / 無 rounded-lg / 無 maxWidth),Dialog 的這些預設都要覆寫。
+ * 直接消費 Radix primitive 讓 shell 擁有完整 layout 控制權。
+ *
+ * ── Layout Family ──
+ * 非 Family 1/2/3/4 — composite / multi-region(Toolbar / Viewport / Filmstrip +
+ * 可選 InfoPanel)。見 `file-viewer.spec.md`「Layout Family」段。
+ *
+ * ── Extensibility ──
+ * `registerFileRenderer(renderer)` 註冊新 renderer;shell 按註冊順序 iterate,
+ * 第一個 `canRender(file)` 回 true 的渲染。FallbackRenderer 永遠兜底(未知檔案
+ * 類型顯示 icon + 檔名 + download)。
+ */
+
+// ─── Renderer Registry ────────────────────────────────────────────────────────
+
+/**
+ * Fallback renderer — 無 renderer 能處理時兜底。
+ * 顯示 Empty 佈局:icon + 檔名 + 「請下載檢視」提示。
+ */
+const FallbackRenderer: React.FC<{ file: FileInfo }> = ({ file }) => (
+  <div className="w-full h-full flex items-center justify-center p-8">
+    <Empty
+      icon={FileText}
+      title={file.name}
+      description={`無法在瀏覽器中預覽此檔案類型（${file.mimeType || 'unknown'}）。請下載後檢視。`}
+    />
+  </div>
+)
+
+const fallbackRenderer: FileRenderer = {
+  id: 'fallback',
+  canRender: () => true,
+  component: ({ file }) => <FallbackRenderer file={file} />,
+}
+
+const imageRenderer: FileRenderer = {
+  id: 'image',
+  canRender: canRenderImage,
+  component: ImageRenderer,
+}
+
+// Registry 是 module-singleton:新 renderer 透過 registerFileRenderer 加入。
+// Fallback 永遠最後(兜底),因此用陣列第二段存放。
+const userRegistered: FileRenderer[] = []
+
+export function registerFileRenderer(renderer: FileRenderer): void {
+  // 去重:同 id 則覆寫
+  const existingIdx = userRegistered.findIndex((r) => r.id === renderer.id)
+  if (existingIdx >= 0) {
+    userRegistered[existingIdx] = renderer
+  } else {
+    userRegistered.push(renderer)
+  }
+}
+
+function resolveRenderer(file: FileInfo): FileRenderer {
+  // 先查 user registered,再 built-in,最後 fallback
+  for (const r of userRegistered) {
+    if (r.canRender(file)) return r
+  }
+  if (imageRenderer.canRender(file)) return imageRenderer
+  return fallbackRenderer
+}
+
+// ─── Zoom presets ─────────────────────────────────────────────────────────────
+
+type ZoomFit = 'fit-width' | 'fit-page'
+
+const ZOOM_PRESETS: number[] = [10, 25, 50, 75, 100, 125, 150, 200, 400]
+const ZOOM_FIT_OPTIONS: { value: ZoomFit; label: string }[] = [
+  { value: 'fit-width', label: 'Fit to width' },
+  { value: 'fit-page', label: 'Fit to page' },
+]
+
+function nextZoomIn(current: number): number {
+  for (const p of ZOOM_PRESETS) {
+    if (p > current) return p
+  }
+  return ZOOM_PRESETS[ZOOM_PRESETS.length - 1]
+}
+function nextZoomOut(current: number): number {
+  for (let i = ZOOM_PRESETS.length - 1; i >= 0; i--) {
+    if (ZOOM_PRESETS[i] < current) return ZOOM_PRESETS[i]
+  }
+  return ZOOM_PRESETS[0]
+}
+
+// ─── ZoomInput ────────────────────────────────────────────────────────────────
+
+interface ZoomInputProps {
+  value: number
+  onChange: (next: number) => void
+  onFit: (fit: ZoomFit) => void
+}
+
+/**
+ * ZoomInput — 數字輸入 + preset dropdown 組合。
+ *
+ * 世界級對照:Figma zoom control / Google Slides zoom / Adobe Acrobat。
+ *
+ * ── 為什麼 inline(不抽獨立 primitive)──
+ * 目前只 FileViewer 消費;MVP 階段遵循 YAGNI。當 PDF / Video viewer 也需要相同
+ * primitive 時,再依「建立前必查既有 pattern」原則從 FileViewer 抽出升級。
+ */
+const ZoomInput: React.FC<ZoomInputProps> = ({ value, onChange, onFit }) => {
+  const [draft, setDraft] = React.useState<string>(`${value}%`)
+  const [open, setOpen] = React.useState(false)
+
+  React.useEffect(() => {
+    setDraft(`${value}%`)
+  }, [value])
+
+  const commitDraft = () => {
+    const parsed = parseInt(draft.replace(/[^0-9]/g, ''), 10)
+    if (Number.isFinite(parsed) && parsed > 0) {
+      // 限 10–400 範圍,對齊 ImageRenderer MIN_SCALE/MAX_SCALE
+      const clamped = Math.min(400, Math.max(10, parsed))
+      onChange(clamped)
+      setDraft(`${clamped}%`)
+    } else {
+      setDraft(`${value}%`)
+    }
+  }
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <div className="relative inline-flex items-center">
+        <input
+          type="text"
+          aria-label="Zoom level"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onBlur={commitDraft}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              commitDraft()
+              ;(e.target as HTMLInputElement).blur()
+            }
+          }}
+          className={cn(
+            // 視覺對齊 field-sm(28px md / 32px lg)+ 左 padding + 右預留 dropdown trigger 寬度
+            'h-field-sm w-20 pl-3 pr-7 rounded-md',
+            'bg-transparent border border-transparent',
+            'text-body tabular-nums text-foreground',
+            'hover:border-border focus:border-primary focus:outline-none',
+            'transition-colors duration-150',
+          )}
+        />
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            aria-label="開啟縮放選單"
+            className={cn(
+              'absolute right-0 top-0 bottom-0 w-7 inline-flex items-center justify-center',
+              'text-fg-muted hover:text-foreground',
+              'outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-r-md',
+            )}
+          >
+            <ChevronDown size={16} aria-hidden />
+          </button>
+        </PopoverTrigger>
+      </div>
+      <PopoverContent align="end" sideOffset={4} className="w-56 p-1">
+        <div className="py-1">
+          {ZOOM_FIT_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => {
+                onFit(opt.value)
+                setOpen(false)
+              }}
+              className={cn(
+                'w-full flex items-center px-2 py-1.5 rounded-md',
+                'text-body text-foreground text-left',
+                'hover:bg-neutral-hover outline-none focus-visible:bg-neutral-hover',
+              )}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+        <Separator className="my-1" />
+        <div className="py-1">
+          {ZOOM_PRESETS.map((p) => {
+            const selected = p === value
+            return (
+              <button
+                key={p}
+                type="button"
+                onClick={() => {
+                  onChange(p)
+                  setOpen(false)
+                }}
+                className={cn(
+                  'w-full flex items-center justify-between px-2 py-1.5 rounded-md',
+                  'text-body text-foreground text-left tabular-nums',
+                  'hover:bg-neutral-hover outline-none focus-visible:bg-neutral-hover',
+                  selected && 'bg-neutral-selected hover:bg-neutral-selected-hover',
+                )}
+              >
+                <span>{p}%</span>
+              </button>
+            )
+          })}
+        </div>
+      </PopoverContent>
+    </Popover>
+  )
+}
+ZoomInput.displayName = 'ZoomInput'
+
+// ─── Toolbar ──────────────────────────────────────────────────────────────────
+
+interface ToolbarProps {
+  file: FileInfo
+  capabilities: FileRendererCapabilities
+  zoom: number
+  onZoomChange: (z: number) => void
+  onFit: (fit: ZoomFit) => void
+  infoOpen: boolean
+  onInfoToggle: () => void
+  onDownload?: () => void
+  allowDownload: boolean
+  onClose: () => void
+}
+
+const Toolbar: React.FC<ToolbarProps> = ({
+  file,
+  capabilities,
+  zoom,
+  onZoomChange,
+  onFit,
+  infoOpen,
+  onInfoToggle,
+  onDownload,
+  allowDownload,
+  onClose,
+}) => {
+  return (
+    <div
+      className={cn(
+        // Surface layer = overlay chrome(non-interactive header strip)
+        'flex items-center gap-2 shrink-0 h-14 bg-surface border-b border-divider',
+        'px-[var(--layout-space-loose)]',
+      )}
+    >
+      {/* 檔名(左,佔據可用寬度,ellipsis)*/}
+      <div className="flex items-center gap-2 min-w-0 flex-1">
+        <FileIcon size={16} className="text-fg-muted shrink-0" aria-hidden />
+        <span
+          className="text-body-lg text-foreground truncate"
+          title={file.name}
+        >
+          {file.name}
+        </span>
+      </div>
+
+      {/* 按鈕順序 canonical:zoom → info → download → close(影響力遞增)*/}
+      <div className="flex items-center gap-1 shrink-0">
+        {capabilities.zoom && (
+          <ZoomInput value={zoom} onChange={onZoomChange} onFit={onFit} />
+        )}
+        <Button
+          variant="text"
+          size="sm"
+          iconOnly
+          startIcon={Info}
+          aria-label={infoOpen ? '關閉詳細資訊' : '顯示詳細資訊'}
+          pressed={infoOpen}
+          onClick={onInfoToggle}
+        />
+        {allowDownload && (
+          <Button
+            variant="text"
+            size="sm"
+            iconOnly
+            startIcon={Download}
+            aria-label="下載檔案"
+            onClick={onDownload}
+          />
+        )}
+        <Button
+          variant="text"
+          size="sm"
+          iconOnly
+          startIcon={X}
+          aria-label="關閉檢視器"
+          onClick={onClose}
+        />
+      </div>
+    </div>
+  )
+}
+
+// ─── InfoPanel ────────────────────────────────────────────────────────────────
+
+interface InfoPanelProps {
+  file: FileInfo
+  readOnly: boolean
+  onDescriptionChange?: (fileId: string, description: string) => void
+  onClose: () => void
+}
+
+function formatBytes(bytes: number | undefined): string | undefined {
+  if (bytes == null) return undefined
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`
+}
+
+const InfoPanel: React.FC<InfoPanelProps> = ({
+  file,
+  readOnly,
+  onDescriptionChange,
+  onClose,
+}) => {
+  const [draft, setDraft] = React.useState(file.description ?? '')
+
+  React.useEffect(() => {
+    setDraft(file.description ?? '')
+  }, [file.id, file.description])
+
+  const commit = () => {
+    if (readOnly) return
+    if (draft !== (file.description ?? '')) {
+      onDescriptionChange?.(file.id, draft)
+    }
+  }
+
+  const sizeText = formatBytes(file.size)
+
+  return (
+    <aside
+      className={cn(
+        'w-80 shrink-0 flex flex-col bg-surface border-l border-divider',
+        'h-full',
+      )}
+      aria-label="檔案詳細資訊"
+    >
+      {/* Panel header — 與 Toolbar 等高(h-14),視覺一致 */}
+      <div
+        className={cn(
+          'flex items-center justify-between gap-2 shrink-0 h-14 border-b border-divider',
+          'px-[var(--layout-space-loose)]',
+        )}
+      >
+        <h3 className="text-body-lg font-medium text-foreground">詳細資訊</h3>
+        <Button
+          variant="text"
+          size="sm"
+          iconOnly
+          startIcon={X}
+          aria-label="關閉詳細資訊"
+          onClick={onClose}
+        />
+      </div>
+
+      {/* Panel body */}
+      <div
+        className={cn(
+          'flex-1 min-h-0 flex flex-col gap-4',
+          'px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]',
+        )}
+      >
+        <div className="flex flex-col gap-1.5">
+          <span className="text-caption text-fg-muted">說明</span>
+          <Textarea
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onBlur={commit}
+            readOnly={readOnly}
+            placeholder={readOnly ? '尚無說明' : '為這個檔案加上說明…'}
+            rows={5}
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <span className="text-caption text-fg-muted">檔案資訊</span>
+          <dl className="flex flex-col gap-1.5 text-body">
+            <div className="flex justify-between gap-4">
+              <dt className="text-fg-secondary">檔名</dt>
+              <dd className="text-foreground text-right break-all">{file.name}</dd>
+            </div>
+            <div className="flex justify-between gap-4">
+              <dt className="text-fg-secondary">類型</dt>
+              <dd className="text-foreground text-right">{file.mimeType || '—'}</dd>
+            </div>
+            {sizeText && (
+              <div className="flex justify-between gap-4">
+                <dt className="text-fg-secondary">大小</dt>
+                <dd className="text-foreground text-right tabular-nums">{sizeText}</dd>
+              </div>
+            )}
+            {file.metadata &&
+              Object.entries(file.metadata).map(([k, v]) => (
+                <div key={k} className="flex justify-between gap-4">
+                  <dt className="text-fg-secondary">{k}</dt>
+                  <dd className="text-foreground text-right break-all">{String(v)}</dd>
+                </div>
+              ))}
+          </dl>
+        </div>
+      </div>
+    </aside>
+  )
+}
+
+// ─── Filmstrip ────────────────────────────────────────────────────────────────
+
+interface FilmstripProps {
+  files: FileInfo[]
+  activeIndex: number
+  onSelect: (index: number) => void
+}
+
+const THUMB_SIZE = 64 // px, 固定
+
+const Filmstrip: React.FC<FilmstripProps> = ({ files, activeIndex, onSelect }) => {
+  const { scrollRef, atStart, atEnd, canScroll } = useScrollEdges<HTMLDivElement>()
+  const scrollByPage = useScrollByPage(scrollRef)
+  const maskImage = buildFadeMask({ canScroll, atStart, atEnd, reserveArrowWidth: 32 })
+
+  // 切換當前檔案時,自動 scroll 讓 active thumb 可見
+  React.useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    const active = el.querySelector<HTMLButtonElement>(`[data-thumb-index="${activeIndex}"]`)
+    active?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+  }, [activeIndex, scrollRef])
+
+  return (
+    <div
+      className={cn(
+        'relative shrink-0 h-24 bg-surface border-t border-divider',
+        'flex items-center',
+        'px-[var(--layout-space-loose)]',
+      )}
+    >
+      {canScroll && !atStart && (
+        <OverflowScrollArrow direction="left" onClick={() => scrollByPage('left')} />
+      )}
+      <div
+        ref={scrollRef}
+        role="tablist"
+        aria-label="檔案佇列"
+        className={cn(
+          'flex items-center gap-1',
+          // 刻意隱藏 native scrollbar + 用 fade-mask(horizontal-overflow pattern)
+          'scrollbar-none overflow-x-auto overflow-y-hidden h-full py-2',
+          'w-full',
+        )}
+        style={{
+          maskImage,
+          WebkitMaskImage: maskImage,
+        }}
+      >
+        {files.map((file, i) => {
+          const active = i === activeIndex
+          const isImage = canRenderImage(file)
+          const ext = file.name.split('.').pop()?.toUpperCase() ?? '檔'
+          return (
+            <button
+              key={file.id}
+              type="button"
+              role="tab"
+              aria-selected={active}
+              aria-label={`${i + 1} / ${files.length}:${file.name}`}
+              data-thumb-index={i}
+              onClick={() => onSelect(i)}
+              className={cn(
+                'shrink-0 rounded-md bg-muted overflow-hidden',
+                'outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                'transition-shadow duration-150',
+                active
+                  ? 'ring-2 ring-primary'
+                  : 'ring-1 ring-border hover:ring-border-hover',
+              )}
+              style={{ width: THUMB_SIZE, height: THUMB_SIZE }}
+            >
+              <AspectRatio ratio={1} className="w-full h-full">
+                {isImage ? (
+                  <img
+                    src={file.url}
+                    alt=""
+                    aria-hidden
+                    className="w-full h-full object-cover"
+                    draggable={false}
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-0.5">
+                    <FileText size={20} className="text-fg-muted" aria-hidden />
+                    <span className="text-footnote text-fg-muted font-medium">{ext}</span>
+                  </div>
+                )}
+              </AspectRatio>
+            </button>
+          )
+        })}
+      </div>
+      {canScroll && !atEnd && (
+        <OverflowScrollArrow direction="right" onClick={() => scrollByPage('right')} />
+      )}
+    </div>
+  )
+}
+
+// ─── FileViewer (shell) ───────────────────────────────────────────────────────
+
+export interface FileViewerProps {
+  files: FileInfo[]
+  initialIndex?: number
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  /** 當前索引(controlled);consumer 想自己控制 active file 時傳。不傳則 shell 管理。 */
+  index?: number
+  onIndexChange?: (index: number) => void
+  /** 當前檔案 description 變化。consumer 負責持久化。readOnly 為 true 時不觸發。 */
+  onDescriptionChange?: (fileId: string, description: string) => void
+  /** true → InfoPanel 的 description textarea 為 readOnly。預設 false。 */
+  readOnly?: boolean
+  /** 顯示底部 filmstrip。預設 false;files.length < 2 時自動隱藏。 */
+  showFilmstrip?: boolean
+  /** 是否提供 download 按鈕。預設 true。 */
+  allowDownload?: boolean
+  /** 自訂 download 行為;未傳則用 anchor download attribute。 */
+  onDownload?: (file: FileInfo) => void
+}
+
+const FileViewer: React.FC<FileViewerProps> = ({
+  files,
+  initialIndex = 0,
+  open,
+  onOpenChange,
+  index: indexProp,
+  onIndexChange,
+  onDescriptionChange,
+  readOnly = false,
+  showFilmstrip = false,
+  allowDownload = true,
+  onDownload,
+}) => {
+  // Index:uncontrolled fallback
+  const [internalIndex, setInternalIndex] = React.useState(initialIndex)
+  const activeIndex = indexProp ?? internalIndex
+
+  const setIndex = React.useCallback(
+    (next: number) => {
+      const clamped = Math.max(0, Math.min(files.length - 1, next))
+      if (indexProp === undefined) setInternalIndex(clamped)
+      onIndexChange?.(clamped)
+    },
+    [files.length, indexProp, onIndexChange],
+  )
+
+  // 開啟時若 uncontrolled,重置為 initialIndex
+  React.useEffect(() => {
+    if (open && indexProp === undefined) {
+      setInternalIndex(Math.max(0, Math.min(files.length - 1, initialIndex)))
+    }
+  }, [open, initialIndex, files.length, indexProp])
+
+  // Info panel open state(shell own)
+  const [infoOpen, setInfoOpen] = React.useState(false)
+
+  // Zoom state(shell own,renderer 消費 + 回報)
+  const [zoom, setZoom] = React.useState(100)
+  React.useEffect(() => {
+    // 切換檔案時重設 zoom 為 100%
+    setZoom(100)
+  }, [activeIndex])
+
+  // Renderer capabilities(mount 時 renderer emit)
+  const [capabilities, setCapabilities] = React.useState<FileRendererCapabilities>({
+    zoom: false,
+  })
+
+  const file = files[activeIndex]
+  const Renderer = file ? resolveRenderer(file) : null
+
+  // Fit-to-* 目前當作把 zoom 重設為 100%(MVP;未來 renderer 可 own fit 實作)
+  const handleFit = React.useCallback((_fit: ZoomFit) => {
+    setZoom(100)
+  }, [])
+
+  // Download handler
+  const handleDownload = React.useCallback(() => {
+    if (!file) return
+    if (onDownload) {
+      onDownload(file)
+      return
+    }
+    // 預設:anchor download(同源檔案有效;跨域由 consumer 提供 onDownload)
+    const a = document.createElement('a')
+    a.href = file.url
+    a.download = file.name
+    a.target = '_blank'
+    a.rel = 'noopener'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+  }, [file, onDownload])
+
+  // Keyboard shortcuts(focus 在 input / textarea 時不觸發)
+  React.useEffect(() => {
+    if (!open) return
+    const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null
+      const tag = target?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || target?.isContentEditable) return
+
+      if (e.key === 'ArrowLeft' && files.length > 1) {
+        e.preventDefault()
+        setIndex(activeIndex - 1)
+      } else if (e.key === 'ArrowRight' && files.length > 1) {
+        e.preventDefault()
+        setIndex(activeIndex + 1)
+      } else if (e.key === '+' || e.key === '=') {
+        if (capabilities.zoom) {
+          e.preventDefault()
+          setZoom((z) => nextZoomIn(z))
+        }
+      } else if (e.key === '-') {
+        if (capabilities.zoom) {
+          e.preventDefault()
+          setZoom((z) => nextZoomOut(z))
+        }
+      } else if (e.key === '0') {
+        if (capabilities.zoom) {
+          e.preventDefault()
+          setZoom(100)
+        }
+      } else if (e.key === 'f' || e.key === 'F') {
+        if (capabilities.zoom) {
+          e.preventDefault()
+          handleFit('fit-page')
+        }
+      } else if (e.key === 'i' || e.key === 'I') {
+        e.preventDefault()
+        setInfoOpen((o) => !o)
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [open, activeIndex, files.length, setIndex, capabilities.zoom, handleFit])
+
+  if (!file || !Renderer) {
+    // files 為空或 index 超界 — 不渲染
+    return null
+  }
+
+  const showFilmstripResolved = showFilmstrip && files.length > 1
+  const showArrows = files.length > 1
+
+  return (
+    <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
+      <DialogPrimitive.Portal>
+        {/* Overlay — FileViewer 固定深色氛圍,與 Dialog 共用 bg-overlay */}
+        <DialogPrimitive.Overlay
+          className={cn(
+            'fixed inset-0 z-50 bg-overlay',
+            'data-[state=open]:animate-in data-[state=closed]:animate-out',
+            'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+          )}
+        />
+        <DialogPrimitive.Content
+          className={cn(
+            // Edge-to-edge fullscreen,無 inset / 無 radius(與一般 Dialog 差別的所在)
+            'fixed inset-0 z-50 outline-none',
+            'data-[state=open]:animate-in data-[state=closed]:animate-out',
+            'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+          )}
+          // 避免 Radix 自動把焦點送進 Content 的第一個 tabbable —— 我們要留給 viewport
+          onOpenAutoFocus={(e) => e.preventDefault()}
+        >
+          {/* 鎖 dark subtree — viewer chrome 永遠暗色氛圍(對齊 Tooltip pattern)*/}
+          <div
+            data-theme="dark"
+            className="w-full h-full flex flex-col bg-canvas text-foreground"
+          >
+            {/* Accessible title — 視覺隱藏但 screen reader 讀得到 */}
+            <DialogPrimitive.Title className="sr-only">
+              檔案檢視器:{file.name}
+            </DialogPrimitive.Title>
+
+            <Toolbar
+              file={file}
+              capabilities={capabilities}
+              zoom={zoom}
+              onZoomChange={setZoom}
+              onFit={handleFit}
+              infoOpen={infoOpen}
+              onInfoToggle={() => setInfoOpen((o) => !o)}
+              onDownload={handleDownload}
+              allowDownload={allowDownload}
+              onClose={() => onOpenChange(false)}
+            />
+
+            {/* 主區:Viewport + 可選 InfoPanel(右側) */}
+            <div className="flex-1 min-h-0 flex">
+              <div className="relative flex-1 min-w-0 bg-canvas">
+                {showArrows && activeIndex > 0 && (
+                  <div className="absolute left-[var(--layout-space-loose)] top-1/2 -translate-y-1/2 z-10">
+                    <Button
+                      variant="text"
+                      size="md"
+                      iconOnly
+                      startIcon={ChevronLeft}
+                      aria-label="上一個檔案"
+                      onClick={() => setIndex(activeIndex - 1)}
+                    />
+                  </div>
+                )}
+                <div className="w-full h-full">
+                  <Renderer.component
+                    file={file}
+                    zoom={zoom}
+                    onZoomChange={setZoom}
+                    onCapabilitiesChange={setCapabilities}
+                  />
+                </div>
+                {showArrows && activeIndex < files.length - 1 && (
+                  <div className="absolute right-[var(--layout-space-loose)] top-1/2 -translate-y-1/2 z-10">
+                    <Button
+                      variant="text"
+                      size="md"
+                      iconOnly
+                      startIcon={ChevronRight}
+                      aria-label="下一個檔案"
+                      onClick={() => setIndex(activeIndex + 1)}
+                    />
+                  </div>
+                )}
+              </div>
+              {infoOpen && (
+                <InfoPanel
+                  file={file}
+                  readOnly={readOnly}
+                  onDescriptionChange={onDescriptionChange}
+                  onClose={() => setInfoOpen(false)}
+                />
+              )}
+            </div>
+
+            {showFilmstripResolved && (
+              <Filmstrip
+                files={files}
+                activeIndex={activeIndex}
+                onSelect={setIndex}
+              />
+            )}
+          </div>
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
+  )
+}
+FileViewer.displayName = 'FileViewer'
+
+export { FileViewer }
+export type { FileInfo, FileRenderer, FileRendererCapabilities, FileRendererProps } from './file-viewer-types'
