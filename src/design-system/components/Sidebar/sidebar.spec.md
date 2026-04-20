@@ -176,7 +176,7 @@ Gmail / Linear 的標準版型：上方 SidebarGroup 放扁平主導覽（Sideba
 
 | 方案 | 外部對齊 | 內部 padding 比例 | 世界級？ |
 |---|---|---|---|
-| A. 寫死 `h-12`（48px） | ✅ 跨元件同高 | ❌ lg density 下 button 36 塞 48 只剩 6px padding，擠壓 | ❌ 破功 |
+| A. 寫死 `h-12`（48px） | ✅ 跨元件同高 | ❌ lg density 下 button 撐高,chrome 固定 → padding 被擠壓到不足,比例破壞 | ❌ 破功 |
 | B. 純 padding `py-3` | ❌ 不同 header 因 content 高度不同，無法對齊 | ✅ 內部 padding 固定 | ❌ 對齊破功 |
 | C. **Density-responsive token**（本方案） | ✅ 跨元件同高（共享 token） | ✅ token 隨 density 放大，padding 比例維持 | ✅ |
 

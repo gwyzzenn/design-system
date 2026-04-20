@@ -296,9 +296,11 @@ const CarouselDots = React.forwardRef<
           onClick={() => scrollTo(i)}
           className={cn(
             'h-1.5 rounded-full transition-all',
-            'bg-white/60 hover:bg-white/80',
+            // Dots 疊在 media(image/video)之上,不是 token color 底——用 --on-emphasis 保持語義
+            // 跟其他「於飽和色底上的淺色前景」一致
+            'bg-on-emphasis/60 hover:bg-on-emphasis/80',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-            i === selectedIndex ? 'w-6 bg-white' : 'w-1.5',
+            i === selectedIndex ? 'w-6 bg-on-emphasis' : 'w-1.5',
           )}
         />
       ))}

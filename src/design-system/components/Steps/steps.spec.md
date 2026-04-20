@@ -213,7 +213,7 @@ sm 的 8px dot 太小,無法用 nested element 做 inset ring。改用 `box-shad
 
 ### 為什麼不用原本的「外圈 ring」設計
 
-原本實作用 `box-shadow: 0 0 0 3px primary` 在 indicator 外加 ring,導致兩個問題:
+原本實作在 indicator 外加一圈 primary ring,導致兩個問題:
 1. Bounding box 變大,連結線位置隨 focus 切換漂移(這是之前「連結線間距沒韻律」的根因)
 2. Filled primary circle + primary outer ring 的視覺讀成「雙圈」,用户反應「很醜」
 

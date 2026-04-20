@@ -36,7 +36,7 @@ export const PersonNameCard: Story = {
         <span className="text-caption text-fg-muted">Reviewer:</span>
         <HoverCard>
           <HoverCardTrigger asChild>
-            <button type="button" className="cursor-pointer rounded-full">
+            <button type="button" aria-label="陳麒仁 個人資訊" className="cursor-pointer rounded-full">
               <Avatar alt="陳麒仁" color="indigo" size={28} />
             </button>
           </HoverCardTrigger>
@@ -240,7 +240,7 @@ export const TriggerShowcase: Story = {
           <span className="text-footnote text-fg-muted font-mono">trigger: Avatar</span>
           <HoverCard openDelay={200} closeDelay={300}>
             <HoverCardTrigger asChild>
-              <button type="button" className="cursor-pointer rounded-full">
+              <button type="button" aria-label="陳麒仁 個人資訊" className="cursor-pointer rounded-full">
                 <Avatar alt="陳麒仁" color="indigo" size={32} />
               </button>
             </HoverCardTrigger>

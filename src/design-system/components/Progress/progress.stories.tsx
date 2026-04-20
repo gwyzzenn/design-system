@@ -16,7 +16,7 @@ const meta: Meta<typeof Progress> = {
   },
   argTypes: {
     value: { control: { type: 'range', min: 0, max: 100, step: 1 } },
-    status: { control: 'select', options: ['primary', 'success', 'error'] },
+    status: { control: 'select', options: ['inProgress', 'success', 'error'] },
     size: { control: 'select', options: ['sm', 'md', 'lg'] },
     affix: { control: 'select', options: [undefined, 'value', 'status-icon'] },
   },
@@ -50,7 +50,7 @@ export const FileUpload: Story = {
     <div className="flex flex-col gap-4 w-[460px]">
       <SectionTitle>檔案上傳列表(Google Drive / Dropbox 模式)</SectionTitle>
       <SectionDesc>
-        每個檔案一條 Progress。上傳中用 primary + 百分比;完成變 success + 勾;失敗變 error + 叉。不再另加一條「總進度」bar。
+        每個檔案一條 Progress。上傳中用 inProgress + 百分比;完成變 success + 勾;失敗變 error + 叉。不再另加一條「總進度」bar。
       </SectionDesc>
       <div className="flex flex-col gap-3 border border-border rounded-md p-4 bg-surface">
         {/* Uploading */}

@@ -10,10 +10,11 @@
 | `components/` | 每個元件一個 PascalCase folder(內含 tsx / spec / stories) | 平坦 `.md` 檔、cross-cutting rule | `components/README.md` |
 | `patterns/` | runtime UI 佈局 / 互動 primitive(.tsx + .spec.md),多元件 consume | 文件撰寫指南、governance meta rule、taxonomy | `patterns/README.md` |
 | `hooks/` | React hooks(跨 DS 元件共用的 `use-*.ts`) | Claude Code hooks(那屬 `.claude/hooks/`) | N/A |
+| `stories-helpers/` | Storybook 共用 helper(非 runtime,僅 `.stories.tsx` / `.anatomy.stories.tsx` 消費的 anatomy 排版 util 等) | 任何 runtime consume(應用 / 元件 / pattern code 不得 import);runtime primitive 應住 `patterns/` | N/A |
 
 ## 本層級(`src/design-system/` 根)只收 `README.md`
 
-所有 DS 內容必屬於某個子 dir(tokens / components / patterns / hooks)。即使跨 pattern 的 taxonomy(如 4-Family Model)也住在最相關的 pattern topic 資料夾內(`patterns/element-anatomy/element-anatomy.spec.md`)—— 這樣 folder = topic home,不需要頂層 flat 檔案。
+所有 DS 內容必屬於某個子 dir(tokens / components / patterns / hooks / stories-helpers)。即使跨 pattern 的 taxonomy(如 4-Family Model)也住在最相關的 pattern topic 資料夾內(`patterns/element-anatomy/element-anatomy.spec.md`)—— 這樣 folder = topic home,不需要頂層 flat 檔案。
 
 若未來真有 scope 橫跨 3+ 子 dir 且不屬任一 topic 的純 meta doc,才重新評估是否加頂層檔(屆時更新本 charter)。
 

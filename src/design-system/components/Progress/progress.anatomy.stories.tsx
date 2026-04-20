@@ -308,7 +308,7 @@ export const ColorMatrix = {
       <H3>Status × Token 對照</H3>
       <Desc>
         橫向看同 status 的 track / fill / affix 色塊;縱向比較三種 status 的 token 差異。
-        primary 的 affix-icon 無顯示(primary 不帶終態 icon)。
+        inProgress 的 affix-icon 無顯示(inProgress 不帶終態 icon)。
       </Desc>
       <div className="overflow-x-auto">
         <table className="border-collapse text-caption">
@@ -457,13 +457,13 @@ export const AffixBehavior = {
           <p className="text-footnote text-fg-muted">
             success → <CircleCheck size={14} className="inline text-success" /> CircleCheck(16px, text-success);
             error → <XCircle size={14} className="inline text-error" /> XCircle(16px, text-error);
-            primary → 無 icon(primary 非終態)。
+            inProgress → 無 icon(inProgress 非終態)。
           </p>
           <div className="flex flex-col gap-2 w-[360px]">
             <Progress value={100} status="success" size="md" affix="status-icon" />
             <Progress value={72} status="error" size="md" affix="status-icon" />
             <Progress value={50} status="inProgress" size="md" affix="status-icon" />
-            <span className="text-footnote text-fg-muted">↑ primary 傳 status-icon 時不渲染 icon(仍保留 wrapper gap)</span>
+            <span className="text-footnote text-fg-muted">↑ inProgress 傳 status-icon 時不渲染 icon(仍保留 wrapper gap)</span>
           </div>
         </div>
 

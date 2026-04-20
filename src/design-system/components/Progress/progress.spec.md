@@ -164,7 +164,7 @@ Radix `Progress.Root` 自動提供：
 
 ## 為何無 StateBehavior
 
-Progress 是**純視覺百分比指示**,本身**無互動狀態**(見「狀態與邊界」段:無 disabled,不接受互動事件)。唯一的「行為」是 value 變化時 fill 寬度動畫——那是 controlled prop 的資料更新,不是 UI state 切換。color variant(primary / success / error)依 value 狀態切換的行為已在 `ColorMatrix` + 元件特有 `AffixBehavior`(percent / icon-on-complete 驅動邏輯)覆蓋。
+Progress 是**純視覺百分比指示**,本身**無互動狀態**(見「狀態與邊界」段:無 disabled,不接受互動事件)。唯一的「行為」是 value 變化時 fill 寬度動畫——那是 controlled prop 的資料更新,不是 UI state 切換。color variant(inProgress / success / error)依 value 狀態切換的行為已在 `ColorMatrix` + 元件特有 `AffixBehavior`(percent / icon-on-complete 驅動邏輯)覆蓋。
 
 對應 anatomy story:保留 `Overview` + `Inspector`(value 試玩) + `ColorMatrix` + `SizeMatrix` + 元件特有 `AffixBehavior`。
 

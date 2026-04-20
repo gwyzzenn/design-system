@@ -52,6 +52,21 @@ RadioGroup 的互動狀態(default / hover / checked / disabled / focus)**與 Ch
 
 ---
 
+## Mode / disabled / readonly / 驗證 / a11y
+
+繼承 Field family,詳見 `../Field/field-controls.spec.md` + `../Field/form-validation.spec.md`。
+
+---
+
+## 禁止事項
+
+- ❌ 單選卻用 Checkbox 群組模擬——selection model 不對,keyboard navigation 與 a11y 角色錯誤
+- ❌ RadioGroup 沒有 group label(`<Field>` 的 label 或 `aria-labelledby`)——螢幕閱讀器無法念出這是哪組選項
+- ❌ 巢狀 RadioGroup(radio 內包 radio)——互斥模型只適用單層,需要階層選擇改用樹狀 Select
+- ❌ 選項數量超過 5 或空間受限時硬用 RadioGroup,不改 Select(見「何時不用」)
+
+---
+
 ## 相關
 
 - `../Checkbox/checkbox.spec.md` — 共用規則（SelectionItem 佈局 / clamp 政策 / 視覺語言）

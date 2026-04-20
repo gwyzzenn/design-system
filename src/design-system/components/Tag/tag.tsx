@@ -58,14 +58,14 @@ const tagVariants = cva(
 // neutral 用 neutral-9 + --inverse-fg（light=白字, dark=深字，自動反轉）
 const SOLID_CLASSES: Record<string, string> = {
   neutral:   'bg-[var(--color-neutral-9)] text-inverse-fg',
-  blue:      'bg-[var(--color-blue-6)] text-white',
-  red:       'bg-[var(--color-deep-orange-6)] text-white',
-  green:     'bg-[var(--color-green-6)] text-white',
+  blue:      'bg-[var(--color-blue-6)] text-on-emphasis',
+  red:       'bg-[var(--color-deep-orange-6)] text-on-emphasis',
+  green:     'bg-[var(--color-green-6)] text-on-emphasis',
   yellow:    'bg-[var(--color-yellow-6)] text-[var(--warning-foreground)]',
-  turquoise: 'bg-[var(--color-turquoise-6)] text-white',
-  purple:    'bg-[var(--color-purple-6)] text-white',
-  magenta:   'bg-[var(--color-magenta-6)] text-white',
-  indigo:    'bg-[var(--color-indigo-6)] text-white',
+  turquoise: 'bg-[var(--color-turquoise-6)] text-on-emphasis',
+  purple:    'bg-[var(--color-purple-6)] text-on-emphasis',
+  magenta:   'bg-[var(--color-magenta-6)] text-on-emphasis',
+  indigo:    'bg-[var(--color-indigo-6)] text-on-emphasis',
 }
 
 export interface TagProps

@@ -67,7 +67,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary: [
-          'bg-primary text-white',
+          'bg-primary text-on-emphasis',
           'hover:bg-primary-hover',
           'active:bg-primary-active',
           'disabled:bg-disabled disabled:text-fg-disabled disabled:border-transparent',
@@ -128,7 +128,7 @@ const buttonVariants = cva(
         variant: 'primary',
         danger: true,
         class: [
-          'bg-error text-white border-transparent',
+          'bg-error text-on-emphasis border-transparent',
           'hover:bg-error-hover',
           'active:bg-error-active',
         ],

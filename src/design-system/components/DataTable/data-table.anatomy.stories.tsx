@@ -397,3 +397,41 @@ export const EmptyState: Story = {
     )
   },
 }
+
+export const BorderedProp: Story = {
+  name: 'bordered prop(預設 true)',
+  render: () => {
+    const col = createColumnHelper<Product>()
+    const columns = [
+      col.accessor('name', { header: 'Product', size: 200, meta: { type: 'string' } }),
+      col.accessor('category', { header: 'Category', size: 140, meta: { type: 'select', options: CATEGORY_OPTIONS } }),
+      col.accessor('price', { header: 'Price', size: 120, meta: { type: 'currency', prefix: '$' } }),
+    ]
+    return (
+      <div className="flex flex-col gap-8">
+        <div>
+          <H3>bordered(boolean,預設 true)</H3>
+          <Desc>多數場景(虛擬捲動 / frozen column / inline edit)保留預設外框;嵌在已有外框的 Card / Section 內且資料量極少無溢出時,才傳 `bordered={false}` 讓最外層視覺收尾,避免雙重外框。</Desc>
+          <div className="overflow-x-auto mb-4">
+            <table className="text-caption border-collapse">
+              <thead><tr><Th>Prop</Th><Th>型別</Th><Th>預設</Th><Th>用途</Th></tr></thead>
+              <tbody>
+                <tr><Td mono>bordered</Td><Td mono>boolean</Td><Td mono>true</Td><Td>外框開關。預設有框(標記內容可能溢出);`false` 用於嵌套在已帶框容器內的展示場景</Td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div className="flex flex-col gap-6">
+            <div>
+              <div className="text-caption text-fg-muted mb-2 font-mono">bordered=&#123;true&#125;(預設)</div>
+              <DataTable columns={columns} data={SAMPLE_DATA.slice(0, 3)} height="auto" />
+            </div>
+            <div>
+              <div className="text-caption text-fg-muted mb-2 font-mono">bordered=&#123;false&#125;</div>
+              <DataTable bordered={false} columns={columns} data={SAMPLE_DATA.slice(0, 3)} height="auto" />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  },
+}

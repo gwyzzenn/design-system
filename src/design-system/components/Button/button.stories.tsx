@@ -119,9 +119,9 @@ export const Danger: Story = {
   render: () => (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap gap-3">
-        <Button variant="primary" danger>Primary danger</Button>
-        <Button variant="secondary" danger>Secondary danger</Button>
-        <Button variant="text" danger>Text danger</Button>
+        <Button variant="primary" danger>刪除專案</Button>
+        <Button variant="secondary" danger>移除成員</Button>
+        <Button variant="text" danger>撤銷授權</Button>
       </div>
       <div className="flex flex-wrap gap-3">
         <Button variant="primary" danger size="sm" iconOnly startIcon={Trash2} aria-label="刪除" />
@@ -244,9 +244,9 @@ export const Disabled: Story = {
       <div>
         <p className="mb-2 text-caption text-fg-muted">danger</p>
         <div className="flex flex-wrap gap-3">
-          <Button variant="primary" danger disabled>Primary danger</Button>
-          <Button variant="secondary" danger disabled>Secondary danger</Button>
-          <Button variant="text" danger disabled>Text danger</Button>
+          <Button variant="primary" danger disabled>刪除專案</Button>
+          <Button variant="secondary" danger disabled>移除成員</Button>
+          <Button variant="text" danger disabled>撤銷授權</Button>
         </div>
       </div>
       <div>

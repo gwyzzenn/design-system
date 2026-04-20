@@ -138,10 +138,10 @@ export const Interactive = {
     <div className="flex flex-col gap-4">
       <span className="text-caption text-fg-muted">點按鈕觸發 Toast</span>
       <div className="flex flex-wrap gap-2">
-        <Button variant="secondary" onClick={() => toast({ title: '檔案已複製到剪貼簿', action: { label: '復原', onClick: () => {} } })}>Neutral</Button>
-        <Button variant="secondary" onClick={() => toast({ variant: 'success', title: '專案已儲存', description: '變更已同步到所有成員', action: { label: '查看', onClick: () => {} } })}>Success</Button>
-        <Button variant="secondary" onClick={() => toast({ variant: 'warning', title: '即將到期的訂閱', description: '7 天後將停用,請前往結算頁續訂', action: { label: '續訂', onClick: () => {} } })}>Warning</Button>
-        <Button variant="secondary" onClick={() => toast({ variant: 'error', title: '無法連線伺服器', description: '請檢查網路後再試一次', action: { label: '重試', onClick: () => {} } })}>Error</Button>
+        <Button variant="secondary" onClick={() => toast({ title: '檔案已複製到剪貼簿', action: { label: '復原', onClick: () => {} } })}>複製檔案</Button>
+        <Button variant="secondary" onClick={() => toast({ variant: 'success', title: '專案已儲存', description: '變更已同步到所有成員', action: { label: '查看', onClick: () => {} } })}>儲存專案</Button>
+        <Button variant="secondary" onClick={() => toast({ variant: 'warning', title: '即將到期的訂閱', description: '7 天後將停用,請前往結算頁續訂', action: { label: '續訂', onClick: () => {} } })}>訂閱提醒</Button>
+        <Button variant="secondary" onClick={() => toast({ variant: 'error', title: '無法連線伺服器', description: '請檢查網路後再試一次', action: { label: '重試', onClick: () => {} } })}>斷線示範</Button>
       </div>
       <Toaster />
     </div>

@@ -54,6 +54,12 @@ Sheet 是**側邊滑入 modal 容器**,關鍵決策維度是 `side`(top / right 
 
 ---
 
+## 空值 / 驗證 / a11y
+
+Sheet 為容器,內容由 consumer 決定;focus trap + Escape close + `aria-labelledby` 由 Radix Dialog primitive 提供。
+
+---
+
 ## 相關
 
 - `../Dialog/dialog.spec.md` — 居中 modal 的對應元件（共用 Radix Dialog base）

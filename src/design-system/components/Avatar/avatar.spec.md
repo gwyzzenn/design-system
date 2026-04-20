@@ -181,3 +181,9 @@ Avatar 是**身份視覺 primitive**(顯示人 / 組織 / 物件的代表視覺)
 - hover 行為(彈 NameCard)由 `hoverCard` prop 委託給 HoverCard primitive 處理,屬 HoverCard 的 state 不屬 Avatar。
 
 對應 anatomy story:保留 `Overview` + `Inspector` + `ColorMatrix` + `SizeMatrix`。
+
+---
+
+## 空值 / 驗證
+
+N/A(非互動 primitive,consumer 決定何時渲染;`src` 為 null / 載入失敗時 fallback 到 initials)。

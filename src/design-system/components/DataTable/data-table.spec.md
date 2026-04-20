@@ -138,6 +138,8 @@ Row actions 欄本質上是 frozen right column，左邊界也使用 full-height
 
 不加框時，最後一行保留底線自然收尾。加框時最後一行底線去掉，避免與外框 double border。
 
+**Prop**：`bordered`（boolean，預設 `true`）。多數場景（有高度約束的虛擬捲動 / frozen column / inline edit 表）都應保持預設；只在**資料量極少、無溢出、嵌在 Card / Section 內已有外框**的展示型場景傳 `bordered={false}` 讓最外層視覺收尾。
+
 ### 七、Column Type
 
 **Column type 是資料行為的預設合約。** 指定 type 就自動獲得該類型的對齊、渲染、排序、篩選行為，不需要逐一配置。

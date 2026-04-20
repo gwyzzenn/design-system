@@ -107,20 +107,20 @@ export const RingIsFocusMarker: Story = {
         <Example label="Value 指向 completed step → 藍底 ✓ + 藍 ring(可同時成立)">
           <Steps value="a" completedValues={['a']} linear={false}>
             <StepItem value="a">
-              <StepLabel>Completed + focused</StepLabel>
+              <StepLabel>送貨地址</StepLabel>
             </StepItem>
             <StepItem value="b">
-              <StepLabel>Upcoming</StepLabel>
+              <StepLabel>確認送出</StepLabel>
             </StepItem>
           </Steps>
         </Example>
         <Example label="Value 指向 error step → 紅底 ✕ + 紅 ring">
           <Steps value="a" errorValues={['a']} linear={false}>
             <StepItem value="a">
-              <StepLabel>Error + focused</StepLabel>
+              <StepLabel>付款</StepLabel>
             </StepItem>
             <StepItem value="b">
-              <StepLabel>Upcoming</StepLabel>
+              <StepLabel>確認送出</StepLabel>
             </StepItem>
           </Steps>
         </Example>

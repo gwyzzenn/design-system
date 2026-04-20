@@ -82,7 +82,7 @@ Progress bar 底部對齊 avatar 底部。justify-between 自動分配 gap（有
 | 屬性 | 值 | 依據 |
 |---|---|---|
 | 消費元件 | `<Progress status={...} value={...} size={...} />` | 本 DS Progress SSOT |
-| status 映射 | `uploading → primary` / `completed → success` / `error → error` | Progress `status` 原生支援 |
+| status 映射 | `uploading → inProgress` / `completed → success` / `error → error` | Progress `status` 原生支援 |
 | size 映射 | `rich → md(4px)` / `compact → sm(2px)` | 與原視覺一致 |
 | value | `status === 'completed' ? 100 : progress` | completed 永遠 100% |
 
@@ -116,7 +116,7 @@ Consumer 自行組合：
 - `mode="rich"` → `var(--field-height-sm)` (density-variable:28 md / 32 lg,與 Button sm 同)
 - `mode="compact"` → `var(--field-height-xs)` (24 固定,與 Button xs 同)
 
-Passive status icon(16 px)置中於 button-sized 容器,hover 時 active Button 填滿同一容器。這讓 flex `gap-2`(8 px)測量的是**兩個同尺寸 button slot 之間的真 8 px gap**,不被 hover bg overflow 吃掉(原本用 `ItemInlineActionButton` 16 px container + 24 px hover bg overflow,實際視覺 gap 只剩 4 px 違反 8 px 規格)。
+Passive status icon 置中於 button-sized 容器,hover 時 active Button 填滿同一容器。這讓 flex gap token 測量的是**兩個同尺寸 button slot 之間的真實 gap**,不被 hover bg overflow 吃掉——icon slot 尺寸 = 同 size Button slot,gap token 才能如實呈現;歷史 bug 細節見 CLAUDE.md `# 失敗記憶索引`。
 
 世界級 DS 的幾何鐵律:**同一 flex 列的互動元素必須有統一 box 尺寸**,gap token 才能如實呈現。
 

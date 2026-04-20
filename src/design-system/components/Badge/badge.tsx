@@ -22,8 +22,8 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        critical: 'bg-notification text-white',
-        high: 'bg-info text-white',
+        critical: 'bg-notification text-on-emphasis',
+        high: 'bg-info text-on-emphasis',
         medium: 'bg-info-subtle text-info-text',
         low: 'bg-secondary text-fg-muted',
       },

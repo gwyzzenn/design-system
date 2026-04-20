@@ -90,6 +90,12 @@ HoverCard 是**純行為 primitive**(只提供 hover 觸發邏輯 + 定位 + 動
 
 ---
 
+## 空值 / 驗證 / loading / a11y
+
+純行為 primitive,無獨立 empty / validation / loading;a11y 由 Radix HoverCard 提供(open on hover / focus,Escape 關)。
+
+---
+
 ## 相關
 
 - `../Tooltip/tooltip.spec.md` — 純文字 hover 提示（HoverCard vs Tooltip 的分界 SSOT 在本 spec）

@@ -10,9 +10,24 @@ const meta: Meta = {
 export default meta
 
 const ALL: NoticeVariant[] = ['neutral', 'info', 'warning', 'error', 'success']
-const L: Record<string, string> = { neutral: 'Neutral', info: 'Info', warning: 'Warning', error: 'Error', success: 'Success' }
+// 真實情境的 title(「人」test:遮 variant 標籤也看得懂)
+const L: Record<string, string> = {
+  neutral: '已切換至離線模式',
+  info: 'v2.4 已發佈',
+  warning: '免費額度剩 3 天',
+  error: '付款失敗',
+  success: '部署完成',
+}
+// description 用簡潔的輔助資訊(非 variant 名稱)
+const D: Record<string, string> = {
+  neutral: '變更會在重新連線後同步',
+  info: '查看更新日誌了解新功能',
+  warning: '升級方案以避免服務中斷',
+  error: '請檢查卡號或改用其他付款方式',
+  success: 'v2.4.1 已上線到 production',
+}
 
-const actionBtn = <Button variant="tertiary" size="xs">Action</Button>
+const actionBtn = <Button variant="tertiary" size="xs">查看詳情</Button>
 
 export const SubtleSingleLine = {
   name: 'Subtle 單行',
@@ -36,7 +51,7 @@ export const SubtleWithDescription = {
   name: 'Subtle + Description',
   render: () => (
     <div className="flex flex-col gap-3 max-w-lg">
-      {ALL.map((v) => <Alert key={v} variant={v} appearance="subtle" title={L[v]} description={L[v]} endContent={actionBtn} />)}
+      {ALL.map((v) => <Alert key={v} variant={v} appearance="subtle" title={L[v]} description={D[v]} endContent={actionBtn} />)}
     </div>
   ),
 }
@@ -45,7 +60,7 @@ export const SolidWithDescription = {
   name: 'Solid + Description',
   render: () => (
     <div className="flex flex-col gap-3 max-w-lg">
-      {ALL.map((v) => <Alert key={v} variant={v} appearance="solid" title={L[v]} description={L[v]} endContent={actionBtn} />)}
+      {ALL.map((v) => <Alert key={v} variant={v} appearance="solid" title={L[v]} description={D[v]} endContent={actionBtn} />)}
     </div>
   ),
 }
@@ -62,7 +77,7 @@ export const Fixed = {
           <div className="px-4 py-2 bg-surface border-b border-divider">
             <span className="text-body font-medium">專案設定</span>
           </div>
-          {ALL.map((v) => <Alert key={v} variant={v} appearance="subtle" placement="fixed" title={`${L[v]} — 全域警告`} />)}
+          {ALL.map((v) => <Alert key={v} variant={v} appearance="subtle" placement="fixed" title={L[v]} />)}
           <div className="p-4 text-fg-muted text-caption">調整此專案的權限與通知偏好。變更會立刻套用到所有成員。</div>
         </div>
       </div>
@@ -73,7 +88,7 @@ export const Fixed = {
           <div className="px-4 py-2 bg-surface border-b border-divider">
             <span className="text-body font-medium">專案設定</span>
           </div>
-          {ALL.map((v) => <Alert key={v} variant={v} appearance="solid" placement="fixed" title={`${L[v]} — 全域警告`} />)}
+          {ALL.map((v) => <Alert key={v} variant={v} appearance="solid" placement="fixed" title={L[v]} />)}
           <div className="p-4 text-fg-muted text-caption">調整此專案的權限與通知偏好。變更會立刻套用到所有成員。</div>
         </div>
       </div>
