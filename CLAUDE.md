@@ -45,7 +45,7 @@
 | D3 | **元件效能** | render 次數 / memo / bundle size / unnecessary re-render | `/performance-audit`(新) |
 | D4 | **UX 行為** | keyboard nav / focus trap / a11y / animation timing / interaction canonical | `/ux-audit`(新) |
 | D5 | **視覺品質** | 對齊 / 韻律 / 對比 / 邊距 / 不貼邊 / typography hierarchy / 世界級對照 | `/visual-audit`(Layer A mechanical + Layer B AI) |
-| D6 | **設計原則自檢** | 實作 vs 原則衝突 → 改實作;**原則本身有問題 → 提議討論,不自改** | 本 CLAUDE.md + skill 的 report 區塊 |
+| D6 | **設計原則自檢**(4 子維)| D6a 合理性 / D6b 一致性 / D6c 無矛盾 / D6d 完整性 — 動 canonical substantive meaning 的提議不自改 | SSOT:`.claude/skills/design-system-audit/references/principle-audit-protocol.md` |
 
 ## 2 模式
 
@@ -79,20 +79,107 @@
 `/design-system-audit` / `/visual-audit` 的 consistency 類 phase **一律 Phase 0 = 全掃 → Phase 1+ = 判 → Phase F = 報告**。無例外。
 
 
+# 自我升級機制(Claude Code 最佳實務:知錯能改,不斷改善)
+
+本 DS 的治理系統設計為**活文件**,每次 audit / commit / user 糾正都有機制回填到 canonical home,讓出錯率隨時間**降低**而非累積。
+
+## 4 個 feedback loop
+
+### 1. Audit false positive 回填
+每次 audit 的 sub-agent 回報 finding 時,若 main agent 驗證為 FP(通常因 scope default / spec rationale / Radix 內建)→ **必回填**到 `.claude/skills/design-system-audit/references/principle-audit-protocol.md` 的「常見 FP 記憶」節 + 視情況 `audit-prompts.md`。
+
+下次 sub-agent 讀 prompt → 看到 FP 記憶 → 同類不再誤報。
+
+### 2. 新 canonical discovery 回填
+Audit 發現新的 meta-pattern(例:2026-04-21 Inline Action icon colored host 分兩支)→ 提議 + user sign-off → 寫到對應 `pattern.spec.md` + 視情況 `# Meta-Pattern 預警` 加新條目。
+
+Meta-pattern 長大 = 未來同類 bug 被預警規則吸收,不再靠 case-by-case 修。
+
+### 3. User 糾正回填(critical — 知錯能改)
+User 糾正 AI 的判斷 → AI **必**把糾正內容寫到 `memory/` 或 CLAUDE.md feedback anchor:
+- 短期(session 內):memory `feedback_*.md`
+- 長期(影響所有未來 session):CLAUDE.md 的 Mindset / Meta-Pattern / 具體 rule
+
+判斷 home:
+- 「這個 user 的個人偏好」 → memory
+- 「這是 DS 本質規則」 → CLAUDE.md / spec
+- 「這是 audit skill 的改進」 → audit-prompts / principle-audit-protocol
+
+**本 session 2026-04-21 例**:
+- User 抓到「applicable-where-meaningful 是省工 policy」→ revert anatomy-standard + 記入 memory project_world_class_sweep
+- User 抓到「audit 沒 scan 矛盾」→ 新建 principle-audit-protocol.md + 更新 D6 定義
+
+### 4. Canonical drift 自動回填
+Spec 跟 tsx 不同步(drift) → AUTO 修讓 spec 對齊 tsx(tsx 是 source of truth)+ commit 紀錄 drift 類型供未來分析。
+
+## 每個 audit skill Phase F 強制 step
+
+所有 audit skill 的 final report(Phase F / Phase 4)**強制**包含 "Self-improvement capture" section:
+
+```markdown
+## Self-improvement capture
+- 新發現 FP pattern: {描述 + 回填位置} OR "無新 FP"
+- 新確立 meta-pattern: {描述 + 提議位置} OR "無新 pattern"
+- 修完的矛盾 / 糾正: {list + 回填位置} OR "無糾正"
+```
+
+**無 learning 的 audit 要寫 "無新 pattern"**(不是省略),確保 step 被執行。
+
+## 自我升級的衡量
+
+| 指標 | 成功訊號 |
+|------|---------|
+| FP 記憶條目數 | 長但增速遞減(早期每 audit 新增 N,成熟後幾 audit 才新增 1) |
+| Meta-Pattern 數 | M1-M6 逐漸擴充,新條目代表根因發現 |
+| User 糾正次數 | 同類糾正遞減(meta-pattern 生效) |
+| Audit 找到的真 bug 數 | 隨系統成熟遞減 |
+
+**紅旗**:FP 記憶沒長 + user 糾正不減 → 表示 feedback loop 沒跑好,check 是否有 audit skill 漏 Phase F。
+
+---
+
+
 # 稽核 vs 執行 分權 canonical
 
 **稽核 = 提議,執行 = 人 sign-off**。這是 auto-mode 下最易混淆的邊界。
 
-## 規則
+## 核心公式
 
-| 行為類型 | 誰決定 | 舉例 |
-|----------|-------|------|
-| 稽核發現 + 修**實作**讓其對齊 canonical | auto-mode 可直接動 | tsc error / spec 明文要求但 code 漂移 / cva defaultVariants 三方不同步 |
-| 稽核發現 + 提議修**設計原則 / canonical 本身** | **人 sign-off,不自改** | 「我覺得 today bar 的 bottom-[5px] 應該改 4px,spec 沒寫清楚」→ 提議,等 user 拍板 |
-| 稽核發現元件有合理偏離 canonical | **補 rationale 到 spec,非改 canonical** | Chip 固定 `h-field-sm` 偏離 default-md family → 在 spec 寫「Material 3 慣例」rationale,不改 default-md 規則 |
-| 常規開發(非稽核結論)| auto-mode 可直接動 | 新增功能 / 修 bug / refactor |
+```
+動 canonical 的 substantive meaning → STOP(提議,等 user sign-off)
+對齊 canonical / 表達統一 / 補 pointer → AUTO(直接修)
+```
 
-## 為什麼
+**判斷 substantive 的 keyword**:「canonical」「聲明」「必須」「統一規則」「SSOT」「rationale」「為什麼」「不允許」「禁止」— 觸及這些關鍵字 + 動到 meaning → 觸發 STOP。
+
+## 判斷表(auto vs STOP)
+
+### AUTO-fix(直接修)
+
+| Finding 類型 | 為何 AUTO |
+|--------------|----------|
+| spec 跟 tsx / cva 不同步(tsx 是 source of truth) | tsx 是 code canonical |
+| spec 跟 spec 用詞不一致 **但 substantive meaning 同** | 純表達統一,不改 meaning |
+| SSOT pointer 缺 / reciprocal 缺 / dead link | 架構已定 |
+| 編號 / 格式 / 排序(anatomy numbering / heading)| 無 substantive 改變 |
+| 命名對齊 **既有** canonical(術語 drift 修) | canonical 已定 |
+| 某 spec hardcoded class / px 漂移 → 用 token 名或 pointer 取代 | 表達層,不動 canonical |
+| Rule A spec prose 移除 class → 遷 anatomy | 職責分離 |
+| Scope default pointer 缺(該指 field-controls.spec.md 沒指) | SSOT 已存在 |
+
+### STOP(提議,等 user sign-off)
+
+| Finding 類型 | 為何 STOP |
+|--------------|----------|
+| spec 聲明原則世界級對照有疑 | 改 substantive |
+| 跨 spec 矛盾 **兩邊都有 rationale**(需仲裁哪個對) | 需判斷 |
+| 新增 / 刪 canonical rule | canonical scope 動 |
+| 命名決策(新 prop value / 新術語) | 命名三 test 後仍需拍板 |
+| 原則 scope 擴充 / 收緊 | governance 動 |
+| 擴 SSOT 納入新 branch(例:Inline Action「colored host」新分支 2026-04-21) | canonical 擴張 |
+| Rationale 存在但疑似過時(實作已改 rationale 沒跟) | 該撤 rationale 還是 revert 實作?需判斷 |
+
+## 為什麼這樣分
 
 - **Canonical 是共識產物**,非個人判斷。Audit 發現 canonical 有疑 → 先提議討論,讓 team / user 拍板
 - **AI 自改 canonical 會造成「每次 session 標準漂移」**,失去 DS 一致性 anchor 的意義
@@ -100,8 +187,9 @@
 
 ## 實作體現
 
-- `/visual-audit`、`/design-system-audit`、`/component-quality-gate` 的 report 都有「**提議討論(待 user sign-off)**」專區,列出牴觸 canonical 但非明顯 bug 的發現
-- Skill workflow 的 Phase F 必有 STOP 點:讓 user 判決是「修實作」還是「改原則」還是「補 rationale」
+- D6 設計原則自檢 scan 走 `.claude/skills/design-system-audit/references/principle-audit-protocol.md` 的判斷公式
+- 所有 audit skill 的 report 都有「**提議討論(待 user sign-off)**」專區
+- Skill workflow 的 Phase F 必有 STOP 點 + 「Self-improvement capture」step(回填學到的 FP / meta-pattern)
 
 
 # SSOT 消費 canonical(做 X 前必查 Y)
@@ -184,7 +272,9 @@ mindset #2 的**機械化執行清單**。寫任何視覺 code 前,對照本表*
 | **Tailwind / CSS 出怪事** | `# Tailwind 使用規則` + `# 失敗記憶索引` 技術陷阱 anchor |
 | **寫任何視覺 code 前** | `# SSOT 消費 canonical` 對照表列出查過的家 |
 | **Stakeholder-visible 產出**(新元件 / 新功能 / 新產品頁 / 比稿) | `# 稽核 6 維 + 2 模式 + 觸發 canonical` → 進階強制 |
-| **稽核結論 = 修實作 or 改原則?** | `# 稽核 vs 執行 分權 canonical`(修實作 auto,改原則等 sign-off) |
+| **稽核結論 = 修實作 or 改原則?** | `# 稽核 vs 執行 分權 canonical`(auto vs STOP 判斷公式 + 表) |
+| **跑 D6 設計原則稽核** | `.claude/skills/design-system-audit/references/principle-audit-protocol.md`(4 子維 scan + 判斷表 + FP 記憶) |
+| **User 糾正 AI 後** | `# 自我升級機制`(判斷 home + 寫到 memory / CLAUDE.md / skill reference) |
 | **spec 跟 code 結論衝突** | `# Spec 規則`(主動提出討論,不默默改) |
 | **在 classification-sensitive dir 建新檔** | **先 Read 該 dir 的 `README.md` charter**(硬規則,見 `# 規則分層`) |
 

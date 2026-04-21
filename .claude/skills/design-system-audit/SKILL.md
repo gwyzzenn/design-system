@@ -259,9 +259,19 @@ Per CLAUDE.md `## 命名必過三重 test`, when proposing ANY new naming (varia
 - 檢查:keyboard nav / focus / ARIA / animation / interaction canonical / 三態
 - P0(完全 block a11y)必修;P1 Phase 2 triage
 
-**Phase 3.5d — D6 原則自檢(進階模式)**
-- 彙整 D1-D5 中所有「提議討論」finding(牴觸 canonical 但非明顯 bug)
-- 列入 Phase 4 final report「提議討論區」,**STOP 等 user sign-off**(不自改原則)
+**Phase 3.5d — D6 原則自檢(進階模式,真 scan 非只 triage)**
+
+chain `.claude/skills/design-system-audit/references/principle-audit-protocol.md` 跑 4 子維 scan:
+- **D6a 合理性**:每條 canonical 是否有世界級對照 + rationale
+- **D6b 一致性**:同概念跨 spec 表達 / 術語是否一致(token 用法 / prop value literal / 命名三 test)
+- **D6c 無矛盾**:spec↔spec / CLAUDE.md↔spec / canonical 聲明衝突
+- **D6d 完整性**:原則有無覆蓋 applicable state / scope / edge case
+
+**判斷 auto vs STOP**:走 protocol 的判斷公式 —
+- 動 canonical **substantive meaning** → **STOP**(提議,等 user sign-off)
+- 對齊 canonical / 表達統一 / 補 pointer → **AUTO**(直接修)
+
+**scan 前必讀 protocol 的「常見 FP 記憶」節**,避免重複過去 false positive。每次找到新 FP → 回填。
 
 **為什麼在 Phase 3 後**:先讓 20 dim code audit 修完,再跑 D3-D5 — 避免 D3-D5 抓到的 finding 其實是 code audit 該抓的(例如 token leak 影響視覺)。
 
@@ -269,17 +279,32 @@ Per CLAUDE.md `## 命名必過三重 test`, when proposing ANY new naming (varia
 - 本次 audit commits 都是 spec.md 純文字修正(無 tsx / token 改動)→ D3-D5 無變,可跳 Phase 3.5
 - 高效模式:只跑 Phase 3.5a(D5),跳 3.5b / 3.5c
 
-### Phase 4 — Final report + memory update
+### Phase 4 — Final report + memory update + Self-improvement capture(強制)
 
 After all commits:
 - Update `memory/project_audit_progress.md`:
-  - Date + audit coverage (which of the 20)
+  - Date + audit coverage (which of the 20 + 6 dims)
   - Findings + resolved counts
   - Known remaining gaps (deferred P2)
 - Short final report:
   - Commits created
   - Deferred items with reasons
   - Next re-audit trigger
+
+**Self-improvement capture(強制,CLAUDE.md `# 自我升級機制`)**:
+
+```markdown
+## Self-improvement capture
+- 新發現 FP pattern: {描述 + 已回填到 principle-audit-protocol.md 或 audit-prompts.md} OR "無新 FP"
+- 新確立 meta-pattern: {描述 + 已提議加到 CLAUDE.md Meta-Pattern 預警 / patterns spec} OR "無新 pattern"
+- 修完的矛盾 / user 糾正: {list + 回填位置(memory / CLAUDE.md / spec)} OR "無糾正"
+```
+
+**規則**:
+- 無 learning 的 audit 要寫 "無新 pattern"(不省略)
+- 發現 FP → **session 結束前必回填** principle-audit-protocol.md 的「常見 FP 記憶」節
+- 發現 meta-pattern → **STOP 提議**(動 canonical substantive)
+- User 糾正 → 寫入對應 home(memory feedback / CLAUDE.md / skill reference)
 
 ---
 

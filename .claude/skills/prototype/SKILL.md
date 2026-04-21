@@ -235,7 +235,7 @@ Storybook title 慣例(不與 Components/ 衝突):
 | **D3 元件效能** | `/performance-audit` | render / memo / bundle(per candidate) |
 | **D4 UX 行為** | `/ux-audit` | keyboard / focus / ARIA / animation |
 | **D5 視覺品質** | `/visual-audit` | Layer A mechanical + Layer B AI judgement |
-| **D6 設計原則自檢** | Phase F 報告「提議討論」區 | 對齊 `# 稽核 vs 執行 分權 canonical`(不自改原則) |
+| **D6 設計原則自檢(4 子維)** | chain `principle-audit-protocol.md` scope to exploration 對 DS canonical | 合理 / 一致 / 無矛盾 / 完整;auto vs STOP 判斷公式 |
 
 #### 執行順序
 
@@ -244,7 +244,8 @@ Storybook title 慣例(不與 Components/ 衝突):
 3. Chain `/performance-audit`(D3)scope 到該 exploration
 4. Chain `/ux-audit`(D4)scope 到該 exploration
 5. Chain `/visual-audit`(D5 Layer B AI judgement)讀 `snapshots/*.png`
-6. D6 彙整 — 若發現 DS canonical 本身有疑 → 寫「提議討論」區不自改
+6. **D6 真 scan**:chain `.claude/skills/design-system-audit/references/principle-audit-protocol.md` 對 exploration code 是否牴觸 DS canonical 跑 4 子維(合理 / 一致 / 無矛盾 / 完整);依判斷公式 auto / STOP
+7. **Self-improvement capture**(強制 Phase F step):見 CLAUDE.md `# 自我升級機制`
 
 **Output**:per candidate 的 6 維 report,彙整成一份 Phase 3.5 gate report
 
