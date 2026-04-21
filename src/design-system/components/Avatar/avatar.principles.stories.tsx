@@ -144,14 +144,14 @@ export const WithBadgeOverlayRule: Story = {
       </Rule>
 
       <Rule
-        title="status + badgeCount 可同時存在(不同角、不同語義)"
-        note="右下 presence + 右上 count 是世界級 chat app(Slack / LINE / WhatsApp)的標配。兩個 overlay 管不同事,不衝突"
+        title="❌ 同一個 Avatar 上同時顯示 status + badgeCount"
+        note="對齊 Badge canonical『一個 anchor 最多 1 個 indicator』。status(presence dot)跟 badgeCount(unread Badge)**擇一使用**,不並存 — 同時出現會讓使用者無法判斷主要訊號,違反 signal crowding 原則"
       >
         <div className="flex items-center gap-4">
-          <Avatar alt="Ada" size={40} status="online" badgeCount={3} />
-          <Avatar alt="Alex" size={40} status="busy" badgeCount={99} />
+          <Avatar alt="Ada" size={40} status="online" />
+          <Avatar alt="Alex" size={40} badgeCount={3} />
         </div>
-        <Label>↑ 右下 presence + 右上 未讀(iMessage / Slack pattern)</Label>
+        <Label>↑ Ada 只顯示線上狀態;Alex 只顯示未讀數 —— 不合併</Label>
       </Rule>
     </div>
   ),

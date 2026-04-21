@@ -162,8 +162,8 @@ function TimeColumn({ values, selected, disabledSet, label, onSelect }: TimeColu
                 disabled={isDisabled}
                 onClick={() => onSelect(v)}
                 className={cn(
-                  // h-9 對齊 DatePicker date cell(36px),跨 picker 視覺一致
-                  'w-full h-9 text-body tabular-nums',
+                  // h-field-sm 對齊 DatePicker date cell(28/32px 統一 field-sm,user AR11)
+                  'w-full h-field-sm text-body tabular-nums',
                   'flex items-center justify-center',
                   'rounded-md cursor-pointer transition-colors',
                   'hover:bg-neutral-hover',
@@ -384,8 +384,10 @@ const TimePicker = React.forwardRef<HTMLButtonElement, TimePickerProps>(
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
           <div className="flex flex-col w-56">
-            {/* Column picker:三欄 flex-1 均分父層寬度,: 分隔固定寬度不吃 slot */}
-            <div className="flex items-stretch px-[var(--layout-space-tight)] pt-[var(--layout-space-tight)]">
+            {/* Column picker:三欄 flex-1 均分。**拿掉 `:` 分隔 element**(AR8 user 反饋:
+                對齊方式怪;Ant TimePicker 也不加 `:` 間隔 — 靠 column 自身間距即可)。
+                gap-1 輕微區隔 columns */}
+            <div className="flex items-stretch gap-1 px-[var(--layout-space-tight)] pt-[var(--layout-space-tight)]">
               <TimeColumn
                 label="hours"
                 values={hourValues}
@@ -393,7 +395,6 @@ const TimePicker = React.forwardRef<HTMLButtonElement, TimePickerProps>(
                 disabledSet={disabledSets.hours}
                 onSelect={(h) => commitDraft({ ...draft, h })}
               />
-              <span className="shrink-0 w-3 flex items-start justify-center pt-1 text-fg-muted text-body">:</span>
               <TimeColumn
                 label="minutes"
                 values={minuteValues}
@@ -402,16 +403,13 @@ const TimePicker = React.forwardRef<HTMLButtonElement, TimePickerProps>(
                 onSelect={(m) => commitDraft({ ...draft, m })}
               />
               {showSeconds && (
-                <>
-                  <span className="shrink-0 w-3 flex items-start justify-center pt-1 text-fg-muted text-body">:</span>
-                  <TimeColumn
-                    label="seconds"
-                    values={secondValues}
-                    selected={draft.s}
-                    disabledSet={disabledSets.seconds}
-                    onSelect={(s) => commitDraft({ ...draft, s })}
-                  />
-                </>
+                <TimeColumn
+                  label="seconds"
+                  values={secondValues}
+                  selected={draft.s}
+                  disabledSet={disabledSets.seconds}
+                  onSelect={(s) => commitDraft({ ...draft, s })}
+                />
               )}
             </div>
             {/* Footer:Now + OK */}

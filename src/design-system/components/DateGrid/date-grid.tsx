@@ -54,53 +54,56 @@ export function DateGrid({
       classNames={{
         months: 'flex flex-col sm:flex-row gap-4',
         month: 'flex flex-col gap-3',
-        // caption h-9 = 36px(同 day cell),讓 arrow buttons fill 整個 caption 高度,
-        // 從而 arrow 上緣 = calendar top padding (12px),與最後一排日期距底 (12px) 對稱
-        month_caption: 'flex items-center justify-center h-9 relative',
+        // caption **h-field-sm**(28px)統一尺寸 — 跟 day cell / nav button 一致;nav 放頂部
+        // caption + chevron 垂直置中(user AR9:prev/next 頂部,年月垂直置中)
+        month_caption: 'flex items-center justify-center h-field-sm relative',
         caption_label: 'text-body font-medium',
-        // nav absolute 覆蓋在 caption 上,inset-x-0 + justify-between + button w-9 = 箭頭中心
-        // 精準對齊 Su(第 1 欄 w-9)/ Sa(第 7 欄 w-9)中心
+        // nav absolute 覆蓋在 caption 上,inset-x-0 + justify-between + button w-field-sm = 箭頭中心對齊欄位
         nav: 'flex items-center absolute inset-x-0 inset-y-0 justify-between pointer-events-none',
         button_previous: cn(
-          'pointer-events-auto inline-flex items-center justify-center h-9 w-9 rounded-md',
+          'pointer-events-auto inline-flex items-center justify-center h-field-sm w-[var(--field-height-sm)] rounded-md',
           'text-fg-muted hover:text-foreground hover:bg-neutral-hover',
           'disabled:opacity-50 disabled:pointer-events-none',
           'transition-colors',
         ),
         button_next: cn(
-          'pointer-events-auto inline-flex items-center justify-center h-9 w-9 rounded-md',
+          'pointer-events-auto inline-flex items-center justify-center h-field-sm w-[var(--field-height-sm)] rounded-md',
           'text-fg-muted hover:text-foreground hover:bg-neutral-hover',
           'disabled:opacity-50 disabled:pointer-events-none',
           'transition-colors',
         ),
         month_grid: 'w-full border-collapse',
         weekdays: 'flex',
-        weekday: 'text-fg-muted text-caption font-normal w-9 h-8 flex items-center justify-center',
+        weekday: 'text-fg-muted text-caption font-normal w-[var(--field-height-sm)] h-field-sm flex items-center justify-center',
         week: 'flex w-full mt-1',
-        // day cell(container)— range-middle 的灰底 track 打在這層(矩形,非 button)
+        // day cell(容器)— range-middle 的灰底 track 打在這層(矩形,非 button)。
+        // day-button 尺寸統一 h-field-sm w-[var(--field-height-sm)] = 28px(md)/ 32px(lg)。
         day: cn(
-          'h-9 w-9 p-0 text-center relative',
-          // range-middle:灰底矩形 track(端點圓和中間矩形接縫形成一條灰底 bar)
-          '[&[data-range-middle]]:bg-neutral-2',
+          'h-field-sm w-[var(--field-height-sm)] p-0 text-center relative',
+          // range-middle 灰底 track:只在 day 容器(矩形)上
+          '[&[data-range-middle=true]]:bg-neutral-2',
         ),
         day_button: cn(
-          'h-9 w-9 p-0 font-normal text-body rounded-full',
-          // hover:藍圈 outline,無 fill(避免跟 selected 混淆)
+          'h-full w-full p-0 font-normal text-body rounded-full transition-colors',
+          // hover:藍圈 outline 圓形 — 只在 non-selected / non-range-middle 狀態下啟用
           'hover:ring-1 hover:ring-primary hover:bg-transparent',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-          'transition-colors',
+          // 用 react-day-picker v9 的 data-* attribute,不用 aria-selected(後者 v9 不保證附在 button)
           // selected / range_start / range_end:藍底白字圓
-          'aria-selected:bg-primary aria-selected:text-on-emphasis aria-selected:hover:bg-primary-hover aria-selected:hover:ring-0',
+          'data-[selected=true]:bg-primary data-[selected=true]:text-on-emphasis',
+          'data-[selected=true]:hover:bg-primary-hover data-[selected=true]:hover:ring-0',
+          // range-middle:button 透明(讓 day 容器的 bg-neutral-2 track 顯露);
+          // 壓制 range-middle 的 hover ring(避免 range 二次 hover 時出現方框 bug — AR12)
+          'data-[range-middle=true]:!bg-transparent data-[range-middle=true]:!text-foreground',
+          'data-[range-middle=true]:hover:ring-0 data-[range-middle=true]:hover:bg-transparent',
         ),
-        // today:文字下方藍色底線(非 ring circle)。text-inherit 讓 selected 狀態下文字色仍 white
+        // today:文字下方藍色底線(非 ring circle)
         today: 'underline decoration-primary decoration-2 underline-offset-4',
         outside: 'text-fg-disabled',
-        // disabled:灰底圓圈 + 淺灰字(對齊 user 附圖)
+        // disabled:灰底圓圈 + 淺灰字
         disabled: 'bg-neutral-2 text-fg-disabled rounded-full cursor-not-allowed',
         range_start: 'rounded-l-full',
         range_end: 'rounded-r-full',
-        // range_middle 的底層 bg 已在 day class 用 data-attr 處理;這裡讓 button 透明顯露底色
-        range_middle: 'aria-selected:bg-transparent aria-selected:text-foreground aria-selected:hover:ring-1 aria-selected:hover:ring-primary',
         hidden: 'invisible',
         ...classNames,
       }}

@@ -228,33 +228,42 @@ const ZoomInput: React.FC<ZoomInputProps> = ({ value, onChange, onFit }) => {
           />
         </DropdownMenuTrigger>
         {/* data-theme="dark":DropdownMenuContent 走 Portal 到 document body 外,
-            不繼承 FileViewer 外層 data-theme="dark",需顯式打 dark 讓選單跟 chrome 一致 */}
-        <DropdownMenuContent align="end" className="w-56" data-theme="dark">
-          {ZOOM_FIT_OPTIONS.map((opt) => (
-            <DropdownMenuItem
-              key={opt.value}
-              onSelect={() => onFit(opt.value)}
-            >
-              {opt.label}
-            </DropdownMenuItem>
-          ))}
-          <DropdownMenuSeparator />
-          {ZOOM_PRESETS.map((p) => {
-            const selected = p === value
-            return (
+            不繼承 FileViewer 外層 data-theme="dark",需顯式打 dark 讓選單跟 chrome 一致。
+            **加 bg-surface-raised 強制用 dark token**(純 data-theme attr 在 Portal 不夠,
+            Tailwind 條件 class + CSS variable 都要一起帶) */}
+        <DropdownMenuContent
+          align="end"
+          className="w-56 bg-surface-raised text-foreground border-divider"
+          data-theme="dark"
+        >
+          {/* 內層 data-theme 再覆蓋一次 — 確保 DropdownMenuItem children 都 resolve dark token */}
+          <div data-theme="dark" className="contents">
+            {ZOOM_FIT_OPTIONS.map((opt) => (
               <DropdownMenuItem
-                key={p}
-                onSelect={() => onChange(p)}
-                data-state={selected ? 'checked' : undefined}
-                className={cn(
-                  'tabular-nums',
-                  selected && 'bg-neutral-selected',
-                )}
+                key={opt.value}
+                onSelect={() => onFit(opt.value)}
               >
-                {p}%
+                {opt.label}
               </DropdownMenuItem>
-            )
-          })}
+            ))}
+            <DropdownMenuSeparator />
+            {ZOOM_PRESETS.map((p) => {
+              const selected = p === value
+              return (
+                <DropdownMenuItem
+                  key={p}
+                  onSelect={() => onChange(p)}
+                  data-state={selected ? 'checked' : undefined}
+                  className={cn(
+                    'tabular-nums',
+                    selected && 'bg-neutral-selected',
+                  )}
+                >
+                  {p}%
+                </DropdownMenuItem>
+              )
+            })}
+          </div>
         </DropdownMenuContent>
       </DropdownMenu>
 
