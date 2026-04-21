@@ -1,194 +1,84 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { useState } from 'react'
-import { zhTW } from 'date-fns/locale/zh-TW'
-import type { DateRange } from 'react-day-picker'
-import { Calendar } from './calendar'
+import { Calendar, type CalendarEvent } from './calendar'
 
-const meta: Meta = {
+const meta: Meta<typeof Calendar> = {
   title: 'Design System/Components/Calendar/展示',
-  parameters: { layout: 'padded' },
+  component: Calendar,
+  parameters: {
+    layout: 'fullscreen',
+    docs: {
+      description: {
+        component:
+          '事件檢視 canvas(月 view MVP)。對齊 Notion Calendar / Google Calendar;與 DatePicker(選日期 form control)**職責不同**,見 spec。',
+      },
+    },
+  },
 }
 export default meta
-type Story = StoryObj
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+type Story = StoryObj<typeof Calendar>
 
-const Card = ({
-  title,
-  desc,
-  children,
-}: {
-  title: string
-  desc?: string
-  children: React.ReactNode
-}) => (
-  <div className="flex flex-col gap-3 mb-10">
-    <div className="flex flex-col gap-1">
-      <h3 className="text-body font-bold text-foreground">{title}</h3>
-      {desc && <p className="text-caption text-fg-muted max-w-[640px] leading-relaxed">{desc}</p>}
+// ── 真實業務情境 ─────────────────────────────────────────────────────
+
+const now = new Date()
+const thisMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0')
+
+/**
+ * 團隊行事曆 — Notion / Google Calendar 替代品情境
+ * 本月會議 / deadline / 休假,多事件類型用 color 區隔。
+ */
+export const 團隊行事曆: Story = {
+  render: () => {
+    const events: CalendarEvent[] = [
+      { id: '1', title: 'Design review', start: `${thisMonth}-05`, end: `${thisMonth}-05`, color: 'blue' },
+      { id: '2', title: 'Sprint planning', start: `${thisMonth}-08`, end: `${thisMonth}-08`, color: 'blue' },
+      { id: '3', title: 'Project Orion deadline', start: `${thisMonth}-12`, end: `${thisMonth}-12`, color: 'red' },
+      { id: '4', title: '1:1 w/ Sarah', start: `${thisMonth}-12`, end: `${thisMonth}-12`, color: 'purple' },
+      { id: '5', title: 'Standup', start: `${thisMonth}-15`, end: `${thisMonth}-15`, color: 'blue' },
+      { id: '6', title: 'Q2 OKR review', start: `${thisMonth}-18`, end: `${thisMonth}-18`, color: 'green' },
+      { id: '7', title: 'Alex vacation', start: `${thisMonth}-20`, end: `${thisMonth}-22`, color: 'yellow', allDay: true },
+      { id: '8', title: 'Customer meeting', start: `${thisMonth}-25`, end: `${thisMonth}-25`, color: 'orange' },
+    ]
+    return (
+      <div className="h-screen p-4 bg-canvas">
+        <Calendar
+          events={events}
+          onEventClick={(e) => alert(`點了事件:${e.title}`)}
+          onDateClick={(d) => console.log('點 date cell:', d)}
+          onCreateEvent={() => alert('開啟新事件對話框')}
+        />
+      </div>
+    )
+  },
+}
+
+/**
+ * 內容發佈排程 — Blog / 影片發布月曆
+ */
+export const 內容發佈月曆: Story = {
+  render: () => {
+    const events: CalendarEvent[] = [
+      { id: 'p1', title: '週五 newsletter', start: `${thisMonth}-02`, end: `${thisMonth}-02`, color: 'blue' },
+      { id: 'p2', title: 'Blog: 設計系統 v2', start: `${thisMonth}-07`, end: `${thisMonth}-07`, color: 'purple' },
+      { id: 'p3', title: 'YouTube: tutorial ep 3', start: `${thisMonth}-10`, end: `${thisMonth}-10`, color: 'red' },
+      { id: 'p4', title: 'Podcast: interview', start: `${thisMonth}-17`, end: `${thisMonth}-17`, color: 'green' },
+      { id: 'p5', title: 'Product announcement', start: `${thisMonth}-28`, end: `${thisMonth}-28`, color: 'orange' },
+    ]
+    return (
+      <div className="h-screen p-4 bg-canvas">
+        <Calendar events={events} onCreateEvent={() => alert('排內容')} />
+      </div>
+    )
+  },
+}
+
+/**
+ * 空行事曆 — 無事件時 calendar 本身是空 canvas,不強制顯示 empty state
+ */
+export const 空行事曆: Story = {
+  render: () => (
+    <div className="h-screen p-4 bg-canvas">
+      <Calendar events={[]} onCreateEvent={() => alert('加第一個事件')} />
     </div>
-    <div className="inline-flex bg-surface-raised border border-border rounded-lg p-4 w-fit">
-      {children}
-    </div>
-  </div>
-)
-
-const formatDate = (d: Date) =>
-  new Intl.DateTimeFormat('zh-TW', { year: 'numeric', month: 'short', day: 'numeric' }).format(d)
-
-const formatRange = (from?: Date, to?: Date) => {
-  if (!from) return '尚未選擇'
-  if (!to) return `${formatDate(from)} — 選擇結束日期`
-  return `${formatDate(from)} → ${formatDate(to)}`
-}
-
-// ── Stories ──────────────────────────────────────────────────────────────────
-
-/**
- * Single mode — 生日 / 到期日等單日選擇(Google Calendar 新增事件日期、
- * Stripe 發票到期日輸入)。最常用的 mode,DatePicker 消費此模式。
- */
-export const Single: Story = {
-  name: 'Single — 生日 / 到期日',
-  render: () => {
-    const [date, setDate] = useState<Date | undefined>(new Date(1995, 5, 12))
-    return (
-      <div>
-        <Card
-          title="選擇生日"
-          desc="使用者設定頁填寫個人資料時的生日欄位,對標 Notion / Google Account。單日選擇,點新日取代舊選。"
-        >
-          <div className="flex flex-col gap-3">
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={setDate}
-              defaultMonth={date}
-              locale={zhTW}
-              autoFocus
-            />
-            <div className="text-caption text-fg-secondary px-1">
-              已選生日:<span className="font-medium text-foreground">{date ? formatDate(date) : '尚未選擇'}</span>
-            </div>
-          </div>
-        </Card>
-      </div>
-    )
-  },
-}
-
-/**
- * Multiple mode — event 報名多日(Luma RSVP 活動可參加日、
- * Notion project 可用日標記)。不連續多選。
- */
-export const Multiple: Story = {
-  name: 'Multiple — 活動可參加日期',
-  render: () => {
-    const today = new Date()
-    const [dates, setDates] = useState<Date[]>([
-      new Date(today.getFullYear(), today.getMonth(), 8),
-      new Date(today.getFullYear(), today.getMonth(), 15),
-      new Date(today.getFullYear(), today.getMonth(), 22),
-    ])
-    return (
-      <div>
-        <Card
-          title="活動可參加日期"
-          desc="參考 Luma / Calendly — 受邀者勾選所有能參加的日期,主辦方彙整後決定最終日期。不連續多選,點已選日即取消。"
-        >
-          <div className="flex flex-col gap-3">
-            <Calendar
-              mode="multiple"
-              selected={dates}
-              onSelect={(d) => setDates(d ?? [])}
-              defaultMonth={today}
-              locale={zhTW}
-            />
-            <div className="text-caption text-fg-secondary px-1">
-              已選 <span className="font-medium text-foreground">{dates.length}</span> 天:
-              <span className="ml-1 text-fg-secondary">
-                {dates.length ? dates.map(formatDate).join('、') : '尚未選擇'}
-              </span>
-            </div>
-          </div>
-        </Card>
-      </div>
-    )
-  },
-}
-
-/**
- * Range mode — 訂單日期範圍(Stripe dashboard 分析時段、
- * Vercel Analytics 報表期間、Airbnb 訂房 check-in/check-out)。
- */
-export const Range: Story = {
-  name: 'Range — 分析時段 / 訂單範圍',
-  render: () => {
-    const today = new Date()
-    const [range, setRange] = useState<DateRange | undefined>({
-      from: new Date(today.getFullYear(), today.getMonth(), 1),
-      to: new Date(today.getFullYear(), today.getMonth(), 14),
-    })
-    return (
-      <div>
-        <Card
-          title="營收報表時段"
-          desc="參考 Stripe Dashboard / Vercel Analytics — 選擇查詢的起訖日。第一次點擊設起日,第二次點擊設迄日,中間自動填滿。"
-        >
-          <div className="flex flex-col gap-3">
-            <Calendar
-              mode="range"
-              selected={range}
-              onSelect={setRange}
-              defaultMonth={range?.from ?? today}
-              locale={zhTW}
-              numberOfMonths={2}
-            />
-            <div className="text-caption text-fg-secondary px-1">
-              查詢範圍:<span className="font-medium text-foreground">{formatRange(range?.from, range?.to)}</span>
-            </div>
-          </div>
-        </Card>
-      </div>
-    )
-  },
-}
-
-/**
- * Inline widget — 直接嵌在 dashboard card 內(Linear project deadline widget、
- * Notion sidebar 行事曆小卡)。不透過 popup,頁面常駐顯示。
- */
-export const Inline: Story = {
-  name: 'Inline — Dashboard 小卡',
-  render: () => {
-    const today = new Date()
-    const [deadline, setDeadline] = useState<Date | undefined>(
-      new Date(today.getFullYear(), today.getMonth() + 1, 5),
-    )
-    return (
-      <div>
-        <Card
-          title="專案截止日 widget"
-          desc="參考 Linear / Height — 專案側欄的 deadline 選擇器,常駐顯示不需點開浮層。Calendar 是 inline primitive,不自包 Popover。"
-        >
-          <div className="flex flex-col gap-3 w-fit">
-            <div className="flex items-center justify-between px-1">
-              <span className="text-caption text-fg-muted">Project deadline</span>
-              <span className="text-caption font-medium text-foreground">
-                {deadline ? formatDate(deadline) : '未設定'}
-              </span>
-            </div>
-            <Calendar
-              mode="single"
-              selected={deadline}
-              onSelect={setDeadline}
-              defaultMonth={deadline ?? today}
-              locale={zhTW}
-              disabled={{ before: today }}
-            />
-          </div>
-        </Card>
-      </div>
-    )
-  },
+  ),
 }

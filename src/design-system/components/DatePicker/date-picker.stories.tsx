@@ -94,6 +94,32 @@ export const SizeAlignment: Story = {
   },
 }
 
+/* ── DatePicker.Range — Ant-style 區間選擇(2026-04-21 新增)── */
+export const RangePicker: Story = {
+  name: 'Range:訂房 / 訂機票情境',
+  render: () => {
+    const [range, setRange] = React.useState<[string | null, string | null]>(['2026-04-15', '2026-04-20'])
+    return (
+      <div className="flex flex-col gap-4 max-w-md">
+        <p className="text-caption text-fg-muted">
+          雙 input + 中間箭頭,整個 wrapper 是單一 trigger。點擊任一位置展開兩個月並列的 range picker。
+        </p>
+        <DatePicker.Range value={range} onChange={setRange} />
+        <p className="text-caption text-fg-muted">
+          目前值:from={range[0] ?? '(空)'} / to={range[1] ?? '(空)'}
+        </p>
+        <p className="text-caption text-fg-muted">Empty 初始狀態:</p>
+        <DatePicker.Range
+          value={[null, null]}
+          onChange={() => {}}
+          placeholder={['入住日期', '退房日期']}
+          clearable
+        />
+      </div>
+    )
+  },
+}
+
 /* ── Display（DataTable cell 用）── */
 export const Display: Story = {
   name: 'Display（cell 用）',

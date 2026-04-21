@@ -462,59 +462,22 @@ element.style.backgroundColor = 'var(--primary)'
 | 選擇 / 狀態視覺 | `patterns/element-anatomy/item-anatomy.spec.md`「選擇 / 狀態視覺規則」節 | 任何有選中態的元件 |
 | 分隔線 vs CSS border | `components/Separator/separator.spec.md` | 任何有分隔線的元件 |
 
-## 既有 DS 元件 / primitive 優先消費(建立新元件 / 寫 story / 寫 consumer code 前 mechanical 掃)
+## 既有 DS 元件 / primitive 優先消費(超級規則)
 
-**超級規則(適用所有寫 code 的 context — 元件 / stories / consumer / exploration)**:
+**`ls src/design-system/components/` + `ls src/design-system/patterns/` 看一次。任何視覺 / 行為命中既有元件 → 必消費,不 hand-craft raw HTML 繞過**。適用所有寫 code 的 context — 元件 / stories / consumer / exploration。
 
-**`ls src/design-system/components/` + `ls src/design-system/patterns/` 看一次。任何視覺 / 行為命中既有元件 → 必消費,不 hand-craft raw HTML 繞過**。
+### 自我檢查腳本(動手前跑一次)
 
-| 情境 | ❌ anti-pattern(手刻) | ✅ canonical(用 DS) |
-|------|---------------------|---------------------|
-| Select / 下拉選單 | `<Popover><PopoverContent><button className="flex items-center px-2">...</button></PopoverContent></Popover>` | `<Select options={...} />` or `<DropdownMenu><DropdownMenuItem>` |
-| Input 欄位 | `<input className="h-field-sm w-20 pl-3 pr-7 border ..." />` | `<Input size="sm" />` or `<NumberInput />` |
-| 列表項目 row(icon + text + action) | `<div className="flex items-center gap-2"><Icon/><span/><Button/></div>` | `<MenuItem>` + slot components(`<ItemIcon>` / `<ItemLabel>` / `<ItemSuffix>`) |
-| 資料表格(含 header / sorting / sticky) | `<table><thead>...</thead><tbody>...</tbody></table>` | `<DataTable columns={...} data={...} />` |
-| 檔案上傳列表 | `<div>filename</div><ProgressBar /><Paperclip />` | `<FileItem mode="compact" />` or `<FileUpload>` |
-| 表單欄位(label + control + error) | `<label>...</label><input/><span className="text-error">...</span>` | `<Field><FieldLabel>...<Input />...<FieldError/>` |
-| 全頁 / 區域 loading | `<div className="absolute inset-0 flex center"><Spinner /></div>` | `<Empty icon={<CircularProgress />} description="..." />` |
-| 確認對話框 | raw `<div className="fixed inset-0 bg-black/50">...<button>OK</button>` | `<Dialog>` + `<DialogHeader>` etc |
-| 分隔線 | `<hr className="..." />` or `<div className="h-px bg-..."/>` | `<Separator />`(必要時)or CSS border(見 separator.spec) |
-| 標籤分類 / 狀態 chip | `<span className="inline-flex px-2 py-0.5 bg-... rounded">...</span>` | `<Tag variant="..." />` or `<Badge />` |
-| 使用者頭像 | `<img className="w-8 h-8 rounded-full" />` | `<Avatar>` |
-| 浮層(彈出資訊) | `<div className="absolute bg-white shadow p-3">...</div>` | `<Popover>` / `<HoverCard>` / `<Tooltip>`(視語義選) |
-| 浮層 media + title + description + actions | 自組 `<div>` 結構 | `<Coachmark>` 或 `<Dialog>`(視是否阻斷) |
+- 新元件有 icon+text 垂直堆疊? → 用 `<Empty>`
+- 新元件有橫向 row 結構(prefix/content/suffix)? → 用 `<MenuItem>` + slot components(`<ItemIcon>` / `<ItemAvatar>` / `<ItemLabel>` / `<ItemSuffix>` / `<ItemInlineAction>`)
+- 新元件是浮層 + 有 header/body/footer? → 用 `overlay-surface` pattern
+- 新元件需捲軸且跨 OS 一致? → 用 `<ScrollArea>`;若刻意隱藏捲軸 + fade-mask → `horizontal-overflow` pattern
+- 新元件有圖像 / media 容器需要鎖定長寬比(防 CLS)? → 用 `<AspectRatio>` primitive
+- **以上都沒命中才可自建**,建完立刻回來加條目
 
-**Story 特別提醒**:**stories 也是 code**。如果 story 在 label / comment 說「DataTable cell 用法」「Table 配額」「Menu 選單」等,**要 render 真的該元件 demo,不可用 raw `<table>` / raw `<button>` 假裝**。否則 story 教壞 consumer、自己也在破壞 DS 訓練資料。
+**本規則同樣適用 stories / consumer / exploration code**。不 hand-craft 已有 prop 能做的事(如 Input loading 走 `loading` prop 不自刻 `<div className="relative"><input/><div className="absolute">`);遇缺口**回元件 spec 擴 API**,不自刻繞過。hook `check_story_anatomy.sh` 攔 stories 手刻。
 
-### Layout primitive 特別子集(建立 pattern-level 新元件前 mechanical 掃)
-
-以下是 **pattern-level** primitives(跨元件共用的視覺結構),建立新元件前必查。若新元件的視覺結構命中任一 row 的 pattern → **必消費該 primitive**,不自己重寫一套。漏掉 = 雙邊漂移 bug(改一邊另一邊失效)。
-
-| 視覺 pattern | 既有 primitive | 典型觸發情境 |
-|------|---------|---------|
-| 單列 row:prefix(icon/avatar) + content + suffix(action) | `patterns/element-anatomy/item-anatomy.*` — `<MenuItem>` canonical + slot components | 任何「列表項目」元件(Menu/Tree/Sidebar/TableRow/StepItem/FileItem...) |
-| 浮層容器的 Header + Body + Footer(border-b/t + padding token) | `patterns/overlay-surface/` — `SurfaceHeader/Body/Footer` | Dialog / Popover / Drawer / Sheet / 任何 elevation-200 浮層的結構化 sub-components |
-| **垂直居中 icon + title + description(+ action)** | `components/Empty/` — `<Empty>` 元件 | **「告訴使用者狀態」的 surface**:空資料 / 拖放邀請(FileUpload)/ 錯誤 / 首次引導 / 無權限 / 載入佔位(非 Skeleton)|
-| 橫向操作按鈕列（gap-2 分組）| `patterns/action-bar/` | Toolbar、page header actions、form footer buttons |
-| 水平溢出處理(捲動/收合,**隱藏捲軸+ fade-mask** UX)| `patterns/horizontal-overflow/` | Tabs / ChipGroup / 未來 Steps 的溢出(刻意隱藏 scrollbar) |
-| **跨 OS 一致 overlay 捲軸(顯示捲軸但不吃寬度)** | `components/ScrollArea/` | DataTable 水平捲動 / Sheet / Dialog body / Sidebar 長 nav 等需要使用者知道有捲軸又要跨 OS 視覺一致 |
-| **固定長寬比容器(防 CLS 坍塌,多張圖統一 ratio)** | `components/AspectRatio/` | Coachmark media / Carousel item image / Card thumbnail / Chart container(override default 16:9) |
-| Field wrapper（border + padding + startIcon + endAction 結構) | `components/Field/field-wrapper.tsx` + `field-controls.spec.md` | 所有單行可編輯欄位元件 |
-
-**自我檢查腳本**:
-- 新元件有 icon+text 垂直堆疊? → 用 `<Empty>`,不自己畫 icon + title + desc
-- 新元件有橫向 row 結構(prefix/content/suffix)? → 用 `element-anatomy/item-anatomy` 的 `<MenuItem>` + slot components(`<ItemIcon>` / `<ItemAvatar>` / `<ItemLabel>` / `<ItemSuffix>` / `<ItemInlineAction>`)
-- 新元件是浮層 + 有 header/body/footer? → 用 `overlay-surface`
-- 新元件內容**可能溢出容器且需要使用者捲動**? → 用 `ScrollArea`(跨 OS 一致 overlay 捲軸);若是刻意隱藏捲軸 + fade-mask → 用 `horizontal-overflow` pattern
-- 新元件有**圖像 / media 容器需要鎖定長寬比**(防 CLS、統一多張圖比例)? → 用 `AspectRatio` primitive,不硬寫 `aspect-video` / `aspect-square` class
-- 以上都沒命中 → 才可自建,但 **建完要立刻回來加行**(防下一個人又重造輪子)
-- **本規則同樣適用 story / consumer / exploration code**:不 hand-craft 已有 prop 能做的事(如 Input loading 走 `loading` prop 不自刻 `<div className="relative"><input/><div className="absolute">` / 全頁 loading 走 `<Empty icon={<CircularProgress/>}/>` 不自刻 `absolute inset-0`)。遇缺口**回元件 spec 擴 API**,不自刻繞過 — hand-craft 視覺對齊 bug 上游。具體 anti-pattern signals 見 `/design-system-audit` Dim 21;pixel-level 視覺 regression(API 用對但視覺仍跑掉)tech debt 見 memory `project_pending_tasks`
-
-**overflow 使用三規則(避免跨 OS 跑版)**:
-1. Design-system 元件 `.tsx` 內**禁止** raw `overflow-auto / overflow-scroll / overflow-{x,y}-{auto,scroll}`(hook `check_token_hygiene.sh` check #4 守衛)
-2. 需捲軸且跨 OS 一致 → 用 `ScrollArea`
-3. 刻意隱藏捲軸 + fade-mask → 用 `horizontal-overflow` pattern
-4. 例外:`overlay-surface` spec 明文允許 Dialog body `flex-1 overflow-y-auto`(viewport-fill 特殊 context);若未來此場景需跨 OS 一致,遷移 ScrollArea 再更新 spec
+**完整對照表(12 個情境 + 8 個 layout primitive + overflow 三規則)** → `.claude/references/build-ui-canonicals.md`
 
 ## Pattern 規則（建立 UI 前檢查）
 
@@ -589,6 +552,40 @@ element.style.backgroundColor = 'var(--primary)'
 
 **禁止** `shadow-sm/md/lg/xl/2xl`、硬寫 `box-shadow`。**允許** `shadow-none`。詳見 `tokens/elevation/elevation.spec.md`。
 
+## Padding source 分層規則(三層各自 canonical)
+
+不同語境的 padding 有不同 source,寫 code 前先判斷屬哪層:
+
+| 層級 | 用途 | 來源 | 例 |
+|------|------|------|---|
+| **Chrome / Section / Card**(跨元件、密度切換) | page gutter、card inner padding、toolbar 外框、dialog header/body/footer | `p-[var(--layout-space-loose)]` / `p-[var(--layout-space-tight)]` | FileViewer toolbar `px-[var(--layout-space-loose)]` / Dialog body padding |
+| **元件內 slot**(結構性、不隨 density) | MenuItem row padding / Field wrapper padding / Dropdown item padding | Tailwind `p-N`(`p-3` / `px-2 py-1.5` 等) | item-anatomy row `px-2`(固定) / Field `px-3` |
+| **精確幾何**(icon ↔ text 對齊、calc-based) | Button padding = `(field-height - icon-size)/2` / Inline action box = icon + 2px | `p-[calc(...)]` / `p-[var(--...)]` / 特殊 `p-Npx` | Button `px-[calc((h-field-md-icon-md)/2)]` |
+
+**判斷法**:
+1. 「這個 padding **會隨 density / theme 變動嗎**?」→ 是 → layout-space token
+2. 「這個 padding 是**元件內部 layout 結構**?」→ 是 → Tailwind `p-N`
+3. 「這個 padding 是**跟 icon / text / 其他 token 算出來的**?」→ 是 → `calc()` / var 任意值
+
+**禁止**:
+- ❌ Chrome padding 用硬寫 `p-4`(應該用 layout-space token,density 切換會壞)
+- ❌ 元件內 slot 用 `p-[var(--layout-space-tight)]`(密度切換會讓 row 結構跑掉,應用固定 Tailwind `p-N`)
+
+## Icon size 來源分層規則
+
+Icon 尺寸按 context 分三類,寫 code 前判斷屬哪類:
+
+| Context | 來源 | 例 |
+|---------|------|---|
+| **Row primitive 內**(MenuItem / TreeItem / SelectionItem / FileItem slot) | `ICON_SIZE[size]` 讀 `RowSizeContext`(自動 size-aware) | `<ItemIcon icon={User} />` 內部走 `ICON_SIZE[contextSize]` |
+| **Button startIcon / endIcon** | Button 自己的 mapping(固定 16 / 16 / 20 by size) | `<Button size="lg" startIcon={Save} />` 自動走 20px |
+| **一次性 / 非 row / 非 Button**(chrome icon、decorative、toolbar 圖示) | inline `size={n}`,但 **n 必對齊 uiSize token**(16/20/24 等,不自創) | `<FileIcon size={16} />` in Toolbar |
+
+**禁止**:
+- ❌ 用 Tailwind `w-4 h-4` / `size-4` 表達 icon size —— 這是 dimension 不是 semantic,讀 code 時看不出「這是 icon size」
+- ❌ Row 內 hand-craft `<Icon size={16} />` 繞過 `RowSizeContext` —— density 切換不會聯動
+- ❌ 自創非 uiSize token 數值(如 `size={18}`、`size={22}`) —— 違反 mindset #2「不憑直覺發明」
+
 ## Row primitives 共用 item-anatomy 公式
 
 寫任何新 row 元件前,讀 `patterns/element-anatomy/item-anatomy.spec.md`(Family 1+2 深度 SSOT)。Audit grep guard 和 SidebarMenuButton 獨立實作風險也在該 spec 的「自我檢查」節。
@@ -609,87 +606,27 @@ element.style.backgroundColor = 'var(--primary)'
 
 # Tailwind 使用規則
 
-**間距與尺寸**：Tailwind 預設間距（`p-4`、`gap-2`、`mt-6` 等）可正常使用。
-需對應 token 時使用任意值：
+**間距與尺寸**:Tailwind 預設間距(`p-4`、`gap-2`、`mt-6` 等)可正常使用。對應 token 時用任意值:
 
 ```tsx
 <div className="p-[var(--layout-space-loose)]" />
 <div className="h-[var(--ui-height-36)]" />
 ```
 
-## Tailwind v4 任意值：CSS variable 必須用 `var()` 包覆
+## 4 條核心規則(每條都有過真實 bug,必遵守)
 
-**必須寫 `w-[var(--foo)]`，不能寫 `w-[--foo]`**。Tailwind v4 對任意值裡的 CSS variable 處理改了——舊的 `[--foo]` shorthand **不會自動包 `var()`**，會被當成 custom property declaration，整個 class **靜默失效**（不報錯，但完全沒效果）。
+1. **CSS variable 必須 `var()` 包覆** — 寫 `w-[var(--foo)]` 而非 `w-[--foo]`;後者在 Tailwind v4 **靜默失效**(曾讓 Sidebar 8 處寬度爆掉)
+2. **自訂 utility 必在 `lib/utils.ts` 顯式註冊到正確 group** — 否則 tailwind-merge 猜 group 誤判衝突 strip 掉 class(曾讓 `text-body` 被 `text-fg-secondary` strip)
+3. **禁用 Tailwind 預設 `shadow-sm/md/lg` / 預設 `text-xs/sm/base` / 硬寫色值** — 繞過 token 系統,dark mode / brand swap 會斷(用 `shadow-[var(--elevation-*)]` / `text-body` 等)
+4. **禁用 shadcn compat alias**(`bg-popover` / `text-muted-foreground` / `bg-accent` 等) — 那是 shadcn add 的臨時橋,我們元件 code 必用 direct token(`bg-surface-raised` / `text-fg-muted` / `bg-neutral-hover`)。hook `check_token_hygiene.sh` 自動攔
 
-**曾經發生的 bug**：Sidebar 從 shadcn 複製的 `w-[--sidebar-width]` 在 8 個位置寬度全失效，sidebar 寬度變成 content fallback 導致主內容被蓋住。
+## 圓角對應(常用)
 
-```tsx
-// ❌ 錯(v4 失效)
-<div className="w-[--sidebar-width] min-w-[--sidebar-width-min]" />
+`rounded-md` = 4px / `rounded-lg` = 8px / `rounded-full` = 9999px
 
-// ✅ 對
-<div className="w-[var(--sidebar-width)] min-w-[var(--sidebar-width-min)]" />
-```
+---
 
-**自我檢查**：若 CSS var 相關寬高看起來怪怪的，先 `grep '\[--[a-z]'` 在 src 裡找有沒有漏網的 shorthand 語法。
-
-**圓角**：
-
-| Utility class   | 值                         |
-|----------------|---------------------------|
-| `rounded-md`   | 4px（--radius-md）    |
-| `rounded-lg`   | 8px（--radius-lg）    |
-| `rounded-full` | 9999px（--radius-full）|
-
-## tailwind-merge 自訂 utility 註冊（技術陷阱）
-
-新增任何 `text-*`、`bg-*`、`border-*`、`ring-*` 自訂 utility 後，**必須到 `lib/utils.ts` 顯式註冊到正確的 group**（font-size / text-color 等）。否則 tailwind-merge 會用 heuristic 猜分組，把不衝突的 class 誤判為衝突並 strip 掉。
-
-**曾發生的 bug**：`text-body`（font-size）和 `text-fg-secondary`（color）被誤判同組，description 失去 font-size。
-
-**診斷法**：`cn()` 後某個 class 消失 → 99% 是 tailwind-merge 誤判 → 去 `lib/utils.ts` 註冊。
-**逃生艙**：inline style + CSS variable（`style={{ fontSize: 'var(--font-body-size)' }}`）。
-
-## 何時可以 / 不可以用 Tailwind utility
-
-**核可清單**（我們的元件 code 可以直接用）：
-
-| 類別 | 允許 utility | 備註 |
-|------|-------------|------|
-| **Layout / Flex / Grid** | `flex`, `grid`, `items-*`, `justify-*`, `gap-*`, `p-*`, `m-*`, `w-*`, `h-*`, `min-*`, `max-*` 等 Tailwind 預設 | spacing scale `p-4` / `gap-2` 等都 OK |
-| **Display / Position** | `block`, `hidden`, `absolute`, `relative`, `z-*` | |
-| **我們 DS 自訂 token utility** | `bg-surface-raised`, `text-foreground`, `text-fg-secondary`, `text-fg-muted`, `border-border`, `border-divider`, `text-body`, `text-caption`, `h-field-*`, `rounded-md` 等 | 所有 semantic token 對應的 utility |
-| **CSS variable 任意值** | `shadow-[var(--elevation-200)]`, `h-[var(--field-height-md)]` 等 | **必須 `var()` 包覆**,不能 `[--foo]` shorthand |
-
-**禁止清單**：
-
-| 類別 | 為什麼禁止 | 改用 |
-|------|----------|------|
-| `shadow-sm/md/lg/xl/2xl` | 繞過 elevation token 系統,沒跟 dark mode 調整聯動 | `shadow-[var(--elevation-100/200/300)]` |
-| 硬寫色值 `#xxx`, `rgb(...)`, `bg-red-500` | 繞過 semantic token,dark mode / brand swap 會斷 | 對應 semantic token |
-| Tailwind 預設 typography `text-xs/sm/base/lg` | 我們有自己的 `text-caption/body/body-lg/h1/h2` 系統 | 用我們的 typography token |
-| 硬寫 px 值 `w-[48px]` 當有 token | 失去 token 關聯,改值時零散處要一起改 | 對應 token 或 calc() |
-
-## shadcn compat aliases — 不給我們元件用
-
-`semantic.css` 的「shadcn Compat Aliases」段（`--popover`, `--popover-foreground`, `--muted-foreground`, `--accent`, `--accent-foreground` 等）**只是 `npx shadcn add X` 複製貼上時的安全網**,讓 shadcn 原生 className 不會因找不到 CSS variable 而 fallback。
-
-**我們自己 design-system 的元件 code 禁止直接使用這些 alias**:
-
-| 禁止（shadcn alias） | 必用（我們的 token） |
-|--------------------|--------------------|
-| `bg-popover` | `bg-surface-raised` |
-| `text-popover-foreground` | `text-foreground` |
-| `text-muted-foreground` | `text-fg-muted` |
-| `bg-accent` | `bg-neutral-hover` |
-| `text-accent-foreground` | `text-foreground` |
-| `bg-muted` | 這個是我們核可的 token（neutral-2 subtle bg）,**不是** shadcn alias,OK 用 |
-
-**原則**：shadcn 原生 utility 只在 shadcn 自動生成的檔案**暫時**存在（作遷移緩衝）; 任何人類編輯或新增的元件 code 都必須用我們的 direct token。**用 shadcn alias = 設計 bug**,優先改為 direct token。
-
-**為什麼**: shadcn alias 是「臨時橋」讓 shadcn add 不炸; 我們有自己 design opinion 後直接用 own token,保持 DS 單一真實來源。允許 shadcn alias 進我們的 code = 慢慢讓 shadcn 命名污染回流,DS 自主性退化。
-
-**曾經發生的 bug**: Popover.tsx / Command.tsx 保留 shadcn template 的 `bg-popover`, `text-popover-foreground`, `text-muted-foreground`, `bg-accent`, `text-accent-foreground` 多處,2026-04-18 session 時 audit 發現統一遷移為 direct token（`bg-surface-raised` / `text-foreground` / `text-fg-muted` / `bg-neutral-hover`）。
+**完整對照**(每條 bug 的詳細歷史 + 核可清單 + 禁止清單 + shadcn alias 全對照表)→ `.claude/references/tailwind-gotchas.md`
 
 
 # Token 命名原則
@@ -741,23 +678,47 @@ Token 命名 = `--{namespace}-{role}-{variant?}`
 - ❌ **Semantic 帶色相**：`--primary-blue`（semantic 不該暗示色相）
 - ❌ **Categorical 中間層**：`--blue` / `--blue-hover` 等（已廢除——Tag 直接用 primitive，Button 用 semantic）
 
-## 6. 新增語意色相必須依照 SOP
+## 6. 新增語意色相 + 色彩架構流派
 
-新增 semantic 色相必須完整執行 4 步（primitive base → semantic 五件套 → dark mode 反轉 → Tailwind bridge）。詳見 `tokens/color/color.spec.md`「新增語意色相的標準流程」。
-
-## 7. 色彩架構流派
-
-本系統採 **Atlassian-style Semantic State Token** 流派。靜態色用 primitive，互動狀態用 semantic state token。新增色彩 token 前必讀 `tokens/color/color.spec.md`「架構流派定位」段落。
+新增 semantic 色相 → 詳見 `tokens/color/color.spec.md`「新增語意色相的標準流程」(SSOT)。本系統採 **Atlassian-style Semantic State Token** 流派(靜態色用 primitive,互動狀態用 semantic state token),完整 rationale 在該 spec「架構流派定位」段落。
 
 
 # 元件 Props 命名原則
 
 **按「是什麼」命名，不按「在哪裡」命名。** 參考 Material（Chip: avatar / icon / deleteIcon）、Ant Design（Tag: icon / closeIcon）等世界級設計系統。
 
-- slot 只接受 icon → 命名帶 `icon`（如 `startIcon`、`endIcon`），型別用 `LucideIcon`，元件內部控制尺寸
-- slot 接受任意視覺元素 → 命名描述內容類型（如 `avatar`），型別用 `ReactNode`
-- slot 是行為 → 用 callback（如 `onDismiss`），元件內部渲染互動元素並控制尺寸與樣式
-- ❌ 不用 `prefix` / `suffix` / `left` / `right` 等純位置名——這些不傳達內容本質，也無法約束型別
+- slot 只接受 icon → 命名帶 `icon`(如 `startIcon`、`endIcon`),型別用 `LucideIcon`,元件內部控制尺寸
+- slot 接受任意視覺元素 → 命名描述內容類型(如 `avatar`),型別用 `ReactNode`
+- slot 是行為 → 用 callback(如 `onDismiss`),元件內部渲染互動元素並控制尺寸與樣式
+- ❌ 不用 `prefix` / `suffix` / `left` / `right` 等純位置名——這些不傳達內容本質,也無法約束型別
+
+## 關閉 / 移除類 callback 命名 canonical(按語意分層,不合併)
+
+四個名稱各有語意,不可替換使用:
+
+| Callback | 語意 | 典型元件 | 世界級對照 |
+|----------|------|---------|-----------|
+| `onClose` | **關閉 overlay session** — 浮層關閉,回到背景 | Dialog / Sheet / Popover / FileViewer / HoverCard | React Aria `onClose` / Material `DialogProps.onClose` |
+| `onDismiss` | **通知被忽略** — 暫時性訊息被 user 關掉,不影響流程 | Alert / Notice / Toast / Coachmark | Polaris `Toast.onDismiss` / iOS `dismiss()` |
+| `onRemove` | **從集合移除一個 item** — parent collection 層面的狀態變化 | PeoplePicker / Combobox multi-select tag / Tag(in tag list) | Material `Chip.onDelete` / React Aria `onRemove` |
+| `onClear` | **欄位內容清空** — value 設為 empty,元件本身不關 | Input / Select / Combobox / DatePicker clear button | Ant Design `allowClear` + `onClear` / Polaris `clearButton` |
+
+**不允許用同一個名稱 cover 多語意**(如用 `onClose` 同時表達 Tag 的 `onRemove`)。spec 寫 callback 時必明示屬於哪一類。
+
+## Badge 類 prop 名 canonical(按放置方式,不按「是 badge」籠統命名)
+
+Badge 在不同 anchor 有兩種截然不同的視覺 / 語意型態,prop 名要區分:
+
+| Prop | 用途 | 典型 anchor | 對應 Badge 型態 |
+|------|------|------------|----------------|
+| `badge` | **Pill 內的 inline badge** — 在 label 右側,跟 endIcon 同層 flex | Button(有 label)/ Tab item / Chip | inline count,label 搭配 |
+| `overlayBadge` | **疊在視覺重心的 overlay badge** — absolute 定位於 icon/avatar 角 | iconOnly Button / pure Icon | top-right count overlay |
+| `badgeCount`(Avatar 專用) | count overlay,內部消費 `<Badge variant="critical">`,貼 avatar 右上 | Avatar | 同 overlayBadge 但 Avatar 語意 |
+| `status`(Avatar 專用) | **非 Badge 元件** — Avatar 內部 SVG presence dot,貼右下 | Avatar | presence indicator(非 Badge) |
+
+**禁止**:同一 prop 名兼 inline + overlay 兩種語意。世界級 Material `BadgedBox`(overlay)vs `Chip.label`(inline)分開、Ant Design `<Badge overflowCount>`(overlay)vs `<Tag>`(inline)分開,都不用同一 prop 名。
+
+**禁止組合**:有 label 的 Button / Chip 疊 `overlayBadge`(badge 會飄到 chrome 邊緣遠離 icon 語義)—— 需計數改用 `badge` inline;完整規則見 `badge.spec.md`「Overlay 適用元件 canonical」。
 
 ## 常用 icon canonical
 

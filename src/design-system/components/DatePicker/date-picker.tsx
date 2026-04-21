@@ -1,11 +1,11 @@
 import * as React from 'react'
-import { X, Calendar as CalendarIcon } from 'lucide-react'
+import { X, Calendar as CalendarIcon, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { FieldMode } from '@/design-system/components/Field/field-types'
 import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
 import { ItemInlineAction } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { Popover, PopoverTrigger, PopoverContent } from '@/design-system/components/Popover/popover'
-import { Calendar } from '@/design-system/components/Calendar/calendar'
+import { DateGrid } from '@/design-system/components/DateGrid/date-grid'
 
 // ── Format ──────────────────────────────────────────────────────────────────
 
@@ -165,7 +165,7 @@ const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
           </button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
+          <DateGrid
             mode="single"
             selected={selected}
             onSelect={(date) => {
@@ -182,4 +182,160 @@ const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
 )
 DatePicker.displayName = 'DatePicker'
 
-export { DatePicker, DatePickerDisplay, formatDate }
+// ── DatePickerRange ─────────────────────────────────────────────────────────
+// Ant-style range picker:single wrapper containing [start input] → [end input] [📅]
+// Click anywhere → opens Popover with Calendar mode="range" showing two months side-by-side.
+
+export interface DatePickerRangeProps extends DateFormatOptions {
+  mode?: FieldMode
+  error?: boolean
+  size?: 'sm' | 'md' | 'lg'
+  /** 區間值:[start ISO, end ISO]。任一 null 代表尚未選。 */
+  value?: [string | null, string | null] | null
+  onChange?: (value: [string | null, string | null]) => void
+  /** Placeholder:[start placeholder, end placeholder] */
+  placeholder?: [string, string]
+  className?: string
+  disabled?: boolean
+  clearable?: boolean
+}
+
+const DatePickerRange = React.forwardRef<HTMLButtonElement, DatePickerRangeProps>(
+  (
+    {
+      mode = 'edit',
+      error = false,
+      size = 'md',
+      value,
+      onChange,
+      placeholder = ['Start date', 'End date'],
+      className,
+      disabled,
+      clearable = false,
+      formatOptions,
+      locale,
+    },
+    ref,
+  ) => {
+    const resolvedMode = disabled ? 'disabled' : mode
+    const isEditable = resolvedMode === 'edit'
+    const iconSize = size === 'lg' ? 20 : 16
+    const [open, setOpen] = React.useState(false)
+
+    const startIso = value?.[0] ?? null
+    const endIso = value?.[1] ?? null
+    const startDate = React.useMemo(() => isoToDate(startIso), [startIso])
+    const endDate = React.useMemo(() => isoToDate(endIso), [endIso])
+    const hasValue = !!(startIso || endIso)
+    const showClear = clearable && hasValue && isEditable
+
+    const startText = startIso
+      ? formatDate(startIso, { formatOptions, locale })
+      : placeholder[0]
+    const endText = endIso
+      ? formatDate(endIso, { formatOptions, locale })
+      : placeholder[1]
+
+    // readonly / disabled view — plain wrapper,no popover
+    if (!isEditable) {
+      return (
+        <div
+          className={cn(fieldWrapperStyles({ mode: resolvedMode, size }), className)}
+          data-field-mode={resolvedMode}
+        >
+          <span className={cn('flex-1 min-w-0 truncate', !startIso && 'text-fg-muted', resolvedMode === 'disabled' && 'text-fg-disabled')}>
+            {startIso ? formatDate(startIso, { formatOptions, locale }) : placeholder[0]}
+          </span>
+          <ArrowRight size={iconSize} className="shrink-0 text-fg-muted mx-2" aria-hidden />
+          <span className={cn('flex-1 min-w-0 truncate', !endIso && 'text-fg-muted', resolvedMode === 'disabled' && 'text-fg-disabled')}>
+            {endIso ? formatDate(endIso, { formatOptions, locale }) : placeholder[1]}
+          </span>
+          <CalendarIcon size={iconSize} className="shrink-0 text-fg-muted pointer-events-none" aria-hidden />
+        </div>
+      )
+    }
+
+    return (
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <button
+            ref={ref}
+            type="button"
+            disabled={disabled}
+            aria-invalid={error || undefined}
+            aria-haspopup="dialog"
+            aria-expanded={open}
+            data-field-mode="edit"
+            data-error={error ? '' : undefined}
+            className={cn(
+              fieldWrapperStyles({ mode: 'edit', size }),
+              'text-left cursor-pointer',
+              'focus-visible:outline-none',
+              error && [
+                'border-error hover:border-error-hover',
+                'focus-within:border-error focus-within:hover:border-error',
+              ],
+              className,
+            )}
+          >
+            <span className={cn(bareInputStyles, 'truncate', !startIso && 'text-fg-muted')}>
+              {startText}
+            </span>
+            <ArrowRight size={iconSize} className="shrink-0 text-fg-muted mx-2" aria-hidden />
+            <span className={cn(bareInputStyles, 'truncate', !endIso && 'text-fg-muted')}>
+              {endText}
+            </span>
+            {showClear && (
+              <ItemInlineAction
+                size={size ?? 'md'}
+                action={{
+                  icon: X,
+                  label: '清除日期區間',
+                  onClick: (e) => {
+                    e?.stopPropagation()
+                    onChange?.([null, null])
+                  },
+                }}
+              />
+            )}
+            <CalendarIcon size={iconSize} className="shrink-0 text-fg-muted pointer-events-none" aria-hidden />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <DateGrid
+            mode="range"
+            numberOfMonths={2}
+            selected={
+              startDate || endDate
+                ? { from: startDate, to: endDate }
+                : undefined
+            }
+            onSelect={(range) => {
+              const next: [string | null, string | null] = [
+                range?.from ? dateToIso(range.from) : null,
+                range?.to ? dateToIso(range.to) : null,
+              ]
+              onChange?.(next)
+              // 只在兩個端點都選好時才關閉
+              if (range?.from && range?.to) setOpen(false)
+            }}
+            defaultMonth={startDate}
+            autoFocus
+          />
+        </PopoverContent>
+      </Popover>
+    )
+  },
+)
+DatePickerRange.displayName = 'DatePickerRange'
+
+// Attach Range as namespace:consumer 用 <DatePicker.Range ...>(Ant-style)
+// 走 Object.assign 確保 TS 型別帶上 Range 屬性,而非只做 runtime 附掛
+const DatePickerWithRange = Object.assign(DatePicker, { Range: DatePickerRange })
+
+export {
+  DatePickerWithRange as DatePicker,
+  DatePickerDisplay,
+  DatePickerRange,
+  formatDate,
+}

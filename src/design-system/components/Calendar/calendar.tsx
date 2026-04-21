@@ -1,85 +1,374 @@
 import * as React from 'react'
-import { DayPicker } from 'react-day-picker'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import 'react-day-picker/style.css'
-
+import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
+import {
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  eachDayOfInterval,
+  format,
+  isSameMonth,
+  isSameDay,
+  addMonths,
+  subMonths,
+} from 'date-fns'
 import { cn } from '@/lib/utils'
+import { Button } from '@/design-system/components/Button/button'
 
 /**
- * Calendar — DayPicker 包裝,用本 DS token 覆寫預設視覺。
+ * Calendar — 事件檢視 canvas(月 view MVP)
  *
- * 視覺語言:
- * - 月份 caption:text-body font-medium
- * - 星期標頭:text-caption text-fg-muted
- * - 日格:36x36 圓形,hover/selected/today 三態清晰
- * - 選中:bg-primary text-white(實心)
- * - 今天:ring-1 ring-primary(framing,非選中時)
- * - 前後月日期:text-fg-disabled(淡化)
- * - nav 按鈕:Tertiary-style icon button,rounded-md
+ * 定位:看事件的 page-level canvas,對齊 Notion Calendar / Google Calendar。
+ * 完整 spec 見 `event-calendar.spec.md`。
  *
- * 覆寫 react-day-picker v9 class names 為本 DS utility class,避免引入原生 .rdp-* 樣式漂移。
+ * ── Layout Family ──
+ * 非 4-Family,屬 page-composite(多區塊 Toolbar + Grid + EventTile)。
+ *
+ * ── MVP scope(本次 session)──
+ * - 月 view 完整(toolbar / grid / event tile / today highlight / outside days)
+ * - 週 / 日 view 是 tech debt
+ * - 拖拉增刪 event 是 tech debt
+ *
+ * ── 與 DatePicker 的區分 ──
+ * DatePicker 是「選日期」form control;Calendar 是「看事件」page canvas。
+ * 名字相近但職責完全不同,spec 頂段明示分界。
  */
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker>
+// ── Types ──────────────────────────────────────────────────────────────────
+
+export interface CalendarEvent {
+  id: string
+  title: string
+  /** ISO 字串 "YYYY-MM-DD"(all-day)或 "YYYY-MM-DDTHH:mm"(timed) */
+  start: string | Date
+  end: string | Date
+  allDay?: boolean
+  /**
+   * 事件類別色。值為 DS primitive 色名(blue / green / orange / purple / red / yellow)。
+   * 對照 Badge / Tag 的 primitive color variants。
+   */
+  color?: 'blue' | 'green' | 'orange' | 'purple' | 'red' | 'yellow'
+  metadata?: Record<string, unknown>
+}
+
+export type CalendarView = 'month' | 'week' | 'day'
+
+export interface CalendarProps {
+  /** 當前 view(MVP 只 'month',其餘 view tech debt) */
+  view?: CalendarView
+  defaultView?: CalendarView
+  onViewChange?: (view: CalendarView) => void
+
+  /** 聚焦日期(月 view 的那個月) */
+  referenceDate?: Date
+  defaultReferenceDate?: Date
+  onReferenceDateChange?: (date: Date) => void
+
+  /** 事件資料 */
+  events?: CalendarEvent[]
+
+  /** 點 event tile 回調 */
+  onEventClick?: (event: CalendarEvent) => void
+  /** 點月 cell 回調(用於新增) */
+  onDateClick?: (date: Date) => void
+  /** 點新事件 CTA 回調 */
+  onCreateEvent?: () => void
+
+  /** 0 = Sunday, 1 = Monday。預設 0(對齊 Google Calendar 美系預設) */
+  weekStartsOn?: 0 | 1
+
+  /** 自訂 event tile 渲染 */
+  renderEventTile?: (event: CalendarEvent) => React.ReactNode
+
+  /** size(MVP 只 md;lg 為 tech debt) */
+  size?: 'md' | 'lg'
+  className?: string
+
+  /** locale(預設 'en-US') */
+  locale?: string
+}
+
+// ── Event tile color tokens ─────────────────────────────────────────────────
+// 對齊 Tag / Badge 的 primitive color system(見 `color.spec.md`)
+
+const EVENT_COLOR_CLASSES: Record<NonNullable<CalendarEvent['color']>, string> = {
+  blue: 'bg-[var(--color-blue-1)] text-[var(--color-blue-7)] hover:bg-[var(--color-blue-2)]',
+  green: 'bg-[var(--color-green-1)] text-[var(--color-green-7)] hover:bg-[var(--color-green-2)]',
+  orange: 'bg-[var(--color-deep-orange-1)] text-[var(--color-deep-orange-7)] hover:bg-[var(--color-deep-orange-2)]',
+  purple: 'bg-[var(--color-purple-1)] text-[var(--color-purple-7)] hover:bg-[var(--color-purple-2)]',
+  red: 'bg-[var(--color-deep-orange-1)] text-[var(--color-deep-orange-7)] hover:bg-[var(--color-deep-orange-2)]',
+  yellow: 'bg-[var(--color-yellow-1)] text-[var(--color-yellow-7)] hover:bg-[var(--color-yellow-2)]',
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+function coerceDate(value: string | Date): Date {
+  return value instanceof Date ? value : new Date(value)
+}
+
+function eventsOnDate(events: CalendarEvent[], date: Date): CalendarEvent[] {
+  return events.filter((e) => {
+    const start = coerceDate(e.start)
+    const end = coerceDate(e.end)
+    // 日期落在 [start, end] 範圍內(日精度)
+    const d = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime()
+    const s = new Date(start.getFullYear(), start.getMonth(), start.getDate()).getTime()
+    const eEnd = new Date(end.getFullYear(), end.getMonth(), end.getDate()).getTime()
+    return d >= s && d <= eEnd
+  })
+}
+
+// ── Component ──────────────────────────────────────────────────────────────
+
+const MAX_TILES_PER_CELL = 3
 
 export function Calendar({
+  view: viewProp,
+  defaultView = 'month',
+  onViewChange,
+  referenceDate: referenceDateProp,
+  defaultReferenceDate,
+  onReferenceDateChange,
+  events = [],
+  onEventClick,
+  onDateClick,
+  onCreateEvent,
+  weekStartsOn = 0,
+  renderEventTile,
+  size = 'md',
   className,
-  classNames,
-  showOutsideDays = true,
-  ...props
+  locale = 'en-US',
 }: CalendarProps) {
+  // Controlled / uncontrolled refDate
+  const [internalRef, setInternalRef] = React.useState<Date>(
+    defaultReferenceDate ?? new Date(),
+  )
+  const refDate = referenceDateProp ?? internalRef
+  const setRefDate = React.useCallback(
+    (next: Date) => {
+      if (referenceDateProp === undefined) setInternalRef(next)
+      onReferenceDateChange?.(next)
+    },
+    [referenceDateProp, onReferenceDateChange],
+  )
+
+  // View state(MVP 只用 month,其他 tech debt)
+  const [internalView, setInternalView] = React.useState<CalendarView>(defaultView)
+  const currentView = viewProp ?? internalView
+  const setView = React.useCallback(
+    (next: CalendarView) => {
+      if (viewProp === undefined) setInternalView(next)
+      onViewChange?.(next)
+    },
+    [viewProp, onViewChange],
+  )
+
+  // Build month grid
+  const days = React.useMemo(() => {
+    const monthStart = startOfMonth(refDate)
+    const monthEnd = endOfMonth(refDate)
+    const gridStart = startOfWeek(monthStart, { weekStartsOn })
+    const gridEnd = endOfWeek(monthEnd, { weekStartsOn })
+    return eachDayOfInterval({ start: gridStart, end: gridEnd })
+  }, [refDate, weekStartsOn])
+
+  const monthTitle = new Intl.DateTimeFormat(locale, {
+    year: 'numeric',
+    month: 'long',
+  }).format(refDate)
+
+  const today = new Date()
+
+  const weekdayNames = React.useMemo(() => {
+    // 取 `days[0..6]` 的名字(gridStart 開始 7 天,正好一週)
+    return days.slice(0, 7).map((d) =>
+      new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(d),
+    )
+  }, [days, locale])
+
+  const handleToday = () => setRefDate(new Date())
+  const handlePrev = () => setRefDate(subMonths(refDate, 1))
+  const handleNext = () => setRefDate(addMonths(refDate, 1))
+
   return (
-    <DayPicker
-      showOutsideDays={showOutsideDays}
-      className={cn('p-3', className)}
-      classNames={{
-        months: 'flex flex-col sm:flex-row gap-4',
-        month: 'flex flex-col gap-3',
-        // caption h-9 = 36px(同 day cell),讓 arrow buttons fill 整個 caption 高度,
-        // 從而 arrow 上緣 = calendar top padding (12px),與最後一排日期距底 (12px) 對稱
-        month_caption: 'flex items-center justify-center h-9 relative',
-        caption_label: 'text-body font-medium',
-        // nav absolute 覆蓋在 caption 上,inset-x-0 + justify-between + button w-9 = 箭頭中心
-        // 精準對齊 Su(第 1 欄 w-9)/ Sa(第 7 欄 w-9)中心
-        nav: 'flex items-center absolute inset-x-0 inset-y-0 justify-between pointer-events-none',
-        button_previous: cn(
-          'pointer-events-auto inline-flex items-center justify-center h-9 w-9 rounded-md',
-          'text-fg-muted hover:text-foreground hover:bg-neutral-hover',
-          'disabled:opacity-50 disabled:pointer-events-none',
-          'transition-colors',
-        ),
-        button_next: cn(
-          'pointer-events-auto inline-flex items-center justify-center h-9 w-9 rounded-md',
-          'text-fg-muted hover:text-foreground hover:bg-neutral-hover',
-          'disabled:opacity-50 disabled:pointer-events-none',
-          'transition-colors',
-        ),
-        month_grid: 'w-full border-collapse',
-        weekdays: 'flex',
-        weekday: 'text-fg-muted text-caption font-normal w-9 h-8 flex items-center justify-center',
-        week: 'flex w-full mt-1',
-        day: 'h-9 w-9 p-0 text-center relative [&:has([aria-selected])]:bg-transparent',
-        day_button: cn(
-          'h-9 w-9 p-0 font-normal text-body rounded-md',
-          'hover:bg-neutral-hover',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-          'transition-colors',
-          'aria-selected:bg-primary aria-selected:text-on-emphasis aria-selected:hover:bg-primary-hover',
-        ),
-        today: 'ring-1 ring-primary rounded-md',
-        outside: 'text-fg-disabled aria-selected:text-on-emphasis',
-        disabled: 'text-fg-disabled opacity-50',
-        hidden: 'invisible',
-        ...classNames,
-      }}
-      components={{
-        Chevron: ({ orientation }) => {
-          const Icon = orientation === 'left' ? ChevronLeft : ChevronRight
-          return <Icon size={16} />
-        },
-      }}
-      {...props}
-    />
+    <div
+      className={cn(
+        'flex flex-col w-full h-full bg-surface rounded-md border border-divider overflow-hidden',
+        className,
+      )}
+      data-view={currentView}
+      data-size={size}
+    >
+      {/* Toolbar:[◀] [今天] [▶]  title  [view tabs]  [+ new] */}
+      <div
+        className={cn(
+          'flex items-center gap-2 shrink-0 border-b border-divider',
+          'px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]',
+        )}
+      >
+        <div className="flex items-center gap-1">
+          <Button
+            variant="text"
+            size="sm"
+            iconOnly
+            startIcon={ChevronLeft}
+            aria-label="上個月"
+            onClick={handlePrev}
+          />
+          <Button variant="tertiary" size="sm" onClick={handleToday}>
+            今天
+          </Button>
+          <Button
+            variant="text"
+            size="sm"
+            iconOnly
+            startIcon={ChevronRight}
+            aria-label="下個月"
+            onClick={handleNext}
+          />
+        </div>
+
+        <h2 className="text-body-lg font-medium text-foreground flex-1 min-w-0 truncate ml-2">
+          {monthTitle}
+        </h2>
+
+        {/* View switcher(MVP 只啟用 month;week/day 為視覺 placeholder) */}
+        <div className="flex items-center gap-1" role="tablist" aria-label="檢視切換">
+          {(['day', 'week', 'month'] as const).map((v) => (
+            <Button
+              key={v}
+              variant={currentView === v ? 'tertiary' : 'text'}
+              size="sm"
+              pressed={currentView === v}
+              disabled={v !== 'month'}
+              onClick={() => setView(v)}
+              role="tab"
+              aria-selected={currentView === v}
+            >
+              {v === 'day' ? '日' : v === 'week' ? '週' : '月'}
+            </Button>
+          ))}
+        </div>
+
+        {onCreateEvent && (
+          <Button variant="primary" size="sm" startIcon={Plus} onClick={onCreateEvent}>
+            新事件
+          </Button>
+        )}
+      </div>
+
+      {/* Weekday header */}
+      <div className="grid grid-cols-7 border-b border-divider bg-muted">
+        {weekdayNames.map((name, i) => (
+          <div
+            key={i}
+            className="px-2 py-1.5 text-caption text-fg-muted font-normal text-center"
+          >
+            {name}
+          </div>
+        ))}
+      </div>
+
+      {/* Month grid:7 cols, ~5-6 rows */}
+      <div
+        className="grid grid-cols-7 flex-1 min-h-0"
+        role="grid"
+        aria-label={`月行事曆,${monthTitle}`}
+      >
+        {days.map((date) => {
+          const inMonth = isSameMonth(date, refDate)
+          const isToday = isSameDay(date, today)
+          const dayEvents = eventsOnDate(events, date)
+          const visibleEvents = dayEvents.slice(0, MAX_TILES_PER_CELL)
+          const overflowCount = dayEvents.length - visibleEvents.length
+
+          return (
+            <button
+              key={date.toISOString()}
+              type="button"
+              role="gridcell"
+              aria-label={`${format(date, 'yyyy-MM-dd')},${dayEvents.length} 個事件`}
+              onClick={() => onDateClick?.(date)}
+              className={cn(
+                'flex flex-col gap-1 min-h-28 p-1.5 text-left',
+                'border-r border-b border-divider last:border-r-0',
+                '[&:nth-child(7n)]:border-r-0',
+                'hover:bg-neutral-hover transition-colors',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                !inMonth && 'bg-muted',
+              )}
+            >
+              {/* Date number header */}
+              <div className="flex items-start justify-end">
+                {isToday ? (
+                  <span className="inline-flex items-center justify-center min-w-6 h-6 px-2 rounded-full bg-primary text-on-emphasis text-body font-medium">
+                    {format(date, 'd')}
+                  </span>
+                ) : (
+                  <span
+                    className={cn(
+                      'text-body font-medium',
+                      !inMonth && 'text-fg-disabled',
+                    )}
+                  >
+                    {format(date, 'd')}
+                  </span>
+                )}
+              </div>
+
+              {/* Event tiles */}
+              <div className="flex flex-col gap-0.5 min-h-0">
+                {visibleEvents.map((event) => {
+                  const colorClass = EVENT_COLOR_CLASSES[event.color ?? 'blue']
+                  if (renderEventTile) {
+                    return (
+                      <div
+                        key={event.id}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onEventClick?.(event)
+                        }}
+                      >
+                        {renderEventTile(event)}
+                      </div>
+                    )
+                  }
+                  return (
+                    <div
+                      key={event.id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onEventClick?.(event)
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          onEventClick?.(event)
+                        }
+                      }}
+                      aria-label={`事件:${event.title}`}
+                      className={cn(
+                        'rounded-md px-1.5 py-0.5 text-caption truncate cursor-pointer transition-colors',
+                        colorClass,
+                      )}
+                    >
+                      {event.title}
+                    </div>
+                  )
+                })}
+                {overflowCount > 0 && (
+                  <div className="text-caption text-fg-muted px-1.5">
+                    +{overflowCount} more
+                  </div>
+                )}
+              </div>
+            </button>
+          )
+        })}
+      </div>
+    </div>
   )
 }
-Calendar.displayName = 'Calendar'
+Calendar.displayName = "Calendar"

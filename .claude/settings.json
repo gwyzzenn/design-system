@@ -22,6 +22,15 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/pre_new_component_spec.sh\""
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check_story_anatomy.sh\""
+          }
+        ]
       }
     ],
     "PostToolUse": [

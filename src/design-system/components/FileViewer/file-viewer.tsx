@@ -7,22 +7,26 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronDown,
+  Plus,
+  Minus,
   File as FileIcon,
   FileText,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/design-system/components/Button/button'
+import { Input } from '@/design-system/components/Input/input'
 import { Empty } from '@/design-system/components/Empty/empty'
-import { Separator } from '@/design-system/components/Separator/separator'
 import { AspectRatio } from '@/design-system/components/AspectRatio/aspect-ratio'
 import { Textarea } from '@/design-system/components/Textarea/textarea'
 import { Field, FieldLabel } from '@/design-system/components/Field/field'
 import { DescriptionList, DescriptionItem } from '@/design-system/components/DescriptionList/description-list'
 import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from '@/design-system/components/Popover/popover'
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from '@/design-system/components/DropdownMenu/dropdown-menu'
 import {
   useScrollEdges,
   useScrollByPage,
@@ -47,7 +51,7 @@ import type {
  * ── 實作基礎 ──
  * 自建 composite,消費 DS primitives:
  *   - Radix DialogPrimitive(焦點 trap / Esc / aria-modal,保有 shadcn 結構優勢)
- *   - `<Empty>` / `<Button>` / `<Separator>` / `<AspectRatio>` / `<Textarea>` / `<Popover>`
+ *   - `<Empty>` / `<Button>` / `<Input variant="bare">` / `<AspectRatio>` / `<Textarea>` / `<DropdownMenu>`
  *   - `patterns/horizontal-overflow`(filmstrip 溢出捲動)
  * 不用 DS 的 `<Dialog>` wrapper:因為 FileViewer 需要 edge-to-edge fullscreen
  * (無 viewport inset / 無 rounded-lg / 無 maxWidth),Dialog 的這些預設都要覆寫。
@@ -146,9 +150,15 @@ interface ZoomInputProps {
 }
 
 /**
- * ZoomInput — 數字輸入 + preset dropdown 組合。
+ * ZoomInput — [−] [% input(bare)with ⌄ menu trigger] [+]
  *
- * 世界級對照:Figma zoom control / Google Slides zoom / Adobe Acrobat。
+ * 世界級對照:Figma zoom control / Adobe Acrobat / Google Slides zoom。
+ *
+ * ── 消費 DS primitive ──
+ *   - `<Button>` iconOnly size="sm" 作 ±按鈕
+ *   - `<Input variant="bare" size="sm">` 作 %輸入(Toolbar inline editing canonical)
+ *   - Input `endAction` slot 提供 ⌄ chevron 觸發 DropdownMenu
+ *   - `<DropdownMenu>` 作 preset + fit 選單(取代原先 Popover + 手刻 button list)
  *
  * ── 為什麼 inline(不抽獨立 primitive)──
  * 目前只 FileViewer 消費;MVP 階段遵循 YAGNI。當 PDF / Video viewer 也需要相同
@@ -156,7 +166,7 @@ interface ZoomInputProps {
  */
 const ZoomInput: React.FC<ZoomInputProps> = ({ value, onChange, onFit }) => {
   const [draft, setDraft] = React.useState<string>(`${value}%`)
-  const [open, setOpen] = React.useState(false)
+  const [menuOpen, setMenuOpen] = React.useState(false)
 
   React.useEffect(() => {
     setDraft(`${value}%`)
@@ -175,90 +185,87 @@ const ZoomInput: React.FC<ZoomInputProps> = ({ value, onChange, onFit }) => {
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <div className="relative inline-flex items-center">
-        <input
-          type="text"
-          aria-label="Zoom level"
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onBlur={commitDraft}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault()
-              commitDraft()
-              ;(e.target as HTMLInputElement).blur()
-            }
-          }}
-          className={cn(
-            // 視覺對齊 field-sm(28px md / 32px lg)+ 左 padding + 右預留 dropdown trigger 寬度
-            'h-field-sm w-20 pl-3 pr-7 rounded-md',
-            'bg-transparent border border-transparent',
-            'text-body tabular-nums text-foreground',
-            'hover:border-border focus:border-primary focus:outline-none',
-            'transition-colors duration-150',
-          )}
-        />
-        <PopoverTrigger asChild>
-          <button
-            type="button"
-            aria-label="開啟縮放選單"
-            className={cn(
-              'absolute right-0 top-0 bottom-0 w-7 inline-flex items-center justify-center',
-              'text-fg-muted hover:text-foreground',
-              'outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-r-md',
-            )}
-          >
-            <ChevronDown size={16} aria-hidden />
-          </button>
-        </PopoverTrigger>
-      </div>
-      <PopoverContent align="end" className="w-56 p-1">
-        <div className="py-1">
+    <div className="inline-flex items-center gap-0.5">
+      {/* 縮小 */}
+      <Button
+        variant="text"
+        size="sm"
+        iconOnly
+        startIcon={Minus}
+        aria-label="縮小"
+        disabled={value <= 10}
+        onClick={() => onChange(nextZoomOut(value))}
+      />
+
+      {/* % input + chevron dropdown trigger(Input endAction slot 承擔 chevron) */}
+      <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+        <DropdownMenuTrigger asChild>
+          {/* DropdownMenuTrigger asChild + Input:Radix 會把 trigger 行為綁到 Input wrapper;
+              Input 本身維持 editable。chevron 由 Input endAction 額外渲染作視覺 affordance */}
+          <Input
+            variant="bare"
+            size="sm"
+            aria-label="縮放比例"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onBlur={commitDraft}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                commitDraft()
+                ;(e.target as HTMLInputElement).blur()
+              }
+              // Space / Enter 不可用於開啟 menu(會干擾 input 編輯)
+              // 使用者靠 chevron 按鈕開選單
+            }}
+            className="w-20 text-center tabular-nums"
+            endAction={{
+              icon: ChevronDown,
+              label: '開啟縮放選單',
+              onClick: () => setMenuOpen((o) => !o),
+            }}
+          />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
           {ZOOM_FIT_OPTIONS.map((opt) => (
-            <button
+            <DropdownMenuItem
               key={opt.value}
-              type="button"
-              onClick={() => {
-                onFit(opt.value)
-                setOpen(false)
-              }}
-              className={cn(
-                'w-full flex items-center px-2 py-1.5 rounded-md',
-                'text-body text-foreground text-left',
-                'hover:bg-neutral-hover outline-none focus-visible:bg-neutral-hover',
-              )}
+              onSelect={() => onFit(opt.value)}
             >
               {opt.label}
-            </button>
+            </DropdownMenuItem>
           ))}
-        </div>
-        <Separator className="my-1" />
-        <div className="py-1">
+          <DropdownMenuSeparator />
           {ZOOM_PRESETS.map((p) => {
             const selected = p === value
             return (
-              <button
+              <DropdownMenuItem
                 key={p}
-                type="button"
-                onClick={() => {
-                  onChange(p)
-                  setOpen(false)
-                }}
+                onSelect={() => onChange(p)}
+                data-state={selected ? 'checked' : undefined}
                 className={cn(
-                  'w-full flex items-center justify-between px-2 py-1.5 rounded-md',
-                  'text-body text-foreground text-left tabular-nums',
-                  'hover:bg-neutral-hover outline-none focus-visible:bg-neutral-hover',
-                  selected && 'bg-neutral-selected hover:bg-neutral-selected-hover',
+                  'tabular-nums',
+                  selected && 'bg-neutral-selected',
                 )}
               >
-                <span>{p}%</span>
-              </button>
+                {p}%
+              </DropdownMenuItem>
             )
           })}
-        </div>
-      </PopoverContent>
-    </Popover>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {/* 放大 */}
+      <Button
+        variant="text"
+        size="sm"
+        iconOnly
+        startIcon={Plus}
+        aria-label="放大"
+        disabled={value >= 400}
+        onClick={() => onChange(nextZoomIn(value))}
+      />
+    </div>
   )
 }
 ZoomInput.displayName = 'ZoomInput'
@@ -631,6 +638,9 @@ const FileViewer: React.FC<FileViewerProps> = ({
     setZoom(100)
   }, [activeIndex])
 
+  // Fit request(shell → renderer 指令;nonce 遞增讓重複同 fit 也觸發 renderer)
+  const [fitRequest, setFitRequest] = React.useState<{ fit: ZoomFit; nonce: number } | null>(null)
+
   // Renderer capabilities(mount 時 renderer emit)
   const [capabilities, setCapabilities] = React.useState<FileRendererCapabilities>({
     zoom: false,
@@ -639,9 +649,9 @@ const FileViewer: React.FC<FileViewerProps> = ({
   const file = files[activeIndex]
   const Renderer = file ? resolveRenderer(file) : null
 
-  // Fit-to-* 目前當作把 zoom 重設為 100%(MVP;未來 renderer 可 own fit 實作)
-  const handleFit = React.useCallback((_fit: ZoomFit) => {
-    setZoom(100)
+  // Fit-to-* 下指令給 renderer,renderer 算 container/image 比例後透過 onZoomChange 回報
+  const handleFit = React.useCallback((fit: ZoomFit) => {
+    setFitRequest((prev) => ({ fit, nonce: (prev?.nonce ?? 0) + 1 }))
   }, [])
 
   // Download handler
@@ -777,6 +787,7 @@ const FileViewer: React.FC<FileViewerProps> = ({
                     file={file}
                     zoom={zoom}
                     onZoomChange={setZoom}
+                    fitRequest={fitRequest}
                     onCapabilitiesChange={setCapabilities}
                   />
                 </div>

@@ -90,6 +90,27 @@ startIcon 不隨 value 變化——它描述的是 input 的用途，不是 valu
 
 ---
 
+## Variant(visual chrome,正交於 mode)
+
+Input 有兩個 visual chrome variant,**獨立於 mode**(mode 是 state,variant 是 chrome look):
+
+| Variant | 視覺 | 適用場景 | 世界級對照 |
+|---------|------|---------|-----------|
+| `'default'`(預設) | bg-surface + 明顯 border + hover/focus 回饋 | 表單 / Field 內嵌 / 標準 edit UI | Material Input / Ant Input default |
+| `'bare'` | 透明 chrome,hover / focus 才出現 border;保留 padding / typography / height | **Toolbar inline editing**(FileViewer zoom input / chart config / rich text toolbar number input / Sidebar inline rename) | VS Code settings input / Figma toolbar number / Notion prop input |
+
+**判斷法**:Input 放在表單或 Field 內 → `default`;放在 Toolbar chrome 或 page-body inline → `bare`。
+
+**`bare` 使用情境的 canonical 要求**:
+- 外層 chrome 必須已提供「這是可編輯」的 affordance(Toolbar 的 icon / prop label / row structure);否則 user 看不到 input chrome 找不到可編輯位置
+- 保留 DS field-height(`h-field-sm/md/lg`)、typography、icon tier、error 視覺——**bare 只動 chrome 不動 sizing**
+
+**禁止**:
+- ❌ 在**表單** context 用 `bare`——表單需要明確的 field chrome 邀請輸入,bare 會失去 affordance
+- ❌ 拿 `bare` 來當「空白 div 替代品」——variant 不是拿掉視覺的工具,而是特定 chrome context 的 canonical
+
+---
+
 ## 相關
 
 - `../NumberInput/number-input.spec.md` — 數值資料

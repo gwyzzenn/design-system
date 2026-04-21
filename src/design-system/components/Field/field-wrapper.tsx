@@ -19,13 +19,17 @@ export const fieldWrapperStyles = cva(
   {
     variants: {
       mode: {
-        edit: [
-          'bg-surface border border-border',
-          'hover:border-border-hover',
-          'focus-within:border-primary focus-within:hover:border-primary',
-        ],
-        readonly: 'bg-disabled border border-transparent',
-        disabled: 'bg-disabled border border-transparent cursor-not-allowed',
+        edit: '',
+        readonly: '',
+        disabled: '',
+      },
+      variant: {
+        // default — 完整 Field wrapper chrome(bg-surface、明顯 border、hover/focus 回饋)
+        default: '',
+        // bare — 透明 chrome,hover / focus 才出現 border。適用 Toolbar inline editing
+        // (FileViewer zoom input / chart config / rich text toolbar number input 等)。
+        // 世界級對照:VS Code settings / Figma toolbar number / Notion prop input。
+        bare: '',
       },
       size: {
         sm: 'text-body h-field-sm px-3 gap-2',
@@ -33,8 +37,52 @@ export const fieldWrapperStyles = cva(
         lg: 'text-body-lg h-field-lg px-3 gap-2',
       },
     },
+    // mode x variant 交叉:visual chrome 由 compoundVariants 決定
+    compoundVariants: [
+      // default variant chrome by mode
+      {
+        mode: 'edit',
+        variant: 'default',
+        className: [
+          'bg-surface border border-border',
+          'hover:border-border-hover',
+          'focus-within:border-primary focus-within:hover:border-primary',
+        ],
+      },
+      {
+        mode: 'readonly',
+        variant: 'default',
+        className: 'bg-disabled border border-transparent',
+      },
+      {
+        mode: 'disabled',
+        variant: 'default',
+        className: 'bg-disabled border border-transparent cursor-not-allowed',
+      },
+      // bare variant chrome by mode
+      {
+        mode: 'edit',
+        variant: 'bare',
+        className: [
+          'bg-transparent border border-transparent',
+          'hover:border-border',
+          'focus-within:border-primary focus-within:hover:border-primary',
+        ],
+      },
+      {
+        mode: 'readonly',
+        variant: 'bare',
+        className: 'bg-transparent border border-transparent',
+      },
+      {
+        mode: 'disabled',
+        variant: 'bare',
+        className: 'bg-transparent border border-transparent cursor-not-allowed opacity-disabled',
+      },
+    ],
     defaultVariants: {
       mode: 'edit',
+      variant: 'default',
       size: 'md',
     },
   }

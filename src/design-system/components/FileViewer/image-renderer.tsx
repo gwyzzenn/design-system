@@ -32,9 +32,12 @@ export const ImageRenderer: React.FC<FileRendererProps> = ({
   file,
   zoom,
   onZoomChange,
+  fitRequest,
   onCapabilitiesChange,
 }) => {
   const apiRef = React.useRef<ReactZoomPanPinchRef | null>(null)
+  const imgRef = React.useRef<HTMLImageElement | null>(null)
+  const containerRef = React.useRef<HTMLDivElement | null>(null)
 
   // 宣告 capability — shell 用此決定 toolbar 內容。
   // 只 emit 一次(mount),後續 capability 不變。
@@ -55,6 +58,36 @@ export const ImageRenderer: React.FC<FileRendererProps> = ({
     }
   }, [zoom])
 
+  // Fit-to-* 指令處理 — 算 container / image 比例,emit 回 shell
+  // 世界級對照:Figma / Google Drive / Adobe Acrobat 的 Fit to width / page 都是
+  // 基於 container 與 image 的實際尺寸計算,不是「切換到固定 100%」
+  React.useEffect(() => {
+    if (!fitRequest) return
+    const img = imgRef.current
+    const container = containerRef.current
+    if (!img || !container) return
+    // 等到 image load 才有 naturalWidth/Height
+    if (!img.naturalWidth || !img.naturalHeight) return
+
+    const containerRect = container.getBoundingClientRect()
+    const cw = containerRect.width
+    const ch = containerRect.height
+    const iw = img.naturalWidth
+    const ih = img.naturalHeight
+    if (cw <= 0 || ch <= 0 || iw <= 0 || ih <= 0) return
+
+    const widthRatio = cw / iw
+    const heightRatio = ch / ih
+    const ratio = fitRequest.fit === 'fit-width'
+      ? widthRatio
+      : Math.min(widthRatio, heightRatio) // 'fit-page' = 整頁符合,取較小 scale
+
+    const nextZoomPct = Math.round(ratio * 100)
+    // Clamp to [MIN_SCALE*100, MAX_SCALE*100]
+    const clamped = Math.min(MAX_SCALE * 100, Math.max(MIN_SCALE * 100, nextZoomPct))
+    onZoomChange(clamped)
+  }, [fitRequest, onZoomChange])
+
   // TransformWrapper 內部 zoom 變動(wheel / pinch)→ 同步回 shell
   const handleTransformed = React.useCallback(
     (_ref: ReactZoomPanPinchRef, state: { scale: number }) => {
@@ -67,32 +100,35 @@ export const ImageRenderer: React.FC<FileRendererProps> = ({
   )
 
   return (
-    <TransformWrapper
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ref={apiRef as any}
-      initialScale={zoom / 100}
-      minScale={MIN_SCALE}
-      maxScale={MAX_SCALE}
-      centerOnInit
-      centerZoomedOut
-      limitToBounds={false}
-      wheel={{ step: 0.15 }}
-      doubleClick={{ mode: 'reset' }}
-      onTransform={handleTransformed}
-    >
-      <TransformComponent
-        wrapperClass="!w-full !h-full"
-        contentClass="!w-full !h-full flex items-center justify-center"
+    <div ref={containerRef} className="w-full h-full">
+      <TransformWrapper
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ref={apiRef as any}
+        initialScale={zoom / 100}
+        minScale={MIN_SCALE}
+        maxScale={MAX_SCALE}
+        centerOnInit
+        centerZoomedOut
+        limitToBounds={false}
+        wheel={{ step: 0.1 }}
+        doubleClick={{ mode: 'reset' }}
+        onTransform={handleTransformed}
       >
-        <img
-          src={file.url}
-          alt={file.name}
-          draggable={false}
-          className="max-w-full max-h-full object-contain select-none"
-          style={{ pointerEvents: 'none' }}
-        />
-      </TransformComponent>
-    </TransformWrapper>
+        <TransformComponent
+          wrapperClass="!w-full !h-full"
+          contentClass="!w-full !h-full flex items-center justify-center"
+        >
+          <img
+            ref={imgRef}
+            src={file.url}
+            alt={file.name}
+            draggable={false}
+            className="max-w-full max-h-full object-contain select-none"
+            style={{ pointerEvents: 'none' }}
+          />
+        </TransformComponent>
+      </TransformWrapper>
+    </div>
   )
 }
 ImageRenderer.displayName = 'ImageRenderer'

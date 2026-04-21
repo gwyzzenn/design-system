@@ -1,3 +1,4 @@
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { Meta, StoryObj } from '@storybook/react'
 import {
   Carousel,
@@ -7,8 +8,8 @@ import {
   CarouselNext,
   CarouselDots,
 } from './carousel'
+import { Button } from '@/design-system/components/Button/button'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/design-system/components/Tabs/tabs'
-import { Avatar } from '@/design-system/components/Avatar/avatar'
 
 const meta: Meta = {
   title: 'Design System/Components/Carousel/設計原則',
@@ -211,20 +212,14 @@ export const ArrowHoverOnly: Story = {
             <div className="absolute inset-0 flex items-end p-5 text-white">
               <div className="text-body-lg font-bold">京都</div>
             </div>
-            <button
-              type="button"
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-md bg-surface border border-border flex items-center justify-center"
-              aria-label="上一張(永遠可見的範例)"
-            >
-              ‹
-            </button>
-            <button
-              type="button"
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-md bg-surface border border-border flex items-center justify-center"
-              aria-label="下一張(永遠可見的範例)"
-            >
-              ›
-            </button>
+            {/* 示範「永遠可見」anti-pattern 時,仍使用 DS Button 維持視覺規格一致;
+                關鍵差異在 wrapper 沒有 opacity-0 + group-hover 的 fade 邏輯 */}
+            <div className="absolute left-3 top-1/2 -translate-y-1/2">
+              <Button variant="tertiary" size="md" iconOnly startIcon={ChevronLeft} aria-label="上一張(永遠可見的範例)" />
+            </div>
+            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+              <Button variant="tertiary" size="md" iconOnly startIcon={ChevronRight} aria-label="下一張(永遠可見的範例)" />
+            </div>
           </div>
           <Label warn>↑ 箭頭永遠可見 · 分散主視覺焦點 · 違反 hover-only 慣例</Label>
         </div>
@@ -344,42 +339,9 @@ export const ForbiddenUsages: Story = {
   ),
 }
 
-export const TestimonialExample: Story = {
-  name: '補充範例:Testimonial carousel',
-  render: () => (
-    <div>
-      <Rule
-        title="✅ Customer testimonial 是 carousel 的經典場景"
-        note="3–5 張 customer quote 卡片,每張是同類(同為客戶評語),使用者願意按順序讀。Linear / Stripe / Notion 官網首頁都採此 pattern。"
-      >
-        <div className="w-[520px]">
-          <Carousel opts={{ loop: true }}>
-            <CarouselContent>
-              {[
-                { name: '林婕欣',   title: 'PM · Gogolook',          quote: 'Workflow 重新設計後節省了一半的會議時間。' },
-                { name: 'David Chen', title: 'Eng Lead · Appier',    quote: '導入後三個月內部署頻率翻倍,on-call 負擔下降。' },
-                { name: 'Sarah Wu',   title: 'Design Dir · KKday',  quote: 'Design token 統一後設計稿和 production 不再需要 QA 來回對。' },
-              ].map((t) => (
-                <CarouselItem key={t.name}>
-                  <div className="bg-surface-raised border border-border rounded-lg p-6 min-h-[180px] flex flex-col justify-between">
-                    <p className="text-body leading-relaxed">「{t.quote}」</p>
-                    <div className="flex items-center gap-3 mt-4">
-                      <Avatar alt={t.name} size={36} />
-                      <div>
-                        <div className="text-caption font-medium">{t.name}</div>
-                        <div className="text-footnote text-fg-muted">{t.title}</div>
-                      </div>
-                    </div>
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-          </Carousel>
-          <Label>3 張同類評語 · 非圖片 overlay 場景 · arrow 仍 hover-only</Label>
-        </div>
-      </Rule>
-    </div>
-  ),
-}
+// TestimonialExample 移除(2026-04-21):
+// 原範例把 arrow overlay 壓在「純文字 quote card」之上,違反 Carousel arrow overlay
+// 「只覆蓋圖 / 背景,不壓文字」的原則——arrow 會遮到 quote 內文或 avatar byline。
+// 純文字 carousel 若真要做,arrow 應該放在 card 外側(非 overlay),但該 layout 少見,
+// DS 不主動 demo 避免教壞 consumer。對齊 carousel.stories.tsx 底部同期移除的
+// TestimonialCarousel 的相同理由。

@@ -1,7 +1,7 @@
 import type { Meta } from '@storybook/react'
 import { useState, useEffect } from 'react'
 import { DatePicker, DatePickerDisplay } from './date-picker'
-import { Calendar as DSCalendar } from '@/design-system/components/Calendar/calendar'
+import { DateGrid as DSDateGrid } from '@/design-system/components/DateGrid/date-grid'
 
 const meta: Meta = {
   title: 'Design System/Components/DatePicker/設計規格',
@@ -792,7 +792,7 @@ export const CalendarTokens = {
           <div className="flex flex-col gap-2">
             <span className="text-caption font-medium text-fg-secondary">實際渲染</span>
             <div className="border border-divider rounded-md bg-surface-raised shadow-[var(--elevation-200)] inline-block">
-              <DSCalendar
+              <DSDateGrid
                 mode="single"
                 selected={selected}
                 onSelect={setSelected}

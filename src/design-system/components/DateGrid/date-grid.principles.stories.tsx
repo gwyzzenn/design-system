@@ -2,11 +2,11 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
 import { zhTW } from 'date-fns/locale/zh-TW'
 import type { DateRange } from 'react-day-picker'
-import { Calendar } from './calendar'
+import { DateGrid } from './date-grid'
 import { DatePicker } from '@/design-system/components/DatePicker/date-picker'
 
 const meta: Meta = {
-  title: 'Design System/Components/Calendar/設計原則',
+  title: 'Design System/Internal/DateGrid/設計原則',
   parameters: { layout: 'padded' },
 }
 export default meta
@@ -72,7 +72,7 @@ export const ModeRule: Story = {
             note="資料欄位只接受一個日期值。使用者心智模型:「我要選一個日」。點新日取代舊選。此 mode 是 DatePicker 內建行為,最常見。"
           >
             <Demo title="Stripe 發票到期日 / Notion 個人生日">
-              <Calendar
+              <DateGrid
                 mode="single"
                 selected={single}
                 onSelect={setSingle}
@@ -87,7 +87,7 @@ export const ModeRule: Story = {
             note="使用者要標記多個獨立日期,彼此不相關。參考 Luma RSVP 活動日標記、請假系統排休日。點已選日 = 取消。"
           >
             <Demo title="Luma 活動可參加日">
-              <Calendar
+              <DateGrid
                 mode="multiple"
                 selected={multiple}
                 onSelect={(d) => setMultiple(d ?? [])}
@@ -102,7 +102,7 @@ export const ModeRule: Story = {
             note="資料語意是「一段時間」,start 與 end 有順序關係。參考 Stripe 分析時段、Vercel Analytics 期間、Airbnb 訂房 check-in/out。"
           >
             <Demo title="Stripe Dashboard 查詢時段">
-              <Calendar
+              <DateGrid
                 mode="range"
                 selected={range}
                 onSelect={setRange}
@@ -144,7 +144,7 @@ export const CalendarVsDatePickerRule: Story = {
           <Demo title="Linear 專案截止日 widget">
             <div className="flex flex-col gap-2 w-fit">
               <span className="text-caption text-fg-muted px-1">Project deadline</span>
-              <Calendar
+              <DateGrid
                 mode="single"
                 selected={inline}
                 onSelect={setInline}
@@ -189,7 +189,7 @@ export const VisualTokenRule: Story = {
         note="選中日用 primary 實心填滿(和系統其他選中態如 Checkbox checked、Tab active 一致);今日但未選 = ring-1 框定位(告訴使用者「這是今天」,但不搶選中視覺)。兩者同時成立時實心 selected 視覺優先。"
       >
         <Demo title="今日 + 已選他日">
-          <Calendar
+          <DateGrid
             mode="single"
             selected={(() => {
               const d = new Date()
@@ -207,7 +207,7 @@ export const VisualTokenRule: Story = {
         note="前後月的補格讓使用者認得「跨月邊界」但不搶主要月份的閱讀焦點;disabled 日期保留可見(告訴使用者「這天存在但不能選」),opacity-50 加上 pointer-events-none。"
       >
         <Demo title="showOutsideDays + disabled 過去日期">
-          <Calendar
+          <DateGrid
             mode="single"
             defaultMonth={new Date()}
             locale={zhTW}
@@ -231,7 +231,7 @@ export const VisualTokenRule: Story = {
   ),
 }
 
-export const NotAnEventCalendarRule: Story = {
+export const NotAnEventViewRule: Story = {
   name: '不是事件行事曆(日程本)',
   render: () => (
     <div>
@@ -240,7 +240,7 @@ export const NotAnEventCalendarRule: Story = {
         note="本元件只處理日期選擇(選一天、多天、範圍)。若需求是「顯示一個月內的事件清單、拖曳事件、切換 week / month / agenda view」——那是事件行事曆,需要專用元件(Google Calendar / Outlook 類),不屬於本元件範疇。"
       >
         <Demo title="✅ 正確用途:選日">
-          <Calendar mode="single" defaultMonth={new Date()} locale={zhTW} />
+          <DateGrid mode="single" defaultMonth={new Date()} locale={zhTW} />
         </Demo>
       </Rule>
 
@@ -278,10 +278,10 @@ export const LocaleRule: Story = {
         note="react-day-picker 接受 date-fns locale 物件。繁中用 zhTW(週首為週日)、英文用 enUS(週首為週日)、德 / 法系國家週首為週一。Consumer 決定傳哪個 locale,Calendar 不內建語言。"
       >
         <Demo title="zhTW(繁體中文 · 週日起)">
-          <Calendar mode="single" defaultMonth={new Date(2026, 3, 1)} locale={zhTW} />
+          <DateGrid mode="single" defaultMonth={new Date(2026, 3, 1)} locale={zhTW} />
         </Demo>
         <Demo title="預設(en-US · 週日起)">
-          <Calendar mode="single" defaultMonth={new Date(2026, 3, 1)} />
+          <DateGrid mode="single" defaultMonth={new Date(2026, 3, 1)} />
         </Demo>
       </Rule>
 

@@ -1,0 +1,81 @@
+import * as React from 'react'
+import type { Meta, StoryObj } from '@storybook/react'
+import { TimePicker } from './time-picker'
+import { Field, FieldLabel } from '@/design-system/components/Field/field'
+
+/**
+ * TimePicker 設計原則 stories — 讀 `time-picker.spec.md` 了解完整規則。
+ * 每則 story 示範一條設計判斷(何時用、何時不用、禁止事項)。
+ */
+
+const meta: Meta<typeof TimePicker> = {
+  title: 'Design System/Components/TimePicker/設計原則',
+  component: TimePicker,
+  parameters: { layout: 'centered' },
+}
+export default meta
+
+type Story = StoryObj<typeof TimePicker>
+
+/**
+ * Rule:會議場景 minuteStep=15
+ * 世界級(Google Calendar / Outlook / Notion Calendar)開會排時間都是 15 分鐘粒度——
+ * minuteStep=1 讓使用者困在挑「9:07 還是 9:08」,失去會議排程本質。
+ */
+export const RuleMinuteStepForMeetings: Story = {
+  name: 'Rule:會議類情境一律 minuteStep=15',
+  render: () => (
+    <div className="flex gap-8">
+      <Field>
+        <FieldLabel>✅ 正確(minuteStep=15)</FieldLabel>
+        <TimePicker value="09:15" onChange={() => {}} minuteStep={15} />
+      </Field>
+      <Field>
+        <FieldLabel>❌ 錯誤(預設 minuteStep=1,會議排程無意義)</FieldLabel>
+        <TimePicker value="09:07" onChange={() => {}} />
+      </Field>
+    </div>
+  ),
+}
+
+/**
+ * Rule:Range 語意用兩個 TimePicker 組合
+ * TimePicker MVP 不內建 Range(見 spec「為何無 Range」)——對齊 Ant composition 思路,
+ * consumer 用兩個 TimePicker + arrow 達成營業時段 / 會議時段等 range 場景。
+ */
+export const RuleRangeComposition: Story = {
+  name: 'Rule:Range 用兩個 TimePicker 組合,不內建',
+  render: () => {
+    const [open, setOpen] = React.useState('10:00')
+    const [close, setClose] = React.useState('22:00')
+    return (
+      <Field>
+        <FieldLabel>營業時段(兩個 TimePicker + →)</FieldLabel>
+        <div className="flex items-center gap-2">
+          <TimePicker value={open} onChange={setOpen} />
+          <span className="text-fg-muted">→</span>
+          <TimePicker value={close} onChange={setClose} />
+        </div>
+      </Field>
+    )
+  },
+}
+
+/**
+ * Rule:禁止用 label Button 作 clear
+ * 對齊 CLAUDE.md「Dismiss 按鈕 canonical」—— clear button 必用 ItemInlineActionButton
+ * (本元件 clearable=true 自動渲染 X Inline Action 在 endAction slot),禁止自刻
+ * `<Button>清除</Button>` 作 clear。
+ */
+export const RuleClearNoLabelButton: Story = {
+  name: 'Rule:clearable 用 X Inline Action,禁用 label Button',
+  render: () => {
+    const [t, setT] = React.useState<string>('14:30')
+    return (
+      <Field>
+        <FieldLabel>✅ clearable=true(自動 X Inline Action)</FieldLabel>
+        <TimePicker value={t} onChange={setT} clearable />
+      </Field>
+    )
+  },
+}

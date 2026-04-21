@@ -1,3 +1,4 @@
+// @anatomy-exempt: inspector 規格表格(token / prop 對照)用 raw <table>,非業務資料表。業務資料表才用 <DataTable>。
 import type { Meta, StoryObj } from '@storybook/react'
 import { DescriptionList, DescriptionItem } from './description-list'
 import { H3, Desc, Td, Th } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
@@ -42,13 +43,17 @@ export const Overview: Story = {
 
       <div>
         <H3>間距</H3>
+        <Desc>所有垂直間距皆走 `--layout-space-tight` token(density-aware)——切 density 自動適配,避免硬寫 px / py-N 脫鉤 token。</Desc>
         <div className="overflow-x-auto">
           <table className="text-caption border-collapse">
-            <thead><tr><Th>位置</Th><Th>Value</Th></tr></thead>
+            <thead><tr><Th>Direction</Th><Th>位置</Th><Th>Value</Th><Th>Rationale</Th></tr></thead>
             <tbody>
-              <tr><Td>label → value(同 item 內)</Td><Td mono>mt-0.5(2px)——極小間距,視覺上 label 與 value 緊密配對</Td></tr>
-              <tr><Td>items 之間垂直 gap</Td><Td mono>gap-y-[var(--layout-space-tight)]——density-aware</Td></tr>
-              <tr><Td>columns 之間水平 gap</Td><Td mono>gap-x-4(16px)</Td></tr>
+              <tr><Td mono>vertical</Td><Td>label → value(同 item 內)</Td><Td mono>mt-0.5(2px)</Td><Td>極小間距,視覺上 label 與 value 緊密配對</Td></tr>
+              <tr><Td mono>vertical</Td><Td>items 之間垂直 gap</Td><Td mono>gap-y-[var(--layout-space-tight)]</Td><Td>density-aware;Gestalt proximity 群組</Td></tr>
+              <tr><Td mono>vertical</Td><Td>columns 之間水平 gap</Td><Td mono>gap-x-4(16px)</Td><Td>cols &gt; 1 時欄間距</Td></tr>
+              <tr><Td mono>horizontal(divided=false)</Td><Td>items 之間垂直 gap</Td><Td mono>mb-[var(--layout-space-tight)] last:mb-0</Td><Td>等同 vertical 的 items gap,density-aware</Td></tr>
+              <tr><Td mono>horizontal(divided=false)</Td><Td>label ↔ value</Td><Td mono>justify-between + gap-4</Td><Td>最小 16px,content 之間自然拉開</Td></tr>
+              <tr><Td mono>horizontal(divided=true)</Td><Td>每 item 上下 padding</Td><Td mono>py-[var(--layout-space-tight)]</Td><Td>density-aware,形成 cell-like row 高度;row 間有 border-b border-divider 對齊格線</Td></tr>
             </tbody>
           </table>
         </div>

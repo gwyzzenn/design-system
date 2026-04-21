@@ -2,11 +2,11 @@ import type { Meta } from '@storybook/react'
 import { useState } from 'react'
 import { zhTW } from 'date-fns/locale/zh-TW'
 import type { DateRange } from 'react-day-picker'
-import { Calendar } from './calendar'
+import { DateGrid } from './date-grid'
 import { H3, Desc, Td, Th, TokenCell } from '@/design-system/stories-helpers/anatomy/anatomy-utils'
 
 const meta: Meta = {
-  title: 'Design System/Components/Calendar/設計規格',
+  title: 'Design System/Internal/DateGrid/設計規格',
   parameters: { layout: 'padded' },
 }
 export default meta
@@ -106,7 +106,7 @@ export const Overview = {
         <H3>視覺一覽</H3>
         <Desc>實際渲染 — single mode,已選今日的前一日展示 selected 視覺,today 以 ring 框定位。</Desc>
         <div className="inline-flex bg-surface-raised border border-border rounded-lg p-2 w-fit">
-          <Calendar
+          <DateGrid
             mode="single"
             selected={(() => {
               const d = new Date()
@@ -197,7 +197,7 @@ export const Inspector = {
           <div className="flex flex-col gap-5">
             <div className="px-6 py-6 rounded-lg bg-canvas border border-divider flex items-center justify-center">
               <div className="bg-surface-raised border border-border rounded-lg p-2">
-                <Calendar
+                <DateGrid
                   mode="single"
                   selected={selected}
                   defaultMonth={selected}
@@ -443,13 +443,13 @@ export const SizeMatrix = {
         <div className="flex flex-col gap-2">
           <span className="text-caption font-medium text-fg-secondary">單月(預設)</span>
           <div className="bg-surface-raised border border-border rounded-lg p-2">
-            <Calendar mode="single" defaultMonth={new Date()} locale={zhTW} />
+            <DateGrid mode="single" defaultMonth={new Date()} locale={zhTW} />
           </div>
         </div>
         <div className="flex flex-col gap-2">
           <span className="text-caption font-medium text-fg-secondary">雙月並排(range 常用)</span>
           <div className="bg-surface-raised border border-border rounded-lg p-2">
-            <Calendar mode="single" defaultMonth={new Date()} locale={zhTW} numberOfMonths={2} />
+            <DateGrid mode="single" defaultMonth={new Date()} locale={zhTW} numberOfMonths={2} />
           </div>
         </div>
       </div>
@@ -484,7 +484,7 @@ export const StateBehavior = {
           <div className="flex flex-col gap-2 min-w-0">
             <span className="text-caption font-medium text-fg-secondary">mode="single"</span>
             <div className="bg-surface-raised border border-border rounded-lg p-2">
-              <Calendar
+              <DateGrid
                 mode="single"
                 selected={single}
                 onSelect={setSingle}
@@ -500,7 +500,7 @@ export const StateBehavior = {
           <div className="flex flex-col gap-2 min-w-0">
             <span className="text-caption font-medium text-fg-secondary">mode="multiple"</span>
             <div className="bg-surface-raised border border-border rounded-lg p-2">
-              <Calendar
+              <DateGrid
                 mode="multiple"
                 selected={multiple}
                 onSelect={(d) => setMultiple(d ?? [])}
@@ -516,7 +516,7 @@ export const StateBehavior = {
           <div className="flex flex-col gap-2 min-w-0">
             <span className="text-caption font-medium text-fg-secondary">mode="range"</span>
             <div className="bg-surface-raised border border-border rounded-lg p-2">
-              <Calendar
+              <DateGrid
                 mode="range"
                 selected={range}
                 onSelect={setRange}

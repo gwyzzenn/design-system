@@ -147,6 +147,7 @@ Shell 看到 `pageNumber` capability 時自動在 toolbar 顯示 page navigator(
 
 - 消費 `react-zoom-pan-pinch`(zoom + pan 行為 primitive,無 UI);世界級產品 Figma / Miro / PhotoSwipe 同流派
 - Scroll wheel 縮放;`zoom > 100%` 時可拖曳 pan
+- **Wheel step 為 `0.1`**(每 tick ~10% 縮放變化,對齊 Figma canonical);不用 additive step 因為高低縮放區間的感受不一致(低 zoom 時 0.15 太跳、高 zoom 時 0.15 又太慢),multiplicative 0.1 在整個 10–400% 範圍內操作感一致
 - Min scale 10%,max scale 400%
 - 雙擊重設 100%
 - 切換檔案時 shell 自動重設 zoom 到 100%(避免上一張檔案的 zoom 狀態帶到下一張)
@@ -155,14 +156,38 @@ Shell 看到 `pageNumber` capability 時自動在 toolbar 顯示 page navigator(
 
 ## ZoomInput 規則
 
-- 視覺:數字輸入 + 右側 `▼` trigger 打開 preset dropdown
-- 固定寬 `w-20`(80px)、高 `h-field-sm`(viewer chrome 尺寸)
-- 直接輸入數字 + Enter 套用;輸入非法值 blur 時還原
-- 範圍 10–400(對齊 ImageRenderer 的 min/max scale)
-- Dropdown 內容:**分兩組**——Fit options 在上(Fit to width / Fit to page),preset 百分比在下(10/25/50/75/100/125/150/200/400),`<Separator>` 分組
-- 當前 zoom 在 preset 中的那項顯示 `bg-neutral-selected`
+### 結構(2026-04-21 canonical)
 
-**Why inline(不抽獨立 primitive)**:目前只 FileViewer 消費。當 PDF / Video viewer 也需要時,再依「建立前必查既有 pattern」原則從 FileViewer 抽出升級。
+```
+[−]  [ % input(bare)  ⌄ ]  [+]
+ │         │               │
+ │         │               └─ Button iconOnly Plus(zoom in 到下一個 preset)
+ │         └─ Input variant="bare" size="sm",w-20 + text-center + tabular-nums;
+ │            endAction = ChevronDown(觸發 DropdownMenu)
+ └─ Button iconOnly Minus(zoom out 到上一個 preset)
+```
+
+**消費 DS primitive**:
+- `<Button>` iconOnly size="sm" 作 ± 按鈕(Minus / Plus icon,disabled 於邊界)
+- `<Input variant="bare" size="sm">` 作 % 輸入(Toolbar inline editing canonical)
+- Input `endAction` slot 渲染 ⌄ chevron 作 DropdownMenu trigger
+- `<DropdownMenu>` 作 preset + fit 選單(取代先前 `<Popover>` + 手刻 button list)
+
+### 互動規則
+
+- 直接輸入數字 + Enter 套用;輸入非法值 blur 時還原為上一個有效值
+- 範圍 **10–400**(對齊 `ImageRenderer.MIN_SCALE = 0.1` / `MAX_SCALE = 4.0`);± 按鈕在邊界 disabled
+- ± 按鈕跳到下一個 preset(`10 / 25 / 50 / 75 / 100 / 125 / 150 / 200 / 400`),不是固定 step
+- ⌄ DropdownMenu 內容分兩組:**Fit options 在上**(Fit to width / Fit to page)/ **preset 百分比在下**,`<DropdownMenuSeparator />` 分組
+- 當前 zoom 在 preset 中的那項視覺標示 `bg-neutral-selected`
+
+### 同 flex 列幾何鐵律(CLAUDE.md 規則)
+
+`[−]` / `[%input]` / `[+]` 三個 slot **都是 h-field-sm(28px)**,統一高度確保 gap 不被 hover bg 吃掉。Button iconOnly size="sm" aspect-square ≈ 28×28,Input size="sm" 28 高,視覺嚴格對齊。
+
+### Why inline(不抽獨立 primitive)
+
+目前只 FileViewer 消費。當 PDF / Video viewer 也需要時,再依「建立前必查既有 pattern」原則從 FileViewer 抽出升級為 `patterns/zoom-control/` pattern primitive。
 
 ---
 

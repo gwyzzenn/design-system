@@ -1,6 +1,6 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
-import { Sparkles, Bot, Users, FolderPlus, BarChart3 } from 'lucide-react'
+import { Sparkles, Bot, Users, FolderPlus, BarChart3, Keyboard, MousePointer2, Command } from 'lucide-react'
 import { Coachmark } from './coachmark'
 import { Button } from '@/design-system/components/Button/button'
 
@@ -126,6 +126,75 @@ export const MultiStepTour: Story = {
         </div>
         <p className="text-footnote text-fg-muted">
           ↑ 多步驟:`kind="new-features"` header 提示脈絡;第 1 步有 Skip,按 Next 進 2+ 步後 Skip 自動隱藏(canonical)
+        </p>
+      </div>
+    )
+  },
+}
+
+// ── Multi-step Tips: 鍵盤快捷鍵教學(Linear / Figma 風格)───────────────────
+
+const tipSteps = [
+  {
+    anchor: '鍵盤導覽',
+    icon: Keyboard,
+    media: { from: '#8b5cf6', to: '#6366f1', label: 'Cmd + K' },
+    title: '用 Cmd + K 叫出全站搜尋',
+    description: '快速搜尋任何檔案、指令、設定;支援模糊比對與歷史紀錄。多數操作都可以從這裡直接觸發。',
+  },
+  {
+    anchor: '快速切換',
+    icon: Command,
+    media: { from: '#0ea5e9', to: '#8b5cf6', label: 'Cmd + P' },
+    title: 'Cmd + P 在最近文件間切換',
+    description: '相當於 VS Code / Figma 的 Go to File;按住 Cmd 不放可多次跳轉,放開即停在當前。',
+  },
+  {
+    anchor: '右鍵動作',
+    icon: MousePointer2,
+    media: { from: '#10b981', to: '#0ea5e9', label: 'Right-click' },
+    title: '右鍵選單集中所有情境動作',
+    description: '在任一檔案或列表項上按右鍵,會列出所有可用動作:複製、分享、重新命名、刪除等。',
+  },
+]
+
+export const TipsMultiStep: Story = {
+  name: '多步 Tips(快捷鍵教學 / kind="tips")',
+  render: () => {
+    const [step, setStep] = React.useState(0)
+    const [open, setOpen] = React.useState(true)
+
+    return (
+      <div className="flex flex-col gap-6 min-w-[360px]">
+        <div className="flex items-center gap-3 p-3 border border-border rounded-lg bg-surface">
+          {tipSteps.map((s, i) => (
+            <Coachmark
+              key={s.anchor}
+              open={open && step === i}
+              onOpenChange={(o) => { if (step === i && !o) setOpen(false) }}
+              kind="tips"
+              image={<MediaGradient from={s.media.from} to={s.media.to} icon={s.icon} label={s.media.label} />}
+              title={s.title}
+              description={s.description}
+              step={{ current: i + 1, total: tipSteps.length }}
+              onPrev={i > 0 ? () => setStep(i - 1) : undefined}
+              onSkip={() => setOpen(false)}
+              onNext={() => (i === tipSteps.length - 1 ? setOpen(false) : setStep(i + 1))}
+              isLastStep={i === tipSteps.length - 1}
+              side="bottom"
+              align="start"
+            >
+              <Button variant={i === step ? 'primary' : 'tertiary'} size="sm" startIcon={s.icon}>
+                {s.anchor}
+              </Button>
+            </Coachmark>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <Button variant="tertiary" size="sm" onClick={() => { setStep(0); setOpen(true) }}>重設 Tips</Button>
+        </div>
+        <p className="text-footnote text-fg-muted">
+          ↑ `kind="tips"` header 文字 = 「使用技巧」(vs `new-features` = 「新功能介紹」),兩者都由元件內 canonical 映射,consumer 不重寫
         </p>
       </div>
     )

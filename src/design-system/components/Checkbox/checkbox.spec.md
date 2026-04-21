@@ -97,6 +97,12 @@ Checkbox 和 Radio 是**表單內的選擇控件**，視覺語言完全一致，
 | md | 16px | 12px | field md |
 | lg | 20px | 16px | field lg |
 
+### 為什麼不完全對齊 `--field-height-*`
+
+- **現況**:控件 sm=16 / md=16 / lg=20px(不等於 `--field-height-sm/md/lg` = 28/32/36px)
+- **Rationale**:Checkbox 控件是**選擇指示器**(indicator),不是容器;field-height 是「可編輯 control 的容器高度」,indicator 視覺上要明顯小於容器,才符合「選項前有個小方框」的心智模型。控件本體走 icon tier(sm/md=16, lg=20),行高對齊透過 SelectionItem 的 `py = (field-height - 1lh) / 2` 保證(控件垂直置中於 1lh 容器)
+- **世界級對照**:Material 3 Checkbox = 18px touch target 內的 18px container / Ant Design Checkbox = 16px 控件 / Polaris Checkbox = 16px——全部獨立於 field-height,控件 icon 與 field 分離是共識
+
 ---
 
 ## Label 對齊

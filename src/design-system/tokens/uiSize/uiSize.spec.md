@@ -34,6 +34,8 @@ Button、Input、Checkbox/Radio SelectionItem 等互動元件。
 | `SegmentedControl` | xs / sm / md / lg | **`md`** | `--field-height-md` |
 | `Checkbox` | sm / md / lg | **`md`** | `--field-height-md`（控件 16/20px 對應） |
 | `RadioGroup` | sm / md / lg | **`md`** | `--field-height-md`（控件 16/20px 對應） |
+| `Rating` | sm / md / lg | **`md`** | `--field-height-md`(container 對齊,icon 走 icon tier 16/16/20) |
+| `TimePicker` | sm / md / lg | **`md`** | `--field-height-md`(Ant-style 時間選擇,對齊 DatePicker 家族) |
 | `Tag` | sm / md / lg | **`md`** | 自帶尺寸，透過 Field size 配對 |
 
 **單一尺寸消費者（不在 default-md 規則內）**：
@@ -41,6 +43,28 @@ Button、Input、Checkbox/Radio SelectionItem 等互動元件。
 | 元件 | 固定 size | 理由 |
 |------|----------|------|
 | `Chip` | 固定 `h-field-sm`（28/32px） | Material 3 / Atlassian / Polaris 共識：filter chips 使用單一高度。不暴露 size prop |
+
+#### 偏離 field-height family 的 rationale 格式(canonical)
+
+任何元件的 size prop **偏離 field-height 對齊**(例:Checkbox 控件 sm/md 都是 16px、Rating 控件非 field-height、Switch 的 thumb 不跟 field-height 成比例等)或 **偏離 default md**(例:Chip 固定 sm),**必須在自己 spec.md 的「尺寸」章節下寫一個子標題固定格式**:
+
+```markdown
+### 為什麼不完全對齊 `--field-height-*`(或:為什麼不 default md)
+
+- **現況**:{sm/md/lg 實際數值或 token,e.g. sm=16px / md=16px / lg=20px(Checkbox)}
+- **Rationale**:{一句話說明偏離理由,指向世界級或 token spec 或 UX 約束}
+- **世界級對照**:{Polaris / Material / Ant / Atlassian 等中至少一個同樣這樣做的 DS}
+```
+
+**必須同時滿足**:
+1. 子標題必含「為什麼」三字(而非被動「尺寸不同」這類寫法),這樣 audit 可以 mechanical grep 「`### 為什麼不完全對齊`」或「`### 為什麼不 default md`」
+2. 三個欄位(現況 / Rationale / 世界級對照)**都要填**,缺一不可——特別是「世界級對照」不能省,mindset #1 要求對標
+3. 位置:必須在 spec 的「尺寸」主章節之下(不是埋在「何時不用」或「禁止事項」等其他章節)
+
+**現有已遵循此格式的元件**:Chip(本檔上表已寫,Material 3 / Atlassian / Polaris 共識)/ Checkbox / RadioGroup / Switch / Slider / Textarea / Rating(2026-04-21 批次補齊,五欄格式統一)
+**需補齊 rationale 段的元件**:(無 — Phase 2 已全部補齊)。未來新增偏離 field-height 的元件 → 必須按本格式寫,`/design-system-audit` 會 enforce。
+
+**audit hook 未來擴展**:若 cva `defaultVariants.size` 不是 `md`,或 `size` variants 的數值不命中 `--field-height-*`,hook 可要求 spec.md 必有符合格式的 rationale 段,否則 block merge(列為 post-Phase-2 可考慮加上的 mechanical gate)。
 
 #### 為什麼必須共享 default
 

@@ -34,12 +34,31 @@ export interface FileRendererCapabilities {
   pageNumber?: { current: number; total: number }
 }
 
+/**
+ * Fit-to-* 指令:shell 向 renderer 下指令「請用 width 或 page fit 比例重新 zoom」。
+ * 採 nonce(counter)模式而非 boolean,讓 shell 可以重複下同一個 fit 指令
+ * (例:user 連按兩次 Fit to page 應該都觸發 ImageRenderer 重新計算)。
+ * renderer 收到 nonce 變化時才執行 fit,不看 fit 值本身是否變。
+ */
+export interface FitRequest {
+  /** 'fit-width' = 寬度填滿;'fit-page' = 整頁符合(width 和 height 都 fit,取較小 scale) */
+  fit: 'fit-width' | 'fit-page'
+  /** 每次 shell 下指令時 +1,renderer watch 此值變化才觸發 fit */
+  nonce: number
+}
+
 export interface FileRendererProps {
   file: FileInfo
   /** 當前 zoom(%);shell own state,passed down 給 renderer。 */
   zoom: number
   /** Renderer 內部 zoom 變化時呼叫(wheel / pinch)。 */
   onZoomChange: (next: number) => void
+  /**
+   * Shell 下的 fit-to-* 指令。renderer 負責算出 container / image 比例,
+   * 並透過 `onZoomChange` 回報算出的 zoom %。null 時不動作。
+   * renderer 若不支援 fit(未計算能力),可忽略此 prop。
+   */
+  fitRequest?: FitRequest | null
   /**
    * Renderer 在 mount 或 file/capability 改變時呼叫,告訴 shell 目前支援哪些
    * capability。不 emit 代表 shell 維持上一個 renderer 的 capability(第一個

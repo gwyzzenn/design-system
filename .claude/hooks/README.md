@@ -21,6 +21,7 @@
 | `check_cva_default_sync.sh` | PostToolUse(Edit/Write/MultiEdit) | 動到 cva `defaultVariants` 時 grep spec / docblock / anatomy 三方,警告不一致(SegmentedControl bug class 預防) |
 | `check_anatomy_section_numbering.sh` | PostToolUse(Edit/Write/MultiEdit) | 編輯 *.anatomy.stories.tsx 時驗證 `name: 'N. ...'` 編號 contiguous 1..N,drift 時警告 |
 | `check_sideoffset_canonical.sh` | PostToolUse(Edit/Write/MultiEdit) | overlay consumer 寫 `sideOffset={N!=8}` 時警告:DS canonical = 8,不該 override;overlay primitive source 本身豁免 |
+| `check_story_anatomy.sh` | PreToolUse(Edit/Write/MultiEdit) | **blocks** stories 裡 hand-craft 繞 DS canonical:raw `<div flex items-center><Icon/>` / raw `<table>` / 自刻 full-surface loading / 自刻 field / dismiss via label Button / 自刻 overlay structure。允許 `// @anatomy-exempt: <reason>` 檔首 bypass、`// @anatomy-exempt-next` 單行 bypass |
 
 ## Task ↔ Hook 對照表(世界級設計任務觸發)
 
@@ -34,6 +35,7 @@
 | Write/Edit spec.md | `check_sync_update.sh` | 連動 stories 更新提醒 |
 | Write/Edit 任何 .tsx/.spec.md | `check_token_hygiene.sh` | 硬寫 shadow / shadcn alias / raw overflow 抓違規 |
 | Write/Edit 產品 code(非 explorations) | `block_prototype_imports.py` | 擋 `import ... explorations/` |
+| Write/Edit *.stories.tsx | `check_story_anatomy.sh` | stories hand-craft 繞 DS 被 exit 2 block;allowlist `// @anatomy-exempt:`(檔首全檔)/ `// @anatomy-exempt-next`(下一行) |
 
 ## 這裡**不收**(反例)
 

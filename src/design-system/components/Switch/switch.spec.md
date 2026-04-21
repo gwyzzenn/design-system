@@ -63,6 +63,12 @@ Track（pill 形，rounded-full）
 
 sm 和 md 視覺相同（純粹命名 mapping，讓消費者可直接傳同一個 size 對齊 Field family）。
 
+### 為什麼不完全對齊 `--field-height-*`
+
+- **現況**:track 高 sm/md=20px / lg=24px(不等於 `--field-height-sm/md/lg` = 28/32/36px);track 寬固定 2× 高(pill 比例);thumb 直徑 = track 高
+- **Rationale**:Switch 是**實體開關類比**(iOS / macOS 系統開關),track 是 pill 形不是 field-like 容器,視覺上**小於 field-height** 才符合「嵌在一列中的小控件」感受;放大到 field-height(28/32/36)會讓 switch 看起來像獨立 Button 而非 toggle。pill 比例(寬=2×高)是世界級 canonical,破壞比例會失去「可滑動凹槽」的視覺語意。行高對齊透過 `<Field>` 容器的 `flex items-center` 垂直置中達成
+- **世界級對照**:iOS `UISwitch` = 32×20pt(獨立 pill 比例,不跟 form field 成比例)/ Material 3 Switch = 52×32dp / GitHub Primer ToggleSwitch = 40×24——全部 pill 比例 2:1、獨立於 field-height
+
 ---
 
 ## 視覺狀態

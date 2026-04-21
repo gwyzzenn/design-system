@@ -33,7 +33,9 @@
 
 ---
 
-## 一種視覺,多種容器尺寸
+## 尺寸
+
+### 一種視覺,多種容器尺寸
 
 **Slider 的視覺是固定的**——track 厚度、thumb 直徑、focus ring 都是單一值,不會隨 `size` 變動。這是跟 Button / Input 等元件的明顯差異,理由是:
 
@@ -51,6 +53,12 @@ Slider 接收 `size?: 'sm' | 'md' | 'lg'` prop(預設 `md`),**這個 prop 只決
 - 視覺:一種尺寸,任何 Field context 長得都一樣
 - 對齊:完美對齊 Field family 的 field-height tier
 - API 一致性:跟 Input / NumberInput 同樣有 `size` prop,消費者不需要特別記「Slider 沒有 size」
+
+### 為什麼不完全對齊 `--field-height-*`
+
+- **現況**:容器高 = `--field-height-sm/md/lg`(對齊);track 厚度固定 4px / thumb 直徑固定 16px / focus ring 固定 2px,**皆不隨 size 變化**(偏離 size-proportional scaling)
+- **Rationale**:Slider 的 thumb 是「位置指示器」,必須足夠大好捕捉(Fitts's Law);縮小成比例(sm=12 / lg=20 之類)會讓 sm 幾乎無法精確拖曳。業界共識:track/thumb 是**單一視覺規格**,`size` 只控容器外高讓 Slider 並排對齊,內部透過 `flex items-center` 垂直置中
+- **世界級對照**:Material 3 Slider(track 4dp thumb 20dp 固定)/ iOS UISlider(track 3pt thumb 28pt 固定)/ Ant Design Slider(track 4px thumb 14px 固定)/ Radix Slider(default 4px track)——全部 thumb / track 尺寸獨立於 form-size system
 
 ---
 

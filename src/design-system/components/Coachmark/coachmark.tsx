@@ -134,7 +134,9 @@ const Coachmark = React.forwardRef<HTMLDivElement, CoachmarkProps>(
 
     // Header title 解析
     const headerTitle =
-      kind === 'tips' || kind === 'new-features' ? KIND_TITLE[kind] : kind
+      kind === 'tips' || kind === 'new-features'
+        ? KIND_TITLE[kind as 'tips' | 'new-features']
+        : kind
 
     return (
       <Popover open={open} onOpenChange={onOpenChange}>

@@ -2,6 +2,7 @@ import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { Settings, Bell, Home } from 'lucide-react'
 import { Avatar } from './avatar'
+import { MenuItem } from '@/design-system/components/Menu/menu-item'
 import { NameCard, NameCardDefaultActions } from '@/design-system/components/NameCard/name-card'
 
 const meta: Meta = {
@@ -33,15 +34,11 @@ export const IdentityVsIconRule: Story = {
     <div>
       <Rule
         title="Avatar — 代表實體（人、組織、專案、App）"
-        note="留言者頭像、團隊成員、workspace logo、app 身份。視覺上 identity 是唯一的、可被辨識的"
+        note="留言者頭像、團隊成員、workspace logo、app 身份。視覺上 identity 是唯一的、可被辨識的。作為列表 row 的 prefix 時透過 MenuItem 的 avatar slot 消費(而非手刻 flex row)"
       >
-        <div className="flex items-center gap-3">
-          <Avatar alt="Ada Chen" size={32} />
-          <span className="text-body">Ada Chen留言</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <Avatar alt="Engineering Team" size={32} color="blue" />
-          <span className="text-body">Engineering Team 專案</span>
+        <div className="border border-divider rounded-lg bg-surface py-1">
+          <MenuItem avatar={{ alt: 'Ada Chen' }}>Ada Chen 的留言</MenuItem>
+          <MenuItem avatar={{ alt: 'Engineering Team', color: 'blue' }}>Engineering Team 專案</MenuItem>
         </div>
       </Rule>
 
@@ -49,14 +46,12 @@ export const IdentityVsIconRule: Story = {
         title="❌ 代表抽象概念：用 Lucide Icon"
         note="「設定」「通知」「首頁」這類功能 / 動作 / 概念不是「誰」,是「做什麼」。Icon 更適合——Avatar 用在這裡會讓使用者以為是某個人的頭像"
       >
-        <div className="flex items-center gap-3">
-          <Avatar alt="S" icon={Settings} size={32} />
-          <span className="text-body">❌ 設定用 Avatar</span>
+        <div className="border border-divider rounded-lg bg-surface py-1">
+          <MenuItem avatar={{ alt: 'S' }}>❌ 設定用 Avatar</MenuItem>
         </div>
         <Label warn>↑ 「S」+ icon 讓使用者誤以為是某個人(使用者 S?)。功能導覽用 Lucide icon</Label>
-        <div className="flex items-center gap-3">
-          <Settings size={20} />
-          <span className="text-body">✓ 設定用 Icon</span>
+        <div className="border border-divider rounded-lg bg-surface py-1">
+          <MenuItem startIcon={Settings}>✓ 設定用 Icon</MenuItem>
         </div>
       </Rule>
 
@@ -64,7 +59,10 @@ export const IdentityVsIconRule: Story = {
         title="判斷法：「這代表『誰』還是『做什麼』？」"
         note="誰 / 什麼實體 → Avatar;做什麼 / 某個概念 → Icon"
       >
+        {/* 視覺圖例(legend),非 list item — 用意是並排展示「Avatar/Icon 各自代表的語義」
+            作為教學 key。MenuItem 在此會誤導(看起來像可點列表),用 inline chip 組合才對。 */}
         <div className="flex items-center gap-3 flex-wrap">
+          {/* @anatomy-exempt-next */}
           <div className="flex items-center gap-2">
             <Avatar alt="Ada Chen" size={24} />
             <span className="text-footnote text-fg-muted">人員</span>
@@ -73,6 +71,7 @@ export const IdentityVsIconRule: Story = {
             <Home size={16} />
             <span className="text-footnote text-fg-muted">首頁(概念)</span>
           </div>
+          {/* @anatomy-exempt-next */}
           <div className="flex items-center gap-2">
             <Avatar alt="ABC Corp" size={24} color="purple" />
             <span className="text-footnote text-fg-muted">組織</span>
@@ -194,17 +193,19 @@ export const HoverCardIntegrationRule: Story = {
             <Label warn>❌ 「已離職」只出現在 hover 內 — 觸控使用者看不到,可能誤發訊息給已離職成員</Label>
           </div>
           <div className="flex flex-col gap-2">
-            {/* Family 2 card-header mode(avatar > text block,見 item-anatomy.spec.md「Card header 大 prefix 對齊」):
-                items-start + text column `justify-center min-h-[avatar-size]`,短文字置中於 avatar、長文字自然撐高。
-                gap-3(12px)對齊 card header canonical(非 gap-2 的 row 緊湊間距)。 */}
-            <div className="flex items-start gap-3">
-              <Avatar alt="Alex Wang" size={48} className="opacity-50" />
-              <div className="flex flex-col justify-center min-w-0 flex-1" style={{ minHeight: 48 }}>
-                <span className="text-body font-medium text-fg-muted">Alex Wang</span>
-                <span className="text-caption text-error mt-0.5">已離職</span>
-              </div>
+            {/* 主畫面呈現關鍵狀態:Family 2 row 結構(avatar + label + description)由 MenuItem
+                承載——size=lg 觸發 block 對齊(avatar 跨越 label + description 中心)。
+                這正是 item-anatomy.spec.md 的 Family 2 canonical,不手刻 flex row。 */}
+            <div className="border border-divider rounded-lg bg-surface py-1 w-full">
+              <MenuItem
+                size="lg"
+                avatar={{ alt: 'Alex Wang' }}
+                description={<span className="text-error">已離職</span>}
+              >
+                Alex Wang
+              </MenuItem>
             </div>
-            <Label>✅ 關鍵狀態直接在主畫面呈現(opacity + 文字標示 + Family 2 card-header 對齊),hover 補充細節即可</Label>
+            <Label>✅ 關鍵狀態直接在主畫面呈現(Family 2 MenuItem 的 description slot 標示),hover 只補充細節</Label>
           </div>
         </div>
       </Rule>

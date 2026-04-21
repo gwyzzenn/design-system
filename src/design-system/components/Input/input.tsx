@@ -15,6 +15,14 @@ export interface InputProps
     Omit<VariantProps<typeof fieldWrapperStyles>, 'mode'> {
   /** Field display mode */
   mode?: FieldMode
+  /**
+   * Visual chrome variant(正交於 mode):
+   * - `'default'`(預設)— Field wrapper 完整 chrome:bg-surface + 明顯 border + hover/focus 回饋。適用表單、Field 內嵌。
+   * - `'bare'` — 透明 chrome,hover / focus 才出現 border。適用 Toolbar inline editing(如 FileViewer zoom input / chart config toolbar / rich text toolbar number input)。保留 padding / typography / height,只拿掉背景和常態 border。
+   *
+   * 世界級對照(bare):VS Code settings input / Figma toolbar number / Notion prop input。
+   */
+  variant?: 'default' | 'bare'
   /** Error 狀態（正交於 mode）。border-error + aria-invalid。 */
   error?: boolean
   /** 左側靜態 icon — 輔助理解 input 用途（如 Search）。fg-muted。 */
@@ -37,6 +45,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
     {
       mode = 'edit',
+      variant = 'default',
       error = false,
       size,
       startIcon: StartIcon,
@@ -69,7 +78,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div
         className={cn(
-          fieldWrapperStyles({ mode: resolvedMode, size }),
+          fieldWrapperStyles({ mode: resolvedMode, variant, size }),
           isEditable && resolvedError && [
             'border-error hover:border-error-hover',
             'focus-within:border-error focus-within:hover:border-error',

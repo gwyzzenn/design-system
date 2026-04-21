@@ -74,11 +74,54 @@ Taxonomy 放任一 folder 都會 scope 不對等。放頂層 `src/design-system/
 
 ## 不進 Family Model 的元件
 
-不能舉一反三的不分類:
-- **Self-contained primitive**:Switch / Checkbox / Radio / Avatar / Badge / CircularProgress / ProgressBar / Skeleton / Separator —— 各自獨立視覺,無 slot 結構
-- **Composite / multi-section**:Dialog / Sheet / NameCard / DataTable / Tabs / Sidebar / Popover / Tooltip / HoverCard / DropdownMenu / SelectMenu / Command / OverflowIndicator / Breadcrumb / Empty / DescriptionList —— 多區塊組合,各自 own 自己的 layout
+不能舉一反三的不分類。**Composite 類再細分三子類**,因為三類的設計約束不同:
 
-這些元件的 spec 直接描述自己的結構,不套 family。
+### Self-contained primitive(獨立視覺 atom,無 slot 結構)
+
+Switch / Checkbox / Radio / Avatar / Badge / CircularProgress / ProgressBar / Skeleton / Separator
+
+各自獨立視覺,spec 直接描述自己結構。
+
+### Overlay-composite(浮層 composite,消費 overlay-surface pattern)
+
+Dialog / Sheet / Popover / Tooltip / HoverCard / Coachmark / Command / SelectMenu / DropdownMenu
+
+**共同約束**:
+- 必消費 `patterns/overlay-surface/` 的 `SurfaceHeader` / `SurfaceBody` / `SurfaceFooter`(padding SSOT)
+- elevation 走 `--elevation-200`+ 的 overlay layer
+- dismiss 走 `onClose`(語意:關閉 overlay session,見 CLAUDE.md 命名 canonical)
+- 部分 overlay 有 modal vs non-modal 分流(Dialog / Sheet modal;Popover / HoverCard non-modal)
+- 在 dark-mode context(如 FileViewer chrome)中需支援 `data-theme="dark"` 子樹
+
+### Page-composite(頁面內 composite,無 overlay 性質)
+
+Tabs / Accordion / DataTable / Calendar / Carousel / Breadcrumb / Sidebar / NameCard / FileItem / FileUpload / FileViewer / OverflowIndicator
+
+**共同約束**:
+- 消費多個 row primitive 或 self-contained primitive
+- 不走 overlay-surface(沒有 elevation / dismiss)
+- 佈局 token 用 `--layout-space-*`(chrome / section)
+- 各自 own 內部 layout SSOT(例:DataTable 的 header row、Calendar 的 grid、Carousel 的 track + arrow)
+
+### Pure-wrapper(純行為 wrapper,無自己視覺)
+
+CheckboxGroup / RadioGroup / FieldGroup(若建)
+
+**共同約束**:
+- 自己**無 render**(transparent wrapper)
+- 提供 context(`CheckboxGroupContext`)給 descendant 同步 state
+- spec 應明文「本元件無視覺」,對應 anatomy story 只有 `Overview` + `Inspector` 兩個(no ColorMatrix / SizeMatrix)
+
+---
+
+### 判斷新 composite 時的流程
+
+寫新 composite spec 時先自問:
+1. 這是浮層(elevation / Portal / dismiss session)嗎? → **Overlay-composite**
+2. 這是頁面內多區塊 layout 嗎? → **Page-composite**
+3. 這本身無視覺、只是 context / state wrapper 嗎? → **Pure-wrapper**
+
+三題全否 → 應該是 Family 1/2/3/4 或 Self-contained primitive,而不是 composite。
 
 ---
 

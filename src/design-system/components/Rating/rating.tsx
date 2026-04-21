@@ -26,9 +26,17 @@ import { cn } from '@/lib/utils'
  * precision="half" — 半星(0.5, 1, 1.5, 2, 2.5, ..., 5)
  */
 
-// Size 對齊 Checkbox / Radio family:sm/md 皆 16px(field-height-sm/md 都是 16 控件),lg=20
-// 理由:Rating 常與 Checkbox / Radio 在同一 form 出現,視覺 baseline 對齊避免刻度不一致
+// Icon size 對齊 icon tier(sm/md=16px, lg=20px):見 tokens/uiSize/uiSize.spec.md
+// 「Icon 尺寸 Tier」——field-height-xs/sm/md 的 icon tier = 16px,field-height-lg = 20px。
+// Container 高度則對齊 --field-height-*(sm=28 / md=32 / lg=36),讓 Rating 可與其他
+// field-height family 元件(Input / Select / Button)並排時 row height 對齊,塞入
+// <Field> 時行高一致。
 const SIZE_PX = { sm: 16, md: 16, lg: 20 } as const
+const CONTAINER_HEIGHT: Record<'sm' | 'md' | 'lg', string> = {
+  sm: 'h-field-sm',
+  md: 'h-field-md',
+  lg: 'h-field-lg',
+}
 
 export interface RatingProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
   /** 當前評分(0 ~ max) */
@@ -109,6 +117,8 @@ const Rating = React.forwardRef<HTMLDivElement, RatingProps>(
         onMouseLeave={() => setHoverValue(null)}
         className={cn(
           'inline-flex items-center gap-1',
+          // Container 對齊 field-height family,讓 Rating 可與 Input/Select/Button 並排 row-align
+          CONTAINER_HEIGHT[size],
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md',
           disabled && 'opacity-disabled pointer-events-none',
           className,
@@ -174,7 +184,7 @@ function StarIcon({ Icon, sizePx, fillRatio, isHalf, interactive, onHover, onCli
         onClick={() => onClick(false)}
         className={cn(
           // p-0 + border-0 + outline-none 三層移除:button 預設視覺(避免 ring / border 漏出)
-          'inline-flex p-0 border-0 bg-transparent outline-none',
+          'inline-flex p-0 border-0 bg-transparent outline-none shadow-none',
           'focus-visible:outline-none',  // focus 視覺由 parent div ring 承擔,不 per-star ring
           interactive ? 'cursor-pointer' : 'cursor-default',
         )}
@@ -182,7 +192,10 @@ function StarIcon({ Icon, sizePx, fillRatio, isHalf, interactive, onHover, onCli
         tabIndex={-1}
         aria-hidden
       >
-        <Icon size={sizePx} fill={fill} className="shrink-0" />
+        {/* stroke="none" 移除 Lucide Star 預設的 outline stroke(1.5px 黑線),
+            讓星星是純 fill-only 的 shape——fill 與 outline 同色視覺上仍有亮度差。
+            世界級對照:Ant Rate / Material MUI Rating 皆純 fill,無 outline stroke。*/}
+        <Icon size={sizePx} fill={fill} stroke="none" className="shrink-0" />
       </button>
     )
   }
@@ -190,9 +203,9 @@ function StarIcon({ Icon, sizePx, fillRatio, isHalf, interactive, onHover, onCli
   // Half: 兩個重疊 icon,左半 filled / 右半 empty + 兩個 hover zone 切半星
   return (
     <span className="relative inline-flex" style={{ width: sizePx, height: sizePx }}>
-      <Icon size={sizePx} fill={FILL_EMPTY} className="absolute inset-0" style={{ color: FILL_EMPTY }} />
+      <Icon size={sizePx} fill={FILL_EMPTY} stroke="none" className="absolute inset-0" style={{ color: FILL_EMPTY }} />
       <span className="absolute inset-0 overflow-hidden" style={{ width: sizePx * fillRatio }}>
-        <Icon size={sizePx} fill={FILL_FILLED} style={{ color: FILL_FILLED }} />
+        <Icon size={sizePx} fill={FILL_FILLED} stroke="none" style={{ color: FILL_FILLED }} />
       </span>
       {interactive && (
         <>

@@ -2,104 +2,205 @@
 
 ## 定位
 
-Calendar 是**月曆 primitive**——顯示一個月的日期網格,供使用者點擊選擇單日 / 多日 / 日期範圍。獨立元件,非 DatePicker 內部私有。
+Calendar 是**事件檢視 canvas**,讓 user 以**月 / 週 / 日** 三種 view 瀏覽、定位、快速增減事件。對齊 Notion Calendar / Google Calendar / Fantastical / macOS Calendar 的事件檢視模型。
 
-**實作基礎**：`react-day-picker@9` 包裝 + 本 DS token 覆寫預設視覺。所有 classNames 透過 `classNames` prop 注入,避免引入原生 `.rdp-*` 樣式漂移。
+**Layout Family**:**非 4-Family,屬 page-composite**(見 `patterns/element-anatomy/element-anatomy.spec.md`「Page-composite」段)。多區塊 layout(Toolbar / Grid / EventTile / SidePanel),各自 own 自己的 anatomy。
 
-**Layout Family**：非上述 family — composite / multi-section（月份 caption + 星期標頭 + 日期網格 + nav 按鈕,多區塊組合）。
+**實作基礎**:
+- 自建 composite(非 DayPicker)—— DayPicker 是「date picker 選日期」primitive,event calendar 是「頁面上看事件」的頁面 layout,兩者語意完全不同
+- 消費 DS primitives:`<Button>` / `<Tabs>`(切換 view) / `<DropdownMenu>`(新增事件入口) / `<ScrollArea>`(垂直事件列表) / `<AspectRatio>`(月 view 的 cell 比例)
+- 日期運算用 `date-fns`(已有 dependency,輕量)——不自造 date math
+
+**與 DatePicker 的區分(重要)**:
+
+| 元件 | 定位 | 互動模型 | 適用 Layout |
+|------|------|---------|------------|
+| `<DatePicker>` | **選日期**的 form control | 點 trigger → 浮層 Calendar → 選一個 → 回填 input | Field control(form 的一部分) |
+| `<Calendar>`(DayPicker 包裝) | DatePicker 的內部 calendar grid primitive | N/A(不直接消費) | Internal to DatePicker |
+| **`<Calendar>`**(本元件) | **看事件**的 page-level canvas | 在月/週/日 view 中瀏覽 event、點 event 看詳情、拖拉新增 | Page layout(整個檢視頁面) |
+
+「User 需要選日期」 → DatePicker。「User 需要看本月會議 / 行程 / 截止日」 → **Calendar**。
 
 **世界級對照**:
-- shadcn `<Calendar>` — 同樣 react-day-picker 包裝 pattern
-- Ant Design `<Calendar>` — inline 行事曆(更複雜含事件)
-- Material MUI `<DateCalendar>` — inline 日期 picker
-- 本元件取 shadcn 最簡潔的 pattern(inline 月曆),事件行事曆(Ant 風格)非本元件範疇
+- **Notion Calendar**:月 / 週 / 日 view + 左側 filter + 時間軸精確拖拉
+- **Google Calendar**:月 / 週 / 日 + 多曆疊加 + 週末 highlight
+- **Fantastical**:月 + event tile 顏色強調
+- **macOS Calendar**:簡潔 month grid + 左側 mini month
+
+本元件 MVP 鎖定 **月 view**(最常用 ~80% 場景),週 / 日 view 列後續增量。
 
 ---
 
 ## 何時用
 
-- **Inline 月曆顯示**:dashboard / 行事曆小卡 / 日期 filter bar
-- **DatePicker 浮層內嵌**:DatePicker 消費本元件作為選日 popup(見 `../DatePicker/date-picker.spec.md`)
-- **範圍選擇**:`mode="range"` 適用「from → to」場景(訂單日期範圍、查詢時段)
-- **多日選擇**:`mode="multiple"` 適用「勾選多個不連續日期」(event sign-up)
+| 情境 | 範例 |
+|------|------|
+| 團隊會議 / 行程總覽 | Notion Calendar 替代品:這個月有哪些會議、專案截止日 |
+| 個人 todo 時間軸 | 本週 / 本月待辦事件分布 |
+| 內容發佈排程 | 社群 / Blog 的發文行事曆、影片排程 |
+| 訂房 / 訂位可視化 | 以 calendar 視角看已訂和空房的 capacity |
+| 專案 milestone | sprint deadline / release date 視覺化 |
 
 ## 何時不用
 
 | 場景 | 改用 | 原因 |
 |------|------|------|
-| 日期輸入欄位 | `DatePicker` | Calendar 是 inline,欄位需要 trigger + popup 結構 |
-| 純顯示單日期 | `DatePickerDisplay` / `Intl.DateTimeFormat` | 不需 interactive 月曆 |
-| 時間選擇(時分) | ⚠️ 未來 TimePicker | Calendar 只處理日期層級 |
-| 事件行事曆(日程本) | 專用行事曆元件 | Calendar 是日期選擇;事件日誌需要 event overlay / drag / week/month view 切換 |
+| 「選一個日期」表單欄位 | `<DatePicker>` | Calendar 是檢視 canvas,不是 form control |
+| 「選一個日期範圍」表單欄位 | `<DatePicker.Range>` | 同上 |
+| 時間 granularity 是時分秒的儀表板 | Timeline / Gantt chart | event calendar 的最小 granularity 是**時段**(15-60 分鐘),不是秒級 |
+| 單純事件**列表**(沒時間軸視覺需求) | `<DataTable>` / `<Empty>` | 列表是「linear」瀏覽,calendar 是「spatial」瀏覽 |
 
 ---
 
-## mode(react-day-picker API)
+## API(MVP)
 
-| mode | 選擇行為 | 典型場景 |
-|------|---------|---------|
-| `single`（預設） | 單日選取,點新日取代舊選 | DatePicker / 生日 / 到期日 |
-| `multiple` | 可勾選多個不連續日期 | event 報名多日 |
-| `range` | from → to 連續範圍 | 訂單日期範圍 / 查詢時段 |
+```tsx
+<Calendar
+  view="month" | "week" | "day"           // MVP 只支援 "month"
+  defaultView="month"
+  referenceDate={Date}                      // 當前聚焦日期(月檢視的那個月)
+  onViewChange={(view) => ...}
+  onReferenceDateChange={(date) => ...}
+  events={Event[]}                          // 事件資料
+  onEventClick={(event) => ...}             // 點 event tile 回調
+  onDateClick={(date) => ...}               // 點月 cell 回調(用於新增)
+  onRangeSelect={(from, to) => ...}         // 月 view 拖拉選一段 range(新增 multi-day)
+  weekStartsOn={0 | 1}                      // 0=Sun, 1=Mon
+  renderEventTile={(event) => ReactNode}    // 自訂 event tile 視覺
+  renderEmpty={() => ReactNode}             // 無事件狀態
+  size="md" | "lg"                          // cell 大小(MVP 兩尺寸)
+  className
+/>
+```
+
+### Event type
+
+```tsx
+interface CalendarEvent {
+  id: string
+  title: string
+  start: string | Date       // ISO "YYYY-MM-DDTHH:mm" 或 "YYYY-MM-DD"(all-day)
+  end: string | Date
+  allDay?: boolean            // true = 跨整日,渲染為橫跨數欄的 tile
+  color?: string              // 事件類別色(來自 DS palette,consumer 自選)
+  metadata?: Record<string, unknown>   // 自由資料,renderEventTile 讀
+}
+```
 
 ---
 
-## 視覺 token（本 DS 覆寫 react-day-picker 預設）
+## Anatomy(月 view,MVP)
 
-| 區塊 | Token |
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ Toolbar:[◀] 2026 年 4 月 [▶]        [< 日 週 月 >]  [+ 新事件] │
+├─────┬─────┬─────┬─────┬─────┬─────┬─────┬────────────────────┤
+│ 週日 │ 週一 │ 週二 │ 週三 │ 週四 │ 週五 │ 週六 │   ← 星期 header   │
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼────────────────────┤
+│ 29* │ 30* │ 31* │  1  │  2  │  3  │  4  │   ← 月 grid row
+│     │     │     │event│event│     │event│
+│     │     │     │█mtg │█vac │     │█dl  │      event tile(橫跨)
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+│  5  │  6  │  7  │  8  │  9  │ 10  │ 11  │
+│event│     │     │     │event│     │     │
+│█ret │     │     │     │█rev │     │     │
+└─────┴─────┴─────┴─────┴─────┴─────┴─────┴────────────────────┘
+
+*= prev/next month outside days(text-fg-disabled)
+```
+
+### Cell 規則
+
+| 區塊 | 規則 |
+|------|------|
+| Cell 高度 | MVP 月 view 固定 `min-h-28`(112px),容納 header 日期 + 3 event tile |
+| Cell 寬度 | `1fr` 等分 7 欄(週) |
+| 日期 header | `h-7` top,右上角數字(對齊 Google Calendar)`text-body font-medium` |
+| Today cell | 日期數字 wrap in `rounded-full bg-primary text-on-emphasis px-2 py-0.5`(對齊 Google Calendar today pill) |
+| Outside day cell | 日期 `text-fg-disabled`,背景比當月 cell 稍暗(`bg-neutral-2`) |
+| Hover cell | `hover:bg-neutral-hover`(點擊新增入口) |
+| Weekend cell | 可選 `bg-neutral-2`(對齊 Google)——可由 prop 控制,MVP 不開 |
+
+### Event tile 規則
+
+| 視覺 | Token |
 |------|-------|
-| 月份 caption | `text-body font-medium` |
-| Nav 按鈕 prev/next | `h-7 w-7 rounded-md text-fg-muted hover:text-foreground hover:bg-neutral-hover` |
-| 星期標頭(一/二/三...) | `text-caption text-fg-muted font-normal w-9 h-8` |
-| 日格 | `h-9 w-9 rounded-md text-body` |
-| Hover | `hover:bg-neutral-hover` |
-| Selected | `bg-primary text-white`(hover `bg-primary-hover`) |
-| Today(未選) | `ring-1 ring-primary` |
-| Outside month(灰色前後月) | `text-fg-disabled` |
-| Disabled | `text-fg-disabled opacity-50` |
-| Focus-visible | `ring-2 ring-ring outline-none` |
+| 一般 event(timed) | `bg-{color}-subtle text-{color}-text rounded-md px-1.5 py-0.5 text-caption truncate` |
+| All-day event | 同上 + `rounded-md` 但可橫跨多 cell(實作用 absolute 或 grid-column span) |
+| Hover tile | `hover:bg-{color}-hover` 微暗化 |
+| 超出 tile 限制 | 顯示 `+N more`(對齊 Google Calendar)click 展開 popover 列表 |
 
-**為什麼固定 h-9 w-9**:月曆格子需要固定尺寸確保對齊,不隨 density 變化(Calendar 是浮層內或 dashboard 卡片,與 field-height family 無關)。
+### Toolbar
+
+```
+[◀] [今天] [▶]    月份標題(2026 年 4 月)    [日 | 週 | 月]    [+ 新事件]
+```
+
+- 左 Nav:`<Button iconOnly>` prev/next + `<Button>今天</Button>` 跳 today
+- 中央 title:`<h2 className="text-h3">` or `text-body-lg font-medium`
+- 右視圖切換:`<SegmentedControl>`(day/week/month)—— MVP 只啟用 month,其他 disabled
+- 右上 CTA:`<Button variant="primary" startIcon={Plus}>新事件</Button>`
+
+對齊 `patterns/action-bar/action-bar.spec.md`(左 context / 中 focus / 右 CTA 的經典分組)。
+
+---
+
+## 狀態
+
+### Empty
+無事件時 cell 空白(不顯示 empty state)——calendar 本身是 canvas,空白 = 沒事件,語意自明。
+
+**不用 `<Empty>` 元件**——Empty 是「引導使用者做什麼」,月曆空白是常態不是引導目標。若整個月**零事件**可選擇顯示 subtle 提示(`<Empty icon={CalendarPlus} title="本月無事件" />`),由 consumer 在 `renderEmpty` 提供。
+
+### Loading
+載入 events 時,cells 用 `<Skeleton>` placeholder tile(對齊其他非同步元件)。
+
+### Error
+載入失敗時,顯示 toolbar 內 inline error hint + retry button;不 block 整個 calendar 顯示。
+
+### a11y
+- Toolbar navigation 用 `<nav aria-label="calendar navigation">`
+- Month grid 用 `role="grid"`,每 cell `role="gridcell"`,日期用 `aria-label="2026 年 4 月 3 日,3 個事件"`
+- Event tile `role="button"` + descriptive `aria-label`(title + time)
+- Keyboard:方向鍵移動 cell focus / Enter 打開事件 / PageUp/Down 切月
 
 ---
 
 ## 禁止事項
 
-- ❌ **不改視覺 token 為硬色值**(`bg-primary` 必須來自 semantic,不可 `bg-blue-500`)
-- ❌ **不用 `.rdp-*` 原生 class 直接樣式化**(繞過本元件 classNames prop 會跨版本斷掉)
-- ❌ **不自包 Popover**(Calendar 是 inline primitive;需要浮層由 consumer 包 Popover,見 DatePicker)
-- ❌ **不混用其他 calendar library**(若 DateRange / DateTime 需求出現,擴充本元件 `mode="range"` 或新 prop,不引第二套)
+- ❌ 不用 `<DayPicker>` 為底層——DayPicker 是 form control 用,結構不適合 page-level event canvas
+- ❌ 不硬寫 month grid 為 `<table>`——用 CSS grid(月 view 可能跨 cell span event,table 不好 span)
+- ❌ 不把 event 資料存在元件內部 state——event 是 consumer 責任,本元件是純 view
+- ❌ 不自動打開「新事件」表單——`onDateClick` / `onRangeSelect` 回調給 consumer 決定(避免強制開 Dialog UX)
+- ❌ 不重造 date math——用 `date-fns`
 
 ---
 
-## A11y 預設
+## MVP vs 後續增量
 
-react-day-picker v9 自動處理:
-- **鍵盤**：ArrowLeft/Right 切日,ArrowUp/Down 切週,PageUp/Down 切月,Home/End 切週首尾
-- **ARIA**：`role="grid"` + 日格 `role="gridcell" aria-selected`
-- **Focus**：`autoFocus` prop 自動 focus 到選中日(或今天)
-- **Locale**：`locale` prop 控制週首日、星期標頭語言
+### MVP(本次 session)
+- 月 view(完整)
+- Toolbar prev/next/today + title
+- Event tile render(單 line + color variant + truncate)
+- Today cell highlight
+- Outside days visual
+- Empty / loading 基礎
 
-Consumer 無需額外處理,保留 react-day-picker API 即可。
-
----
-
-## shadcn passthrough 例外說明
-
-Calendar 本元件是**對 `react-day-picker` 的 `<DayPicker>` 元件薄包裝**,用於橋接 DS token(classNames 覆寫 + components 注入自訂 IconLeft/IconRight)。**不套 `React.forwardRef`**,原因如下:
-
-- **底層 `DayPicker` 自己不接受 forwarded ref**——react-day-picker 的 API 是 declarative props(selected / onSelect / classNames / components 等),沒有 DOM ref 介面可 forward
-- **沒有我們擁有的 DOM root 可 ref**——Calendar 的視覺全由 `DayPicker` render,我們只注入 className token 覆寫,沒有自己的外層 `<div>` 容器
-- **Radix-compat 的 forwardRef 在此無意義**——若硬 wrap 成 `const Calendar = forwardRef(...)` 則 ref 會指向哪裡?指向 `DayPicker`(DayPicker 不支援),或指向 consumer 不期待的節點,都不對
-
-保留 `displayName = 'Calendar'` 讓 React DevTools / Storybook 辨識;`...props` 透過 props interface 顯式列舉 passthrough 至 DayPicker(不 spread DOM,保持 API 邊界清楚)。
-
-**何時應改**:若未來 react-day-picker 升級提供 forwardRef 或 `ref` prop,或我們決定包一層自有 DOM 容器(如加 footer action buttons),再改為 canonical forwardRef wrapper。
+### 後續(tech debt)
+- 週 view(timeline 24 小時縱軸)
+- 日 view(single-day timeline)
+- 拖拉新增 event(from 月 cell → range select)
+- 拖拉移動 event(cross-day drag)
+- 「+N more」展開 popover
+- 左側 mini month + filter sidebar
+- 多曆疊加(multi-calendar sources)
+- Print view / iCal export
 
 ---
 
 ## 相關
 
-- `../DatePicker/date-picker.spec.md` — **本元件 consumer**:DatePicker 消費 Calendar 作為選日 popup
-- `../../tokens/color/color.spec.md` — semantic token 來源（primary / neutral / fg-muted 等）
-- react-day-picker 官方文件 — `https://react-day-picker.js.org`
+- `../DatePicker/date-picker.spec.md` — 選日期的 form control,本元件姊妹概念(不同職責)
+- `../Calendar/calendar.spec.md` — DatePicker 內部 calendar grid primitive(DayPicker 包裝);**不直接面向 consumer**
+- `../../patterns/action-bar/action-bar.spec.md` — Toolbar 左中右分組規則
+- `../../patterns/element-anatomy/element-anatomy.spec.md` — Page-composite 分類

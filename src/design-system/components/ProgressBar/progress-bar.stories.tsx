@@ -17,7 +17,6 @@ const meta: Meta<typeof ProgressBar> = {
   argTypes: {
     value: { control: { type: 'range', min: 0, max: 100, step: 1 } },
     status: { control: 'select', options: ['inProgress', 'success', 'error'] },
-    size: { control: 'select', options: ['sm', 'md', 'lg'] },
     affix: { control: 'select', options: [undefined, 'value', 'status-icon'] },
   },
 }
@@ -34,7 +33,7 @@ const SectionDesc = ({ children }: { children: React.ReactNode }) => (
 // ── Default(基本範例) ──────────────────────────────────────────────────
 
 export const Default: Story = {
-  args: { value: 45, status: 'inProgress', size: 'md', affix: 'value' },
+  args: { value: 45, status: 'inProgress', affix: 'value' },
   render: (args) => (
     <div className="w-[360px]">
       <ProgressBar {...args} />

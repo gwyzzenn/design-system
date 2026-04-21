@@ -44,6 +44,18 @@ RadioGroup 是**互斥單選且全選項可見**的表單控件——從 2-5 個
 
 ---
 
+## 尺寸
+
+共用 Checkbox 的 sm/md/lg 控件尺寸(sm/md=16px, lg=20px),詳見 `../Checkbox/checkbox.spec.md`「尺寸」。
+
+### 為什麼不完全對齊 `--field-height-*`
+
+- **現況**:控件 sm=16 / md=16 / lg=20px(不等於 `--field-height-sm/md/lg` = 28/32/36px)
+- **Rationale**:Radio 與 Checkbox 視覺語言共用(只是形狀 round vs square),rationale 完全繼承 Checkbox——控件是選擇指示器(indicator)不是容器,走 icon tier(16/16/20),行高對齊透過 SelectionItem 的 `py = (field-height - 1lh) / 2` 保證
+- **世界級對照**:Material 3 Radio = 20px / Ant Design Radio = 16px / Polaris RadioButton = 16px——全部獨立於 field-height,與 Checkbox 控件尺寸對齊
+
+---
+
 ## 為何無 StateBehavior
 
 RadioGroup 的互動狀態(default / hover / checked / disabled / focus)**與 Checkbox 共用同一套 SelectionItem 佈局 + 狀態規則**(見「與 Checkbox 的差異」段表格描述),由 Checkbox 的 StateBehavior story own。RadioGroup 只改 selection model(互斥),不改 state 視覺。重寫 StateBehavior = 與 Checkbox 漂移風險(圓圈 vs 方框形狀差異已由 cva 控制,state 色完全共用)。

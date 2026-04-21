@@ -814,6 +814,22 @@ import { ItemInlineAction, ItemSuffix, type InlineActionConfig } from "@/design-
 2. 在 suffix slot 用 `ItemInlineAction` 渲染
 3. 用 `RowSizeProvider`(已由 SidebarProvider 等容器提供)確保 descendant 讀到對的 size
 
+### Dismiss 按鈕 canonical(跨 Family 共用)
+
+Dismiss 是「關閉 / 移除 anchor」的 icon-only action,屬 inline action 的**語義子類**。跨 Family 一致規則:
+
+**Default(99% 情境)**:dismiss 用 `ItemInlineActionButton`(= `ItemInlineAction` 渲染 `<button>`)。適用 Alert / Notice / Toast 非 managed / Dialog header close / Sheet close / Coachmark close / Combobox Tag dismiss / FileItem dismiss / 任何浮層 header 的關閉 X。
+
+**唯一合理例外**:**anchor 本身有 solid 色背景**(如 Tag 的 `red / blue / orange` variant)→ dismiss X 的 hover bg 需配 anchor 色相,不能用中性 `neutral-hover`(視覺違和)→ 允許自刻 JSX,但 spec 必須明文註明例外理由。**現有先例**:`tag.tsx:~104` + `field-controls.spec.md`「Tag dismiss」段。
+
+**❌ 禁止**:
+- **用帶文字 label 的 Button 作 dismiss**(如「關閉」/「Close」文字按鈕)—— 雙重 affordance(icon + label 做同一件事),違反 dismiss「可忽略」的本質,Signal 過載
+- **自刻 `<button><X /></button>`** — 繞過 `ItemInlineAction` 的尺寸 / hover bg / a11y 自動化,破壞跨元件一致性
+
+**第三方 managed 不算例外**:sonner toast 的 auto-dismiss、Radix Dialog 的 `DialogClose` wiring —— **我們改寫後的 close 按鈕視覺必須套 `ItemInlineActionButton`**,不可保留第三方預設樣式。第三方庫只負責 state logic(何時關),視覺觸發點由我們 own。
+
+**hook `check_story_anatomy.sh` 規則 B** 已在 stories 層攔 label Button 作 dismiss。
+
 ---
 
 ## 選擇 / 狀態視覺規則

@@ -260,8 +260,19 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const fieldCtx = useFieldContext?.()
     const resolvedSize = size ?? (fieldCtx?.size as typeof size) ?? 'md'
 
-    // shadcn compat：AlertDialog、Toast 等元件內部會傳入這些 alias，
-    // 在此靜默轉換，不暴露到型別或自動完成。
+    // ── Dev-mode warning:overlayBadge 只適用 iconOnly ──
+    // 有 label 的 Button 傳入 overlayBadge 會被忽略(只 render icon / 不渲染 overlay slot),
+    // 靜默忽略會讓 consumer 誤以為「傳了但位置錯」。Dev mode 印 warning 引導改用 `badge` prop
+    // (inline 位置,跟 label 並列)或改 `iconOnly`。Spec SSOT:badge.spec.md「Overlay 適用元件」。
+    if (process.env.NODE_ENV !== 'production' && overlayBadge && !iconOnly) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        '[DS Button] `overlayBadge` 只適用於 `iconOnly` Button。有 label 的 Button 請改用 `badge` prop(inline 位置,跟 label 並列),或移除 label 改為 iconOnly。SSOT:badge.spec.md「Overlay 適用元件 canonical」節。'
+      )
+    }
+
+    // shadcn compat:AlertDialog、Toast 等元件內部會傳入這些 alias,
+    // 在此靜默轉換,不暴露到型別或自動完成。
     const resolvedVariant: InternalVariant =
       (variantProp as string) === 'destructive' ? 'primary' :
       (variantProp as string) === 'ghost'        ? 'text'    :
