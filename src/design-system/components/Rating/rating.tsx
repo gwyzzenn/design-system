@@ -26,13 +26,19 @@ import { cn } from '@/lib/utils'
  * precision="half" — 半星(0.5, 1, 1.5, 2, 2.5, ..., 5)
  */
 
-// Icon size 對齊 icon tier(sm/md=16px, lg=20px):見 tokens/uiSize/uiSize.spec.md
+// Icon size 對齊 icon tier(xs/sm/md=16px, lg=20px):見 tokens/uiSize/uiSize.spec.md
 // 「Icon 尺寸 Tier」——field-height-xs/sm/md 的 icon tier = 16px,field-height-lg = 20px。
-// Container 高度則對齊 --field-height-*(sm=28 / md=32 / lg=36),讓 Rating 可與其他
+// Container 高度則對齊 --field-height-*(xs=24 / sm=28 / md=32 / lg=36),讓 Rating 可與其他
 // field-height family 元件(Input / Select / Button)並排時 row height 對齊,塞入
 // <Field> 時行高一致。
-const SIZE_PX = { sm: 16, md: 16, lg: 20 } as const
-const CONTAINER_HEIGHT: Record<'sm' | 'md' | 'lg', string> = {
+//
+// ── 使用情境 ──
+// - **Standalone**(獨立展示評分,如商品卡 / 評論)→ 建議 `xs`(24px,對齊 Avatar / Tag sm /
+//   field-height-xs;Material / iOS canonical standalone rating 常用 24)
+// - **Field 內**(表單評分欄位)→ 跟 Field 尺寸對齊(sm / md / lg,default md)
+const SIZE_PX = { xs: 16, sm: 16, md: 16, lg: 20 } as const
+const CONTAINER_HEIGHT: Record<'xs' | 'sm' | 'md' | 'lg', string> = {
+  xs: 'h-field-xs',
   sm: 'h-field-sm',
   md: 'h-field-md',
   lg: 'h-field-lg',
@@ -47,8 +53,8 @@ export interface RatingProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 
   onChange?: (value: number) => void
   /** 滿分(預設 5) */
   max?: number
-  /** 尺寸 */
-  size?: 'sm' | 'md' | 'lg'
+  /** 尺寸。standalone 建議 xs(24px);Field 內跟隨 Field size 傳 sm/md/lg */
+  size?: 'xs' | 'sm' | 'md' | 'lg'
   /** 精度:full = 整星,half = 半星 */
   precision?: 'full' | 'half'
   /** 唯讀(無 hover / click 響應) */
