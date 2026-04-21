@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Upload as UploadIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Empty } from '@/design-system/components/Empty/empty'
+import { CircularProgress } from '@/design-system/components/CircularProgress/circular-progress'
 
 /**
  * FileUpload — 拖放 / 點擊上傳區塊
@@ -10,9 +11,10 @@ import { Empty } from '@/design-system/components/Empty/empty'
  * 與本 DS 既有 FileItem(顯示已上傳檔案)配對 — 這裡 own「上傳觸發 + 拖放偵測」,
  * 上傳後的檔案清單顯示交給 consumer 用 FileItem 渲染。
  *
- * ── 3 狀態 ──
+ * ── 4 狀態 ──
  * idle     (default) — border-dashed border-divider  bg-surface
  * drag-over         — border-dashed border-primary  bg-primary-subtle
+ * loading           — 上傳中(async)顯示 CircularProgress,阻擋新互動
  * disabled          — opacity-disabled pointer-events-none
  *
  * ── children 插槽 ──
@@ -35,6 +37,16 @@ export interface FileUploadProps extends Omit<React.HTMLAttributes<HTMLDivElemen
   accept?: string
   maxSize?: number
   disabled?: boolean
+  /**
+   * Loading 狀態(async 上傳 / 伺服器處理中)。
+   * - 顯示 CircularProgress 取代預設 Empty 內容
+   * - 阻擋新點擊 / drag 事件(避免 double-submit)
+   * - 宣告 `aria-busy="true"` 讓 screen reader 感知處理中
+   * - Consumer 負責在上傳完成後自己切回 `loading={false}`
+   */
+  loading?: boolean
+  /** Loading 狀態的文字標題(預設「上傳中…」) */
+  loadingTitle?: string
   /** 標題文字(預設「Click or drag file here to upload」) */
   title?: string
   /** 說明文字(預設「Support for a single or bulk upload」) */
@@ -52,6 +64,8 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
       accept,
       maxSize,
       disabled = false,
+      loading = false,
+      loadingTitle = '上傳中…',
       title = 'Click or drag file here to upload',
       description = multiple ? 'Support for a single or bulk upload' : 'Support for a single file upload',
       children,
@@ -92,39 +106,42 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
       onClick?.(e)
     }
 
-    const state = disabled ? 'disabled' : isDragOver ? 'drag-over' : 'idle'
+    // State 優先序:disabled > loading > drag-over > idle(disabled 最硬,loading 次之)
+    const state = disabled ? 'disabled' : loading ? 'loading' : isDragOver ? 'drag-over' : 'idle'
+    const isBlocked = disabled || loading
 
     return (
       <div
         ref={ref}
         role="button"
-        tabIndex={disabled ? -1 : 0}
+        tabIndex={isBlocked ? -1 : 0}
         aria-disabled={disabled || undefined}
+        aria-busy={loading || undefined}
         data-state={state}
         onClick={handleClick}
         onKeyDown={(e) => {
-          if (disabled) return
+          if (isBlocked) return
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault()
             inputRef.current?.click()
           }
         }}
         onDragEnter={(e) => {
-          if (disabled) return
+          if (isBlocked) return
           e.preventDefault()
           setDragOver(true)
         }}
         onDragLeave={(e) => {
-          if (disabled) return
+          if (isBlocked) return
           e.preventDefault()
           setDragOver(false)
         }}
         onDragOver={(e) => {
-          if (disabled) return
+          if (isBlocked) return
           e.preventDefault()
         }}
         onDrop={(e) => {
-          if (disabled) return
+          if (isBlocked) return
           e.preventDefault()
           setDragOver(false)
           filterAndDispatch(e.dataTransfer.files)
@@ -141,6 +158,8 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
           'border-divider bg-surface hover:bg-neutral-hover',
           // drag-over
           'data-[state=drag-over]:border-primary data-[state=drag-over]:bg-primary-subtle data-[state=drag-over]:hover:bg-primary-subtle',
+          // loading(阻擋新互動但不 opacity-disabled — 避免跟 disabled 視覺撞,保持「處理中」語意)
+          'data-[state=loading]:cursor-progress data-[state=loading]:pointer-events-none',
           // disabled
           'data-[state=disabled]:opacity-disabled data-[state=disabled]:pointer-events-none data-[state=disabled]:cursor-not-allowed',
           className,
@@ -156,12 +175,19 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
           disabled={disabled}
           onChange={(e) => filterAndDispatch(e.target.files)}
         />
-        {children ?? (
+        {loading ? (
           <Empty
-            icon={UploadIcon}
-            title={title}
-            description={description}
+            icon={<CircularProgress size={48} />}
+            title={loadingTitle}
           />
+        ) : (
+          children ?? (
+            <Empty
+              icon={UploadIcon}
+              title={title}
+              description={description}
+            />
+          )
         )}
       </div>
     )
