@@ -1,8 +1,8 @@
 # components/ Charter
 
-## 這裡只收:單一元件的 folder
+## 這裡只收:元件家族的 folder
 
-每個元件一個 PascalCase folder,內含:
+每個元件家族一個 PascalCase folder,內含:
 - `{name}.tsx` — 元件本體
 - `{name}.spec.md` — 設計原則
 - `{name}.stories.tsx` — 展示
@@ -12,6 +12,21 @@
 
 **folder 名**: PascalCase(`Button/` / `DatePicker/`)
 **file 名**: kebab-case(`button.tsx` / `date-picker.tsx`)
+
+## Compound component family(多元件 + 共享規則)
+
+部分 folder 是**元件家族 home**,houses 多個緊耦合 primitive + 共享規則 spec。對齊 Ant Design `Checkbox.Group` / Mantine `Checkbox.Group` / Chakra compound pattern 世界級慣例:tightly coupled primitives 同資料夾而非拆分。
+
+現有 compound folders:
+- `Field/` — `field.tsx` + `field-wrapper.tsx` + `field-context.ts` + `field-types.ts` + `field-controls.spec.md`(跨 form 元件共享 mode/disabled/readonly 規則)+ `form-validation.spec.md`(表單驗證跨 primitive 規則,**無 Layout Family — behavior spec 非元件**)
+- `Checkbox/` — `checkbox.tsx` + `checkbox-group.tsx`(2026-04-21 CheckboxGroup merge 自 separate folder,對齊 standalone + group 世界級慣例)+ `boolean-display.tsx`(table cell 顯示)
+- `Menu/` — `menu-item.tsx`(家族預留位)
+- `SelectionControl/` — `selection-item.tsx`(Checkbox/Radio 共享的 row layout primitive home)
+
+**判斷 compound vs 單獨 folder**:
+- 元件能**獨立 lifecycle / 獨立使用** → 各自獨立 folder(Button / Input / Select)
+- 元件**同家族共享 context / 命名 / 規則** → compound folder(Field / Checkbox / Menu)
+- 新元件若模糊,先問「能不能不依賴同家族其他元件獨立使用」— 能 → 獨立 folder;不能 → compound family
 
 ## 這裡**不收**(反例)
 

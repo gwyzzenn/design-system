@@ -44,6 +44,16 @@ export const Overview = {
 - **強制編號**:Storybook sidebar 不依 `export` 順序,改依 story `name` 字母排序。中文無字母序,sidebar 會亂序;加編號前綴強制排序 canonical 化,順序跟 anatomy-standard 這份文件一致
 - **世界級對照**:Polaris(Anatomy / Variants / States)/ Material(Anatomy / Guidelines)/ Atlassian(Examples / Code) 的 Storybook 皆為每個 story 明確標題,從不靠 identifier 帶出 sidebar 名稱
 
+### Canonical 是 applicable-where-meaningful,非 rigid uniform
+
+**canonical 5 section 的意圖不是「每個元件強制 5 section」**,而是:**該元件若有對應視覺決策,必須用 canonical 命名 + 編號表達;若沒有(N/A),必須在 spec.md 明文 rationale**。
+
+判斷一個 section 是否 applicable:
+- **ColorMatrix**:元件有 variant / severity / hue / theme 差異 → applicable;單一視覺(Separator / Skeleton) → N/A
+- **SizeMatrix**:元件有 size tier(sm/md/lg) → applicable;固定尺寸(Notice 單一 size / AspectRatio 自由比例) → N/A
+- **StateBehavior**:元件有互動 state(hover / selected / disabled / loading) → applicable;純視覺 indicator(Badge / Tag) → N/A
+- **Inspector**:元件有可 inspect 的 slot + token 對照 → applicable;純 wrapper 無 slot → N/A
+
 ### 允許的偏離(CLAUDE.md「Consistency Audit 原則」公式)
 
 1. **追加第 6+ 個元件特有 story**:OK,不需 rationale。命名遵循以下格式:
@@ -51,11 +61,13 @@ export const Overview = {
    - 中文 `name:` 必須用編號前綴 + 中文描述:`'6. 標準比例'` / `'6. 佈局矩陣'` / `'6. 色彩綁定規則'`
    - ❌ 不准用素顏型 `'色彩綁定規則'`(破壞編號連續性)
    - ❌ 不准帶括號 context `'6. Orientation(horizontal / vertical)'` — 括號寫在 story 標題本體,不影響 sidebar 文字
-2. **缺 canonical 5 某一項**:**必須在元件 spec.md 寫一段 rationale**,格式:「本元件無 `{StateBehavior}` story,因為 {原因}」。典型原因:
+2. **缺 canonical 5 某一項(N/A)**:**必須在元件 spec.md 寫一段 rationale**,格式:「本元件無 `{SectionName}` story,因為 {原因}」。典型原因:
    - Badge / Tag:純視覺 indicator,無互動狀態 → 不需 StateBehavior
    - Chart:色彩來自 ChartConfig 不來自元件 variant → 不需 ColorMatrix
    - Separator / Skeleton / CircularProgress / Avatar:無 size tier(自由 number)→ 不需 SizeMatrix(或 SizeMatrix 改為「範圍展示」)
-3. **同概念改名**:不允許(如 `VisualTokens` 取代 `ColorMatrix` / `StyleMatrix` 取代 `ColorMatrix`)一律改回 canonical
+   - Notice / Alert:固定單一 size(Material Banner / Polaris Banner 共識) → 不需 SizeMatrix
+3. **保留 canonical 編號**:若有 Overview(1) + ColorMatrix(3) + StateBehavior(5),**編號保持 3 和 5**,不重編為 2 和 3 — 這讓讀者在 sidebar 一眼看出「這個元件跳過了 2 和 4」而非誤以為 canonical 就只有 3 個 section
+4. **同概念改名**:不允許(如 `VisualTokens` 取代 `ColorMatrix` / `StyleMatrix` 取代 `ColorMatrix`)一律改回 canonical
 
 **`/design-system-audit` Dimension 13 強制 grep 比對**:
 - `export const` 名稱 ≠ canonical → violation
