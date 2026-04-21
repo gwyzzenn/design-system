@@ -19,7 +19,9 @@ const Rule = ({
   <div className="mb-14">
     <h3 className="text-body font-bold text-foreground mb-1">{title}</h3>
     {note && <p className="text-caption text-fg-muted mb-5 max-w-[720px] leading-relaxed">{note}</p>}
-    <div className="flex flex-col gap-4 max-w-md">{children}</div>
+    {/* items-start 讓 direct children 保持自然寬度(避免 iconOnly Button 等在 flex-col 被
+        stretch 撐滿 max-w-md 的 bug)。需要 full-width row 的 child 自己 w-full / self-stretch */}
+    <div className="flex flex-col gap-4 max-w-md items-start">{children}</div>
   </div>
 )
 

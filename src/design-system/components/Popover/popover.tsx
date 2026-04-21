@@ -55,21 +55,30 @@ PopoverContent.displayName = PopoverPrimitive.Content.displayName
 
 // PopoverHeader: SurfaceHeader + Close X(對齊 Dialog 的 canonical,見 docblock)
 // justify-between 讓 children 與 Close 分左右。
-const PopoverHeader = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, children, ...props }, ref) => (
-  <SurfaceHeader
-    ref={ref}
-    className={cn("justify-between", className)}
-    {...props}
-  >
-    <div className="flex-1 min-w-0">{children}</div>
-    <PopoverPrimitive.Close asChild>
-      <ItemInlineActionButton icon={X} aria-label="關閉" size="md" />
-    </PopoverPrimitive.Close>
-  </SurfaceHeader>
-))
+interface PopoverHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+  /**
+   * 隱藏右上 close X(預設 false,顯示)。
+   * Coachmark / Tour 類 composition 用 Skip / Done 自管 close,不需 X。
+   */
+  hideClose?: boolean
+}
+
+const PopoverHeader = React.forwardRef<HTMLDivElement, PopoverHeaderProps>(
+  ({ className, children, hideClose = false, ...props }, ref) => (
+    <SurfaceHeader
+      ref={ref}
+      className={cn("justify-between", className)}
+      {...props}
+    >
+      <div className="flex-1 min-w-0">{children}</div>
+      {!hideClose && (
+        <PopoverPrimitive.Close asChild>
+          <ItemInlineActionButton icon={X} aria-label="關閉" size="md" />
+        </PopoverPrimitive.Close>
+      )}
+    </SurfaceHeader>
+  ),
+)
 PopoverHeader.displayName = "PopoverHeader"
 
 const PopoverBody = SurfaceBody

@@ -1,6 +1,6 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
-import { Sparkles, Bot, Users, FolderPlus, BarChart3, Keyboard, MousePointer2, Command } from 'lucide-react'
+import { Sparkles, Bot, Users, FolderPlus, Keyboard, MousePointer2, Command } from 'lucide-react'
 import { Coachmark } from './coachmark'
 import { Button } from '@/design-system/components/Button/button'
 
@@ -40,7 +40,7 @@ export const FeatureDiscovery: Story = {
         <Coachmark
           open={open}
           onOpenChange={setOpen}
-          image={<MediaGradient from="#6366f1" to="#8b5cf6" icon={Bot} label="AI 助理" />}
+          image={<MediaGradient from="var(--color-indigo-6)" to="var(--color-purple-6)" icon={Bot} label="AI 助理" />}
           title="試試新的 AI 助理"
           description="在任何文件中按下 AI 按鈕,讓 Claude 幫你摘要、翻譯或改寫內容。"
           onNext={() => setOpen(false)}
@@ -62,21 +62,21 @@ const tourSteps = [
   {
     anchor: '建立 Workspace',
     icon: FolderPlus,
-    media: { from: '#0ea5e9', to: '#06b6d4', label: 'Workspace' },
+    media: { from: 'var(--color-blue-6)', to: 'var(--color-cyan-6)', label: 'Workspace' },
     title: '建立你的第一個 Workspace',
     description: 'Workspace 是團隊協作的主要空間,所有專案、文件、成員都在這裡集中管理。',
   },
   {
     anchor: '邀請成員',
     icon: Users,
-    media: { from: '#f59e0b', to: '#ef4444', label: '團隊' },
+    media: { from: 'var(--color-yellow-6)', to: 'var(--color-deep-orange-6)', label: '團隊' },
     title: '邀請成員加入',
     description: '輸入 email 寄送邀請,新成員會自動加入這個 Workspace 並看到你目前的專案。',
   },
   {
     anchor: '建立第一個專案',
     icon: Sparkles,
-    media: { from: '#10b981', to: '#059669', label: '專案' },
+    media: { from: 'var(--color-green-6)', to: 'var(--color-green-7)', label: '專案' },
     title: '建立你的第一個專案',
     description: '專案用來組織相關的任務、文件和討論。你隨時可以建立更多專案或邀請成員加入。',
   },
@@ -138,21 +138,21 @@ const tipSteps = [
   {
     anchor: '鍵盤導覽',
     icon: Keyboard,
-    media: { from: '#8b5cf6', to: '#6366f1', label: 'Cmd + K' },
+    media: { from: 'var(--color-purple-6)', to: 'var(--color-indigo-6)', label: 'Cmd + K' },
     title: '用 Cmd + K 叫出全站搜尋',
     description: '快速搜尋任何檔案、指令、設定;支援模糊比對與歷史紀錄。多數操作都可以從這裡直接觸發。',
   },
   {
     anchor: '快速切換',
     icon: Command,
-    media: { from: '#0ea5e9', to: '#8b5cf6', label: 'Cmd + P' },
+    media: { from: 'var(--color-blue-6)', to: 'var(--color-purple-6)', label: 'Cmd + P' },
     title: 'Cmd + P 在最近文件間切換',
     description: '相當於 VS Code / Figma 的 Go to File;按住 Cmd 不放可多次跳轉,放開即停在當前。',
   },
   {
     anchor: '右鍵動作',
     icon: MousePointer2,
-    media: { from: '#10b981', to: '#0ea5e9', label: 'Right-click' },
+    media: { from: 'var(--color-green-6)', to: 'var(--color-blue-6)', label: 'Right-click' },
     title: '右鍵選單集中所有情境動作',
     description: '在任一檔案或列表項上按右鍵,會列出所有可用動作:複製、分享、重新命名、刪除等。',
   },
@@ -201,68 +201,8 @@ export const TipsMultiStep: Story = {
   },
 }
 
-// ── No Media: Simple What's New ─────────────────────────────────────────────
-
-export const TextOnly: Story = {
-  name: '純文字提示(What\'s New / Stripe 風格)',
-  render: () => {
-    const [open, setOpen] = React.useState(true)
-    return (
-      <div className="flex flex-col items-center gap-3">
-        <Coachmark
-          open={open}
-          onOpenChange={setOpen}
-          title="新版圖表模式已上線"
-          description="Dashboard 現在支援互動式圖表,可切換折線 / 長條 / 圓餅。點選右上圖表圖示查看。"
-          onNext={() => setOpen(false)}
-          isLastStep  /* single-step → CTA = 「知道了」 */
-          side="bottom"
-          align="end"
-        >
-          <Button variant="tertiary" startIcon={BarChart3}>圖表模式</Button>
-        </Coachmark>
-        <p className="text-footnote text-fg-muted">↑ 不含 media 時整體更緊湊,適合單純的版本更新提示</p>
-      </div>
-    )
-  },
-}
-
-// ── Video / Illustration ────────────────────────────────────────────────────
-
-export const WithIllustration: Story = {
-  name: '搭配動畫 illustration(Figma 風格)',
-  render: () => {
-    const [open, setOpen] = React.useState(true)
-    return (
-      <div className="flex flex-col items-center gap-3">
-        <Coachmark
-          open={open}
-          onOpenChange={setOpen}
-          image={
-            <div className="w-full h-full flex items-center justify-center"
-              style={{
-                backgroundImage: 'radial-gradient(circle at 30% 30%, #fde68a 0%, transparent 50%), radial-gradient(circle at 70% 60%, #a5b4fc 0%, transparent 50%), linear-gradient(135deg, #fff 0%, #f3f4f6 100%)',
-              }}
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center" style={{ boxShadow: 'var(--elevation-100)' }}>
-                  <Sparkles className="w-6 h-6 text-primary" />
-                </div>
-                <div className="text-caption text-foreground font-medium">Figma-style preview</div>
-              </div>
-            </div>
-          }
-          title="Auto-layout 讓設計更有彈性"
-          description="選取多個 layer 後按 Shift+A 建立 auto-layout,元素會自動對齊並隨內容調整。"
-          onNext={() => setOpen(false)}
-          isLastStep  /* single-step → CTA = 「知道了」 */
-          side="bottom"
-          align="start"
-        >
-          <Button variant="primary" size="sm" startIcon={Sparkles}>Auto-layout</Button>
-        </Coachmark>
-        <p className="text-footnote text-fg-muted">↑ Illustration / animated preview 比純截圖更能傳達「這個功能在做什麼」</p>
-      </div>
-    )
-  },
-}
+// 備註(2026-04-21 決策):移除 `TextOnly` 與 `WithIllustration` 兩則範例。
+// - TextOnly:user 明示「先不要提供純文字提示風格範例」(缺 media 的 Coachmark 跟 Popover
+//   差異太小,讓消費者誤用)
+// - WithIllustration:原本 illustration 用硬寫 hex(違 DS token 原則)且視覺差異不明顯,
+//   無法傳達「動畫 / illustration 比 flat screenshot 更強」的主訴,刪除避免誤導

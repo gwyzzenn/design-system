@@ -7,6 +7,7 @@ import {
   PopoverBody,
   PopoverFooter,
   PopoverHeader,
+  PopoverTitle,
 } from '@/design-system/components/Popover/popover'
 import { Button } from '@/design-system/components/Button/button'
 import { AspectRatio } from '@/design-system/components/AspectRatio/aspect-ratio'
@@ -147,12 +148,17 @@ const Coachmark = React.forwardRef<HTMLDivElement, CoachmarkProps>(
           align={align}
           sideOffset={sideOffset}
           className={cn('w-80 p-0 overflow-hidden')}
+          // 禁止 Radix 開啟時自動 focus 第一個 focusable(預設會 focus Prev / Skip / Next),
+          // Coachmark 的 CTA 不該被 auto-focus 偷觸發(user 可能還在讀 body,按 Enter 就推進)。
+          // 想推進的 user 自己 tab 到 CTA 即可。
+          onOpenAutoFocus={(e) => e.preventDefault()}
         >
           {headerTitle && (
-            <PopoverHeader>
-              <span className="text-caption font-medium text-fg-secondary uppercase tracking-wide">
-                {headerTitle}
-              </span>
+            // Header title 走 `<PopoverTitle>` 共用 Popover 頭部 typography canonical
+            // (`text-body font-medium`,對齊 Popover header 樣式)。hideClose 讓 Coachmark
+            // 自管 close 流程(Skip / Done),不重複 Popover 的右上 X。
+            <PopoverHeader hideClose>
+              <PopoverTitle>{headerTitle}</PopoverTitle>
             </PopoverHeader>
           )}
 
@@ -176,7 +182,9 @@ const Coachmark = React.forwardRef<HTMLDivElement, CoachmarkProps>(
           {hasFooterContent && (
             <PopoverFooter className="justify-between">
               {stepText ? (
-                <span className="text-caption text-fg-secondary tabular-nums">
+                // step 文字走 text-body 跟 body content 字體一致(對齊 Dialog / Popover footer
+                // raw text canonical:footer 的純文字 = body 字體,不縮小到 caption)
+                <span className="text-body text-fg-secondary tabular-nums">
                   {stepText}
                 </span>
               ) : (
