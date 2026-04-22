@@ -247,10 +247,15 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
         <HoverCardTrigger asChild>
           {baseEl}
         </HoverCardTrigger>
-        {/* HoverCardContent 無 inner padding:canonical consumer 是 NameCard(自帶 `px-4 py-3` chrome)。
-            breathing invariant 由 content 層負責(M16 視覺容器 breathing),避免雙層 padding 造成
-            visual weight 過重。若 consumer 傳非 NameCard content,需自行確保 inner padding。 */}
-        <HoverCardContent className="bg-surface-raised rounded-lg border border-border" style={{ boxShadow: 'var(--elevation-200)' }}>
+        {/* HoverCardContent canonical(2026-04-23):
+            - 無 inner padding(consumer NameCard 自帶 `px-4 py-3` chrome)
+            - max-height = Radix viewport-aware 變數 → NameCard 內部 body ScrollArea 捲動
+            breathing invariant 由 content 層負責(M16);若 consumer 傳非 NameCard content,
+            需自行確保 inner padding + 內部 body 捲動策略 */}
+        <HoverCardContent
+          className="bg-surface-raised rounded-lg border border-border overflow-hidden max-h-[var(--radix-hover-card-content-available-height)]"
+          style={{ boxShadow: 'var(--elevation-200)' }}
+        >
           {hoverCard}
         </HoverCardContent>
       </HoverCard>

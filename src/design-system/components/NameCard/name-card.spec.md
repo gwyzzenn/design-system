@@ -26,14 +26,28 @@
 
 ## 結構
 
-NameCard 為固定寬度的垂直 section 堆疊：
-- **Profile header** — Avatar + Name + Subtitle
-- **Action buttons**（選用）— 快速動作列
-- **Status section**（選用）— 狀態標籤 + 訊息
-- **Info fields**（選用）— 透過 DescriptionList 呈現結構化欄位
-- **View more** — 導向 profile 頁的 link。**Hover context(HoverCard / Popover 浮層)必含**;standalone page-level NameCard(profile panel / directory card 等非 hover 情境)可省略。詳「View more canonical」節
+NameCard 是**三層 chrome 結構**(2026-04-23 canonical):
 
-Section 之間用 `border-t border-divider` 固定分隔（見 `separator.spec.md`「元件固定結構 → CSS border-t/b」）。詳細 class / padding token 見 `name-card.tsx`。
+```
+┌─────────────────────────────┐
+│ HEADER(固定,shrink-0)       │  ← Profile(Avatar + Name + Subtitle)+ Actions(選用)
+├─────────────────────────────┤
+│ BODY(flex-1,可垂直捲動)      │  ← Status section + Status message + Info fields(選用)
+│ ↕ 空間不足時此區 ScrollArea   │    (三者皆無 → Body 不 render,header 直接貼 footer)
+├─────────────────────────────┤
+│ FOOTER(固定,shrink-0)       │  ← View more(hover context 必含,詳「View more canonical」)
+└─────────────────────────────┘
+```
+
+- **Header 固定**:Profile + Actions 一體,**不捲動**(使用者的視覺 anchor:誰 + 可對他做什麼)
+- **Body 可捲動**:Status / Status message / Fields 三者中有任一時 render,以 `<ScrollArea>` 包(cross-OS overlay 捲軸)
+- **Footer 固定**:View more **永遠可見**(hover preview 的 escape hatch 到完整 profile)
+
+**取消「精簡版」變體**:NameCard 只有**一種結構**,consumer 未傳的 section 自動不 render 但結構位置一致(無 `minimal` prop 或變體 split)。世界級對照:Slack / GitHub / LinkedIn hover-profile 皆單一結構(chrome pattern + conditional sections),不分「簡版/full 版」。
+
+Section 之間用 `border-t border-divider` 分隔(見 `separator.spec.md`「元件固定結構 → CSS border-t/b」)。詳細 class / padding token 見 `name-card.tsx`。
+
+**View more 按鈕 padding**:固定 `py-3`(12px),比 Body `py-3` 同位 — 讓 footer 有明顯呼吸空間,不跟 body section 邊界混淆。
 
 ## 寬度（元件級常數）
 
