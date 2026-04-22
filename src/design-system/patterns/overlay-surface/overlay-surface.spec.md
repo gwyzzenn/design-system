@@ -92,18 +92,36 @@ Dialog 和 Popover 的**結構化 sub-components 共用 primitive**——提供 
   都採此 pattern:body 有 gutter,item hover bg 貼滿 gutter 內邊(容器內貼邊合理;chrome 外殼仍保留 loose 呼吸)
 - Item size 對齊 `patterns/element-anatomy/item-anatomy.spec.md`(Family 1 Menu item / Family 2 List item)
 
-**規則 3.1 — Hover bg 「不貼邊」的 context 判斷(2026-04-22 新增)**:
-CLAUDE.md mindset「視覺上不輸世界級」要求 hover bg 不貼 chrome 邊(避免視覺斷裂)。**但「邊」指的是
-chrome 外殼邊緣(dialog border / sheet border / popover border),不是 body padded 容器內邊緣**:
+**規則 3.1 — Hover bg flush 的 canonical(2026-04-22 新增,v2 2026-04-22 校準)**:
+**Hover bg 必 flush「容器內邊緣」,禁止 inset**。inset 或貼 chrome 邊都是違規。
 
-| Context | hover bg 能否貼邊 | Rationale |
-|---------|-------------------|-----------|
-| Chrome 外殼邊緣(dialog border / sheet border) | ❌ 不能貼 | 貼死 chrome 看起來被裁掉,失去浮層「有外殼」的感 |
-| Body padded 容器內邊緣(body px-loose 內側) | ✅ 可以貼(flush) | body 已經把 chrome 推開 loose,hover bg 填滿 body padded area 視覺自然 |
-| Page content 中的獨立 card / section | ❌ 不能貼 | card 自己是獨立元素需呼吸 |
+**正確認知**「貼邊」的兩種情境:
 
-**判斷法**:問「hover bg 邊緣外還有沒有其他 breathing space?」有(body padding / chrome gutter)→ 可以 flush;
-無(直接接到 chrome / page edge)→ 不能貼,需 inset gutter。
+| Context | 判定 | Rationale |
+|---------|------|-----------|
+| Hover bg flush **容器內邊緣**(body padded area 的內邊、card 內部、sidebar nav padded area 內邊) | ✅ **合法,且是 canonical**(必 flush) | 世界級 Linear / Notion / Figma / Slack / Material M3 / Polaris 的 overlay list item hover 一律 flush 到容器 padded 內邊緣,row 的 full-width 可點擊感才成立 |
+| Hover bg **inset** 容器內邊緣(兩側留 gutter 沒填滿) | ❌ **違規**(視覺「縮在中間」,破壞 row 可點擊感) | inset 會讓 hover 看起來像「只對 row 的中段反應」,違反 row = full-width click target 的心智模型 |
+| Hover bg 貼 **chrome 外殼邊**(dialog border / sheet border / page edge) | ❌ **違規**(視覺被裁切) | chrome 外殼是浮層的「框」,hover bg 貼死會失去「列表 vs 外殼」的層次 |
+
+**Layer 區分**:
+- Chrome 外殼(dialog / sheet / popover border)— hover bg 不能貼到這裡(chrome 本身有 `px-loose` gutter 把 hover bg 推離外殼)
+- **Body padded 容器內邊緣**(chrome 的 `px-loose` 結束的位置,即 body padded area 的內邊)— hover bg 必 flush 到這裡
+- Item content 內距(item 自己的 text / icon 到 item box 邊的距離)— 由 item-anatomy 規則處理
+
+**實作等式**(為什麼 `body px-loose + item px-0` 會產生 canonical flush):
+```
+chrome 外殼邊 ─────── [ loose gutter ] ─────── body padded 內邊 ─────── item box ─────── body padded 內邊 ─────── [ loose gutter ] ─────── chrome 外殼邊
+                                                          ↑              ↑
+                                                 hover bg 左邊        hover bg 右邊(flush)
+```
+- 若 item 加 `px-N`,hover bg 就會 inset N px from body padded 內邊 = 違規
+- 若 body 減 `px-(loose-N)`,hover bg 就會貼近 chrome 邊 N px = 違規
+- **Canonical = body `px-loose` + item `px-0` + item `rounded-md`**(rounded 讓 hover 內邊緣有柔和轉折)
+
+**判斷 checklist(改完 UI 走 M11 state walk 時必跑)**:
+1. hover 元素的「直接 container」是什麼?(body padded area / card 內 / sidebar padded area)
+2. hover bg 左右兩邊是否 flush 到這個 container 的 padded 內邊?
+3. Flush ✓ → OK;Inset / 貼 chrome ✗ → 修
 
 **規則 4 — 對稱**:
 - 對稱 pt=pb(避免「頂貼邊、底留空」非對稱斷裂)

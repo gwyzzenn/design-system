@@ -20,12 +20,21 @@ import {
  * - Radix primitives：behavior（keyboard nav, focus management, aria roles）
  * - MenuItem：visual（layout, padding, icon alignment, typography）
  *
- * Radix primitive 是外層容器，控制 focus-visible:bg-neutral-hover。
- * MenuItem 內層只負責佈局，不加互動樣式。
+ * Radix primitive 是外層容器,控制 `data-[highlighted]:bg-neutral-hover`。
+ * MenuItem 內層只負責佈局,不加互動樣式。
  *
- * 為何 focus-visible 而非 focus：滑鼠 click 也會觸發 `:focus`,會讓使用者
- * 點選後留下 hover-bg 殘影。`focus-visible` 只在鍵盤導覽 / 程式 focus 時
- * 套用,click 不套——對齊 Menu/menu-item.tsx canonical。
+ * ── Hover / highlight canonical(2026-04-22 修正)──
+ * 用 Radix 官方的 `data-[highlighted]` attribute,**不用 `:focus-visible` / `:hover` /
+ * `:focus`**:
+ *   - Radix 在 **mouse hover、keyboard arrow nav、focus move in** 時自動 set `data-highlighted`
+ *   - mouse leave / focus move out / menu close 時自動清掉
+ *   - 不會在 click 後留殘影(Radix 內部已處理)
+ *   - 跨瀏覽器一致(不依賴 `:focus-visible` 的 heuristic)
+ *
+ * 曾經用過 `focus-visible:bg-neutral-hover` 的理由:避免 click 後殘影。但實測:mouse hover
+ * 觸發 Radix 程式化 `.focus()`,Chromium / Safari / Firefox 對 programmatic focus 是否 fire
+ * `:focus-visible` 行為不一致,導致 mouse hover 有時無 bg。改用 `data-[highlighted]:` 後行為
+ * 一致 —— 世界級 canonical(shadcn / Radix docs / Ariakit 皆此)。
  */
 
 // ── Floating layer 共用樣式 ──
@@ -45,10 +54,11 @@ type SizeKey = RowSize
 const ICON_SIZE = ROW_ICON_SIZE
 
 // ── Shared item classes on Radix primitive ──
+// Highlight(hover + keyboard nav): 用 Radix `data-[highlighted]` canonical(見 docblock)
 const radixItemClass = [
   'relative cursor-pointer select-none outline-none',
   'transition-colors duration-150',
-  'focus-visible:bg-neutral-hover',
+  'data-[highlighted]:bg-neutral-hover',
   'data-[disabled]:pointer-events-none data-[disabled]:text-fg-disabled data-[disabled]:cursor-default',
 ].join(' ')
 
