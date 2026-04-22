@@ -65,6 +65,16 @@ function getInitial(text: string): string {
   return text.trim().charAt(0).toUpperCase()
 }
 
+// Semantic presence tokens — 見 color/semantic.css
+// Module-level constant(2026-04-22 D3 perf audit):從 render body 移到 module scope,
+// 避免每次 Avatar render 都 re-declare 此 4-entry object(Low impact 但渲染大量 avatars 時累積可觀)
+const STATUS_DOT_COLOR: Record<string, string> = {
+  online: 'var(--status-online)',
+  away: 'var(--status-away)',
+  busy: 'var(--status-busy)',
+  offline: 'var(--status-offline)',
+}
+
 // ── Component ──
 
 export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -129,14 +139,6 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
     const dotSize = isFill ? 10 : Math.max(8, Math.min(16, Math.round(numSize * 0.28)))
     // Border ring 在 surface 上分離 dot 與 avatar,dotSize ≥ 12 時升階到 3px 保持視覺比例
     const dotBorder = dotSize >= 12 ? 3 : 2
-
-    // Semantic presence tokens — 見 color/semantic.css
-    const STATUS_DOT_COLOR: Record<string, string> = {
-      online: 'var(--status-online)',
-      away: 'var(--status-away)',
-      busy: 'var(--status-busy)',
-      offline: 'var(--status-offline)',
-    }
 
     const avatarEl = (
       <div
