@@ -9,6 +9,7 @@ import { Input } from '@/design-system/components/Input/input'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
 import { Switch } from '@/design-system/components/Switch/switch'
 import { MenuItem } from '@/design-system/components/Menu/menu-item'
+import { NameCard, NameCardDefaultActions } from '@/design-system/components/NameCard/name-card'
 
 /**
  * 通知設定 — variant="list" 中 item(title + desc + right-side Switch)
@@ -204,7 +205,21 @@ export const LongContent = {
                   key={m.empNum}
                   className="flex items-center gap-3 py-2 px-[var(--layout-space-loose)] rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left"
                 >
-                  <Avatar size={40} src={`https://i.pravatar.cc/80?u=${m.empNum}`} alt={m.name} />
+                  {/* Person avatar canonical:hover 必出現 NameCard(DS-wide rule,見 avatar.spec.md)
+                      世界級 Slack / Figma / Linear / Notion 的 person avatar 全預設 hover → profile popover */}
+                  <Avatar
+                    size={40}
+                    src={`https://i.pravatar.cc/80?u=${m.empNum}`}
+                    alt={m.name}
+                    hoverCard={
+                      <NameCard
+                        name={m.name}
+                        avatar={{ src: `https://i.pravatar.cc/80?u=${m.empNum}`, alt: m.name }}
+                        subtitle={`${roles[i % roles.length]}｜${m.empId}`}
+                        actions={<NameCardDefaultActions />}
+                      />
+                    }
+                  />
                   <div className="flex flex-col min-w-0 flex-1">
                     <span className="text-body font-medium truncate">{m.name}</span>
                     <span className="mt-0.5 text-caption text-fg-secondary truncate">
@@ -296,7 +311,20 @@ export const ListBody = {
                   key={m.empNum}
                   className="flex items-center gap-3 py-2 px-[var(--layout-space-loose)] rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left"
                 >
-                  <Avatar size={40} src={`https://i.pravatar.cc/80?u=${m.empNum}`} alt={m.name} />
+                  {/* Person avatar canonical:hover 必出現 NameCard */}
+                  <Avatar
+                    size={40}
+                    src={`https://i.pravatar.cc/80?u=${m.empNum}`}
+                    alt={m.name}
+                    hoverCard={
+                      <NameCard
+                        name={m.name}
+                        avatar={{ src: `https://i.pravatar.cc/80?u=${m.empNum}`, alt: m.name }}
+                        subtitle={`${m.role}｜${m.empId}`}
+                        actions={<NameCardDefaultActions />}
+                      />
+                    }
+                  />
                   <div className="flex flex-col min-w-0 flex-1">
                     <span className="text-body font-medium truncate">{m.name}</span>
                     <span className="mt-0.5 text-caption text-fg-secondary truncate">
