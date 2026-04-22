@@ -1,4 +1,4 @@
-# Audit Subagent Prompts (20 audits)
+# Audit Subagent Prompts (22 audits)
 
 Each prompt is self-contained — designed to paste into an `Agent` call with `run_in_background: true` and `subagent_type: general-purpose`.
 
@@ -501,7 +501,7 @@ End: `Total issues found: M. Categories: [breakdown]`. Under 500 words. Don't fi
 
 ---
 
-## Running all 20 in parallel
+## Running all 22 in parallel
 
 Single message with 20 `Agent` tool calls, each with `run_in_background: true`. Expected wall time: 3-5 minutes for all to complete (they process in parallel server-side).
 
@@ -785,4 +785,77 @@ For each canonical declaration in spec.md(任何「Row action cap = X」「Dismi
 Report: `spec.md:L{line} — canonical「{宣告}」無 benchmark 對照 → 補 world-class 至少 3 家 or 降級為 heuristic`
 
 End: `N canonical declarations scanned, M without benchmark, top 3: [list]`. Under 400 words. Don't fix.
+```
+
+---
+
+## 21. 連續 item list wrapper gap(consumer 層)
+
+**Type**: Consistency
+**Canonical source**: `patterns/element-anatomy/item-anatomy.spec.md`「連續 item 貼邊合法性」公式 3 條 + 元件 spec「List wrapper canonical」(e.g. `components/FileItem/file-item.spec.md`)
+**Rationale home**: consumer code 的 inline comment / 元件 spec「List wrapper canonical」
+
+Scan consumer 層(`.tsx` / `.stories.tsx` / `src/explorations/`)對 item 元件的 list wrapper gap 是否正確:
+
+1. 公式 1(同類 standalone card/pill list):每個 card/pill 永久視覺層(bg + radius + inset)相鄰必 gap。violation:`<div className="flex flex-col">`(無 gap)下多個 FileItem rich / Card / Chip standalone
+2. 公式 2(同類 flush / transparent list):0 gap 合法,分隔靠 border-b / progress bar / connector。無需 gap → flag 是 FP
+3. 公式 3(混合視覺語言 list):必取最保守 gap。violation:compact FileItem Type A + Type B 混用但無 gap
+
+Hook `check_item_list_gap.sh` 已 P2 block 外框 / P1 warn 缺 gap,本 dim 為 audit 層 redundant check 捕遺漏。
+
+對每個 list wrapper violation:
+- file:line
+- 元件類型 + 判斷屬哪條公式 violation
+- 建議 gap 值(該元件 spec「List wrapper canonical」指定值)
+
+Report format:
+```
+[P0 consumer list wrapper 違反 gap canonical] {file}:{line}
+  wrapper: {className}
+  children: {item type}
+  公式: {1/2/3} → 必 gap {value}
+  SSOT: {元件 spec「List wrapper canonical」}
+```
+
+End: `N wrappers scanned, M violations, top 3: [list]`. Under 300 words. Don't fix.
+
+---
+
+## 22. 視覺容器 inner breathing(consumer 層)
+
+**Type**: Absolute
+**Canonical source**: `patterns/element-anatomy/element-anatomy.spec.md`「視覺容器 breathing invariant」
+**Rationale home**: N/A(absolute rule · breathing 必存在)
+
+Scan consumer 自建的視覺邊界容器(非 chrome primitive 消費)是否有 inner padding:
+
+`.tsx` 內 grep pattern `<(div|section|aside|header|footer|main|nav)` 帶以下任一:
+- `bg-(surface|neutral|primary|error|warning|success|info|inverse|overlay)-*` 或 `bg-\[var(--...)\]`
+- `border` 類(非 `border-0` / `border-transparent`)
+- `shadow-\[var(--elevation-...\]` / `shadow-\[...\]`(非 `shadow-none`)
+
+若同 className 無 `p-N` / `px-N` / `py-N` / `p-\[var(...)\]` / `pt-N` / `pb-N` → violation。
+
+Hook `check_container_breathing.sh` 已 P1 warn,本 dim 為 audit 層捕 hook 遺漏 / 多行 className split 的 case。
+
+**排除**(hook 同邏輯):
+- Chrome primitive(SurfaceHeader / SurfaceBody / SurfaceFooter / Field wrapper / Button / Input)= 自帶 canonical padding
+- `@breathing-exempt:` / `@breathing-exempt-next` 標記
+- Specific justification in spec (e.g. SheetBody variant="list" 刻意 `py-2 no px`)
+
+對每個 violation 報:
+- file:line
+- container 類型(div/section/etc)
+- 視覺邊界類(bg / border / shadow)
+- 建議 padding token(chrome → `--layout-space-loose/tight`;其他 → `px-3` 等)
+
+Report format:
+```
+[P0 視覺容器缺 inner breathing] {file}:{line}
+  container: {tag className}
+  視覺邊界: {bg / border / shadow}
+  SSOT: `patterns/element-anatomy/element-anatomy.spec.md`「視覺容器 breathing invariant」
+```
+
+End: `N containers scanned, M violations, top 3: [list]`. Under 300 words. Don't fix.
 ```

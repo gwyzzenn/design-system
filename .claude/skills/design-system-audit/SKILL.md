@@ -1,6 +1,6 @@
 ---
 name: design-system-audit
-description: Systematic audit of this design system for world-class quality. Runs 20 audits covering spec hygiene / code correctness / a11y / naming / tokens / patterns / CLAUDE.md consistency / Layout Family compliance / prop value collisions / shadcn alias leakage / home-name-vs-scope fit / spec hardcoded-values, and surfaces actionable fix lists. Has explicit checkpoints where the skill MUST stop and ask user. Invoke via /design-system-audit when asked to audit, re-audit, check quality, or verify design system health.
+description: Systematic audit of this design system for world-class quality. Runs 22 audits covering spec hygiene / code correctness / a11y / naming / tokens / patterns / CLAUDE.md consistency / Layout Family compliance / prop value collisions / shadcn alias leakage / home-name-vs-scope fit / spec hardcoded-values, and surfaces actionable fix lists. Has explicit checkpoints where the skill MUST stop and ask user. Invoke via /design-system-audit when asked to audit, re-audit, check quality, or verify design system health.
 ---
 
 # Design System Audit (20 dimensions, world-class)
@@ -20,7 +20,7 @@ Purpose: catch every bug class this project has shipped historically PLUS struct
 
 ## 對齊 CLAUDE.md `# 稽核 6 維 + 2 模式` — 本 skill 是 6 維的 D1 + D2 home
 
-CLAUDE.md 定義 6 維:D1 設計語言 / D2 程式語言 / D3 效能 / D4 UX / D5 視覺 / D6 原則自檢。本 skill 的 20 audits 覆蓋 **D1 + D2**(spec hygiene / code correctness / SSOT / cva / naming / tokens / patterns)。**D3-D5 由對應 skill 處理**:
+CLAUDE.md 定義 6 維:D1 設計語言 / D2 程式語言 / D3 效能 / D4 UX / D5 視覺 / D6 原則自檢。本 skill 的 22 audits 覆蓋 **D1 + D2**(spec hygiene / code correctness / SSOT / cva / naming / tokens / patterns)。**D3-D5 由對應 skill 處理**:
 
 | 維度 | 對應 skill |
 |------|-----------|
@@ -49,7 +49,7 @@ CLAUDE.md 定義 6 維:D1 設計語言 / D2 程式語言 / D3 效能 / D4 UX / D
 
 ---
 
-## The 20 audits
+## The 22 audits
 
 Grouped by theme. Each runs as an independent subagent; many can parallelize.
 
@@ -108,6 +108,13 @@ Grouped by theme. Each runs as an independent subagent; many can parallelize.
 | 19 | **Home-name-vs-scope 一致性** | classification folder 名稱若與實際 scope 偏離(item-layout 裝 4-family taxonomy → rename item-anatomy 的學到的教訓);charter README 說的「這裡收 X」與實際內容是否一致 |
 | 20 | **Spec 硬寫機械化值檢查** | spec.md 不該有 `5.5px` / 完整 Tailwind class lists / cva object literals — 這些屬 tsx;spec 只記錄「為什麼」的判斷性描述 |
 
+### Group H — Consumer-layer consistency (P0 / P1,2026-04-22 新增)
+
+| # | Audit | What it catches |
+|---|-------|-----------------|
+| 21 | **連續 item list wrapper gap**(consumer 層 Consistency)| consumer stories / app code 的 `.map()` list wrapper gap 是否對齊 item 元件的「List wrapper canonical」:standalone card/pill → 必 gap;flush/transparent → 0 gap OK;mixed 視覺語言 → 必取保守 gap。hook `check_item_list_gap.sh` 是預警層,本 dim 補 audit 層 |
+| 22 | **視覺容器 inner breathing**(consumer 層 Absolute)| consumer 自建的視覺邊界容器(permanent bg / border / shadow 三擇一)是否有 inner padding。hook `check_container_breathing.sh` 是預警層,本 dim 補 multi-line className / 非 div 容器的 case |
+
 ---
 
 ## Workflow
@@ -126,7 +133,7 @@ Grouped by theme. Each runs as an independent subagent; many can parallelize.
 
 ### Phase 1 — Parallel audit execution
 
-Launch all 20 audits as background subagents (single message, multiple `Agent` tool calls with `run_in_background: true`). Use prompts in [references/audit-prompts.md](references/audit-prompts.md).
+Launch all 22 audits as background subagents (single message, multiple `Agent` tool calls with `run_in_background: true`). Use prompts in [references/audit-prompts.md](references/audit-prompts.md).
 
 **Every audit prompt declares three metadata lines at top**:
 - **Type**: `Absolute` or `Consistency` (per CLAUDE.md「Consistency Audit 原則」)
@@ -327,6 +334,6 @@ After all commits:
 
 ## References
 
-- [references/audit-prompts.md](references/audit-prompts.md) — Exact subagent prompts for all 20 audits
+- [references/audit-prompts.md](references/audit-prompts.md) — Exact subagent prompts for all 22 audits
 - [references/historical-bugs.md](references/historical-bugs.md) — Bug classes indexed by audit
 - [references/checkpoints.md](references/checkpoints.md) — Detailed examples of each MUST-ASK scenario

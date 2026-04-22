@@ -46,7 +46,7 @@
 
 ### Level 5 — Skill (`.claude/skills/*/SKILL.md` + `references/`)
 
-- **Audit / 稽核協議**(如 `design-system-audit` 的 20 個 audits / `product-ui-audit` 的 6 維度檢核)
+- **Audit / 稽核協議**(如 `design-system-audit` 的 22 個 audits / `product-ui-audit` 的 6 維度檢核)
 - **AI↔user 對話 protocol**(checkpoint 範本:「先不管」vs tech debt / 新 rule 提議 / 分類模糊等)
 - **特定工作流 playbook**(only-when-invoked 的多步驟流程)
 - **文件撰寫指南**(story-writing 等)
@@ -141,7 +141,7 @@ Q5. 是 CLAUDE.md / SKILL.md 已有項目的「深層細節」嗎?
 | cva 適用範圍 | CLAUDE.md ✓ | CLAUDE.md | 寫元件 code 的 pattern 決策,Level 1 |
 | 4-Family Model 頂層 taxonomy | CLAUDE.md + item-layout SSOT(舊) | `patterns/element-anatomy/element-anatomy.spec.md`(taxonomy overview)+ `patterns/element-anatomy/item-anatomy.spec.md`(F1/F2 deep)flat 並列 | 2026-04-20 refactor:folder `element-anatomy` = topic home,flat 多檔 topical pattern(overview + 具體 topic),對齊 Material / Polaris Foundations 組織法;不用 nested / 不用頂層飛地 |
 | 「先不管」語意區分 | CLAUDE.md(❌ 錯放) | **`design-system-audit` Checkpoint 7** | AI↔user 對話 protocol,不是設計規則;只在 audit triage 情境需要 |
-| 20 個 audits | CLAUDE.md(❌ 若放這會污染) | **`design-system-audit` skill** | 只在 `/design-system-audit` invoke 時需要 |
+| 22 個 audits | CLAUDE.md(❌ 若放這會污染) | **`design-system-audit` skill** | 只在 `/design-system-audit` invoke 時需要 |
 | Tech debt 清單 | CLAUDE.md(❌ 會過期變誤導) | **Memory** | 隨時間變化的 session 狀態 |
 | Spec 寫作要交叉比對 | CLAUDE.md 或 spec 或 Hook | **Hook `check_sync_update.sh`** | 能機械化在 Edit 後自動提醒 |
 | `ItemLayout` export(ghost) | 本來以為是 industry idiom | **移除,改用 `<MenuItem>` + slot components** | 實查 Material 用 `<ListItem>` / Polaris `<ResourceItem>` / Ant `<List.Item>`——都無 Layout 後綴。ItemLayout 違反「element-level 不用 layout 字」鐵律 + 不是 idiom。只是 doc 裡 ghost reference,真實 exports 是 `ItemIcon / ItemAvatar / ItemLabel / ItemSuffix / ItemInlineAction`(slot pattern)+ `MenuItem`(canonical F1) |
