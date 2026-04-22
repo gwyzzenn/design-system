@@ -86,9 +86,9 @@ export const CornerActionGroup = {
           dismissible={false}
         />
         <div className="absolute top-3 right-4 flex items-center gap-1">
-          <Button iconOnly size="sm" startIcon={RefreshCw} aria-label="重新整理" />
-          <Button iconOnly size="sm" startIcon={Share2} aria-label="分享連結" />
-          <Separator orientation="vertical" className="h-4" />
+          <Button iconOnly size="sm" variant="text" startIcon={RefreshCw} aria-label="重新整理" />
+          <Button iconOnly size="sm" variant="text" startIcon={Share2} aria-label="分享連結" />
+          <Separator orientation="vertical" className="h-5 mx-1" />
           <Button iconOnly dismiss size="sm" startIcon={XIcon} aria-label="關閉通知" />
         </div>
       </div>

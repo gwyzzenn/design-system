@@ -841,11 +841,16 @@ Row action 的 affordance 是「次要功能」,不是 primary CTA。Button chro
 
 ```
 ✅ canonical 佈局:
-┌─ Alert ────────────── [⟲] │ [X] ┐   ← chrome corner action group(Button sm)
-│ [icon] Title                     │      refresh / close 同 size Button + Separator
-│ Description                      │
-│                   [CTA1] [CTA2]  │   ← body action row(Button sm)
-└──────────────────────────────────┘
+┌─ Alert ────────────── [⟲] [↗] │ [X] ┐   ← chrome corner action group
+│ [icon] Title                        │      ⟲ share → Button iconOnly sm variant="text"
+│ Description                         │      close X → Button iconOnly sm dismiss
+│                   [CTA1] [CTA2]     │      Separator `h-5 mx-1` 分群
+└─────────────────────────────────────┘   ← body action row(Button sm,有 variant chrome)
+
+**Corner action group 視覺規則**:
+- Corner 所有 action 一律 `variant="text"`(跟 dismiss 同視覺權重,避免填色 chrome 跟 body CTA 搶焦點)
+- Close X 走 `dismiss` prop 套 fg-muted 弱化
+- Separator 用 `h-5 mx-1`(visible 分群,不太窄不太寬)
 
 ❌ 禁止:
 │ Title     [CTA1] [CTA2] [X] │   ← 同 row 混 CTA + dismiss(違反 same-row;
