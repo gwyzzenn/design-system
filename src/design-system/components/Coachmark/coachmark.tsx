@@ -173,12 +173,14 @@ const Coachmark = React.forwardRef<HTMLDivElement, CoachmarkProps>(
             // Why: Coachmark 雖是 onboarding / feature discovery,但文字可讀性 > 視覺焦點;
             // 中文 / 長句中置會「每行起點不同」造成閱讀鋸齒,左對齊最穩。
             // 世界級參考:Notion / Linear / Figma onboarding tour 皆左對齊;Intercom Messenger 亦如是。
-            <PopoverBody className="flex flex-col gap-1">
+            <PopoverBody className="flex flex-col">
               {title && (
                 <h3 className="text-body-lg font-medium text-foreground">{title}</h3>
               )}
               {description && (
-                <p className="text-body text-fg-secondary">{description}</p>
+                // title(body-lg 16)+ desc(body 14)→ reading-lg token(label tier 決定)
+                // 對齊 Dialog / Sheet canonical;移除原 gap-1(4px)drift
+                <p className="mt-[var(--item-gap-label-desc-reading-lg)] text-body text-fg-secondary">{description}</p>
               )}
             </PopoverBody>
           )}

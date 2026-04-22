@@ -48,7 +48,7 @@ export const Overview: Story = {
           <li>
             <span className="font-mono">default children</span> — 消費 <code>&lt;Empty&gt;</code> 元件
             (`../Empty/empty.spec.md` SSOT),icon 走 Empty 的 `Avatar 48px neutral`,
-            title `text-body-lg font-medium`,description `text-body`,gap `mb-4` / `mt-0.5`。
+            title `text-body-lg font-medium`,description `text-body`,gap `mb-4` / `--item-gap-label-desc-reading-lg`(2px)。
             改視覺去 Empty 改,FileUpload 自動跟進。
           </li>
           <li>
@@ -143,7 +143,7 @@ export const Inspector: Story = {
               <div>&nbsp;&nbsp;icon: Avatar 48px neutral (via Empty)</div>
               <div>&nbsp;&nbsp;title: text-body-lg font-medium (via Empty)</div>
               <div>&nbsp;&nbsp;description: text-body (via Empty)</div>
-              <div>&nbsp;&nbsp;gaps: mb-4 / mt-0.5 (via Empty)</div>
+              <div>&nbsp;&nbsp;gaps: mb-4 / --item-gap-label-desc-reading-lg (via Empty)</div>
               <hr className="my-2 border-divider" />
               <div className="flex items-center gap-1.5">
                 bg: <TokenCell token={state === 'drag-over' ? '--primary-subtle' : '--surface'} />

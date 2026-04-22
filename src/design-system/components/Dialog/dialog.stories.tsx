@@ -23,7 +23,7 @@ import { ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatom
  *   世界級對照:macOS System Prefs / iOS Settings / Gmail notif / Notion 皆 suffix control
  *   對齊 title 第一行(不 center 文字塊)
  * - 外層 flex 用 `items-start`(讓 content 自然 flow,suffix 由 h-[1lh] 對齊第一行)
- * - title / description gap = `mt-0.5`(2px)
+ * - title / description gap = `--item-gap-label-desc-scanning`(2px)
  * - description 色 = `text-fg-secondary`(neutral-8)
  * - **無 row hover**:只有 Switch 互動
  */
@@ -48,7 +48,7 @@ function NotificationSettings() {
         <DialogBody variant="list">
           <div className="flex flex-col">
             {items.map((n) => (
-              // item-anatomy Family 2:[content: title + desc(mt-0.5 gap)] [ItemSuffix: Switch]
+              // item-anatomy Family 2:[content: title + desc(--item-gap-label-desc-scanning gap)] [ItemSuffix: Switch]
               // items-start(let content flow);suffix h-[1lh] 對齊 title 第一行(24px 閾值 canonical)
               // px-loose:content 對齊 header/footer 的 loose padding(body variant="list" 無水平 padding)
               <div
@@ -57,8 +57,8 @@ function NotificationSettings() {
               >
                 <div className="min-w-0 flex-1">
                   <div className="text-body font-medium">{n.title}</div>
-                  {/* mt-0.5 = 2px title↔desc gap(item-anatomy canonical);neutral-8 = fg-secondary */}
-                  <div className="mt-0.5 text-caption text-fg-secondary">{n.desc}</div>
+                  {/* --item-gap-label-desc-scanning = 2px title↔desc gap(item-anatomy canonical);neutral-8 = fg-secondary */}
+                  <div className="mt-[var(--item-gap-label-desc-scanning)] text-caption text-fg-secondary">{n.desc}</div>
                 </div>
                 {/* Suffix: Switch — ItemSuffix h-[1lh] 對齊 title 第一行(≤ 24px suffix 的 canonical) */}
                 <ItemSuffix>
@@ -203,7 +203,7 @@ export const LongContent = {
           <DialogBody variant="list">
             <div className="flex flex-col">
               {members.map((m, i) => (
-                // item-anatomy Family 2:[prefix Avatar 40] [content: title + description(mt-0.5 gap)]
+                // item-anatomy Family 2:[prefix Avatar 40] [content: title + description(--item-gap-label-desc-scanning gap)]
                 // `px-2 rounded-md` → content(avatar / text)在 hover bg 內有 8px breathing
                 // (非背景元素不可直接觸 affordance bg 邊 — 真實 invariant,對齊 Material / Polaris 世界級)
                 // description 色 = text-fg-secondary(neutral-8);separator = full-width 「｜」
@@ -228,7 +228,7 @@ export const LongContent = {
                   />
                   <div className="flex flex-col min-w-0 flex-1">
                     <span className="text-body font-medium truncate">{m.name}</span>
-                    <span className="mt-0.5 text-caption text-fg-secondary truncate">
+                    <span className="mt-[var(--item-gap-label-desc-scanning)] text-caption text-fg-secondary truncate">
                       {roles[i % roles.length]}｜{m.empId}｜{m.empNum}
                     </span>
                   </div>
@@ -333,7 +333,7 @@ export const ListBody = {
                   />
                   <div className="flex flex-col min-w-0 flex-1">
                     <span className="text-body font-medium truncate">{m.name}</span>
-                    <span className="mt-0.5 text-caption text-fg-secondary truncate">
+                    <span className="mt-[var(--item-gap-label-desc-scanning)] text-caption text-fg-secondary truncate">
                       {m.role}｜{m.empId}｜{m.empNum}
                     </span>
                   </div>

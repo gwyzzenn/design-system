@@ -193,8 +193,8 @@ chrome 邊 ─ hover bg 左邊 ─────── [ loose breathing ] ──�
             <Avatar size={40} />  {/* Family 2 block mode avatar */}
             <div>
               {c.name}
-              {/* title↔desc 2px gap,desc 色 fg-secondary */}
-              <p className="mt-0.5 text-caption text-fg-secondary">{c.role}｜{c.empId}</p>
+              {/* title(body)+ desc(caption)= scanning token;desc 色 fg-secondary */}
+              <p className="mt-[var(--item-gap-label-desc-scanning)] text-caption text-fg-secondary">{c.role}｜{c.empId}</p>
             </div>
           </button>
         ))}
@@ -235,8 +235,8 @@ chrome 邊 ─ hover bg 左邊 ─────── [ loose breathing ] ──�
             <Avatar size={40} /> {/* Family 2 block mode avatar */}
             <div>
               {c.name}
-              {/* title↔desc 2px gap,desc 色 fg-secondary */}
-              <p className="mt-0.5 text-caption text-fg-secondary">{c.role}｜{c.empId}</p>
+              {/* title(body)+ desc(caption)= scanning token;desc 色 fg-secondary */}
+              <p className="mt-[var(--item-gap-label-desc-scanning)] text-caption text-fg-secondary">{c.role}｜{c.empId}</p>
             </div>
           </button>
         ))}

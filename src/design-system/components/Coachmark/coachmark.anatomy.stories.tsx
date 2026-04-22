@@ -73,7 +73,7 @@ export const Overview: Story = {
             <thead><tr><Th>區塊</Th><Th>條件渲染</Th><Th>Padding</Th><Th>說明</Th></tr></thead>
             <tbody>
               <tr><Td>Media</Td><Td mono>image != null</Td><Td mono>aspect-video(無 inner padding)</Td><Td>full-width bg-muted,overflow-hidden</Td></tr>
-              <tr><Td>Body</Td><Td mono>title || description</Td><Td mono>PopoverBody(px-loose py-tight)</Td><Td>consumer 控制 Body flex-col gap-1</Td></tr>
+              <tr><Td>Body</Td><Td mono>title || description</Td><Td mono>PopoverBody(px-loose py-tight)</Td><Td>title(body-lg)+ desc(body)垂直 stack,desc 套 mt `--item-gap-label-desc-reading-lg`(2px)</Td></tr>
               <tr><Td>Footer</Td><Td mono>step || onSkip || onNext || onPrev</Td><Td mono>PopoverFooter(px-loose py-tight)</Td><Td>justify-between(不是 justify-end)</Td></tr>
             </tbody>
           </table>
@@ -170,7 +170,7 @@ export const Inspector: Story = {
                 <tr><Td>Media 背景</Td><Td><TokenCell token="--muted" display="bg-muted" /></Td></tr>
                 <tr><Td>Media 比例</Td><Td mono>aspect-video(16:9)</Td></tr>
                 <tr><Td>Body padding</Td><Td mono>px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]</Td></tr>
-                <tr><Td>Body gap</Td><Td mono>gap-1(Title / Description 間)</Td></tr>
+                <tr><Td>Body gap</Td><Td mono>--item-gap-label-desc-reading-lg(Title body-lg → Description body,2px)</Td></tr>
                 <tr><Td>Title typography</Td><Td mono>text-body-lg font-medium text-foreground</Td></tr>
                 <tr><Td>Description typography</Td><Td mono>text-body text-fg-secondary</Td></tr>
                 <tr><Td>Footer padding</Td><Td mono>px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]</Td></tr>

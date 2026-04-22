@@ -48,7 +48,7 @@ export const Overview: Story = {
           <table className="text-caption border-collapse">
             <thead><tr><Th>Direction</Th><Th>位置</Th><Th>Value</Th><Th>Rationale</Th></tr></thead>
             <tbody>
-              <tr><Td mono>vertical</Td><Td>label → value(同 item 內)</Td><Td mono>mt-0.5(2px)</Td><Td>極小間距,視覺上 label 與 value 緊密配對</Td></tr>
+              <tr><Td mono>vertical</Td><Td>label → value(同 item 內)</Td><Td mono>--item-gap-label-desc-reading(2px)</Td><Td>極小間距,視覺上 label 與 value 緊密配對(dt body + dd body → reading token)</Td></tr>
               <tr><Td mono>vertical</Td><Td>items 之間垂直 gap</Td><Td mono>gap-y-[var(--layout-space-tight)]</Td><Td>density-aware;Gestalt proximity 群組</Td></tr>
               <tr><Td mono>vertical</Td><Td>columns 之間水平 gap</Td><Td mono>gap-x-4(16px)</Td><Td>cols &gt; 1 時欄間距</Td></tr>
               <tr><Td mono>horizontal(divided=false)</Td><Td>items 之間垂直 gap</Td><Td mono>mb-[var(--layout-space-tight)] last:mb-0</Td><Td>等同 vertical 的 items gap,density-aware</Td></tr>

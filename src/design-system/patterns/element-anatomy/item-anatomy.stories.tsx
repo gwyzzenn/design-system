@@ -280,7 +280,7 @@ const ListItemPreview = ({ size, startIcon: StartIcon, avatar, label, descriptio
         <span className={cn('break-words', lineClampClass(labelMaxLines))}>{label}</span>
         {description && (
           <p
-            className={cn('mt-0.5 text-fg-secondary break-words', lineClampClass(descMaxLines))}
+            className={cn('mt-[var(--item-gap-label-desc-reading)] text-fg-secondary break-words', lineClampClass(descMaxLines))}
             // ── 規則(item-anatomy.spec.md 閱讀模式) ──
             // ListItem 是 reading mode:description 字體**最小 14px**(spec「14→14px, 16→14px」)。
             // sm/md/lg 全部 14px,行高跟 label 同(預設 1.5,不套 leading-compact)。
@@ -796,7 +796,7 @@ const InspectorInner = () => {
               {hasPx && <span><strong style={{ color: Z.pad.text }}>padding-x</strong> = {pxPx}</span>}
               {effectiveHasPrefix && <span><strong style={{ color: Z.icon.text }}>prefix-content gap</strong> = {gapPx}</span>}
               <span><strong style={{ color: Z.label.text }}>py</strong> = {preset.py.includes('calc') ? `calc((field-height-${size} − 一行文字高度) / 2)` : preset.py}</span>
-              {hasDescription && <span>label-desc gap = mt-0.5 (2px)</span>}
+              {hasDescription && <span>label-desc gap = --item-gap-label-desc-reading (2px)</span>}
             </div>
           </div>
         </div>
@@ -823,7 +823,7 @@ const InspectorInner = () => {
               <TkVal token={preset.gap} value={preset.gapDesc} />
             </PropRow>
             {hasDescription && (
-              <PropRow label="label-desc" dot={Z.gap.text}><TkVal token="mt-0.5" value="2px" /></PropRow>
+              <PropRow label="label-desc" dot={Z.gap.text}><TkVal token="--item-gap-label-desc-reading" value="2px" /></PropRow>
             )}
             {effectiveHasSuffix && (
               <PropRow label="suffix gap" dot={Z.suffix.text}>
@@ -948,7 +948,7 @@ export const AlignmentThreshold = {
               <div className="flex flex-col items-center justify-center shrink-0"
                 style={{ width: 120, height: '100%', background: Z.label.bg }}>
                 <span className="text-[14px] font-mono font-bold" style={{ color: Z.label.text }}>Label</span>
-                <span className="text-[10px] font-mono mt-1 opacity-60" style={{ color: Z.gap.text }}>mt-0.5</span>
+                <span className="text-[10px] font-mono mt-1 opacity-60" style={{ color: Z.gap.text }}>--item-gap-label-desc-*</span>
                 <span className="text-[12px] font-mono opacity-80" style={{ color: Z.label.text }}>description</span>
               </div>
               <div className="flex items-center justify-center shrink-0"
@@ -998,7 +998,7 @@ export const AlignmentThreshold = {
               <div className="flex flex-col items-center justify-center shrink-0"
                 style={{ width: 120, height: '100%', background: Z.label.bg }}>
                 <span className="text-[14px] font-mono font-bold" style={{ color: Z.label.text }}>Label</span>
-                <span className="text-[10px] font-mono mt-1 opacity-60" style={{ color: Z.gap.text }}>mt-0.5</span>
+                <span className="text-[10px] font-mono mt-1 opacity-60" style={{ color: Z.gap.text }}>--item-gap-label-desc-*</span>
                 <span className="text-[12px] font-mono opacity-80" style={{ color: Z.label.text }}>description</span>
               </div>
               <div className="flex items-start justify-center shrink-0 pt-3"
@@ -1110,7 +1110,7 @@ export const ReadingModes = {
           <div className="mt-1 flex flex-col gap-1 text-[11px] text-fg-muted">
             <p><strong>Label:</strong> leading-compact (1.3)</p>
             <p><strong>Desc:</strong> 降一級字體 + fg-secondary</p>
-            <p><strong>Gap:</strong> mt-0.5 (2px)</p>
+            <p><strong>Gap:</strong> --item-gap-label-desc-scanning (2px,sm/md)/ -scanning-lg (lg)</p>
           </div>
         </div>
 
@@ -1136,7 +1136,7 @@ export const ReadingModes = {
           <div className="mt-1 flex flex-col gap-1 text-[11px] text-fg-muted">
             <p><strong>Label:</strong> default line-height (1.5)</p>
             <p><strong>Desc:</strong> 同字體 + fg-secondary（僅顏色區分）</p>
-            <p><strong>Gap:</strong> mt-0.5 (2px)</p>
+            <p><strong>Gap:</strong> --item-gap-label-desc-reading (2px,sm/md)/ -reading-lg (lg)</p>
           </div>
         </div>
       </div>
@@ -1167,7 +1167,7 @@ export const ReadingModes = {
                     <Td><TkVal token={sc.descFont} value={`${sc.descSize}, lh ${sc.descLh}`} /></Td>
                     <Td><TkVal token={rd.labelFont} value={`${rd.labelSize}, lh ${rd.labelLh}`} /></Td>
                     <Td><TkVal token={rd.descFont} value={`${rd.descSize}, lh ${rd.descLh}`} /></Td>
-                    <Td mono>mt-0.5 (2px)</Td>
+                    <Td mono>--item-gap-label-desc-* (2px)</Td>
                   </tr>
                 )
               })}

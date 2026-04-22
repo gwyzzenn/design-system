@@ -32,7 +32,7 @@
          [Avatar 48px neutral + icon]     ← 可選
           gap = --layout-space-tight
         [Title 16px font-medium centered]  ← 可選
-                 mt-0.5 (2px)
+         --item-gap-label-desc-reading-lg (2px)
       [Description 14px fg-secondary centered]
                w-full (no max-width)
           gap = --layout-space-loose
@@ -144,4 +144,4 @@ Empty 是 **pure layout primitive**(排列 icon / title / description / action �
 - `../FileUpload/file-upload.spec.md` — **本元件 consumer**:FileUpload 預設 children 直接渲染 `<Empty icon={Upload} title description />`,共用 icon+title+desc SSOT
 - `../../tokens/typography/typography.spec.md` — Typography tier
 - `../../tokens/layoutSpace/layoutSpace.spec.md` — Layout-space token
-- `../../patterns/element-anatomy/item-anatomy.spec.md` — label → desc gap `mt-0.5`
+- `../../patterns/element-anatomy/item-anatomy.spec.md` — label → desc gap(token `--item-gap-label-desc-reading-lg` / primitive `<ItemContent>`)

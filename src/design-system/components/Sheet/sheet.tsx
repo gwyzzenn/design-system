@@ -202,7 +202,9 @@ const SheetDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SheetPrimitive.Description
     ref={ref}
-    className={cn("text-body text-fg-secondary", className)}
+    // title → description 間距 canonical:SheetTitle body-lg(16)+ desc body(14)→ reading-lg token
+    // (label tier 決定;對齊 Dialog canonical。Tailwind preflight reset h2/p margin=0 → 必顯式 mt)
+    className={cn("mt-[var(--item-gap-label-desc-reading-lg)] text-body text-fg-secondary", className)}
     {...props}
   />
 ))

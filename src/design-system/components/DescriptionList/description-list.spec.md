@@ -74,7 +74,7 @@
 
 ### Vertical direction
 
-- **label → value**(同 item 內):`mt-0.5`(2px)——極小間距,視覺上 label 與 value 緊密配對
+- **label → value**(同 item 內):`--item-gap-label-desc-reading` token(2px)——極小間距,視覺上 label 與 value 緊密配對
 - **items 之間垂直 gap**:`gap-y-[var(--layout-space-tight)]`——density-aware,跟隨系統密度設定
 - **columns 之間水平 gap**:`gap-x-4`(16px)
 

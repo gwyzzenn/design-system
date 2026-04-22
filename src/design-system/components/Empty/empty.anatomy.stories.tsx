@@ -57,7 +57,7 @@ export const Overview: Story = {
             <tbody>
               <tr><Td mono>icon</Td><Td>選填</Td><Td>Avatar 48px neutral + icon</Td><Td>—</Td></tr>
               <tr><Td mono>title</Td><Td>選填</Td><Td>16px font-medium centered</Td><Td mono>--layout-space-tight</Td></tr>
-              <tr><Td mono>description</Td><Td>必有(預設唯一 slot)</Td><Td>14px · fg-secondary(有 title/action 時)/ fg-muted(孤身 description,placeholder tier)· centered</Td><Td mono>mt-0.5(2px,跟 item-layout 一致)</Td></tr>
+              <tr><Td mono>description</Td><Td>必有(預設唯一 slot)</Td><Td>14px · fg-secondary(有 title/action 時)/ fg-muted(孤身 description,placeholder tier)· centered</Td><Td mono>--item-gap-label-desc-reading-lg(2px,title body-lg)</Td></tr>
               <tr><Td mono>action</Td><Td>選填</Td><Td>CTA Button</Td><Td mono>--layout-space-loose</Td></tr>
             </tbody>
           </table>
@@ -241,7 +241,7 @@ export const SlotCombinations: Story = {
             </thead>
             <tbody>
               <tr><Td>icon → title</Td><Td mono>--layout-space-tight</Td><Td>12/16 px(density)</Td></tr>
-              <tr><Td>title → description</Td><Td mono>mt-0.5</Td><Td>2px(緊密配對,跟 item-layout 一致)</Td></tr>
+              <tr><Td>title → description</Td><Td mono>--item-gap-label-desc-reading-lg</Td><Td>2px(緊密配對,title=body-lg 16 + desc=body 14 → reading-lg token)</Td></tr>
               <tr><Td>description → action</Td><Td mono>--layout-space-loose</Td><Td>24/32 px(density)</Td></tr>
             </tbody>
           </table>
