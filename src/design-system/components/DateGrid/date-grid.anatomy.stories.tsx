@@ -44,7 +44,7 @@ const PARTS: Record<PartKey, PartSpec> = {
   dayToday:     { label: 'Today(未選)', bg: 'transparent',     text: '--foreground',  border: '--primary',   extra: 'ring-1 ring-primary' },
   dayHover:     { label: 'Hover',        bg: '--neutral-hover', text: '--foreground',  border: 'transparent' },
   dayOutside:   { label: 'Outside 月份', bg: 'transparent',     text: '--fg-disabled', border: 'transparent' },
-  dayDisabled:  { label: 'Disabled',     bg: 'transparent',     text: '--fg-disabled', border: 'transparent', extra: 'opacity-50 · pointer-events-none' },
+  dayDisabled:  { label: 'Disabled',     bg: 'transparent',     text: '--fg-disabled', border: 'transparent', extra: 'text-fg-disabled · pointer-events-none' },
   dayFocus:     { label: 'Focus-visible',bg: 'transparent',     text: '--foreground',  border: '--ring',      extra: 'ring-2 ring-ring' },
 }
 

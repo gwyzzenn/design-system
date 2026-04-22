@@ -69,14 +69,18 @@ export function DateGrid({
           'absolute top-0 left-0 z-[1]',
           'inline-flex items-center justify-center h-field-xs w-[var(--field-height-xs)] rounded-md',
           'text-fg-muted hover:text-foreground hover:bg-neutral-hover',
-          'disabled:opacity-50 disabled:pointer-events-none',
+          // nav button 是單一 text-style icon button → semantic `text-fg-disabled`(對齊 Button variant=text disabled)
+          // 非 composite 整塊 disabled,故**不**用 opacity token
+          'disabled:text-fg-disabled disabled:pointer-events-none',
           'transition-colors',
         ),
         button_next: cn(
           'absolute top-0 right-0 z-[1]',
           'inline-flex items-center justify-center h-field-xs w-[var(--field-height-xs)] rounded-md',
           'text-fg-muted hover:text-foreground hover:bg-neutral-hover',
-          'disabled:opacity-50 disabled:pointer-events-none',
+          // nav button 是單一 text-style icon button → semantic `text-fg-disabled`(對齊 Button variant=text disabled)
+          // 非 composite 整塊 disabled,故**不**用 opacity token
+          'disabled:text-fg-disabled disabled:pointer-events-none',
           'transition-colors',
         ),
         // Grid:flex flex-col,row 間距 mt-1(4px)垂直 between weeks(用 week 的 mt-1 或 grid gap-y-1)

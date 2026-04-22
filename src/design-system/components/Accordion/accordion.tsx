@@ -47,7 +47,8 @@ const AccordionTrigger = React.forwardRef<
         'py-4 text-body font-medium text-foreground text-left',
         'transition-colors hover:text-fg-secondary',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-        'disabled:opacity-50 disabled:pointer-events-none',
+        // AccordionTrigger 單一 text-style 列 → semantic `text-fg-disabled`(非 opacity);Button canonical 對齊
+        'disabled:text-fg-disabled disabled:pointer-events-none',
         "[&[data-state=open]>svg]:rotate-180",
         className,
       )}

@@ -293,12 +293,12 @@ export const ColorMatrix: Story = {
               <tr>
                 <Td mono>disabled</Td>
                 <Td>
-                  <TokenCell token="--foreground" display="foreground · opacity-50" />
+                  <TokenCell token="--fg-disabled" display="text-fg-disabled" />
                 </Td>
                 <Td>
-                  <TokenCell token="--fg-muted" display="fg-muted · opacity-50" />
+                  <TokenCell token="--fg-disabled" display="text-fg-disabled" />
                 </Td>
-                <Td>pointer-events-none + opacity 50%</Td>
+                <Td>pointer-events-none + 語義 disabled fg 色(對齊 Button variant=text,非 opacity)</Td>
               </tr>
             </tbody>
           </table>
