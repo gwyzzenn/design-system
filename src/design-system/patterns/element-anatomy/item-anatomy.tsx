@@ -189,13 +189,14 @@ export const itemPrefixAlignVariants = cva(
       align: {
         inline: "h-[1lh]",
         // sm/md desc = text-caption (12px × 1.3 = 15.6px)
+        // block-sm / block-md:scanning mode(body + caption 組合)→ 用 scanning mode 專屬 gap token
         "block-sm":
-          "h-[calc(1lh+var(--item-gap-label-desc)+var(--font-caption-size)*1.3)]",
+          "h-[calc(1lh+var(--item-gap-label-desc-scanning)+var(--font-caption-size)*1.3)]",
         "block-md":
-          "h-[calc(1lh+var(--item-gap-label-desc)+var(--font-caption-size)*1.3)]",
-        // lg desc = text-body (14px) + leading-compact (1.3) = 18.2px
+          "h-[calc(1lh+var(--item-gap-label-desc-scanning)+var(--font-caption-size)*1.3)]",
+        // block-lg:scanning-lg mode(body-lg + body compact 組合)→ 用 scanning-lg mode 專屬 gap token
         "block-lg":
-          "h-[calc(1lh+var(--item-gap-label-desc)+var(--font-body-size)*1.3)]",
+          "h-[calc(1lh+var(--item-gap-label-desc-scanning-lg)+var(--font-body-size)*1.3)]",
       },
     },
     defaultVariants: {
@@ -269,12 +270,13 @@ export interface ItemContentProps extends Omit<React.HTMLAttributes<HTMLDivEleme
   label: React.ReactNode
   description?: React.ReactNode
   /**
-   * Typography mode:
-   * - `"reading"`(預設):繼承 parent `text-body`(14px / 1.5 leading)
-   * - `"scanning"`:desc `text-caption`(12px)+ `leading-compact`(1.3)—— sm/md menu
-   * - `"scanning-lg"`:desc `text-body`(14px)+ `leading-compact`(1.3)—— lg menu(desc 比 label text-body-lg 16 小一 tier)
+   * Typography mode(4 種組合,對應 token `--item-gap-label-desc-{mode}`):
+   * - `"reading"`(預設):body(14/1.5) + body(14/1.5)—— FileItem / SelectionItem sm-md 等
+   * - `"reading-lg"`:body-lg(16/1.5) + body(14/1.5)—— NameCard / SelectionItem lg / Switch lg
+   * - `"scanning"`:body(14/1.3) + caption(12/1.3)—— MenuItem sm-md(row 帶 leading-compact)
+   * - `"scanning-lg"`:body-lg(16/1.3) + body(14/1.3)—— MenuItem lg
    */
-  mode?: "scanning" | "scanning-lg" | "reading"
+  mode?: "reading" | "reading-lg" | "scanning" | "scanning-lg"
   descriptionTone?: "secondary" | "error" | "muted" | "disabled"
   descriptionWrap?: boolean
   /**
@@ -325,13 +327,16 @@ export const ItemContent = React.forwardRef<HTMLDivElement, ItemContentProps>(
     // Typography mode:
     // - scanning:caption(12)+ leading-compact — sm/md menu idiom
     // - scanning-lg:body(14)+ leading-compact — lg menu(desc 比 label 小 1 tier)
-    // - reading:繼承 parent text-body — Family 2 List item 大宗
+    // - reading-lg:body(14)+ default leading — NameCard / SelectionItem lg(label 是 body-lg,desc 小 1 tier)
+    // - reading:繼承 parent text-body(14/1.5)— Family 2 List item 大宗
     const modeClass =
       mode === "scanning"
         ? "text-[length:var(--font-caption-size)] leading-compact"
         : mode === "scanning-lg"
           ? "text-[length:var(--font-body-size)] leading-compact"
-          : ""
+          : mode === "reading-lg"
+            ? "text-[length:var(--font-body-size)]"
+            : ""
 
     const clampClass = descriptionClamp ? `line-clamp-${descriptionClamp}` : ""
 
@@ -345,7 +350,16 @@ export const ItemContent = React.forwardRef<HTMLDivElement, ItemContentProps>(
         {description && (
           <span
             className={cn(
-              "mt-[var(--item-gap-label-desc)]",
+              // Typography-mode-aware gap token(2026-04-23):
+              // 同 mode(= label+desc typography 組合)永遠同 gap,不同 mode 可獨立調整。
+              // 備註:本 DS「配對」專指元件 size 配對(Tag↔Field 等,uiSize.spec.md),非此 concept
+              mode === "scanning"
+                ? "mt-[var(--item-gap-label-desc-scanning)]"
+                : mode === "scanning-lg"
+                  ? "mt-[var(--item-gap-label-desc-scanning-lg)]"
+                  : mode === "reading-lg"
+                    ? "mt-[var(--item-gap-label-desc-reading-lg)]"
+                    : "mt-[var(--item-gap-label-desc-reading)]",
               modeClass,
               toneClass,
               clampClass,

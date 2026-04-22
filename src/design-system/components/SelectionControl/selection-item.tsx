@@ -45,11 +45,13 @@ type SizeKey = 'sm' | 'md' | 'lg'
 const AVATAR_PX = AVATAR_SIZE
 
 // ── Block 對齊容器 ──
-// reading mode: desc 永遠 14px (var(--font-body-size) * 1.5)
+// sm/md: reading mode (body 14/1.5 + body 14/1.5) — gap token `reading`
+// lg:    reading-lg mode (body-lg 16/1.5 + body 14/1.5) — gap token `reading-lg`
+// desc 永遠 body(14) line-height;`1lh` 會 resolve 到 label 的 line-height(sm/md=21, lg=24)
 const blockAlignClass: Record<SizeKey, string> = {
-  sm: 'h-[calc(1lh+var(--item-gap-label-desc)+var(--font-body-size)*1.5)]',
-  md: 'h-[calc(1lh+var(--item-gap-label-desc)+var(--font-body-size)*1.5)]',
-  lg: 'h-[calc(1lh+var(--item-gap-label-desc)+var(--font-body-size)*1.5)]',
+  sm: 'h-[calc(1lh+var(--item-gap-label-desc-reading)+var(--font-body-size)*1.5)]',
+  md: 'h-[calc(1lh+var(--item-gap-label-desc-reading)+var(--font-body-size)*1.5)]',
+  lg: 'h-[calc(1lh+var(--item-gap-label-desc-reading-lg)+var(--font-body-size)*1.5)]',
 }
 
 // ── Selection Item ──────────────────────────────────────────────────────────
@@ -200,7 +202,11 @@ const SelectionItem = React.forwardRef<HTMLDivElement, SelectionItemProps>(
           {description && (
             <p
               className={cn(
-                'mt-[var(--item-gap-label-desc)] break-words',
+                // sm/md: reading mode(body+body 14/1.5)/ lg: reading-lg(body-lg+body 14/1.5)
+                sizeKey === 'lg'
+                  ? 'mt-[var(--item-gap-label-desc-reading-lg)]'
+                  : 'mt-[var(--item-gap-label-desc-reading)]',
+                'break-words',
                 descClampClass,
                 disabled ? 'text-fg-disabled' : 'text-fg-secondary',
               )}

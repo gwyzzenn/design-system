@@ -5,10 +5,17 @@
   --layout-space-tight:  12px;
   --layout-space-bottom: 48px; /* intentionally fixed — same in md and lg density (see spec) */
 
-  /* Item-level micro-gap(2026-04-23 SSOT 化 — 原 hard-code `mt-0.5` 散落 13+ 消費者)
-     不隨 density 變化(micro-spacing,跟 field-height 同 invariant class)
-     Primary consumer:<ItemContent> primitive,consumer 不直接用 token */
-  --item-gap-label-desc:  2px;  /* label ↔ description 之間 */
+  /* Item-level label ↔ description gap — typography mode aware(2026-04-23)
+     理論基礎:gap 由 **typography mode**(label + description 的 font-size / line-height 組合)決定。
+     同 mode 全 DS 永遠同 gap;不同 mode 可不同值。架構支援 per-mode 獨立調整。
+     目前 4 mode 都 2px(視覺統一 tight 間距)— 未來可獨立調整不牽動其他 mode。
+     Primary consumer:<ItemContent mode={...}> primitive,自動挑對應 token。
+     備註:本 DS「配對」(uiSize.spec.md)專指 Tag↔Field 等**元件 size 配對**,
+     跟本 token 表達的「label + desc typography 組合」不同概念,勿混淆。 */
+  --item-gap-label-desc-reading:     2px;  /* reading:    body(14/1.5)    + body(14/1.5) — FileItem / SelectionItem sm-md / Dialog / Empty / Switch sm-md / DescriptionList */
+  --item-gap-label-desc-reading-lg:  2px;  /* reading-lg: body-lg(16/1.5) + body(14/1.5) — NameCard / SelectionItem lg / Switch lg */
+  --item-gap-label-desc-scanning:    2px;  /* scanning:   body(14/1.3)    + caption(12/1.3) — MenuItem sm-md / Steps sm-md(row 本身 leading-compact) */
+  --item-gap-label-desc-scanning-lg: 2px;  /* scanning-lg:body-lg(16/1.3) + body(14/1.3) — MenuItem lg / Steps lg */
 }
 
 [data-layout-space="lg"],

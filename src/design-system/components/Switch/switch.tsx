@@ -186,8 +186,16 @@ const Switch = React.forwardRef<
           disabled ? 'cursor-not-allowed' : readOnly ? 'cursor-default' : 'cursor-pointer'
         )}
       >
-        {/* Label↔desc 標準間距 via `--item-gap-label-desc` token(SSOT,跟 SelectionItem / ItemContent 同源) */}
-        <span className="flex-1 min-w-0 flex flex-col gap-[var(--item-gap-label-desc)]">
+        {/* Label↔desc gap typography-mode-aware:
+            sm/md = reading(body+body 14/1.5),lg = reading-lg(body-lg+body 14/1.5) */}
+        <span
+          className={cn(
+            'flex-1 min-w-0 flex flex-col',
+            sizeKey === 'lg'
+              ? 'gap-[var(--item-gap-label-desc-reading-lg)]'
+              : 'gap-[var(--item-gap-label-desc-reading)]',
+          )}
+        >
           <span
             className={cn(
               // Reading mode 字級:lg → text-body-lg (16px),sm/md → text-body (14px)

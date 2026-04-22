@@ -111,7 +111,7 @@ const DescriptionItem = React.forwardRef<HTMLDivElement, DescriptionItemProps>(
     return (
       <div ref={ref} className={cn('flex flex-col', className)} {...props}>
         <dt className="text-body text-fg-secondary">{label}</dt>
-        <dd className="text-body mt-[var(--item-gap-label-desc)]">{children}</dd>
+        <dd className="text-body mt-[var(--item-gap-label-desc-reading)]">{children}</dd>
       </div>
     )
   },

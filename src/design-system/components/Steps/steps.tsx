@@ -778,7 +778,11 @@ const StepDescription = React.forwardRef<HTMLSpanElement, StepDescriptionProps>(
       <span
         ref={ref}
         className={cn(
-          'mt-[var(--item-gap-label-desc)] leading-compact break-words',
+          // Steps 跟 MenuItem 同 scanning-family:sm/md = scanning(body+caption),lg = scanning-lg(body-lg+body-compact)
+          size === 'lg'
+            ? 'mt-[var(--item-gap-label-desc-scanning-lg)]'
+            : 'mt-[var(--item-gap-label-desc-scanning)]',
+          'leading-compact break-words',
           disabled ? 'text-fg-disabled' : 'text-fg-secondary',
           className,
         )}

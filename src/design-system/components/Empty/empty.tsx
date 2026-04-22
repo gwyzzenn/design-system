@@ -70,7 +70,7 @@ const Empty = React.forwardRef<HTMLDivElement, EmptyProps>(
               // 在 menu 內自動對齊 menu items;standalone 時 fallback text-body
               descFont,
               (title || action) ? 'text-fg-secondary' : 'text-fg-muted',
-              title && 'mt-[var(--item-gap-label-desc)]',
+              title && 'mt-[var(--item-gap-label-desc-reading)]',
             )}
           >
             {description}
