@@ -167,7 +167,7 @@ Tailwind：`h-tab-sm` / `h-tab-md` / `h-tab-lg`。
 
 | Token | md | lg | 消費者 |
 |-------|----|----|--------|
-| `--chrome-header-height` | 48px | 56px | Sidebar header/footer、主內容 page header、app top bar、`--sidebar-width-icon` |
+| `--chrome-header-height` | 48px | 56px | Sidebar header/footer、主內容 page header、app top bar、`--sidebar-width-icon`、**Overlay family chrome**(Dialog / Sheet / Popover / Coachmark header + footer,透過 `patterns/overlay-surface` 的 SurfaceHeader / SurfaceFooter `min-h-[var(--chrome-header-height)]`)|
 
 ### Canonical 意圖(AR47,2026-04-21)
 
