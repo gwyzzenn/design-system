@@ -264,3 +264,54 @@ className="pb-[var(--layout-space-bottom)]"
 className="gap-2"   // 8px 緊密
 className="gap-4"   // 16px 非緊密
 ```
+
+---
+
+## Readable content max-width canonical(2026-04-22)
+
+**規則**:long-form content(prose / description / help text 多行段落)應限 **最大行寬 65-75 characters**(約 600-720 px at 16px body),讓眼睛 saccade 不過寬。**UI copy**(label / button / short status)**不適用**本規則,讓容器決定。
+
+**Tailwind utility**:`max-w-prose`(= 65ch)已存在,直接用。
+
+**本 DS 適用對象**:
+- Dialog / Sheet body 內的 long-form `<p>` / description 段落 → 加 `max-w-prose`
+- Field description 多行段落(`<FieldDescription>` 超過 1 行) → optional `max-w-prose`
+- Article / Blog / Release notes(future) → `max-w-prose` 必需
+- Onboarding / Coachmark 說明段 → `max-w-prose`(若內容長)
+
+**不適用對象**:
+- Button label / Tag / Chip / Badge(short UI copy)
+- Table cell(受 column width 限制)
+- Inline `<InlineStack>` 的 short text
+
+**世界級 benchmark**:
+
+| DS | Max-width | 單位 |
+|----|-----------|------|
+| Apple HIG | 65-75 characters per line | 動態計算 |
+| Material 3 | body 40-60 optimal, max 80 | character-based |
+| Polaris | page body container max 662px | px |
+| Atlassian | prose max ~720px / ~65ch | ch |
+| Carbon | paragraph max 56ch | ch |
+| Tailwind `max-w-prose` | 65ch(default)| ch |
+
+**共識**:**65-75ch 全業界共識 readable line length**。UI copy(非 prose)不設 max-width 讓容器決定。
+
+**使用**:
+
+```tsx
+// ✅ Long-form in Dialog body
+<DialogBody>
+  <p className="max-w-prose">這是一段較長的說明文字……</p>
+</DialogBody>
+
+// ✅ Field description 多行
+<FieldDescription className="max-w-prose">
+  此欄位用於...(多行說明)
+</FieldDescription>
+
+// ❌ Short UI copy 硬加 max-w-prose
+<Button className="max-w-prose">提交</Button>  {/* 無意義,label 極短 */}
+```
+
+**meta pattern**:**視覺層 vs 幾何層分離** — container width 是 layout 幾何,reading width 是閱讀體驗,分開 canonical。

@@ -106,3 +106,56 @@ Typography 由三個獨立維度組成，分開疊加：
 ## 跨元件參考
 
 行高在 row 類元件中的應用（scanning vs reading 模式）詳見 `patterns/element-anatomy/item-anatomy.spec.md`「兩種閱讀模式」節。
+
+---
+
+## Inline icon + text 對齊 canonical(2026-04-22)
+
+**規則**:inline 排列的 icon + text 用 **flex `items-center` 對齊**,icon **尺寸略大於 cap-height**(約 `x-height × 1.5` 或 `cap-height × 1.2`),視覺效果 = icon 中心對齊 text x-height 中線。**不用 baseline-align**(會讓 icon 下陷)。
+
+**本 DS 實作**:
+- Row 內 inline icon:`ICON_SIZE` table(sm/md = 16, lg = 20)for `text-body`(14px);大致 = cap-height(~10px) × 1.6
+- Button inline icon:固定 16(xs/sm/md) / 20(lg),對齊 button text
+- 單行 inline 用 `h-[1lh]` 確保 icon 不被文字 descender / line-box 下移
+
+**世界級 benchmark**:
+
+| DS | 對齊方式 | Optical adjust |
+|----|---------|---------------|
+| Material 3 | Icon center ↔ text line-height mid | icon 略大於 cap-height(MD3 icon 20 for body 14) |
+| Apple HIG / SF Symbols | baseline-aware(`baseline` / `firstBaseline` / `center`)| SF Symbol 內建 cap-height metadata |
+| Figma DS | `align-items: center` + icon 對齊 x-height baseline grid | icon 高 ≈ cap-height + 2px |
+| Polaris | `<InlineStack blockAlign="center">`;icon fixed 16 for body 14 | 無 documented optical rule |
+| Atlassian | flex center;icon 16 for body 14 | 無 explicit rule |
+| Carbon | `align-items: center`;icon 16 for body 14 | 無 optical rule |
+
+**共識**:**flex center + icon 略大於 cap-height(≈ 1.2-1.5 倍)是全業界 de-facto**。只有 Apple SF Symbols 有正式 baseline-aware 系統;其他家純 flex center。
+
+**本 DS 選擇**:flex center + `ICON_SIZE` mapping(對齊 Material / Polaris / Atlassian / Carbon idiom)。不使用 baseline-aware(過度工程,且我們 icon 非 SF Symbol font)。
+
+**使用**:
+
+```tsx
+// ✅ Inline icon + text(Button / Tag / InlineStack)
+<div className="flex items-center gap-2">
+  <Icon size={16} className="shrink-0" />
+  <span className="text-body">Label</span>
+</div>
+
+// ✅ Row 內 inline icon(走 ICON_SIZE table)
+<MenuItem icon={User}>Profile</MenuItem>  // 自動 ICON_SIZE[md] = 16
+
+// ❌ icon size ≠ cap-height range
+<div className="flex items-center gap-2">
+  <Icon size={24} />  {/* 對 text-body 14 過大,視覺 unbalanced */}
+  <span className="text-body">Label</span>
+</div>
+
+// ❌ baseline align 讓 icon 下陷
+<div className="flex items-baseline gap-2">
+  <Icon size={16} />  {/* icon 底邊貼 text baseline,視覺下陷 */}
+  <span className="text-body">Label</span>
+</div>
+```
+
+**meta pattern**:**視覺層 vs 幾何層分離** — icon glyph box(16×16)與 optical center(cap-height mid)分離,icon 尺寸基於 cap-height 而非 font-size。
