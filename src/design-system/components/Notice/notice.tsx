@@ -2,6 +2,7 @@ import * as React from 'react'
 import { X as XIcon, Info, CircleCheck, TriangleAlert, XCircle, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/design-system/components/Button/button'
+import { ItemPrefix } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
 /**
  * Notice — Toast / Alert 共用的視覺佈局層
@@ -93,9 +94,9 @@ const Notice = React.forwardRef<HTMLDivElement, NoticeProps>(
         {...props}
       >
         {StatusIcon && (
-          <span className="h-[1lh] shrink-0 flex items-center">
+          <ItemPrefix>
             <StatusIcon size={16} className={cn('shrink-0', iconClassName)} aria-hidden />
-          </span>
+          </ItemPrefix>
         )}
 
         <div className="flex flex-col min-w-0 flex-1">

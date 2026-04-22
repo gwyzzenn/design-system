@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
 import { Button } from '@/design-system/components/Button/button'
 import { ProgressBar } from '@/design-system/components/ProgressBar/progress-bar'
-import { ItemContent, ItemInlineActionButton } from '@/design-system/patterns/element-anatomy/item-anatomy'
+import { ItemContent, ItemInlineActionButton, ItemPrefix } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
 /**
  * FileItem — 檔案顯示 / 上傳進度
@@ -255,9 +255,9 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
         {...rowA11y}
         {...props}
       >
-        <span className="h-[1lh] shrink-0 flex items-center">
+        <ItemPrefix>
           <Paperclip size={ICON_PX} className="shrink-0 text-fg-muted" aria-hidden />
-        </span>
+        </ItemPrefix>
         {/* Compact 共用 contentRow(via ItemContent primitive SSOT)—— 先前 inline
             hand-craft 導致 compact label↔desc gap 跟 rich 不同步。shared contentRow
             保證兩 mode 修 primitive 一處全同步。 */}

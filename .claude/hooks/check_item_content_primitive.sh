@@ -100,10 +100,38 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
   > $(echo "$LINE" | sed 's/^[[:space:]]*//' | cut -c1-120)
   建議修法(擇一):
     (a) 用 token:改成 \`mt-[var(--item-gap-label-desc)]\` / \`gap-[var(--item-gap-label-desc)]\`
-    (b) 用 primitive:改用 \`<ItemContent label description descriptionTone>\`
+    (b) 用 primitive:改用 \`<ItemContent label description descriptionTone mode>\`
         (from \`@/design-system/patterns/element-anatomy/item-anatomy\`)
   若此處刻意 hard-code 有 rationale,在該 tsx 檔首加 // @item-gap-exempt: <reason>
   SSOT: tokens/layoutSpace/layoutSpace.css + patterns/element-anatomy/item-anatomy.tsx(ItemContent)"
+  fi
+
+  # P2 WARN: suffix block formula `calc(1lh+2px+...)` 硬寫 2px(應用 token)
+  if echo "$LINE" | grep -qE 'calc\(1lh\+2px\+'; then
+    WARN_VIOLATIONS="${WARN_VIOLATIONS}
+────────────────────────────────
+[P2 hard-coded 2px in calc formula(warn)] ${FILE_PATH}:${ROW}
+  > $(echo "$LINE" | sed 's/^[[:space:]]*//' | cut -c1-120)
+  建議修法:\`calc(1lh+2px+...)\` → \`calc(1lh+var(--item-gap-label-desc)+...)\`
+  Rationale:block formula 的 gap 2px 應跟 inline label↔desc gap 共用 SSOT token,
+  確保「改 token 一處 → inline + block 兩層 formula 同步」。
+  SSOT: tokens/layoutSpace/layoutSpace.css(\`--item-gap-label-desc\`)"
+  fi
+
+  # P3 WARN: `h-[1lh] shrink-0 flex items-center` 手刻 prefix wrapper(應用 ItemPrefix primitive)
+  if echo "$LINE" | grep -qE '"[^"]*\bh-\[1lh\]\s+shrink-0\s+flex\s+items-center\b'; then
+    WARN_VIOLATIONS="${WARN_VIOLATIONS}
+────────────────────────────────
+[P3 hard-coded prefix wrapper(warn)] ${FILE_PATH}:${ROW}
+  > $(echo "$LINE" | sed 's/^[[:space:]]*//' | cut -c1-120)
+  建議修法:改用 \`<ItemPrefix>\` primitive
+    (from \`@/design-system/patterns/element-anatomy/item-anatomy\`)
+  Rationale:\`h-[1lh] shrink-0 flex items-center\` 是 item-anatomy「Prefix 垂直對齊」
+  canonical 的實作細節,ItemPrefix 已封裝(+ \`min-w-[var(--item-prefix-slot,auto)]\` 對齊行為)。
+  手刻 = 未來改 prefix wrapper 規則需手動 grep 26+ 檔。
+  若本 span 有 **特殊 width / justify-content 需求**(例如 TreeView 固定 iconPx 寬):
+  加 // @item-gap-exempt-next 到此行上一行(必須附 rationale 在 spec.md)。
+  SSOT: patterns/element-anatomy/item-anatomy.tsx(ItemPrefix)"
   fi
 
 done < "$TMP"
