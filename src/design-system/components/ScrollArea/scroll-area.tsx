@@ -36,10 +36,16 @@ const ScrollArea = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <ScrollAreaPrimitive.Root
     ref={ref}
-    className={cn('relative overflow-hidden', className)}
+    className={cn('relative flex flex-col overflow-hidden', className)}
     {...props}
   >
-    <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]">
+    {/* Viewport canonical(2026-04-23):Root 用 `flex flex-col`,Viewport 用 `flex-1 min-h-0`。
+        原 `h-full` 在 Root 為 flex item(外層 flex-1 min-h-0)時失效 — Chrome 不把
+        flex-computed 高度視為 `height: 100%` 的 definite anchor,導致 Viewport 撐成
+        content height 而非 parent height → 失去 scroll 能力。
+        改 Root 為 flex container,Viewport 成 flex item,flex algorithm 給 definite height。
+        `w-full` 保留(水平維度不受影響)。 */}
+    <ScrollAreaPrimitive.Viewport className="flex-1 min-h-0 w-full rounded-[inherit]">
       {children}
     </ScrollAreaPrimitive.Viewport>
     <ScrollBar />

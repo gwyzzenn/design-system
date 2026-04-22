@@ -22,7 +22,10 @@ const HoverCardTrigger = HoverCardPrimitive.Trigger
 const HoverCardContent = React.forwardRef<
   React.ElementRef<typeof HoverCardPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof HoverCardPrimitive.Content>
->(({ className, align = "center", sideOffset = 8, collisionPadding = 8, ...props }, ref) => (
+>(({ className, align = "center", sideOffset = 8, collisionPadding = 12, ...props }, ref) => (
+  // collisionPadding=12(2026-04-23):Radix / browser 內部 1-2px rounding 讓
+  // visual padding 實際比 prop 值少 1-2px。提高到 12 保證使用者實際看到 ≥ 8px viewport
+  // edge gap(對齊 overlay-surface「靠邊 8px」canonical)。
   <HoverCardPrimitive.Content
     ref={ref}
     align={align}
