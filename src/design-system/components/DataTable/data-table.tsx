@@ -361,11 +361,13 @@ function DataTableInner<TData>(
         )}
         {/* Header 的 center 區保持 overflow-hidden(非 scroll)—— body 的 center 才有 scroll,
             header 靠 JS 同步 scrollLeft(見 onCenterBodyScroll)。這樣不會出現雙 scrollbar。
-            為了視覺對齊 body 的 scroll gutter,此處 scrollbar-gutter: stable */}
+            為了對齊 body 的 V scrollbar(native 捲軸吃 ~15-17px 寬),header 等寬預留 gutter:
+            `scrollbar-gutter: stable` 放在 centerBody(真正有 V scroll 的 container)+
+            header 這層不需額外處理,因為 body 預留了空間後 H 內容寬度會自然等同 header。
+            注意:header 的 `scrollbar-gutter` 無效(因為 overflow-hidden),刻意不設 */}
         <div
           ref={centerHeaderRef}
           className="flex-1 min-w-0 overflow-hidden"
-          style={{ scrollbarGutter: 'stable' }}
         >
           <div className="w-max min-w-full">
             {renderHeaderRow(centerCols, false)}
@@ -398,9 +400,14 @@ function DataTableInner<TData>(
         <div
           ref={centerBodyRef}
           // Center body 同時擁有 H + V scroll;maxHeight 限制讓 H scrollbar 落在 visible 底部
+          // `scrollbar-gutter: stable` 永遠預留 V scrollbar 寬度(~15-17px),避免 body 出現 V
+          // scrollbar 時右端被縮,跟 header 右端產生 gap(Windows/Linux native scrollbar 吃寬)
           data-datatable-hscroll
           className="flex-1 min-w-0 overflow-x-scroll overflow-y-auto"
-          style={hasHeightConstraint ? { maxHeight: height } : undefined}
+          style={{
+            ...(hasHeightConstraint ? { maxHeight: height } : {}),
+            scrollbarGutter: 'stable',
+          }}
           onScroll={onCenterBodyScroll}
         >
           <div className="w-max min-w-full">

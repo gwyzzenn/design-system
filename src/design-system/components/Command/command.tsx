@@ -54,6 +54,16 @@ const CommandInput = React.forwardRef<
 
 CommandInput.displayName = CommandPrimitive.Input.displayName
 
+/**
+ * CommandList — cmdk primitive 的 scroll container。
+ *
+ * TODO(ScrollArea canonical):DS 其他 scroll 區(DataTable / Sheet / Sidebar / DropdownMenu)
+ * 已遷 ScrollArea 確保跨 OS 一致,但 cmdk 的 `List` primitive 內部用 ResizeObserver +
+ * `[cmdk-list-sizer]` 管理自己的 scroll 幾何,而 selected-item `scrollIntoView` 假設
+ * List 本身就是 scroll container。強行 wrap ScrollArea 會破壞 auto-scroll-to-selected。
+ * 後續方案:(a) 等 cmdk 支援 asChild/scrollParent prop;(b) 自寫 scroll sync hook。
+ * 目前暫用 native `overflow-y-auto`,承擔跨 OS scrollbar 視覺不一致的 known tech debt。
+ */
 const CommandList = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.List>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.List>

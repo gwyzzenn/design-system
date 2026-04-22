@@ -140,8 +140,15 @@ SheetHeader.displayName = "SheetHeader"
 // 捲軸必用 ScrollArea(跨 OS 一致、不吃寬度)— 不自寫 overflow-y-auto。
 // padding 搬進 viewport inner div:px-loose / pt-tight / pb-bottom。
 // data-sheet-body:讓 SheetContent onOpenAutoFocus 找得到 body 第一個互動元素
-// `variant="list"`:body 只放 list 時移除 padding,list item 自己 px/py(對齊 DialogBody)
+// `variant="list"`:body 放 list — 移除 pt/pb,保留 `px-loose` 讓 list item 對齊 header/footer
+// (對齊 DialogBody canonical — Material/Polaris/Atlassian list-in-overlay 共識)
 interface SheetBodyProps extends React.HTMLAttributes<HTMLDivElement> {
+  /**
+   * Body 佈局模式。
+   * - `default`(預設):`px-loose / pt-tight / pb-bottom`,form / 一般內容
+   * - `list`:`px-loose` 保留(對齊 header/footer),移除 pt/pb,list item 自己 py
+   *   見 Dialog.DialogBodyProps + patterns/element-anatomy/item-anatomy.spec.md
+   */
   variant?: "default" | "list"
 }
 const SheetBody = React.forwardRef<HTMLDivElement, SheetBodyProps>(
@@ -150,7 +157,7 @@ const SheetBody = React.forwardRef<HTMLDivElement, SheetBodyProps>(
       <div
         className={cn(
           variant === "list"
-            ? ""
+            ? "px-[var(--layout-space-loose)]"
             : "px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)] pb-[var(--layout-space-bottom)]",
         )}
       >

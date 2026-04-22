@@ -30,6 +30,7 @@ import { Button } from '@/design-system/components/Button/button'
 import { Field, FieldLabel } from '@/design-system/components/Field/field'
 import { Input } from '@/design-system/components/Input/input'
 import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
+import { ScrollArea } from '@/design-system/components/ScrollArea/scroll-area'
 
 const meta: Meta = {
   title: 'Design System/Components/Sheet/設計原則',
@@ -75,23 +76,27 @@ export const VsDialogRule: Story = {
               <SheetTitle>專案設定</SheetTitle>
               <SheetDescription>修改此專案的基本資訊與通知偏好</SheetDescription>
             </SheetHeader>
-            <div className="flex-1 overflow-y-auto py-4 flex flex-col gap-4">
-              <Field>
-                <FieldLabel>名稱</FieldLabel>
-                <Input defaultValue="產品路線圖" />
-              </Field>
-              <Field>
-                <FieldLabel>描述</FieldLabel>
-                <Input defaultValue="Q1 / Q2 產品開發重點" />
-              </Field>
-              <Field>
-                <FieldLabel>通知</FieldLabel>
-                <div className="grid">
-                  <Checkbox defaultChecked label="新任務" />
-                  <Checkbox label="每日摘要" />
-                </div>
-              </Field>
-            </div>
+            {/* Overlay body 長內容必用 ScrollArea 而非 native overflow-y-auto,對齊 DS
+                跨 OS 一致 canonical(避免 Windows/Linux 右側被吃 15-17px)。 */}
+            <ScrollArea className="flex-1">
+              <div className="py-4 flex flex-col gap-4">
+                <Field>
+                  <FieldLabel>名稱</FieldLabel>
+                  <Input defaultValue="產品路線圖" />
+                </Field>
+                <Field>
+                  <FieldLabel>描述</FieldLabel>
+                  <Input defaultValue="Q1 / Q2 產品開發重點" />
+                </Field>
+                <Field>
+                  <FieldLabel>通知</FieldLabel>
+                  <div className="grid">
+                    <Checkbox defaultChecked label="新任務" />
+                    <Checkbox label="每日摘要" />
+                  </div>
+                </Field>
+              </div>
+            </ScrollArea>
             <SheetFooter>
               <SheetClose asChild>
                 <Button variant="tertiary">取消</Button>
@@ -245,16 +250,19 @@ export const HeaderFooterStructureRule: Story = {
               <SheetTitle>建立新客戶</SheetTitle>
               <SheetDescription>填寫基本資料後可進行付款設定</SheetDescription>
             </SheetHeader>
-            <div className="flex-1 overflow-y-auto py-4 flex flex-col gap-4">
-              <Field>
-                <FieldLabel>公司名稱</FieldLabel>
-                <Input placeholder="輸入公司名稱" />
-              </Field>
-              <Field>
-                <FieldLabel>聯絡人 Email</FieldLabel>
-                <Input placeholder="contact@example.com" />
-              </Field>
-            </div>
+            {/* Overlay body 長內容必用 ScrollArea,對齊 DS 跨 OS 一致 canonical */}
+            <ScrollArea className="flex-1">
+              <div className="py-4 flex flex-col gap-4">
+                <Field>
+                  <FieldLabel>公司名稱</FieldLabel>
+                  <Input placeholder="輸入公司名稱" />
+                </Field>
+                <Field>
+                  <FieldLabel>聯絡人 Email</FieldLabel>
+                  <Input placeholder="contact@example.com" />
+                </Field>
+              </div>
+            </ScrollArea>
             <SheetFooter>
               <SheetClose asChild>
                 <Button variant="tertiary">取消</Button>

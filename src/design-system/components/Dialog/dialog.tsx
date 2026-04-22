@@ -149,14 +149,22 @@ DialogHeader.displayName = "DialogHeader"
 // padding 搬進 viewport inner div:px-loose / pt-tight / pb-bottom(Dialog 「大容器」底部多一拍呼吸)。
 // data-dialog-body:讓 DialogContent onOpenAutoFocus 找得到 body 第一個有意義互動元素(避免 focus 到 close X)
 //
-// **`variant="list"`**(2026-04-22 新增,對齊 Material / Polaris / Atlassian list-in-dialog canonical):
-// body 只放 list 時移除 vertical padding(list item 自己的 py 是節奏來源,list 接頂接底 flush)。
-// 水平 padding 也移除讓 item 自己的 hover bg 可以全寬。
+// **`variant="list"`**(2026-04-22 canonical,對齊 Material / Polaris / Linear list-in-dialog):
+// body 只放 list 時 **移除 vertical padding** 但**保留 horizontal padding**(list item 左右
+// 邊距仍對齊 header title 與 footer button 的 left),list item 自己的 py 是節奏來源。
+// 這樣 list item content 跟 header title 垂直對齊 — 世界級 Material M3 / Polaris
+// ResourceList / Atlassian OptionList 都是這個 pattern(body horizontal gutter 保留,vertical 移除)。
 interface DialogBodyProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * Body 佈局模式。
    * - `default`(預設):body 有 px-loose / pt-tight / pb-bottom,適合 form 或一般內容
-   * - `list`:移除 body padding,list item 自己負責 py,list 接頂接底 flush(避免 body padding + item py 雙層堆疊過鬆)
+   * - `list`:body 移除 vertical padding(pt/pb),保留 `px-loose` 讓 list item 左右對齊 header
+   *   title 與 footer button(視覺垂直對齊)。item 自己負責 py 節奏。
+   *
+   * List item 本身應遵循 **item-anatomy** 原則:
+   * - 純文字 / 簡單 list → MenuItem(Family 1 scanning)或 ListItem(Family 2 reading,future)
+   * - key-value pair → DescriptionList(horizontal / vertical 模式)
+   * 見 `patterns/element-anatomy/item-anatomy.spec.md`「Row primitives 共用結構規格」。
    */
   variant?: "default" | "list"
 }
@@ -166,8 +174,8 @@ const DialogBody = React.forwardRef<HTMLDivElement, DialogBodyProps>(
       <div
         className={cn(
           variant === "list"
-            ? // list mode:無 padding,list item 自己 px/py
-              ""
+            ? // list mode:保留 px-loose 對齊 header / footer;移除 pt/pb 讓 list 接頂接底
+              "px-[var(--layout-space-loose)]"
             : "px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)] pb-[var(--layout-space-bottom)]",
         )}
       >

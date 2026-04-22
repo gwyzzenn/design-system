@@ -74,8 +74,9 @@ Dialog 和 Popover 的**結構化 sub-components 共用 primitive**——提供 
 ### Canonical(我們 DS)
 
 **規則 1 — body 放 list 時移除 body 的 pt/pb**:
-- 消費者 wrap list 用 `<DialogBody className="!py-0">...</DialogBody>`(override DialogBody 的 default py)
-- 或 DialogBody API 加 `unpadded={true}` / `variant="list"` prop(future work)
+- 消費者一律用 `<DialogBody variant="list">` / `<SheetBody variant="list">`(2026-04-22 canonical,已 ship)
+- Body 保留 `px-loose`(list item 左右對齊 header title 與 footer button),僅移除 `pt` / `pb`
+- **禁止 hand-craft `className="!py-0"` override**(違反 mindset #2「不憑直覺發明」——有 prop 不用自刻)
 
 **規則 2 — list 本身不加上下 padding**:
 - `<div className="flex flex-col">` wrap list items(不加 `py-*`)
@@ -101,14 +102,14 @@ Dialog 和 Popover 的**結構化 sub-components 共用 primitive**——提供 
 ### Consumer 範例
 
 ```tsx
-// ✅ canonical:Dialog 放 contact picker
+// ✅ canonical:Dialog 放 contact picker(2026-04-22 ship variant="list")
 <Dialog>
   <DialogContent>
     <DialogHeader>...</DialogHeader>
-    <DialogBody className="!py-0">  {/* override body pt/pb */}
+    <DialogBody variant="list">  {/* body 保留 px-loose,移除 pt/pb */}
       <div className="flex flex-col">
         {contacts.map(c => (
-          <button className="flex items-center gap-3 px-3 py-2 hover:bg-muted">
+          <button className="flex items-center gap-3 py-2 hover:bg-neutral-hover">
             <Avatar /> <div>{c.name}<p>{c.org}</p></div>
           </button>
         ))}

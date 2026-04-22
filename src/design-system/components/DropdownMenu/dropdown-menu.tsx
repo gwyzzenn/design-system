@@ -5,6 +5,7 @@ import { ChevronRight, type LucideIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { AvatarData } from "@/design-system/components/Avatar/avatar"
 import { MenuItem } from "@/design-system/components/Menu/menu-item"
+import { ScrollArea } from "@/design-system/components/ScrollArea/scroll-area"
 import {
   RowSizeProvider,
   useRowSize,
@@ -114,7 +115,7 @@ const DropdownMenuContent = React.forwardRef<
       collisionPadding={collisionPadding}
       align={align}
       onCloseAutoFocus={(e) => e.preventDefault()}
-      className={cn(floatingLayerClass, 'py-2', maxHeight && 'overflow-y-auto', className)}
+      className={cn(floatingLayerClass, !maxHeight && 'py-2', className)}
       style={{
         boxShadow: 'var(--elevation-200)',
         minWidth: minWidth ?? 'max(180px, var(--radix-dropdown-menu-trigger-width))',
@@ -123,7 +124,15 @@ const DropdownMenuContent = React.forwardRef<
       {...props}
     >
       <RowSizeProvider value={size}>
-        {children}
+        {maxHeight ? (
+          // 長選單用 ScrollArea 跨 OS 一致捲動(不吃寬度,macOS/Windows 視覺一致)
+          // py-2 移到內層,ScrollArea Viewport 才能 scroll 整個 padded 區
+          <ScrollArea className="max-h-[inherit]">
+            <div className="py-2">{children}</div>
+          </ScrollArea>
+        ) : (
+          children
+        )}
       </RowSizeProvider>
     </DropdownMenuPrimitive.Content>
   </DropdownMenuPrimitive.Portal>

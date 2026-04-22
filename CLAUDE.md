@@ -724,6 +724,7 @@ Internal primitive vs public-facing 元件的分類 test 見 `components/README.
 | 主題 | 位置 | 影響範圍 |
 |------|------|---------|
 | Row primitive 共用規則 | `patterns/element-anatomy/item-anatomy.spec.md` | MenuItem / SidebarMenuButton / TreeItem / DropdownMenuItem / SelectMenu |
+| **List item 範疇必消費 primitive canonical**(list item → MenuItem/Family 2;key-value → DescriptionList;禁自刻) | `patterns/element-anatomy/item-anatomy.spec.md`「List item 範疇的必消費 primitive canonical」節 | 任何 overlay body / page 內的 list 或 key-value 資訊展示 |
 | 工具列 / 操作列 | `patterns/action-bar/action-bar.spec.md` | 任何有按鈕列的頁面 |
 | 水平溢出處理 | `patterns/horizontal-overflow/horizontal-overflow.spec.md` | Tabs / Chip / 未來 Steps |
 | 浮層外殼 Header/Body/Footer | `patterns/overlay-surface/overlay-surface.spec.md` | Dialog / Popover(padding SSOT) |

@@ -75,7 +75,7 @@ export const WithForm = {
 export const LongContent = {
   name: '長內容（body 捲動）',
   render: () => (
-    <Dialog>
+    <Dialog defaultOpen>
       <DialogTrigger asChild>
         <Button>開啟 Modal</Button>
       </DialogTrigger>
@@ -83,10 +83,12 @@ export const LongContent = {
         <DialogHeader>
           <DialogTitle>成員列表</DialogTitle>
         </DialogHeader>
-        <DialogBody>
+        {/* Body 放 list → variant="list":body px-loose 保留(item 對齊 header/footer)、pt/pb 移除、item 自己 py
+            item 用 Family 2 reading mode 節奏(py-2),border-divider 分隔 */}
+        <DialogBody variant="list">
           <div className="flex flex-col">
             {Array.from({ length: 30 }, (_, i) => (
-              <div key={i} className="py-2 border-b border-divider text-body">
+              <div key={i} className="py-2 text-body border-b border-divider last:border-b-0">
                 成員 {i + 1}
               </div>
             ))}
@@ -167,9 +169,11 @@ export const ListBody = {
                 { name: 'Ethan Park', org: 'Nebula Inc', id: 'EMP-01093' },
                 { name: 'Fiona Lin', org: 'ACME Corp', id: 'EMP-00672' },
               ].map((m) => (
+                // Body 已 px-loose(對齊 header title),item 只負責 py + gap + border
+                // 對應 item-anatomy Family 2 reading mode(prefix avatar / content title+desc)
                 <button
                   key={m.id}
-                  className="flex items-center gap-3 px-[var(--layout-space-loose)] py-3 hover:bg-neutral-hover text-left border-b border-divider last:border-b-0"
+                  className="flex items-center gap-3 py-3 hover:bg-neutral-hover text-left border-b border-divider last:border-b-0"
                 >
                   <div className="w-10 h-10 rounded-full bg-primary-subtle text-primary flex items-center justify-center text-body-lg font-medium shrink-0">
                     {m.name.charAt(0)}
@@ -208,7 +212,7 @@ export const ListBody = {
               ].map((n) => (
                 <button
                   key={n.title}
-                  className="flex flex-col gap-0.5 px-[var(--layout-space-loose)] py-2 hover:bg-neutral-hover text-left border-b border-divider last:border-b-0"
+                  className="flex flex-col gap-0.5 py-2 hover:bg-neutral-hover text-left border-b border-divider last:border-b-0"
                 >
                   <span className="text-body font-medium">{n.title}</span>
                   <span className="text-caption text-fg-muted">{n.desc}</span>
@@ -238,7 +242,7 @@ export const ListBody = {
               {['Bug', 'Feature', 'Improvement', 'Research', 'Documentation', 'Refactor', 'Test'].map((t) => (
                 <button
                   key={t}
-                  className="flex px-[var(--layout-space-loose)] py-1.5 hover:bg-neutral-hover text-left text-body border-b border-divider last:border-b-0"
+                  className="flex py-1.5 hover:bg-neutral-hover text-left text-body border-b border-divider last:border-b-0"
                 >
                   {t}
                 </button>

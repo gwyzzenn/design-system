@@ -67,6 +67,84 @@
 
 ---
 
+## List item 範疇的必消費 primitive canonical(2026-04-22)
+
+**鐵律**:只要判斷內容屬於 **list item 範疇**(不管一行兩行、不管有沒有 icon、不管 overlay 內還是頁面上),**預設先按照 item-anatomy 的方式消費既有 primitive**——不准 hand-craft `<div className="flex py-3">...</div>` 繞過 anatomy canonical。
+
+### 世界級對照(所有世界級 DS 都有統一的 item primitive,不讓 consumer 自刻)
+
+| DS | Primitive 名稱 | 對應 slot API |
+|----|--------------|---------------|
+| **Material M3** | `ListItem` + `ListItemText` + `ListItemAvatar` + `ListItemIcon` + `ListItemSecondaryAction` | avatar / icon / primary text / secondary text / trailing action |
+| **Shopify Polaris** | `ResourceItem` + `ResourceList` | media(avatar / thumbnail)/ name / accessibilityLabel / shortcutActions |
+| **Atlassian(ADG)** | `Item` / `ItemGroup`(primitive + composition) | elemBefore / elemAfter / description |
+| **Ant Design** | `List.Item` + `List.Item.Meta` | avatar / title / description / actions |
+| **GitHub Primer** | `ActionList.Item`(+ `LeadingVisual` / `TrailingVisual` / `Description`) | leadingVisual / trailingVisual / description |
+| **Apple HIG(UIKit)** | `UIListContentConfiguration`(system-provided cell layout) | image / text / secondaryText |
+
+**共識**:每家 DS 都 ship list item primitive + slot API,禁止 consumer 自刻 — 自刻 = 跨產品視覺語言斷裂。
+
+### 判斷流程(content 類型 → primitive 選擇)
+
+```
+這段內容是什麼?
+
+├─ list item 範疇(一筆資料一列、重複 N 次的結構化條目)?
+│   │
+│   ├─ 緊湊掃視(menu 容器 / cmd palette / dropdown)?
+│   │   → <MenuItem>(Family 1 scanning,SSOT) + slot components
+│   │
+│   ├─ 閱讀式(頁面上、overlay body 內、avatar+title+desc)?
+│   │   → Family 2(reading) — 目前沒有單一 <ListItem> primitive,
+│   │     先 compose:使用 slot components(<ItemIcon> / <ItemAvatar> /
+│   │     <ItemLabel> / <ItemSuffix> / <ItemInlineAction>)照 Family 2
+│   │     結構 + tokens 組裝;或直接消費既有 Family 2 consumer
+│   │     (FileItem rich / SelectionItem / Notice 的 anatomy)
+│   │
+│   └─ Key-Value 配對(Label: Value 形式的屬性展示 / metadata 列)?
+│       → <DescriptionList> + <DescriptionItem>(horizontal / vertical)
+│         SSOT: components/DescriptionList/description-list.spec.md
+│
+└─ 非 list item 範疇(form / prose / single block / illustration)?
+    → 不走 item primitive,走 Field / 文字 / 自訂 layout
+```
+
+### Key-Value(DescriptionList)vs List item(MenuItem / Family 2)的邊界
+
+| Content shape | 消費 | 理由 |
+|---------------|------|------|
+| `[avatar] Title\nSubtitle` / `[icon] Label` | **MenuItem / Family 2** | 語意是「一個實體 / 一筆資料」,title 是 item 識別 |
+| `Email:user@x.com` / `Created: 2026-04-22` | **DescriptionList** | 語意是「同一實體的 N 個屬性」,label 是 key,不是 item 識別 |
+| 一排 `[status dot] Project name [count]` | **MenuItem / Family 2** | 實體列表(每個 project 是獨立 item) |
+| NameCard 裡 profile 的「職稱 / 部門 / 到期日」 | **DescriptionList(horizontal)** | 同一人的多個 metadata 屬性 |
+
+### ❌ 禁止(自刻 = 繞過 anatomy canonical)
+
+- ❌ overlay body 裡 `<div className="flex items-center gap-3 py-3 hover:bg-neutral-hover">...</div>` 當 list item(應用 MenuItem / ItemAvatar + ItemLabel + ItemSuffix slot components)
+- ❌ 頁面上 key-value 自刻 `<div className="grid grid-cols-[120px_1fr]"><span>Email</span><span>...</span></div>`(應用 DescriptionList + DescriptionItem)
+- ❌ 為「就一兩行」偷懶不消費 primitive(一行也是 list item,照走 MenuItem)
+- ❌ 自發明 row 結構(勿用 `prefix` / `suffix` / `left` / `right` 命名,勿自刻 24px item 閾值)
+
+### 消費前的 4-step check
+
+1. `ls src/design-system/patterns/element-anatomy/`(確認 item-anatomy primitive 存在)
+2. grep 近親 consumer(MenuItem / FileItem / SelectionItem / Notice)看 slot 怎麼用
+3. 判斷 key-value vs list item(見上表)選對 primitive
+4. 內部結構不命中既有 slot → 回 item-anatomy.spec.md 擴 API,**不自刻繞過**
+
+### 寫任何 list / key-value UI 前 grep 自檢
+
+```bash
+# 看有沒有繞過 item-anatomy 的手刻 list item
+rg "className=\"flex.*py-[0-9].*hover:bg" src/design-system src/hooks --type tsx
+# 看有沒有繞過 DescriptionList 的手刻 key-value grid
+rg "grid-cols-\[[0-9]+px_1fr\]" src/design-system src/hooks --type tsx
+```
+
+非空 = drift,要改用 primitive。
+
+---
+
 ## 任何未來的 row 元件
 
 必須先判斷屬於 Family 1 或 Family 2，然後照對應章節的規則做。**不要自己發明新規格**——發明前必先讀本 spec 全文 + CLAUDE.md「4-Family Model」。

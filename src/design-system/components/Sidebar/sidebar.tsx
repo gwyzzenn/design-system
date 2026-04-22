@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils"
 import { Badge } from "@/design-system/components/Badge/badge"
 import { Button } from "@/design-system/components/Button/button"
 import { Input } from "@/design-system/components/Input/input"
+import { ScrollArea } from "@/design-system/components/ScrollArea/scroll-area"
 import { Separator } from "@/design-system/components/Separator/separator"
 import {
   Sheet,
@@ -482,19 +483,25 @@ SidebarSeparator.displayName = "SidebarSeparator"
 const SidebarContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div">
->(({ className, ...props }, ref) => {
+>(({ className, children, ...props }, ref) => {
   return (
     <div
       ref={ref}
       data-sidebar="content"
-      // SidebarContent 只負責 scroll 與 flex-1——呼吸空間和分隔線由 SidebarGroup 自己處理
-      // (對齊 MenuGroup 的 py-2 + [&+&]:border-t 模式)
+      // SidebarContent 用 ScrollArea 處理長列表 scroll——跨 OS 一致不吃寬度(macOS
+      // overlay vs Windows/Linux always-visible 差異見 scroll-area.tsx 註解)。
+      // 呼吸空間和分隔線由 SidebarGroup 自己處理(對齊 MenuGroup 的 py-2 + [&+&]:border-t)。
+      // ScrollArea Root 本身 overflow-hidden,icon-collapsed 時不會露出 scroll chrome。
       className={cn(
-        "flex min-h-0 flex-1 flex-col overflow-auto group-data-[collapsible=icon]:overflow-hidden",
+        "flex min-h-0 flex-1 flex-col",
         className
       )}
       {...props}
-    />
+    >
+      <ScrollArea className="flex-1">
+        <div className="flex flex-col">{children}</div>
+      </ScrollArea>
+    </div>
   )
 })
 SidebarContent.displayName = "SidebarContent"
