@@ -158,12 +158,19 @@ interface DialogBodyProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * Body 佈局模式。
    * - `default`(預設):body 有 px-loose / pt-tight / pb-bottom,適合 form 或一般內容
-   * - `list`:body `px-[calc(loose-8px)] py-2`,item 自己 **`px-2 rounded-md`**
-   *   → hover bg 外邊 flush body padded 內邊緣(整片 hover 覆蓋 row)、**content(avatar / text)
-   *   在 hover bg 內仍有 8px horizontal padding**(真實 invariant:非背景元素必有 spacing,
-   *   不可直接觸到 affordance bg 邊 — 2026-04-22 v3 校準,對齊 Material / Polaris / Linear
-   *   / Notion / Slack 世界級 list row 共通 pattern)
-   * - 幾何等式:content left = body px (loose-8) + item px (8) = **loose** from chrome → 對齊 header title ✓
+   * - `list`:body **`py-2`**(無 horizontal padding),item 自己 **`px-[var(--layout-space-loose)] rounded-md`**
+   *   → hover bg 外邊 **flush chrome 邊**(貼齊 dialog 外殼內邊)、**content(avatar / text)在 hover bg
+   *   內有 loose breathing**(對齊 header title 位置)
+   *
+   * ── 兩個 invariant(2026-04-22 v4 user Image #26 校準)──
+   * 1. **Content 對齊 header/footer**:content left = body px (0) + item px (loose) = **loose** from chrome
+   *    → 跟 `SurfaceHeader` 的 `px-loose` 同位,視覺一致
+   * 2. **Content 在 hover bg 內有 breathing**:item px-loose 讓 content 離 hover bg 邊 loose,不觸邊
+   *
+   * ── Hover bg 邊位置 = 設計選擇(不是 invariant)──
+   * 本 DS 當前選 **flush chrome**(Linear / Cmd+K idiom)— body 無水平 padding,hover bg 貼 chrome 內邊。
+   * 另一個合法選擇是 **inset with chrome gutter**(Material M3 / Polaris idiom)— body 有 px,
+   * hover bg 離 chrome 邊若干 px;兩者皆世界級,擇一即可。**不是 violation 判斷點**。
    *
    * List item 本身應遵循 **item-anatomy** 原則:
    * - 純文字 / 簡單 list → MenuItem(Family 1 scanning)或 Family 2 手刻(reading)
@@ -178,12 +185,11 @@ const DialogBody = React.forwardRef<HTMLDivElement, DialogBodyProps>(
       <div
         className={cn(
           variant === "list"
-            ? // list mode 2026-04-22 v3(user Image #24 vs #25 校準為真實 invariant):
-              // - px `calc(loose-8)`:body 把 chrome 推開 loose-8,item 再 px-2 → content 在 chrome 裡總 loose 對齊 header
+            ? // list mode 2026-04-22 v4(user Image #26 校準,flush chrome canonical):
+              // - body 無水平 padding → hover bg flush chrome 邊(Linear idiom)
               // - py-2:menu group 節奏
-              // - item 負責 px-2 rounded-md → hover bg 寬 = body padded area(flush body padded 內邊);
-              //   **content 在 hover bg 內有 8px breathing**(不直接觸 bg 邊緣 = Image #25 canonical)
-              "px-[calc(var(--layout-space-loose)-0.5rem)] py-2"
+              // - item 負責 px-loose rounded-md → content 對齊 header title + content 在 hover bg 內有 loose breathing
+              "py-2"
             : "px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)] pb-[var(--layout-space-bottom)]",
         )}
       >

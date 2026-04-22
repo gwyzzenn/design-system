@@ -45,9 +45,10 @@ function NotificationSettings() {
             {items.map((n) => (
               // item-anatomy Family 2:[content: title + desc(mt-0.5 gap)] [suffix: Switch]
               // 無 hover / 無 cursor-pointer —— 只有 Switch 是互動元素
+              // `px-loose`:content 對齊 header/footer 的 loose padding(variant="list" body 無水平 padding)
               <div
                 key={n.key}
-                className="flex items-center gap-3 py-2"
+                className="flex items-center gap-3 py-2 px-[var(--layout-space-loose)]"
               >
                 <div className="flex flex-col min-w-0 flex-1">
                   <span className="text-body font-medium">{n.title}</span>
@@ -200,7 +201,7 @@ export const LongContent = {
                 // description 色 = text-fg-secondary(neutral-8);separator = full-width 「｜」
                 <button
                   key={m.empNum}
-                  className="flex items-center gap-3 py-2 px-2 rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left"
+                  className="flex items-center gap-3 py-2 px-[var(--layout-space-loose)] rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left"
                 >
                   <Avatar size={40} src={`https://i.pravatar.cc/80?u=${m.empNum}`} alt={m.name} />
                   <div className="flex flex-col min-w-0 flex-1">
@@ -292,7 +293,7 @@ export const ListBody = {
                 // variant="list" canonical v3:item `px-2 rounded-md` → content 在 hover bg 內有 breathing
                 <button
                   key={m.empNum}
-                  className="flex items-center gap-3 py-2 px-2 rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left"
+                  className="flex items-center gap-3 py-2 px-[var(--layout-space-loose)] rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left"
                 >
                   <Avatar size={40} src={`https://i.pravatar.cc/80?u=${m.empNum}`} alt={m.name} />
                   <div className="flex flex-col min-w-0 flex-1">
@@ -332,10 +333,10 @@ export const ListBody = {
           <DialogBody variant="list">
             <div className="flex flex-col">
               {['Bug', 'Feature', 'Improvement', 'Research', 'Documentation', 'Refactor', 'Test'].map((t) => (
-                // variant="list" canonical v3:item `px-2 rounded-md` → text 在 hover bg 內有 breathing
+                // variant="list" canonical v4(Image #30):item `px-loose rounded-md` → text 對齊 header + breathing 在 hover bg 內 + hover bg flush chrome
                 <button
                   key={t}
-                  className="flex py-1.5 px-2 rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left text-body"
+                  className="flex py-1.5 px-[var(--layout-space-loose)] rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left text-body"
                 >
                   {t}
                 </button>
