@@ -126,3 +126,40 @@ export const Destructive = {
     </Dialog>
   ),
 }
+
+/**
+ * OpenSnapshot — visual-audit 專用 story(非 consumer-facing 教學範例)。
+ *
+ * 用 `defaultOpen` 讓 overlay 在 render 當下就開著,Playwright 截圖才抓得到
+ * Dialog chrome(Header/Body/Footer)。不用 play() + userEvent,是因為
+ * Radix `defaultOpen` 對 Portal 自動生效,不需額外互動觸發 — 世界級 DS
+ * (Polaris / Atlassian)的 chromatic 稽核也走同 pattern。
+ *
+ * 情境選用「確認刪除專案」— Jira / Linear 常見的 destructive confirmation,
+ * 涵蓋 title + description + footer 雙 action 的完整 chrome。
+ */
+export const OpenSnapshot = {
+  name: '開啟狀態(視覺稽核用)',
+  tags: ['!autodocs'],
+  render: () => (
+    <Dialog defaultOpen>
+      <DialogTrigger asChild>
+        <Button>打開 Dialog</Button>
+      </DialogTrigger>
+      <DialogContent autoHeight maxWidth={480}>
+        <DialogHeader>
+          <DialogTitle>確認刪除專案</DialogTitle>
+        </DialogHeader>
+        <DialogBody>
+          <p className="text-body">這個操作無法復原。專案內的所有 task、討論與附件都會被永久刪除。</p>
+        </DialogBody>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="tertiary">取消</Button>
+          </DialogClose>
+          <Button variant="primary" danger>確認刪除</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  ),
+}

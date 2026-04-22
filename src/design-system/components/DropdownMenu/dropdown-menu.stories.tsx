@@ -212,6 +212,39 @@ export const RadioItems: StoryObj = {
   render: () => <RadioDemo />,
 }
 
+// ── OpenSnapshot(視覺稽核用) ──
+// 用 `defaultOpen` 讓 overlay 在 render 當下就開著,Playwright 截圖才抓得到
+// Dropdown chrome(item / icon / shortcut / separator)。不用 play() + userEvent,
+// 是因為 Radix `defaultOpen` 對 Portal 自動生效 — 世界級 DS 的 chromatic 稽核
+// 也走同 pattern。
+//
+// 情境用 Basic 複製模板(複製 / 編輯 / 刪除),涵蓋 startIcon / shortcut /
+// separator / danger item 等 row-anatomy 核心 slot。
+
+export const OpenSnapshot: StoryObj = {
+  name: '開啟狀態(視覺稽核用)',
+  tags: ['!autodocs'],
+  render: () => (
+    <DropdownMenu defaultOpen>
+      <DropdownMenuTrigger asChild>
+        <Button variant="tertiary" endIcon={ChevronDown}>操作</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuItem startIcon={Copy} shortcut="⌘C">
+          複製
+        </DropdownMenuItem>
+        <DropdownMenuItem startIcon={Pencil} shortcut="⌘E">
+          編輯
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem startIcon={Trash2} shortcut="⌘⌫" className="text-error">
+          刪除
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  ),
+}
+
 // ── 尺寸 ──
 
 export const Sizes: StoryObj = {

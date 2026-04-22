@@ -66,6 +66,47 @@ export const FilterPanel: Story = {
   ),
 }
 
+/**
+ * OpenSnapshot — visual-audit 專用 story(非 consumer-facing 教學範例)。
+ *
+ * 用 `defaultOpen` 讓 Popover 在 render 當下就開著,Playwright 截圖才抓得到
+ * Popover chrome(Header + X / Body / Footer)。不用 play() + userEvent,是
+ * 因為 Radix `defaultOpen` 對 Portal 自動生效 — 世界級 DS 的 chromatic 稽核
+ * 也走同 pattern。
+ *
+ * 情境沿用 FilterPanel(Jira / Linear 狀態篩選),是 Popover「多選 + footer
+ * save CTA」canonical 的完整示範,涵蓋 Header X、checkbox list、footer 雙
+ * action 整組 chrome。
+ */
+export const OpenSnapshot: Story = {
+  name: '開啟狀態(視覺稽核用)',
+  tags: ['!autodocs'],
+  render: () => (
+    <Popover defaultOpen>
+      <PopoverTrigger asChild>
+        <Button variant="tertiary" startIcon={Filter}>依狀態篩選</Button>
+      </PopoverTrigger>
+      <PopoverContent align="start">
+        <PopoverHeader>
+          <PopoverTitle>依狀態篩選</PopoverTitle>
+        </PopoverHeader>
+        <PopoverBody>
+          <div className="grid">
+            <Checkbox defaultChecked label="待處理" />
+            <Checkbox defaultChecked label="進行中" />
+            <Checkbox label="已完成" />
+            <Checkbox label="已封存" />
+          </div>
+        </PopoverBody>
+        <PopoverFooter>
+          <Button variant="tertiary" size="sm" className="flex-1">清除</Button>
+          <Button variant="primary" size="sm" className="flex-1">套用</Button>
+        </PopoverFooter>
+      </PopoverContent>
+    </Popover>
+  ),
+}
+
 // SettingsPanel story 於 2026-04-20 移除:
 //   原本是「顯示設定 mini panel (Notion 頁面設定)」— 用 Popover + 多個 horizontal
 //   Field + Switch 展示 settings list。

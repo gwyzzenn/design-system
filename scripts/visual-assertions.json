@@ -47,8 +47,10 @@
     { "id": "design-system-components-dialog-展示--basic", "file": "dialog-basic.png" },
     { "id": "design-system-components-dialog-展示--with-form", "file": "dialog-form.png" },
     { "id": "design-system-components-dialog-展示--destructive", "file": "dialog-destructive.png" },
+    { "id": "design-system-components-dialog-展示--open-snapshot", "file": "dialog-open-snapshot.png", "rationale": "開啟狀態 snapshot — visual-audit 專用,用 defaultOpen 讓 Playwright 抓到 Dialog chrome(Header/Body/Footer),補 Layer A/B 先前只抓到 trigger 按鈕的 MINOR gap" },
 
     { "id": "design-system-components-popover-展示--filter-panel", "file": "popover-filter-panel.png" },
+    { "id": "design-system-components-popover-展示--open-snapshot", "file": "popover-open-snapshot.png", "rationale": "開啟狀態 snapshot — visual-audit 專用,用 defaultOpen 讓 Playwright 抓到 Popover chrome(Header+X / Body / Footer),補 Layer A/B 先前只抓到 trigger 按鈕的 MINOR gap" },
     { "id": "design-system-components-popover-設計規格--color-matrix", "file": "popover-color-matrix.png" },
 
     { "id": "design-system-components-alert-展示--corner-action-group", "file": "alert-corner-action-group.png" },
@@ -66,6 +68,7 @@
 
     { "id": "design-system-components-dropdownmenu-展示--basic", "file": "dropdownmenu-basic.png" },
     { "id": "design-system-components-dropdownmenu-展示--groups", "file": "dropdownmenu-groups.png" },
+    { "id": "design-system-components-dropdownmenu-展示--open-snapshot", "file": "dropdownmenu-open-snapshot.png", "rationale": "開啟狀態 snapshot — visual-audit 專用,用 defaultOpen 讓 Playwright 抓到 Dropdown chrome(item / icon / shortcut / separator),補 Layer A/B 先前只抓到 trigger 按鈕的 MINOR gap" },
 
     { "id": "design-system-patterns-item-anatomy--icon-action-primitive-decision", "file": "item-anatomy-icon-action-decision.png" },
     { "id": "design-system-patterns-item-anatomy--inspector", "file": "item-anatomy-inspector.png" },

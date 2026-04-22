@@ -306,7 +306,15 @@ async function auditScenario(browser, scenario, opts = {}) {
 
   try {
     await page.goto(url, { waitUntil: 'networkidle', timeout: 45_000 })
+    await page.mouse.move(0, 0) // avoid mouse hovering an icon-only trigger auto-showing tooltip in snapshot
     await page.waitForTimeout(600) // animations + font settle
+    // Blur active element — overlays with autoFocus (Radix Dialog / Popover) focus on close button,
+    // and icon-only Button's focus-triggered tooltip would appear in the snapshot
+    await page.evaluate(() => {
+      const el = document.activeElement
+      if (el && 'blur' in el && typeof el.blur === 'function') el.blur()
+    })
+    await page.waitForTimeout(200) // let tooltip dismiss
     await page.screenshot({
       path: join(OUT_DIR, scenario.file),
       fullPage: false,
