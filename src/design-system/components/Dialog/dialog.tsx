@@ -186,9 +186,12 @@ interface DialogBodyProps extends React.HTMLAttributes<HTMLDivElement> {
    */
   variant?: "default" | "list"
 }
+// `className` forward 到 **inner content div**(非外層 ScrollArea wrapper)——
+// consumer `<DialogBody className="flex flex-col gap-X">` 期望作用於 children 排列;
+// 套在 ScrollArea 上會 0 效果(children 住 inner div),曾造成 modal form field 完全貼邊。
 const DialogBody = React.forwardRef<HTMLDivElement, DialogBodyProps>(
   ({ className, children, variant = "default", ...props }, ref) => (
-    <ScrollArea ref={ref} data-dialog-body className={cn("flex-1 min-h-0", className)} {...props}>
+    <ScrollArea ref={ref} data-dialog-body className="flex-1 min-h-0" {...props}>
       <div
         className={cn(
           variant === "list"
@@ -198,6 +201,7 @@ const DialogBody = React.forwardRef<HTMLDivElement, DialogBodyProps>(
               // - item 負責 px-loose rounded-md → content 對齊 header title + content 在 hover bg 內有 loose breathing
               "py-2"
             : "px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)] pb-[var(--layout-space-bottom)]",
+          className,
         )}
       >
         {children}

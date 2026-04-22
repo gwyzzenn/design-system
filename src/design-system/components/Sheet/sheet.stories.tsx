@@ -34,9 +34,11 @@ export const CreateProjectRight: Story = {
         <SheetHeader>
           <SheetTitle>建立新專案</SheetTitle>
         </SheetHeader>
-        {/* Field-to-field gap = `--layout-space-tight`:此 form 含 Textarea(full-width),
-            依 `layoutSpace.spec.md` 規則 3「跟 fw 相鄰 gap 一律 tight」。不用 gap-4(loose)。 */}
-        <SheetBody className="flex flex-col gap-[var(--layout-space-tight)]">
+        {/* Field-to-field gap = `--layout-space-loose`:form 用 `flex-col gap-*` 單值,保守選 loose
+            讓「非 fw ↔ 非 fw」Input↔Input 合規(規則 3 per-transition 原意 loose);
+            fw-adjacent 的微 tight 視覺損失 < 非 fw-adjacent 的 loose 破壞。
+            詳 `layoutSpace.spec.md` 規則 3 caveat。 */}
+        <SheetBody className="flex flex-col gap-[var(--layout-space-loose)]">
           <Field>
             <FieldLabel>專案名稱</FieldLabel>
             <Input placeholder="例:Q2 產品路線圖" />
@@ -80,9 +82,11 @@ export const EditUserRight: Story = {
         <SheetHeader>
           <SheetTitle>Ada Chen</SheetTitle>
         </SheetHeader>
-        {/* Field-to-field gap = `--layout-space-tight`:此 form 含 Textarea(full-width),
-            依 `layoutSpace.spec.md` 規則 3「跟 fw 相鄰 gap 一律 tight」。不用 gap-4(loose)。 */}
-        <SheetBody className="flex flex-col gap-[var(--layout-space-tight)]">
+        {/* Field-to-field gap = `--layout-space-loose`:form 用 `flex-col gap-*` 單值,保守選 loose
+            讓「非 fw ↔ 非 fw」Input↔Input 合規(規則 3 per-transition 原意 loose);
+            fw-adjacent 的微 tight 視覺損失 < 非 fw-adjacent 的 loose 破壞。
+            詳 `layoutSpace.spec.md` 規則 3 caveat。 */}
+        <SheetBody className="flex flex-col gap-[var(--layout-space-loose)]">
           <Field>
             <FieldLabel>顯示名稱</FieldLabel>
             <Input defaultValue="Ada Chen" />
@@ -137,7 +141,7 @@ export const OpenSnapshot: Story = {
         <SheetHeader>
           <SheetTitle>編輯使用者 profile</SheetTitle>
         </SheetHeader>
-        <SheetBody className="flex flex-col gap-[var(--layout-space-tight)]">
+        <SheetBody className="flex flex-col gap-[var(--layout-space-loose)]">
           <Field>
             <FieldLabel>顯示名稱</FieldLabel>
             <Input defaultValue="Alan Chen" />
