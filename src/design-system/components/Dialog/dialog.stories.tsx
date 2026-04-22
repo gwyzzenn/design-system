@@ -39,7 +39,7 @@ function NotificationSettings() {
               // px-2 rounded-md 對齊 canonical;item 右側 Switch 做 in-modal 設定
               <label
                 key={n.key}
-                className="flex items-center gap-3 py-2 px-2 rounded-md hover:bg-neutral-hover cursor-pointer"
+                className="flex items-center gap-3 py-2 px-2 rounded-md hover:bg-neutral-hover has-[:focus-visible]:bg-neutral-hover cursor-pointer"
               >
                 <div className="flex flex-col min-w-0 flex-1">
                   <span className="text-body font-medium">{n.title}</span>
@@ -160,7 +160,7 @@ export const LongContent = {
                 // hover bg(item bg)inset 8px from body padded edge → 不貼 chrome 邊(視覺稽核「不貼邊」)
                 <button
                   key={name}
-                  className="flex items-center gap-3 py-2 px-2 rounded-md hover:bg-neutral-hover text-left"
+                  className="flex items-center gap-3 py-2 px-2 rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left"
                 >
                   <Avatar size={40} alt={name} color={(['primary', 'info', 'success', 'warning'] as const)[i % 4]} />
                   <div className="flex flex-col min-w-0 flex-1">
@@ -252,7 +252,7 @@ export const ListBody = {
                 // variant="list" canonical:item px-2 rounded-md,content 對齊 header + hover bg inset 8px
                 <button
                   key={m.id}
-                  className="flex items-center gap-3 py-2 px-2 rounded-md hover:bg-neutral-hover text-left"
+                  className="flex items-center gap-3 py-2 px-2 rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left"
                 >
                   <div className="w-10 h-10 rounded-full bg-primary-subtle text-primary flex items-center justify-center text-body-lg font-medium shrink-0">
                     {m.name.charAt(0)}
@@ -294,7 +294,7 @@ export const ListBody = {
               {['Bug', 'Feature', 'Improvement', 'Research', 'Documentation', 'Refactor', 'Test'].map((t) => (
                 <button
                   key={t}
-                  className="flex py-1.5 px-2 rounded-md hover:bg-neutral-hover text-left text-body"
+                  className="flex py-1.5 px-2 rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left text-body"
                 >
                   {t}
                 </button>
