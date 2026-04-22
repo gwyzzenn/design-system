@@ -196,38 +196,118 @@ Tailwind：`h-tab-sm` / `h-tab-md` / `h-tab-lg`。
 - 本 DS 選 **48px @ md / 56px @ lg** 取「密集工具型產品」的下限(Linear / Figma / Notion 主 chrome 40-52px),給主內容區留更多 vertical space
 - 跟 Button-lg + Field-lg 高度(40 / 36)拉出視覺 hierarchy — chrome 高於任何 row control,但不壓迫內容
 
-### 消費 `--chrome-header-height` 的 2 種實作 pattern(2026-04-22 新增,**語義不等價**)
+### Chrome header 選型 canonical(2026-04-22 v5 整合,**DS-wide SSOT entry point**)
 
-**這個 token 可被消費成 fixed-height 或 min-height 兩種 CSS 用法,但兩者是不同的語義宣告,不是 interchangeable**。選錯會違反元件的設計意圖。
+**本節是 DS-wide chrome header 設計選型的入口**。任何新 chrome surface(modal / toolbar / sidebar / banner)的 header 實作都從這裡開始判斷。
 
-| Pattern | CSS | 語義宣告 | 適用場景 | 範例 |
-|---------|-----|---------|---------|------|
-| **Fixed-height**(剛性)| `h-[var(--chrome-header-height)]` | **宣告 header 內容是單行固定結構,不會長高** | Content 永遠單一結構:logo + 名、toolbar icons、zoom controls | Sidebar header `sidebar.tsx:L429`、FileViewer toolbar `file-viewer.tsx:L321`、FileViewer InfoPanel header `L442`、app top bar |
-| **Min-height**(彈性)| 透過 SurfaceHeader `py-tight` + unbounded slot trick 讓單行內容達到 48/56 | **宣告 header 可以成長 — title 可換行、可附 subtitle / description** | Modal / Sheet / Popover 的 header 可能有長 title、兩行、或 subtitle 補充 | Dialog `SurfaceHeader` 間接消費、Sheet `SurfaceHeader` 間接消費、Popover `PopoverHeader` 間接消費 |
+---
 
-**判斷 decision tree**:
-1. 問「這個 chrome 的 title 有可能多行 / 有 subtitle / 有 description 嗎?」
-   - **不會** → Fixed-height:`h-[var(--chrome-header-height)]`,宣告剛性
-   - **會** → Min-height / padding-based:用 SurfaceHeader 或自行 `py-tight` + unbounded slot,允許 grow
-2. 不要為了「視覺高度一致」選錯 pattern 而犧牲語義:即便單行 content 在 padding-based 下恰好也是 48/56,其語義仍是「可以成長」,是不同宣告。
+#### Decision tree(必走)
 
-**世界級對照**:
-- **Fixed-height 派**:macOS Menu Bar / Finder sidebar / VS Code Activity Bar — 所有是 **永遠單行 + 結構固定** 的 chrome
-- **Padding-based 派**:Material Dialog / Polaris Modal / Atlassian Modal header / iOS NavigationBar(有 large title 時可展開)— **title 可能多行 / 有 subtitle** 的 chrome
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Q: 這個 chrome header 的 title 有可能多行 /             │
+│    有 subtitle / 有 description 嗎?                        │
+└──────────────┬──────────────────────────────────────────────┘
+               │
+      ┌────────┴────────┐
+      │                 │
+      ▼                 ▼
+    不會               會 / 可能有
+      │                 │
+      ▼                 ▼
+ 【Fixed-height】     【Padding-based】
+  剛性宣告 chrome    彈性宣告 chrome
+  不會 grow          會隨內容 grow
+      │                 │
+      ▼                 ▼
+  h-[var(--chrome-      overlay family:
+   header-height)]     用 SurfaceHeader(見下)
+  + items-center       非 overlay:
+                       py-[var(--layout-space-tight)]
+                       + data-unbounded slot trick
+```
 
-**本 DS 當前分類**(2026-04-22 校準):
-- Fixed-height chrome:Sidebar header/footer、FileViewer toolbar + InfoPanel header、app top bar(如果有)
-- Padding-based chrome:Dialog / Sheet / Popover / Coachmark header + footer(via SurfaceHeader / SurfaceFooter)
-- 一致性:**同元件在不同 context 下不切換 pattern**(FileViewer toolbar 永遠 fixed;Dialog 永遠 padding-based)
+---
 
-**選錯的後果**:
-- Fixed-height 套到能長 subtitle 的 chrome → subtitle 會被剪掉或擠壓(overflow-hidden 吞文字,或 subtitle 跑出容器)
-- Padding-based 套到剛性 chrome → chrome 高度不穩,下方 content 跳動,視覺斷裂
+#### 2 種 pattern 對照
 
-**相關 anchor**:
-- `patterns/overlay-surface/overlay-surface.spec.md`「Chrome dismiss size canonical v5」:padding-based 的實作細節(SurfaceHeader + unbounded slot trick)
-- `components/Sidebar/sidebar.tsx:L429`:fixed-h 的 chrome 範例
-- `components/FileViewer/file-viewer.tsx:L321`:fixed-h + 消費者的 chrome 範例
+| Pattern | CSS | 語義宣告 | 適用場景 |
+|---------|-----|---------|---------|
+| **Fixed-height**(剛性)| `h-[var(--chrome-header-height)]` + `items-center` | 「content 永遠單行固定結構,不會 grow」 | Sidebar / FileViewer toolbar / FileViewer InfoPanel / app top bar / page header |
+| **Padding-based**(彈性)| `py-[var(--layout-space-tight)]` + unbounded slot trick | 「content 可以 grow — title 多行 / subtitle / description」 | Dialog / Sheet / Popover / Coachmark header + footer |
+
+**兩個 pattern 在單行 content 下視覺等效都是 48/56,但語義不同 — 選錯違反元件設計意圖**。
+
+---
+
+#### 世界級對照(8 家 DS 同一 split pattern)
+
+| DS | Fixed-height 實例 | Padding-based 實例 |
+|----|-------------------|-------------------|
+| Material M3 | AppBar 56/64 dp | Dialog min-height + padding |
+| Polaris | TopBar 56px | Modal padding-based |
+| Atlassian | global nav / top bar | Modal padding |
+| Carbon(IBM)| UIShell 48px | Modal |
+| Ant Design | Layout.Header | Modal(支援 subtitle prop)|
+| Apple HIG | NavigationBar(compact)| Alert padding + NavBar large title grow |
+| GitHub Primer | PageHeader | Dialog padding |
+| VS Code / Figma | Activity Bar / toolbar | — |
+
+**結論**:我方 "fixed / padding split" 是 8/8 世界級共通 pattern。
+
+---
+
+#### 本 DS 當前分類(查核表)
+
+| 元件 | Pattern | 位置 / 行號 | 能否 grow? |
+|------|---------|-------------|-----------|
+| Sidebar header/footer | Fixed-h | `sidebar.tsx:L429` | ✗ |
+| FileViewer Toolbar | Fixed-h | `file-viewer.tsx:L321` | ✗ |
+| FileViewer InfoPanel header | Fixed-h | `file-viewer.tsx:L442` | ✗ |
+| App top bar | Fixed-h | 見 sidebar.stories.tsx:L92 | ✗ |
+| Dialog header/footer | Padding-based | SurfaceHeader/Footer 間接 | ✓(有 DialogDescription)|
+| Sheet header/footer | Padding-based | 同上 | ✓(有 SheetDescription)|
+| Popover header/footer | Padding-based | 同上 | ✓(forward-compat)|
+| Coachmark header/footer | Padding-based(via Popover)| 同上 | ✓ |
+| Notice / Alert / Toast | 獨立 banner family(`px-4 py-3` fixed)| `notice.tsx:L50` | N/A(不屬 chrome canonical)|
+
+**一致性原則**:同元件在不同 context 下不切換 pattern。FileViewer toolbar 永遠 fixed,Dialog 永遠 padding-based。
+
+---
+
+#### Overlay family 的 padding-based 詳細實作
+
+Padding-based 套用在 overlay family 時,配合 **v5 data-unbounded layout-slot trick**:
+- Button `variant="text"` OR `dismiss` 自動加 `data-unbounded="true"` 屬性
+- SurfaceHeader / SurfaceFooter 的 CSS rule 對 `[data-unbounded]` 套負 my `calc((--field-height-xs - --field-height-sm) / 2)` → md -2px / lg -4px
+- 效果:Button native size + touch target 不變(sm 28/32),layout 佔位縮到 24
+- Header 只有 unbounded control 時高度 = 24 + 2×tight = 48 md / 56 lg = `--chrome-header-height` ✓
+- Header 塞 bounded control(primary / tertiary,無 `data-unbounded`)→ 自然長高(bounded 的視覺邊界讓 padding 看起來合理)
+
+**完整細節 + 震盪歷史備忘**:`patterns/overlay-surface/overlay-surface.spec.md`「Chrome dismiss size canonical v5」
+
+---
+
+#### 選錯的後果(驗證 decision tree 的重要性)
+
+- **Fixed-height 套到能 grow 的 chrome**(e.g. 把 Dialog 改 fixed-h 48):DialogDescription 被剪切 → 違反 modal 作為完整決策 context 的職責
+- **Padding-based 套到剛性 chrome**(e.g. 把 Sidebar header 改 padding-based):長 workspace 名稱時 chrome 跳動 → 違反 sidebar 剛性佈局職責
+- **overlay 用 xs dismiss(size 而非 layout-slot trick)**:touch target 變 24 違反 a11y,且看起來小失禮 — v5 trick 同時保視覺 + a11y + 幾何
+
+---
+
+#### 新元件 chrome 建立 checklist
+
+建新 surface with chrome header 前必過:
+1. ☐ 跑 decision tree:title 會 grow 嗎?(有 multi-line / subtitle / description 可能性?)
+2. ☐ 選 pattern:fixed-h OR padding-based
+3. ☐ 若 fixed-h:用 `h-[var(--chrome-header-height)]` + items-center,不自訂高度
+4. ☐ 若 padding-based + overlay family:直接用 SurfaceHeader / SurfaceFooter primitive(繼承 v5 trick)
+5. ☐ 若 padding-based + 非 overlay(少見):自行 `py-tight` + `[&_[data-unbounded]]:my-[calc(...)]` CSS rule,並在 spec 記錄 rationale
+6. ☐ Dismiss button:overlay 用 `<Button dismiss size="sm" data-dismiss />`(native sm,trick 自動套);notification banner 用 `<Button dismiss size="xs" />`(family 特化)
+
+**SSOT 入口**(本節即入口):`tokens/uiSize/uiSize.spec.md`「Chrome header 選型 canonical」
 - Density lg 模式下 56px 對齊 Material 桌面 app bar 的舒適呼吸
 
 ---

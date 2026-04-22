@@ -216,6 +216,8 @@ mindset #2 的**機械化執行清單**。寫任何視覺 code 前,對照本表*
 | **Dismiss / inline action / overflow menu**| `patterns/element-anatomy/item-anatomy.spec.md`「Dismiss 按鈕 canonical」+「Inline Action 設計規格」+「常用 icon canonical」 |
 | **按鈕排列 / 群組 / 分隔**| `patterns/action-bar/action-bar.spec.md` |
 | **Header 高度 / chrome padding**| `tokens/uiSize/uiSize.spec.md`(`--chrome-header-height`)+ `tokens/layoutSpace/layoutSpace.spec.md` |
+| **Chrome header 選型**(fixed-h vs padding-based)| `tokens/uiSize/uiSize.spec.md`「Chrome header 選型 canonical」— DS-wide SSOT entry,含 decision tree + 8 家世界級對照 + 本 DS 分類查核表 + 新元件 checklist |
+| **Overlay chrome dismiss / unbounded button**| `patterns/overlay-surface/overlay-surface.spec.md`「Chrome dismiss size canonical v5」— v5 data-unbounded layout-slot trick 實作細節 |
 | **Form field gap**| `components/Field/field.spec.md` +「layoutSpace 規則 3:fw↔non-fw = tight」 |
 | **Icon 選擇 / 尺寸**| `# 元件 Props 命名原則` 的「常用 icon canonical」+ `# UI 開發規則` 的「Icon size 來源分層規則」 |
 | **浮層 header / body / footer**| `patterns/overlay-surface/overlay-surface.spec.md` |
@@ -276,6 +278,7 @@ mindset #2 的**機械化執行清單**。寫任何視覺 code 前,對照本表*
 | **新元件的內部 layout 選型** | `# 系統內部 Layout — 4-Family Model` 判斷流程 → `patterns/element-anatomy/element-anatomy.spec.md`(完整 taxonomy) |
 | **新 row / item 元件的結構(Family 1+2)** | `patterns/element-anatomy/item-anatomy.spec.md`(Family 1+2 row 結構 SSOT) |
 | **新 skill / hook / command** | 對應 `.claude/{home}/README.md` charter → `design-system-audit/references/rule-placement.md` |
+| **建立新 chrome header**(modal / toolbar / sidebar / overlay header)| `tokens/uiSize/uiSize.spec.md`「Chrome header 選型 canonical」— decision tree(fixed-h 剛性 vs padding-based 彈性)+ 8 家世界級對照 + 新元件 checklist |
 | **無明確前例的設計決策** | `# 遇不確定時的協議`(先 grep → 讀近親 spec → 仍不確定就問) |
 | **提設計建議 / 給 option A/B/C** | 本表對應 task 行找到「讀 Y」→ grep 所有可能 relevant 的家(patterns / 近親元件 spec / tokens / memory feedback / `# Meta-Pattern 預警` / skill references),**每個 option 必含「DS canonical(spec:line 或 token name)」+「世界級對照」兩件**;只給世界級 = 螺絲鬆(memory `feedback_recommendation_must_grep_ds`) |
 | **Tailwind / CSS 出怪事** | `# Tailwind 使用規則` + `# 失敗記憶索引` 技術陷阱 anchor |
