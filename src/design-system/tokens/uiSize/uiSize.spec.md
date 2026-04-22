@@ -400,32 +400,3 @@ className={cn(
 ```ts
 document.documentElement.setAttribute('data-density', 'lg')
 ```
-
----
-
-## Interactive target size floor canonical(2026-04-22)
-
-**規則**:可互動元素(button / link / icon-target / row-clickable)的 **hit area 最小 24×24 px**(WCAG 2.5.5 AA floor);觸控情境理想 **≥44×44**(Apple HIG / Material touch)。**視覺盒**可小(e.g. icon 16),**hit 盒** 透過 padding / `::before` 撐開。
-
-**本 DS 遵守**:
-- `--field-height-xs = 24` 是最小 field tier,Button xs iconOnly 即 24×24 hit ≥ WCAG AA
-- Row inline action(`ItemInlineAction`)icon 16 + hover-bg 22 視覺 + row `py-2` 讓實際 hit area ≥ 24
-- 非 field 的 raw icon(decorative)不受本規則(因為不可互動)
-
-**世界級 benchmark**:
-
-| DS / Spec | Hit area 最小 | 視覺≠hit 處理 |
-|-----------|-------------|---------------|
-| WCAG 2.5.5 AAA | 44×44 CSS px | — |
-| WCAG 2.5.8 AA(2.2)| 24×24 CSS px(+ spacing exception) | 周圍 24×24 圓內無其他目標才可視覺更小 |
-| Apple HIG | 44×44 pt(touch)/ 28×28(macOS) | SwiftUI `.contentShape`,`hitRegion` |
-| Material 3 | 48×48 dp(touch)/ 40×40 OK | `::before` pseudo 撐開(IconButton) |
-| Polaris | 44×44 px | Button min-height 內建 |
-| Atlassian | 24×24 視覺 / 32×32 hit | IconButton 內 padding |
-| Carbon | 44×44 touch / 32×32 desktop | icon 16 + button 32 via padding |
-
-**共識**:視覺可小(≥16 icon),**hit area 必 ≥24(WCAG AA)/ 理想 ≥44(touch)**。本 DS 以 24 作 desktop floor,跟 Atlassian / Carbon desktop tier 一致。
-
-**違反 trigger**:新增互動元素 hit area < 24×24 → audit / a11y 必 flag。若視覺設計需要更小,用 `::before absolute inset-[-Npx]` 撐開 hit area 不動視覺盒。
-
-**meta pattern**:**視覺盒 vs 幾何盒分離**(mindset #2「不憑直覺發明」的深層形式)— 視覺可為 design 服務,hit 盒為 a11y 服務,兩者各自走 canonical。

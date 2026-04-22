@@ -800,39 +800,3 @@ CSS 變數在定義元素上解析。`:root` 的 `--foreground: var(--color-neut
 // ✅ Tag / Avatar 直接用 primitive
 <Tag style={{ backgroundColor: 'var(--color-blue-1)', color: 'var(--color-blue-7)' }} />
 ```
-
----
-
-## Focus ring 放置 canonical(2026-04-22)
-
-**規則**:focus-visible 指示器 **outset + ring-offset 2px**(desktop default);dense list / table 可改 **inset** 避免壓相鄰 row。容器必 `overflow: visible` 或 per-item `isolation: isolate`。連續 list item focus 時 focused item `z-index` 提升避免被相鄰 item 覆蓋。
-
-**本 DS 現狀**:
-- `--ring = var(--primary)` 作為 focus 顏色 token
-- Tailwind utility `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2` 是 DS 標準組合(outset 2px + 2px offset)
-- Dense table 的 row / cell focus 可改 `ring-inset`(Carbon idiom)
-
-**世界級 benchmark**:
-
-| DS | 放置 | Ring-offset | 避免壓相鄰 |
-|----|------|------------|-----------|
-| Material 3 | outset 3px + state layer(inset tint)| 2px gap | `z-index` 提升 focused |
-| Polaris | outset 2px + 1px offset | Yes | focused stacking top |
-| Atlassian | outset 2px solid `B200` | 2px offset | `overflow: visible` 必要 |
-| Carbon(IBM)| **inset** 2px(dense)+ outset 1px border | Hybrid | dense row 改 inset 避免壓相鄰 |
-| Apple HIG | outset 3-4px accent halo | Yes | List row 用整列 bg 不用 ring |
-| GitHub Primer | outset 2px + 2px offset | Yes | `isolation: isolate` per-item |
-
-**共識**:desktop 預設 **outset + offset**(5/6 家);**dense list / table 改 inset**(Carbon idiom)避免壓相鄰。連續 item focus 用 `z-index` 或 `isolation` 解決 overlap。
-
-**本 DS 決策**:
-- 一般互動元素(Button / Input / Select / Menu / Card)→ `ring-2 ring-offset-2` outset
-- Dense list row(DataTable row / 密集清單)→ 可 `ring-inset`,加 `z-index: 1` 或 `isolation: isolate` 提升 focused
-- 容器 `overflow: hidden` 時必額外處理(用 `:focus-visible { z-index: 10 }` OR 改 inset)
-
-**違反 trigger**:
-- ❌ 容器 `overflow: hidden` + outset ring 無 z-index 提升 → focus ring 被 clip
-- ❌ Dense list 用 outset ring 無 z-index / isolation → ring 壓到相鄰 row
-- ❌ 自訂 `outline` 用硬 color 繞過 `var(--ring)` → brand swap / dark mode 斷
-
-**meta pattern**:**視覺層 vs 幾何層分離** — ring 不屬於 content box,是獨立 a11y 幾何層。
