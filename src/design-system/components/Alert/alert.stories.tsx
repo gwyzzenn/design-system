@@ -86,15 +86,16 @@ export const CornerActionGroup = {
           dismissible={false}
         />
         <div className="absolute top-3 right-4 flex items-center gap-1">
-          <Button iconOnly size="sm" variant="text" startIcon={RefreshCw} aria-label="重新整理" />
-          <Button iconOnly size="sm" variant="text" startIcon={Share2} aria-label="分享連結" />
+          {/* Chrome action group canonical(2026-04-22):close 左側 refresh/share 同為 chrome 輕量 action,全 xs 對齊 chrome-header-height 幾何 */}
+          <Button iconOnly size="xs" variant="text" startIcon={RefreshCw} aria-label="重新整理" />
+          <Button iconOnly size="xs" variant="text" startIcon={Share2} aria-label="分享連結" />
           <Separator orientation="vertical" className="h-5 mx-1" />
-          <Button iconOnly dismiss size="sm" startIcon={XIcon} aria-label="關閉通知" />
+          <Button iconOnly dismiss size="xs" startIcon={XIcon} aria-label="關閉通知" />
         </div>
       </div>
 
       <span className="text-caption text-fg-muted">
-        ✅ Close X 跟 refresh / share 同 Button iconOnly sm,Separator 分群(refresh/share 一群、close 一群)。
+        ✅ Close X 跟 refresh / share 同 Button iconOnly xs(chrome 輕量 action,chrome-header-height 幾何),Separator 分群。
         ❌ 禁止混 Inline Action + Button iconOnly(違反 same-row consistency)。
       </span>
     </div>

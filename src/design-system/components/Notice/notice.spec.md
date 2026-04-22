@@ -38,7 +38,7 @@ item-layout 4-slot：
 ```
 
 - Icon: 16px，`h-[1lh]` inline 對齊 first line
-- Dismiss X: `<Button iconOnly dismiss size="sm" />` — chrome corner action group region(Cat 3),詳見 `patterns/element-anatomy/item-anatomy.spec.md`「Dismiss canonical — X close only」+ `components/Alert/alert.spec.md`「Chrome corner close X canonical」
+- Dismiss X: `<Button iconOnly dismiss size="xs" />` — chrome corner action group region(Cat 3)。xs 是 **Notification banner family canonical**(Notice / Alert / Toast inherit):ephemeral banner `px-4 py-3` 固定不隨 density,dismiss 邊角小 affordance 輕量不搶眼。詳見 `patterns/overlay-surface/overlay-surface.spec.md`「Chrome dismiss size canonical — 三家族分類」+ `patterns/element-anatomy/item-anatomy.spec.md`「Dismiss canonical — X close only」
 - endContent: 通常放 `<Button variant="tertiary" size="xs">`
 
 ## Variant

@@ -22,9 +22,13 @@ import { Button } from '@/design-system/components/Button/button'
  * icon size: 16px（ICON_SIZE.md）
  *
  * ── Dismiss X(chrome corner close,Cat 3 Action group region)──
- * 用 Button iconOnly dismiss size="sm" — 非 Inline Action、非自刻 button。
- * Rationale:Alert / Toast 右上 X 屬 action group region(實務上 close 左側可加 refresh / share
- * + Separator),統一 Button iconOnly。`dismiss` prop 自動套 variant="text" + fg-muted override。
+ * 用 Button iconOnly dismiss **size="xs"** — 非 Inline Action、非自刻 button。
+ * Rationale(Notification banner family canonical):
+ * - Notice / Alert / Toast 屬 **notification banner family**(ephemeral、px-4 py-3 固定不隨 density),
+ *   dismiss 是邊角小 affordance,xs 視覺不搶眼不跟 content 競爭。見 `overlay-surface.spec.md`
+ *   「Chrome dismiss size canonical」三家族分類(Modal sm / Non-modal xs / Notification xs)
+ * - Close 左側可加 refresh / share(action group region),皆統一 xs
+ * - `dismiss` prop 自動套 variant="text" + fg-muted override
  * SSOT:patterns/element-anatomy/item-anatomy.spec.md「Dismiss canonical — X close only」
  *      + components/Alert/alert.spec.md「Chrome corner close X canonical」。
  */
@@ -115,7 +119,7 @@ const Notice = React.forwardRef<HTMLDivElement, NoticeProps>(
                 data-dismiss
                 iconOnly
                 dismiss
-                size="sm"
+                size="xs"
                 startIcon={XIcon}
                 aria-label="關閉通知"
                 onClick={onDismiss}
