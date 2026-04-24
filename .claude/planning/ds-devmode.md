@@ -1,8 +1,18 @@
 # DS Devmode Addon — 規格 + 開工計劃
 
-**Status**: Planned, not started(2026-04-24)
-**Trigger**: 下次 user 說「開工 / 繼續 / 做 ds-devmode」
+**Status**: ✅ **Shipped**(2026-04-24 commit `b3acb79`)
 **Redundancy**: on-disk(本檔)+ memory `project_ds_devmode_addon_2026_04_24.md`
+
+## 交付驗證(2026-04-24)
+
+4 階段全完成,Playwright self-verify 7 張截圖對照 `ref/*.png`:
+- ✅ Stage 1:click-to-pin + Off/Live/Pin toggle + Alt+I + Esc
+- ✅ Stage 2:computed style + token reverse lookup(`var(--radius-sm, 4px)` 等正確反查)
+- ✅ Stage 3:redline overlay(紫 outline + 紅距離 + dashed parent)
+- ✅ Stage 4:padding hatching(藍 45deg)+ List/Code toggle + Copy
+
+實作 location:`.storybook/addons/ds-devmode/`(Panel/manager/preview/utils × 4/preset/package.json/README)
+Self-verify script:`scripts/verify-ds-devmode.mjs`
 
 ## 目標(User ref 圖明確要求)
 
