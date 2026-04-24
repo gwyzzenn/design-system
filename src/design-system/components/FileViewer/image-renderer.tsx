@@ -117,7 +117,7 @@ export const ImageRenderer: React.FC<FileRendererProps> = ({
   return (
     <div ref={containerRef} className="w-full h-full overflow-hidden">
       <TransformWrapper
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // any-allow: react-zoom-pan-pinch TransformWrapper ref type not exported; API surface stable per lib docs
         ref={apiRef as any}
         initialScale={1}
         minScale={MIN_SCALE}

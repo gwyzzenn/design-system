@@ -132,19 +132,10 @@ export const Danger: Story = {
   ),
 }
 
-// ── startIcon（左側 icon）──────────────────────────────────────────
-
-export const WithStartIcon: Story = {
-  name: 'startIcon',
-  args: { size: 'sm' },
-  render: (args) => (
-    <div className="flex flex-wrap items-center gap-3">
-      <Button size={args.size} startIcon={Plus}>新增項目</Button>
-      <Button size={args.size} variant="tertiary" startIcon={Download}>匯出</Button>
-      <Button size={args.size} variant="text" startIcon={Settings}>設定</Button>
-    </div>
-  ),
-}
+// ── startIcon / endIcon display retired 2026-04-24 ──
+// `WithStartIcon` retired(Dim 25 earn-existence):同教 principle 已在 `startIconRule`
+// principles story(含視覺 + do/don't + 規則註解),display 層重複教相同原則 = noise。
+// 需要 startIcon / endIcon 的 quick reference → 參考 `.principles.stories.tsx`。
 
 // ── endIcon / badge（右側）────────────────────────────────────
 

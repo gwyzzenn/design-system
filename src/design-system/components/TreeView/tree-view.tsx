@@ -1,3 +1,4 @@
+// code-quality-allow: file-size — foundational composite(TreeView owns tree logic + TreeItem + drag-drop + keyboard;拆 sub-component 會把 register/unregister 跨檔傳 ref 複雜化超過可讀性 gain)
 import * as React from 'react'
 import * as CollapsiblePrimitive from '@radix-ui/react-collapsible'
 import {

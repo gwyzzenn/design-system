@@ -58,6 +58,9 @@ export interface DataTableProps<TData>
 
 // ── Type → Display ──────────────────────────────────────────────────────────
 
+// column meta is user-supplied free-form bag(type / prefix / options / formatOptions / locale 等);
+// 窄型化到 discriminated union 會把 renderTypedValue() 吹成 ~100 行 switch,實際 runtime 靠 `type` field 區分
+// any-allow: free-form consumer meta
 function renderTypedValue(value: unknown, meta?: Record<string, any>, autoRowHeight?: boolean, tableSize?: TableSize): React.ReactNode {
   const type = meta?.type as ColumnType | undefined
   const wrap = autoRowHeight && meta?.wrap === true
@@ -490,5 +493,6 @@ export const DataTable = React.forwardRef(DataTableInner) as <TData>(
   props: DataTableProps<TData> & { ref?: React.ForwardedRef<HTMLDivElement> }
 ) => React.ReactElement
 
+// any-allow: generic-constrained forwardRef cannot set displayName through typed API without erasing generic
 ;(DataTable as any).displayName = 'DataTable'
 export { dataTableVariants }

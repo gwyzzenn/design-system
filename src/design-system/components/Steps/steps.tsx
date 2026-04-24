@@ -1,3 +1,4 @@
+// code-quality-allow: file-size — foundational composite(Steps + StepItem + orientation/state/connector 邏輯緊密耦合,拆檔會讓 props drilling 複雜化超過可讀 gain)
 import * as React from 'react'
 import { Check, ChevronDown, X } from 'lucide-react'
 import { cva, type VariantProps } from 'class-variance-authority'

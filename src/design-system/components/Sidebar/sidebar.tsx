@@ -1,3 +1,4 @@
+// code-quality-allow: file-size — foundational composite(SidebarProvider / Sidebar / SidebarMenu / SidebarGroup / SidebarMenuButton 等 10+ primitives 共享 context + 20+ sidebar-specific features;已是 foundational SSOT spec cap 800)
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import * as CollapsiblePrimitive from "@radix-ui/react-collapsible"
