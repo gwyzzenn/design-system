@@ -24,7 +24,7 @@ const SingleSelectDemo = () => {
   return (
     <div className="flex flex-col gap-4 max-w-xs">
       <p className="text-caption text-fg-muted">Select 作為觸發點，點擊開啟 SelectMenu</p>
-      <Select options={statusOptions} value={value} onChange={setValue} />
+      <Select options={statusOptions} value={value} onChange={setValue} aria-label="狀態(SelectMenu single-select demo)" />
     </div>
   )
 }

@@ -163,6 +163,8 @@ export interface ComboboxProps {
   searchAriaLabel?: string
   /** Empty-selection placeholder text。Default: 「選擇…」 */
   emptyPlaceholder?: string
+  /** a11y:無 Field wrapper 時提供 role='combobox' 的 accessible name(axe aria-input-field-name) */
+  'aria-label'?: string
 }
 
 const getIconSize = (size: string) => size === 'lg' ? 20 : 16
@@ -262,6 +264,7 @@ function CustomCombobox({
   searchPlaceholder = '搜尋…', // i18n-allow: DS default
   searchAriaLabel = '搜尋選項', // i18n-allow: DS default
   emptyPlaceholder = '選擇…', // i18n-allow: DS default
+  'aria-label': ariaLabel,
 }: ComboboxProps) {
   const fieldCtx = useFieldContext()
   const error = errorProp || (fieldCtx?.invalid ?? false)
@@ -301,6 +304,7 @@ function CustomCombobox({
     <div
       id={fieldCtx?.id}
       role="combobox" aria-expanded={open} tabIndex={0}
+      aria-label={ariaLabel}
       aria-invalid={error || undefined}
       aria-required={fieldCtx?.required || undefined}
       aria-describedby={fieldCtx?.descriptionId}

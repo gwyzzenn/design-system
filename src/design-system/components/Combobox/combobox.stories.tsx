@@ -32,19 +32,19 @@ export const Modes: Story = {
       <div className="flex flex-col gap-6 max-w-sm">
         <div>
           <h3 className="text-body font-bold text-foreground mb-2">edit</h3>
-          <Combobox options={categoryOptions} value={value} onChange={setValue} />
+          <Combobox options={categoryOptions} value={value} onChange={setValue} aria-label="類別(edit mode demo)" />
         </div>
         <div>
           <h3 className="text-body font-bold text-foreground mb-2">readonly</h3>
-          <Combobox mode="readonly" options={categoryOptions} value={value} />
+          <Combobox mode="readonly" options={categoryOptions} value={value} aria-label="類別(readonly mode demo)" />
         </div>
         <div>
           <h3 className="text-body font-bold text-foreground mb-2">disabled</h3>
-          <Combobox mode="disabled" options={categoryOptions} value={value} />
+          <Combobox mode="disabled" options={categoryOptions} value={value} aria-label="類別(disabled mode demo)" />
         </div>
         <div>
           <h3 className="text-body font-bold text-foreground mb-2">readonly (empty)</h3>
-          <Combobox mode="readonly" options={categoryOptions} value={[]} />
+          <Combobox mode="readonly" options={categoryOptions} value={[]} aria-label="類別(readonly empty demo)" />
         </div>
       </div>
     )
@@ -120,6 +120,7 @@ export const Searchable: Story = {
             value={value}
             onChange={setValue}
             searchable
+            aria-label="類別(searchable popover demo)"
           />
         </div>
         <div className="flex flex-col gap-4">
@@ -130,6 +131,7 @@ export const Searchable: Story = {
             onChange={setValue2}
             searchable
             searchIn="trigger"
+            aria-label="類別(searchable inline demo)"
           />
         </div>
       </div>

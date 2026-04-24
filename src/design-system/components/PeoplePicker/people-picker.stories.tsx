@@ -66,7 +66,7 @@ const SinglePicker = () => {
     <div className="flex flex-col gap-6 max-w-xs">
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">edit（可互動）</h3>
-        <PeoplePicker value={val} people={samplePeople} onChange={(v) => setVal(v[0] ?? null)} />
+        <PeoplePicker value={val} people={samplePeople} onChange={(v) => setVal(v[0] ?? null)} aria-label="負責人(edit mode demo)" />
       </div>
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">readonly</h3>

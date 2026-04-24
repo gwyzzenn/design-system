@@ -37,19 +37,19 @@ export const Modes: Story = {
       <div className="flex flex-col gap-6 max-w-xs">
         <div>
           <h3 className="text-body font-bold text-foreground mb-2">edit</h3>
-          <Select options={statusOptions} value={value} onChange={setValue} />
+          <Select options={statusOptions} value={value} onChange={setValue} aria-label="狀態(edit mode demo)" />
         </div>
         <div>
           <h3 className="text-body font-bold text-foreground mb-2">readonly</h3>
-          <Select mode="readonly" options={statusOptions} value={value} />
+          <Select mode="readonly" options={statusOptions} value={value} aria-label="狀態(readonly mode demo)" />
         </div>
         <div>
           <h3 className="text-body font-bold text-foreground mb-2">disabled</h3>
-          <Select mode="disabled" options={statusOptions} value={value} />
+          <Select mode="disabled" options={statusOptions} value={value} aria-label="狀態(disabled mode demo)" />
         </div>
         <div>
           <h3 className="text-body font-bold text-foreground mb-2">readonly (null)</h3>
-          <Select mode="readonly" options={statusOptions} value={null} />
+          <Select mode="readonly" options={statusOptions} value={null} aria-label="狀態(readonly null demo)" />
         </div>
       </div>
     )

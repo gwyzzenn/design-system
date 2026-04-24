@@ -19,7 +19,7 @@ export const Default: Story = {
     const [value, setValue] = React.useState([50])
     return (
       <div className="w-[360px] flex flex-col gap-4">
-        <Slider value={value} onValueChange={setValue} />
+        <Slider value={value} onValueChange={setValue} aria-label="預設 slider demo" />
         <p className="text-caption text-fg-secondary">Value: {value[0]}</p>
       </div>
     )

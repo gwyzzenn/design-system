@@ -55,7 +55,7 @@ export interface SliderProps
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
   SliderProps
->(({ className, size, value, defaultValue, ...props }, ref) => {
+>(({ className, size, value, defaultValue, 'aria-label': ariaLabel, ...props }, ref) => {
   // 推導要渲染幾個 thumb:controlled 用 value,uncontrolled 用 defaultValue,
   // 都沒有時 fallback 單 thumb(Radix 預設行為)
   const thumbCount =
@@ -128,7 +128,7 @@ const Slider = React.forwardRef<
             'data-[disabled]:cursor-not-allowed data-[disabled]:border-border',
             'data-[disabled]:hover:[box-shadow:none]',
           )}
-          aria-label={thumbCount > 1 ? `Thumb ${i + 1}` : undefined}
+          aria-label={ariaLabel ? (thumbCount > 1 ? `${ariaLabel} (${i + 1})` : ariaLabel) : (thumbCount > 1 ? `Thumb ${i + 1}` : undefined)}
         />
       ))}
     </SliderPrimitive.Root>
