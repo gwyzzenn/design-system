@@ -1,6 +1,6 @@
 ---
 name: story-writing
-description: Guide for writing Storybook stories (.stories.tsx / .principles.stories.tsx / .anatomy.stories.tsx) with world-class example quality. Enforces real-product scenarios, 「人」+「舉一反三」tests, Rule-note 原則>結論, and anatomy 5-story structure. Invoke when user says「寫 story」「新增範例」「補 anatomy」「principles story」or is about to create/edit any `.stories.tsx` file in design-system.
+description: Guide for writing Storybook stories (.stories.tsx / .principles.stories.tsx / .anatomy.stories.tsx) with world-class example quality. Enforces real-product scenarios, 「人」+「舉一反三」tests, Rule-note 原則>結論, and anatomy 6-story structure(含 A11y,2026-04-24). Invoke when user says「寫 story」「新增範例」「補 anatomy」「principles story」or is about to create/edit any `.stories.tsx` file in design-system.
 ---
 
 # Story Writing
@@ -44,7 +44,7 @@ Purpose: Storybook 是公開文件,範例 = 設計系統品質。本 skill 把�
 
 任一不過 → 改範例,不是補說明文字。
 
-### Phase 3 — anatomy 5-story 結構(僅 anatomy 適用)
+### Phase 3 — anatomy 6-story 結構(僅 anatomy 適用)
 
 **參考 `references/anatomy-standard.md`**——每個元件 anatomy 必備 **canonical 5 件套**(`export const Overview / Inspector / ColorMatrix / SizeMatrix / StateBehavior`,一字不差) + Inspect 面板規格 + token-first 原則 + 值溯源完整性。
 
@@ -77,7 +77,7 @@ Checkpoint: 寫完後必驗:
 ## References
 
 - `references/example-selection.md` — 完整範例選擇原則(合法來源 / 禁止清單 / 2 test / 正確範例 / Rule note / 視覺品質)
-- `references/anatomy-standard.md` — anatomy 5-story 結構 + Inspect 面板 + 品質規則
+- `references/anatomy-standard.md` — anatomy 6-story 結構 + Inspect 面板 + 品質規則
 - `references/self-check.md` — 7 題自我檢查 checklist
 
 ## 相關

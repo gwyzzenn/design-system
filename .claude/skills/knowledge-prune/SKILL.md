@@ -132,31 +132,62 @@ Proceed with P0+P1 as atomic commit? Then discuss P2?
 - 每 P2 item 一個獨立 commit(animation trail 可回溯)
 - 新 meta-pattern 加進 CLAUDE.md `# Meta-Pattern 預警` → 同時**必檢討哪些下游條目冗餘**(上游加 = 下游減)
 
-### Phase 5 — Final report + baseline update
+### Phase 5 — Final report + **quantified retire rate** + baseline update
+
+**Retire rate 計算公式**(從 aspirational 轉 quantified,2026-04-24):
+
+```
+total_governance_items_before = 
+  count(CLAUDE.md 章節) 
+  + count(Meta-Pattern 條目)
+  + count(.claude/skills/)
+  + count(.claude/hooks/)
+  + count(MEMORY.md entries)
+  + count(memory files)
+  + count(spec.md SSOT anchors)
+
+retired_this_quarter = items 本次 /knowledge-prune 刪 / 合併 / 撤
+
+retire_rate = retired_this_quarter / total_governance_items_before
+```
+
+**Target**:≥ 5% / quarter。< 5% 不一定壞(系統已成熟 / 無冗贅),但必在 report 明寫 rationale(「成熟 — 無 retire 候選 / stable ecosystem」),不可空白。
 
 ```markdown
 ## Prune report(N 日期)
 
 ### Metric delta
 - CLAUDE.md: B → A(-X 行)
-- MEMORY.md: B → A(-Y 條目)
+- MEMORY.md: B → A(-Y 條目 / -Z 檔)
 - Total spec.md: B → A(-Z 行)
-- Hooks: B → A(-N 個)
-- Retire rate: X% (target ≥ 5% per quarter)
+- Hooks: B → A(-N 個 hook retired)
+- Skills: B → A(-N 個 skill retired)
+- **Retire rate: X% = retired N / total M**(target ≥ 5%)
+  - 公式套用見本 Phase 頂部
+  - 若 < 5% 必附 rationale(成熟 / 無冗贅 / deferred 等)
 
-### Retired
-- {list of retired items + why}
+### Retired(實際)
+- {list of retired items + why + grep 確認無 reference}
+
+### 未達 retire target rationale(若 < 5%)
+- {e.g. "governance ecosystem stable, 上季已大幅 prune,本季無重大冗贅"}
 
 ### Still deferred(P2 pending user sign-off)
 - {list}
 
-## Self-improvement capture(對齊 CLAUDE.md `# 資訊治理 canonical` → Audit skill Phase F 節)
+## Self-improvement capture
 - 新發現 prune pattern: {...} OR "無"
 - 新確立 anti-bloat rule: {...} OR "無"
 - 下次 prune trigger 建議: {...}
 ```
 
-Update `.claude/logs/metric-snapshots.jsonl`(append 本次 baseline)。
+Update `.claude/logs/metric-snapshots.jsonl`:
+
+```json
+{"ts":"2026-04-24","retire_rate":0.07,"retired":5,"total_before":71,"claude_md_lines":612,"hooks_total":18,"skills_total":13,"memory_entries":29}
+```
+
+**本 snapshot 讓 `/governance-health` trend 分析:**若 3 季連續 retire rate < 5% 且 governance 行數仍增 → auto-propose「有隱性冗贅未抓,考慮換 /knowledge-prune 掃描策略」。
 
 ---
 

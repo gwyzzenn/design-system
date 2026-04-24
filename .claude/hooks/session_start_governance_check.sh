@@ -49,18 +49,33 @@ if [ -f "$CORRECTIONS_LOG" ]; then
   fi
 fi
 
-# Check 4: benchmarks freshness
+# Check 4: benchmarks freshness — AUTO-RUN fetcher if > 30 days or never fetched
+# (對齊 M14 AUTO integrate pipeline — external signal refresh 不等 user 提醒)
 BENCH_DIR="$PROJECT_DIR/.claude/benchmarks"
 if [ -d "$BENCH_DIR" ]; then
-  LAST_BENCH=$(find "$BENCH_DIR" -type f -name '*.jsonl' -o -name '*.md' 2>/dev/null | xargs -I{} stat -f '%m' {} 2>/dev/null | sort -n | tail -1 || echo "")
-  if [ -n "$LAST_BENCH" ]; then
-    NOW=$(date +%s)
-    DAYS=$(( (NOW - LAST_BENCH) / 86400 ))
-    if [ "$DAYS" -gt 30 ]; then
-      REMINDERS="${REMINDERS}\n- External DS / Claude Code benchmarks last refreshed ${DAYS} days ago (> 30). Run .claude/benchmarks/fetch.sh."
-    fi
+  LAST_FETCH_FILE="$BENCH_DIR/last-fetch.txt"
+  SHOULD_AUTO_FETCH=0
+
+  if [ ! -f "$LAST_FETCH_FILE" ]; then
+    SHOULD_AUTO_FETCH=1
+    FETCH_REASON="never fetched"
   else
-    REMINDERS="${REMINDERS}\n- .claude/benchmarks/ empty — never fetched. Run .claude/benchmarks/fetch.sh to establish baseline."
+    LAST_TS=$(stat -f '%m' "$LAST_FETCH_FILE" 2>/dev/null || echo "0")
+    NOW=$(date +%s)
+    DAYS=$(( (NOW - LAST_TS) / 86400 ))
+    if [ "$DAYS" -gt 30 ]; then
+      SHOULD_AUTO_FETCH=1
+      FETCH_REASON="${DAYS} days stale"
+    fi
+  fi
+
+  # Background fetch(不 block session 起動,寫結果供下次 session 用)
+  # 只有 fetcher 存在才跑,容忍網路錯誤(fetch.sh 內建 fail-silent)
+  if [ "$SHOULD_AUTO_FETCH" = "1" ] && [ -x "$BENCH_DIR/fetch.sh" ]; then
+    (bash "$BENCH_DIR/fetch.sh" > "$BENCH_DIR/.last-auto-fetch.log" 2>&1 &) 2>/dev/null
+    REMINDERS="${REMINDERS}\n- Benchmarks ${FETCH_REASON} → auto-fetching in background(結果寫 .last-auto-fetch.log,下次 session 生效)"
+  elif [ "$SHOULD_AUTO_FETCH" = "1" ]; then
+    REMINDERS="${REMINDERS}\n- Benchmarks ${FETCH_REASON} → manually run \`bash .claude/benchmarks/fetch.sh\`"
   fi
 fi
 

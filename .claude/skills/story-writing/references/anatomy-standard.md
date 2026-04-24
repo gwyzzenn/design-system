@@ -29,7 +29,8 @@
 | 3 | `ColorMatrix` | `'3. 色彩對照表'` |
 | 4 | `SizeMatrix` | `'4. 尺寸對照表'` |
 | 5 | `StateBehavior` | `'5. 狀態行為'` |
-| 6+ | 元件特有 | `'6. XXX'` / `'7. XXX'` 依順序編號(中文命名,見下方擴充規則) |
+| 6 | `Accessibility` | `'6. 無障礙與鍵盤'`(互動元件強制,純視覺 indicator N/A)|
+| 7+ | 元件特有 | `'7. XXX'` / `'8. XXX'` 依順序編號(中文命名,見下方擴充規則) |
 
 ```ts
 export const Overview = {
@@ -53,6 +54,7 @@ export const Overview = {
 - **ColorMatrix**:applicable 如元件有 variant / hue / severity / theme。N/A 僅當元件色彩完全繼承 context(例 HoverCard 繼承 page theme 無自己 palette)
 - **SizeMatrix**:applicable 如元件有 size prop(sm/md/lg)。固定尺寸才 N/A(Notice / Chip / Avatar 的特定固定場合)
 - **StateBehavior**:applicable 如元件有任何互動 state(hover / selected / disabled / loading / error / focus)。純靜態 indicator(Badge / Tag)才 N/A
+- **Accessibility**(2026-04-24 加,對齊 Material / Polaris / Atlassian 專章):applicable 如元件有任何鍵盤互動 / ARIA / focus 管理。內含:ARIA props 對照表 / Keyboard map(Tab/Enter/Esc/arrow)/ Focus order 圖 / WCAG AA 對比 snapshot。純視覺 indicator(Badge / Tag / Separator)才 N/A。**Migration strategy**:existing 元件**不 retroactively backfill**;新元件 / 重大修改時建;`/design-system-audit` 稽核發現缺 → flag + 補
 
 **嚴格警告**:曾經被誤用「applicable-where-meaningful」放行大量元件跳 Inspector,造成 anatomy 紙本文件不如世界級。**2026-04-21 audit 重修:policy 改回「預設全建,N/A 要硬 rationale」**。N/A 不是省工通行證。
 
@@ -107,6 +109,39 @@ export const Overview = {
 - 每個互動狀態的前後對照(如 loading spinner 替換規則)
 - 所有 variant 的 disabled 渲染(含變體模式)
 - 元件特有狀態(如 checked toggle)
+
+## 6. 無障礙與鍵盤(2026-04-24 新增,對齊 Material / Polaris / Atlassian 專章)
+
+**對齊世界級**:Material 3 / Polaris / Atlassian DSP 三家元件文件皆有 A11y + Keyboard 專章。散在 StateBehavior(focus/disabled)+ principles(do/don't)不夠突出,designer / audit 找 a11y 資訊需要翻多檔。
+
+**包含**(applicable 時必有):
+- **ARIA props 對照表**:每 prop 對應的 aria-* mapping(e.g. `disabled` → `aria-disabled` / `required` → `aria-required`)
+- **Keyboard map**:Tab / Shift+Tab / Enter / Space / Esc / Arrow keys(↑↓←→) 各做什麼
+- **Focus order 圖**:複合元件(DatePicker / Combobox / DropdownMenu)的 focus 進入 → 內部 navigation → 退出流程
+- **WCAG AA 對比 snapshot**:主要 state(default / hover / focus / disabled)對比度通過 visual-audit Layer A
+
+**N/A 條件**:純視覺 indicator(Badge / Tag / Separator / Skeleton / Avatar 非 interactive 時)— rationale 寫 spec「本元件無互動」。
+
+**Migration**:
+- 新元件 / 元件重大修改時**強制**建
+- **既有元件不 retroactively backfill**(尊重 user 2026-04-24 指示)
+- `/design-system-audit` Dim 10(a11y 覆蓋)擴充:發現 interactive 元件缺 Accessibility story → flag
+- 新元件 checklist 加 `Accessibility story 建立`
+
+## 三層 stories 互聯 cross-link(2026-04-24 新增)
+
+每個 story 頂部 meta 或底部 Rule note 必含統一 **「See also」** 區塊,讓讀者從任一層入口跳到其他角度:
+
+```markdown
+See also:
+- 展示({name}.stories.tsx) — 真實業務場景
+- 設計規格({name}.anatomy.stories.tsx) — 6-matrix inspect
+- 設計原則({name}.principles.stories.tsx) — do/don't + 情境選擇
+```
+
+**為什麼需要**:展示 / 設計規格 / 設計原則 3 層職責不重複但視角不同(「看 → 查 → 判斷」)。沒有 cross-link 讀者容易 stuck 在一層,漏看其他角度的 canonical。
+
+**實作**:`compile-stories.mjs` 自動在每個 story 的 docs meta 注入此 section;consumer 不手寫。
 
 ## 設計規格品質規則
 

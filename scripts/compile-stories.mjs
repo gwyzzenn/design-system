@@ -127,6 +127,26 @@ if (specMeta['禁止事項']) {
   })
 }
 
+// ── 6. Accessibility story stub(2026-04-24,6-story 新增)──
+// 對齊 Material / Polaris / Atlassian a11y 專章。POC 先輸出 section 架構;
+// aria-*/keyboard/focus-order 詳細內容由 spec frontmatter a11y 欄位 + tsx aria props 合併產。
+console.log('')
+console.log('## 6. 無障礙與鍵盤(Accessibility & Keyboard)')
+console.log('')
+console.log('> 2026-04-24 加入 6-story canonical(對齊 Material/Polaris/Atlassian 專章)。')
+console.log('> Phase 4 會擴充:從 spec frontmatter `a11y` 欄位 + tsx aria props 合併產 ARIA 對照表 / Keyboard map / Focus order / WCAG AA 對比 snapshot。')
+console.log('')
+console.log('*Phase 3 POC 先輸出 section placeholder;正式內容 Phase 4 加 spec `a11y:` frontmatter 欄位後產。*')
+
+// ── 7. Cross-link section(2026-04-24 canonical — 3 層 stories 互聯)──
+console.log('')
+console.log('## See also(三層 stories 互聯)')
+console.log('')
+console.log(`- **展示**(${lowerKebab}.stories.tsx)— 真實業務場景`)
+console.log(`- **設計規格**(${lowerKebab}.anatomy.stories.tsx)— 6-matrix inspect(本檔)`)
+console.log(`- **設計原則**(${lowerKebab}.principles.stories.tsx)— do/don't + 情境選擇`)
+
+console.log('')
 console.log('=== END AUTO-COMPILED block ===')
 console.log('')
-console.log(`Phase 3 POC done. Next: Phase 4 integration(pre-commit hook + drift detection + tsx AST parse + 44 元件 migration).`)
+console.log(`Phase 3 POC done. Next: Phase 4 integration(pre-commit hook + drift detection + tsx AST parse + 44 元件 migration + a11y frontmatter schema).`)
