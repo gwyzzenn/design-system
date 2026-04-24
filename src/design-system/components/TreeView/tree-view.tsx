@@ -22,7 +22,7 @@ import {
   RowSizeProvider,
   ItemIcon,
   ItemInlineAction,
-  rowPaddingBySize,
+  ROW_PADDING_BY_SIZE,
   type InlineActionConfig,
 } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
@@ -657,8 +657,8 @@ const treeItemVariants = cva(
   ],
   {
     variants: {
-      // 消費 rowPaddingBySize SSOT(item-anatomy.tsx)— drift risk 消除
-      size: rowPaddingBySize,
+      // 消費 ROW_PADDING_BY_SIZE SSOT(item-anatomy.tsx)— drift risk 消除
+      size: ROW_PADDING_BY_SIZE,
     },
     defaultVariants: {
       size: 'md',

@@ -111,7 +111,7 @@ export const INLINE_ACTION_HOVER_BG_SIZE: Record<RowSize, number> = {
 }
 
 /**
- * `rowPaddingBySize` — Family 1+2 row primitive 的 size → padding + typography 公式 SSOT
+ * `ROW_PADDING_BY_SIZE` — Family 1+2 row primitive 的 size → padding + typography 公式 SSOT
  *
  * Formula(canonical):`py = (field-height - 1lh) / 2`,對齊 1em text 到 field-height center。
  *
@@ -121,7 +121,7 @@ export const INLINE_ACTION_HOVER_BG_SIZE: Record<RowSize, number> = {
  *
  * 2026-04-24 D Phase 1+2 consolidation 建立。
  */
-export const rowPaddingBySize: Record<RowSize, string> = {
+export const ROW_PADDING_BY_SIZE: Record<RowSize, string> = {
   sm: 'text-body leading-compact py-[calc((var(--field-height-sm)-1lh)/2)]',
   md: 'text-body leading-compact py-[calc((var(--field-height-md)-1lh)/2)]',
   lg: 'text-body-lg leading-compact py-[calc((var(--field-height-lg)-1lh)/2)]',

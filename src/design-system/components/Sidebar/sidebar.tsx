@@ -34,7 +34,7 @@ import {
   ItemInlineActionButton,
   RowSizeProvider,
   getUniformPrefixSlotStyle,
-  rowPaddingBySize,
+  ROW_PADDING_BY_SIZE,
   type RowSize,
   type InlineActionConfig,
 } from "@/design-system/patterns/element-anatomy/item-anatomy"
@@ -633,11 +633,8 @@ const sidebarGroupLabelVariants = cva(
   ],
   {
     variants: {
-      size: {
-        sm: "text-body leading-compact py-[calc((var(--field-height-sm)-1lh)/2)]",
-        md: "text-body leading-compact py-[calc((var(--field-height-md)-1lh)/2)]",
-        lg: "text-body-lg leading-compact py-[calc((var(--field-height-lg)-1lh)/2)]",
-      },
+      // 消費 ROW_PADDING_BY_SIZE SSOT(跟 SidebarMenuButton / MenuItem / TreeItem 一致)
+      size: ROW_PADDING_BY_SIZE,
     },
     defaultVariants: { size: "md" },
   }
@@ -810,13 +807,13 @@ const sidebarMenuButtonVariants = cva(
   ],
   {
     variants: {
-      // size:消費 rowPaddingBySize SSOT(item-anatomy.tsx)+ Sidebar-specific collapsed height
+      // size:消費 ROW_PADDING_BY_SIZE SSOT(item-anatomy.tsx)+ Sidebar-specific collapsed height
       // 前為 3 cva(menu / sidebar / tree)重複同一 py 公式,drift risk 已知。
       // 改用 shared SSOT 後 formula 改一處全同步。
       size: {
-        sm: [rowPaddingBySize.sm, "group-data-[collapsible=icon]:!h-[var(--field-height-sm)]"],
-        md: [rowPaddingBySize.md, "group-data-[collapsible=icon]:!h-[var(--field-height-md)]"],
-        lg: [rowPaddingBySize.lg, "group-data-[collapsible=icon]:!h-[var(--field-height-lg)]"],
+        sm: [ROW_PADDING_BY_SIZE.sm, "group-data-[collapsible=icon]:!h-[var(--field-height-sm)]"],
+        md: [ROW_PADDING_BY_SIZE.md, "group-data-[collapsible=icon]:!h-[var(--field-height-md)]"],
+        lg: [ROW_PADDING_BY_SIZE.lg, "group-data-[collapsible=icon]:!h-[var(--field-height-lg)]"],
       },
       variant: {
         /** 預設 — 導覽 item,參與 single-selection */
@@ -1069,10 +1066,12 @@ const sidebarMenuSkeletonVariants = cva(
   ],
   {
     variants: {
+      // 消費 ROW_PADDING_BY_SIZE SSOT + skeleton-icon size modifier(Sidebar-specific)
+      // 注:skeleton 無文字,typography class 雖被帶入但無害,保持公式一處同步
       size: {
-        sm: "py-[calc((var(--field-height-sm)-1lh)/2)] [&>[data-sidebar=menu-skeleton-icon]]:size-4",
-        md: "py-[calc((var(--field-height-md)-1lh)/2)] [&>[data-sidebar=menu-skeleton-icon]]:size-4",
-        lg: "py-[calc((var(--field-height-lg)-1lh)/2)] [&>[data-sidebar=menu-skeleton-icon]]:size-5",
+        sm: [ROW_PADDING_BY_SIZE.sm, "[&>[data-sidebar=menu-skeleton-icon]]:size-4"],
+        md: [ROW_PADDING_BY_SIZE.md, "[&>[data-sidebar=menu-skeleton-icon]]:size-4"],
+        lg: [ROW_PADDING_BY_SIZE.lg, "[&>[data-sidebar=menu-skeleton-icon]]:size-5"],
       },
     },
     defaultVariants: { size: "md" },

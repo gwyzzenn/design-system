@@ -17,6 +17,14 @@ import { ICON_SIZE, AVATAR_SIZE } from '@/design-system/patterns/element-anatomy
 //   - density 切換時 field-height 自動調整，padding 跟著算
 //
 // 容器設 text-body / text-body-lg 建立 1lh context（div 上正常繼承）。
+//
+// ── 為什麼 NOT 消費 ROW_PADDING_BY_SIZE(item-anatomy.tsx SSOT,2026-04-24 consolidation)──
+// menu / sidebar / tree 3 cva 統一消費 ROW_PADDING_BY_SIZE;SelectionItem 刻意不消費,
+// 因 typography 不同(mode 差異,非 drift):
+//   - ROW_PADDING_BY_SIZE:`text-body leading-compact`(scanning mode,緊湊)
+//   - SelectionItem:`text-body`(**無 leading-compact** — reading mode,Checkbox/Radio 搭配
+//     較長 label + description,需預設 1.5 leading 而非 1.3 compact)
+// py 公式本身相同 — 若 field-height token 變動,本檔需手動同步(contained,由本註解 anchor 追)。
 
 export const selectionItemStyles = cva(
   'flex items-start gap-2',
