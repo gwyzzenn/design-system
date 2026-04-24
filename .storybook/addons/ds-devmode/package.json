@@ -1,0 +1,15 @@
+{
+  "name": "storybook-addon-ds-devmode",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./preset": "./preset.ts",
+    "./manager": "./manager.tsx",
+    "./preview": "./preview.ts"
+  },
+  "storybook": {
+    "displayName": "DS Devmode",
+    "supportedFrameworks": ["react"]
+  }
+}

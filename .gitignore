@@ -36,3 +36,5 @@ snapshots/
 
 # User local reference images (not for commit)
 ref/
+snapshots-devmode/
+storybook-static-dev/

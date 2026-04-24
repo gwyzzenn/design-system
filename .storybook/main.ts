@@ -16,8 +16,11 @@ const config: StorybookConfig = {
     "@storybook/addon-a11y",         // 無障礙檢查(對 DS 很重要)
     "@storybook/addon-docs",         // 自動生成文件
     // addon-html:選了元件後在右側 panel 看 rendered HTML + 套用的 className list,
-    // 為 custom DS Inspect addon(`.storybook/addons/ds-inspect/`)的補強。
+    // 為 custom DS Devmode addon 的補強。
     "@whitespace/storybook-addon-html",
+    // DS Devmode — local addon,Figma Dev Mode 等級 inspect(anatomy / redline / token reverse lookup)。
+    // Register via managerEntries + previewAnnotations below(繞 auto-discovery 的 .ts 副檔名問題)
+    "./addons/ds-devmode/preset",
   ],
 
   framework: {
