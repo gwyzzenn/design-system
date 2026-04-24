@@ -58,6 +58,7 @@
     "tailwindcss": "^4.2.2"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.2",
     "@storybook/addon-a11y": "8.6.0",
     "@storybook/addon-docs": "8.6.0",
     "@storybook/addon-essentials": "8.6.0",
@@ -71,7 +72,9 @@
     "@vitejs/plugin-react": "^4.3.1",
     "@whitespace/storybook-addon-html": "^7.0.0",
     "js-yaml": "^4.1.1",
+    "pixelmatch": "^7.1.0",
     "playwright": "^1.59.1",
+    "pngjs": "^7.0.0",
     "storybook": "8.6.0",
     "typescript": "^5.5.4",
     "vite": "^5.4.0"

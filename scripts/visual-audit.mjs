@@ -31,8 +31,11 @@
  */
 
 import { chromium } from 'playwright'
+import { AxeBuilder } from '@axe-core/playwright'
+import pixelmatch from 'pixelmatch'
+import { PNG } from 'pngjs'
 import { mkdir, writeFile, readFile } from 'node:fs/promises'
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { spawn, execSync } from 'node:child_process'
@@ -40,8 +43,11 @@ import { spawn, execSync } from 'node:child_process'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const PROJECT_ROOT = join(__dirname, '..')
 const OUT_DIR = join(PROJECT_ROOT, 'snapshots')
+const BASELINE_DIR = join(PROJECT_ROOT, 'snapshots-baseline')
 const ASSERTIONS_PATH = join(PROJECT_ROOT, 'scripts/visual-assertions.json')
 const STORYBOOK_URL = 'http://localhost:6006'
+const PIXEL_DIFF_THRESHOLD = 0.1 // pixelmatch threshold (0=strict, 1=loose)
+const PIXEL_DIFF_PCT_BUDGET = 0.5 // flag scenario if > 0.5% pixels differ from baseline
 
 // ── Args parse(支援 --flag 和 --key=value)─────────────────────────────────
 const ARG_LIST = process.argv.slice(2)
@@ -57,6 +63,9 @@ const HEADED = ARGS_SET.has('--headed')
 const RETINA = ARGS_SET.has('--retina') // 預設 1x,Layer B AI 可讀(2x 超 2000px 限制);--retina opt-in for debug
 const SCOPE = ARGS_KV['--scope'] ?? 'changed' // changed | all | component:<name>
 const URLS = ARGS_KV['--urls'] // CSV of URLs,overrides scenario mode
+const NO_A11Y = ARGS_SET.has('--no-a11y') // skip @axe-core/playwright(default runs)
+const NO_DIFF = ARGS_SET.has('--no-diff') // skip baseline pixel diff
+const UPDATE_BASELINE = ARGS_SET.has('--update-baseline') // copy new snapshots as baseline
 
 // ── 主 scenario 清單 ────────────────────────────────────────────────────────
 // 先讀 assertions.json 取 scenario,fallback 到 hardcoded
@@ -329,19 +338,74 @@ async function auditScenario(browser, scenario, opts = {}) {
       await page.waitForTimeout(200) // let tooltip dismiss
     }
 
-    await page.screenshot({
-      path: join(OUT_DIR, scenario.file),
-      fullPage: false,
-    })
+    const screenshotPath = join(OUT_DIR, scenario.file)
+    await page.screenshot({ path: screenshotPath, fullPage: false })
 
     const contrast = await scanContrast(page)
     const geometry = await runGeometryAssertions(page, scenario.assertions)
+
+    // ── axe-core a11y scan(2026-04-25,補 WCAG floor canonical 自動化)──
+    // Canonical ladder(`# 稽核 canonical` 節)排序 WCAG 為 mechanical floor,但允許
+    // DS spec documented exemption(incidental text / disabled / logotype / decorative)。
+    // axe-core 不知 exemption,會誤報合法 disabled text 為 color-contrast violation。
+    // 策略:disable axe `color-contrast`(Layer A `scanContrast` 已管含 exemption 邏輯),
+    // 保留 axe 其他規則(aria-label / label-association / focus / landmark 等 axe 特長)。
+    let a11yViolations = []
+    if (!opts.noA11y) {
+      try {
+        const axe = await new AxeBuilder({ page })
+          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+          .disableRules(['color-contrast'])
+          .analyze()
+        a11yViolations = axe.violations.map((v) => ({
+          id: v.id,
+          impact: v.impact,
+          description: v.description,
+          help: v.help,
+          nodes: v.nodes.length,
+        }))
+      } catch (axeErr) {
+        a11yViolations = [{ id: '_axe-error', impact: 'unknown', description: axeErr.message }]
+      }
+    }
+
+    // ── pixel diff vs baseline(if baseline exists)──
+    let diff = null
+    if (!opts.noDiff) {
+      const baselinePath = join(BASELINE_DIR, scenario.file)
+      if (existsSync(baselinePath)) {
+        try {
+          const current = PNG.sync.read(readFileSync(screenshotPath))
+          const baseline = PNG.sync.read(readFileSync(baselinePath))
+          if (current.width === baseline.width && current.height === baseline.height) {
+            const diffImg = new PNG({ width: current.width, height: current.height })
+            const diffPixels = pixelmatch(
+              current.data,
+              baseline.data,
+              diffImg.data,
+              current.width,
+              current.height,
+              { threshold: PIXEL_DIFF_THRESHOLD },
+            )
+            const total = current.width * current.height
+            const pct = (diffPixels / total) * 100
+            diff = { diffPixels, total, pct: Number(pct.toFixed(3)), exceedBudget: pct > PIXEL_DIFF_PCT_BUDGET }
+          } else {
+            diff = { error: `dimension mismatch(current ${current.width}×${current.height} vs baseline ${baseline.width}×${baseline.height})` }
+          }
+        } catch (diffErr) {
+          diff = { error: diffErr.message }
+        }
+      }
+    }
 
     return {
       id: scenario.id ?? scenario.url,
       file: scenario.file,
       contrast,
       geometryViolations: geometry,
+      a11yViolations,
+      diff,
     }
   } catch (err) {
     return { id: scenario.id ?? scenario.url, file: scenario.file, error: err.message }
@@ -461,23 +525,44 @@ async function main() {
   const results = []
   let totalContrastViolations = 0
   let totalGeometryViolations = 0
+  let totalA11yViolations = 0
+  let totalDiffBudgetBreached = 0
 
   for (const scenario of scopedScenarios) {
     console.log(`[visual-audit] 稽核 ${scenario.id ?? scenario.url}`)
-    const r = await auditScenario(browser, scenario, { retina: RETINA })
+    const r = await auditScenario(browser, scenario, { retina: RETINA, noA11y: NO_A11Y, noDiff: NO_DIFF })
     results.push(r)
     if (r.contrast?.violations?.length) totalContrastViolations += r.contrast.violations.length
     if (r.geometryViolations?.length) totalGeometryViolations += r.geometryViolations.length
+    if (r.a11yViolations?.length) totalA11yViolations += r.a11yViolations.length
+    if (r.diff?.exceedBudget) totalDiffBudgetBreached++
     if (r.error) console.error(`  ✗ ${r.error}`)
   }
 
   await browser.close()
+
+  // ── Update baseline if requested ──
+  if (UPDATE_BASELINE) {
+    const { copyFile } = await import('node:fs/promises')
+    if (!existsSync(BASELINE_DIR)) await mkdir(BASELINE_DIR, { recursive: true })
+    let copied = 0
+    for (const r of results) {
+      if (r.file && !r.error) {
+        await copyFile(join(OUT_DIR, r.file), join(BASELINE_DIR, r.file))
+        copied++
+      }
+    }
+    console.log(`[visual-audit] Baseline updated(${copied} files copied to snapshots-baseline/)`)
+  }
+
   if (storybookProc) storybookProc.kill()
 
   const report = {
     generatedAt: new Date().toISOString(),
     totalContrastViolations,
     totalGeometryViolations,
+    totalA11yViolations,
+    totalDiffBudgetBreached,
     scenarios: results,
   }
   await writeFile(join(OUT_DIR, 'report.json'), JSON.stringify(report, null, 2))
@@ -485,11 +570,20 @@ async function main() {
   console.log(`\n[visual-audit] 完成`)
   console.log(`  Contrast violations: ${totalContrastViolations}`)
   console.log(`  Geometry violations: ${totalGeometryViolations}`)
+  if (!NO_A11Y) console.log(`  A11y violations (WCAG 2.1 AA): ${totalA11yViolations}`)
+  if (!NO_DIFF) console.log(`  Baseline diff budget breached: ${totalDiffBudgetBreached} (threshold ${PIXEL_DIFF_PCT_BUDGET}%)`)
   console.log(`  Report: ${join(OUT_DIR, 'report.json')}`)
   console.log(`  Screenshots: ${OUT_DIR}/*.png`)
   console.log(`\n[Layer B:invoke /visual-audit 讀 snapshots/ 做 AI 設計合理性判斷]`)
 
-  process.exit(totalContrastViolations > 0 || totalGeometryViolations > 0 ? 1 : 0)
+  process.exit(
+    totalContrastViolations > 0 ||
+      totalGeometryViolations > 0 ||
+      totalA11yViolations > 0 ||
+      totalDiffBudgetBreached > 0
+      ? 1
+      : 0,
+  )
 }
 
 main().catch((err) => {
