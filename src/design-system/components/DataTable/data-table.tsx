@@ -343,16 +343,22 @@ function DataTableInner<TData>(
   // ── Render header row for a region ──
   const renderHeaderRow = (cols: Column<TData, unknown>[], isRight: boolean) => {
     const headers = getRegionHeaders(cols)
+    // a11y(2026-04-25 axe aria-required-children):若 region 無 visible cells(只有
+    // invisible rowActions placeholder 或 region 本身空),不設 role='row' — 改為純
+    // layout div,避免 axe 抓到「row 無 cell/columnheader 子元素」violation。
+    const hasVisibleChildren = headers.length > 0
+    const RowTag = hasVisibleChildren ? 'div' : 'div'
+    const rowRole = hasVisibleChildren ? 'row' : undefined
     return (
-      <div role="row" className={cn('flex items-center border-b border-divider', rowHeight, HEADER_BG)}>
+      <RowTag role={rowRole} className={cn('flex items-center border-b border-divider', rowHeight, HEADER_BG)}>
         {headers.map((h, i) => headerCellEl(h, i < headers.length - 1 && !(isRight && i === headers.length - 1)))}
         {isRight && hasRowActions && (
-          <div role="columnheader" className="flex items-center justify-end shrink-0 gap-2 invisible" style={cellPadding}>
-            {/* 渲染一個假 row 的 actions 來佔位，確保 header 和 body 同寬 */}
+          <div className="flex items-center justify-end shrink-0 gap-2 invisible" aria-hidden="true" style={cellPadding}>
+            {/* 渲染一個假 row 的 actions 來佔位,確保 header 和 body 同寬(aria-hidden 避免 screen reader 讀出 invisible 內容)*/}
             {rows[0] && rowActions!(rows[0].original)}
           </div>
         )}
-      </div>
+      </RowTag>
     )
   }
 
