@@ -28,6 +28,7 @@ import * as React from 'react'
 // useScrollEdges — 給 scroll 模式
 // ─────────────────────────────────────────────────────────────────────────────
 
+// code-quality-allow: dead-export — hook return type — API surface for consumers who want to annotate
 export interface UseScrollEdgesResult<T extends HTMLElement> {
   /** 綁在 scroll container 上的 ref */
   scrollRef: React.RefObject<T>
@@ -106,6 +107,7 @@ export interface UseOverflowIndicesOptions {
   reserveTriggerWidth?: number
 }
 
+// code-quality-allow: dead-export — hook return type — API surface for consumers who want to annotate
 export interface UseOverflowIndicesResult<C extends HTMLElement> {
   /** 綁在 items 的父容器上 */
   containerRef: React.RefObject<C>

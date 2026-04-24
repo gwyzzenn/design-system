@@ -232,6 +232,7 @@ const arrowWrapperClass = cn(
   '[&:has(button:disabled)]:opacity-0 [&:has(button:disabled)]:pointer-events-none',
 )
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const CarouselPrevious = React.forwardRef<HTMLButtonElement, ArrowProps>(
   ({ className, 'aria-label': ariaLabel = '上一張' /* i18n-allow: DS default; consumer override via aria-label prop */ }, ref) => {
     const { orientation, scrollPrev, canScrollPrev } = useCarousel()

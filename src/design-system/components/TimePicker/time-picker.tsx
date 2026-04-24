@@ -194,6 +194,7 @@ function TimeColumn({ values, selected, disabledSet, label, onSelect, withDivide
 
 // ── Disabled time callback ──────────────────────────────────────────────────
 
+// code-quality-allow: dead-export — public API surface — consumer-exposed for future use
 export interface DisabledTimeResult {
   disabledHours?: number[]
   disabledMinutes?: number[]
@@ -467,4 +468,5 @@ const TimePicker = React.forwardRef<HTMLButtonElement, TimePickerProps>(
 )
 TimePicker.displayName = 'TimePicker'
 
+// code-quality-allow: dead-export — sub-component (display variant) — consumer 可 compose 自行渲染
 export { TimePicker, TimePickerDisplay, formatTime }

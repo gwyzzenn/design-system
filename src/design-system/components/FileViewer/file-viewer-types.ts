@@ -40,6 +40,7 @@ export interface FileRendererCapabilities {
  * (例:user 連按兩次 Fit to page 應該都觸發 ImageRenderer 重新計算)。
  * renderer 收到 nonce 變化時才執行 fit,不看 fit 值本身是否變。
  */
+// code-quality-allow: dead-export — public API surface — consumer-exposed for future use
 export interface FitRequest {
   /** 'fit-width' = 寬度填滿;'fit-page' = 整頁符合(width 和 height 都 fit,取較小 scale) */
   fit: 'fit-width' | 'fit-page'

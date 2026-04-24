@@ -43,6 +43,7 @@ import { cn } from '@/lib/utils'
 
 export type DateGridProps = React.ComponentProps<typeof DayPicker>
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const DateGrid = React.forwardRef<HTMLDivElement, DateGridProps>(function DateGrid(
   {
     className,

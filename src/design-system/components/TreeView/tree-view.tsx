@@ -65,9 +65,11 @@ const CONTEXT_PX_VAR: Record<TreeContext, string> = {
 }
 
 /** Drag drop position — 拖放目標的三種位置 */
+// code-quality-allow: dead-export — public event/state type — consumer event handler parameter type
 export type DropPosition = 'before' | 'after' | 'inside'
 
 /** onDragEnd callback 的參數 */
+// code-quality-allow: dead-export — public event/state type — consumer event handler parameter type
 export interface TreeDragEndEvent {
   /** 被拖曳的 node id */
   sourceId: string
@@ -199,6 +201,7 @@ export interface TreeViewProps extends Omit<React.HTMLAttributes<HTMLDivElement>
   'aria-label'?: string
 }
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
   (
     {
@@ -487,6 +490,7 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeViewProps>(
       isKeyboardRef.current = false
     }, [])
 
+    // code-quality-allow: long-function — helper fn 結構緊密,拆 sub-fn 會跨 fn 傳 state 反而複雜
     const handleKeyDown = React.useCallback(
       (e: React.KeyboardEvent) => {
         isKeyboardRef.current = true

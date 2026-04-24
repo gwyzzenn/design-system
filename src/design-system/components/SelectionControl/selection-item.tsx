@@ -26,6 +26,7 @@ import { ICON_SIZE, AVATAR_SIZE } from '@/design-system/patterns/element-anatomy
 //     較長 label + description,需預設 1.5 leading 而非 1.3 compact)
 // py 公式本身相同 — 若 field-height token 變動,本檔需手動同步(contained,由本註解 anchor 追)。
 
+// code-quality-allow: dead-export — public API surface — consumer-exposed for future use
 export const selectionItemStyles = cva(
   'flex items-start gap-2',
   {

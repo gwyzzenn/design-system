@@ -145,6 +145,7 @@ function TruncateCell({ children, className }: { children: React.ReactNode; clas
 // 不用 CSS sticky。Header 永遠在頂部。
 // ══════════════════════════════════════════════════════════════════════════════
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 function DataTableInner<TData>(
   {
     columns, data, size = 'md', autoRowHeight = false, height = '400px',

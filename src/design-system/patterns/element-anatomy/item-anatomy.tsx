@@ -1,3 +1,4 @@
+// code-quality-allow: file-size — foundational SSOT for Family 1+2 row primitives + all item-anatomy helpers(ItemContent / ItemIcon / ItemPrefix / ItemSuffix / ItemInlineAction 等),拆檔會讓 primitive 跨檔 import 滿天飛
 import * as React from "react"
 import type { LucideIcon } from "lucide-react"
 import { cva } from "class-variance-authority"
@@ -104,6 +105,7 @@ export function getUniformPrefixSlotStyle(size: RowSize): React.CSSProperties {
  * 規則:icon size + 2px(每邊 +1px,用 absolute positioning 溢出不影響排版)。
  * 對齊 `item-anatomy.spec.md`「Inline Action 設計規格」節。
  */
+// code-quality-allow: dead-export — public constant — DS API surface,consumer 可引(即使當前 internal-only)
 export const INLINE_ACTION_HOVER_BG_SIZE: Record<RowSize, number> = {
   sm: 18,
   md: 18,
@@ -199,6 +201,7 @@ ItemPrefix.displayName = "ItemPrefix"
  * gap 用 `var(--item-gap-label-desc)` token;font-size 用 token-awareness
  * (`var(--font-caption-size)` / `var(--font-body-size)`)。改 token → 公式同步。
  */
+// code-quality-allow: long-function — cva variant/styles table — 拆 fn 會失去 type inference + 跨 fn 傳 config 反而難讀
 export const itemPrefixAlignVariants = cva(
   "flex items-center gap-2 shrink-0",
   {
@@ -326,6 +329,7 @@ export interface ItemContentProps extends Omit<React.HTMLAttributes<HTMLDivEleme
   descriptionClassName?: string
 }
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 export const ItemContent = React.forwardRef<HTMLDivElement, ItemContentProps>(
   (
     {

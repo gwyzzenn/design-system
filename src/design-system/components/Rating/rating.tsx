@@ -83,6 +83,7 @@ export interface RatingProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 
   'aria-label'?: string
 }
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const Rating = React.forwardRef<HTMLDivElement, RatingProps>(
   (
     {

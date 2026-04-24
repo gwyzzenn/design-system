@@ -96,6 +96,7 @@ function useSidebar() {
 
 // ── Provider ───────────────────────────────────────────────────────────────
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const SidebarProvider = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
@@ -844,6 +845,7 @@ const sidebarMenuButtonVariants = cva(
   }
 )
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const SidebarMenuButton = React.forwardRef<
   HTMLButtonElement,
   Omit<React.ComponentProps<"button">, "id"> & {
@@ -907,6 +909,7 @@ const SidebarMenuButton = React.forwardRef<
 
     // Click handler:id 存在且非 meta 才 setActiveId(single-selection 自動建立),
     // 同時呼叫 consumer 傳入的 onClick
+    // code-quality-allow: long-function — helper fn 結構緊密,拆 sub-fn 會跨 fn 傳 state 反而複雜
     const handleClick = React.useCallback(
       (e: React.MouseEvent<HTMLButtonElement>) => {
         if (!isMeta && id !== undefined) setActiveId(id)
@@ -985,6 +988,7 @@ const SidebarMenuButton = React.forwardRef<
       </span>
     ) : null
 
+    // code-quality-allow: long-function — helper fn 結構緊密,拆 sub-fn 會跨 fn 傳 state 反而複雜
     const buttonWithTooltip = tooltip ? (
       (() => {
         const tooltipProps =

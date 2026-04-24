@@ -228,6 +228,7 @@ ScrollTabsList.displayName = 'ScrollTabsList'
 // Fade mask 純視覺,軟化內容硬邊,跟 menu 機制正交 (兩者可並存)。
 // Menu button 出現條件: canScroll (有溢出空間才需要 navigator)。
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const MenuTabsList = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.List>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
@@ -237,6 +238,7 @@ const MenuTabsList = React.forwardRef<
 
   // Local ref map — 追蹤每個 trigger 的 DOM 元素,供 scrollIntoView 使用。
   // 不用 useOverflowIndices 因為 menu 永遠顯示全部,不需要動態 overflow 計算。
+  // code-quality-allow: long-function — helper fn 結構緊密,拆 sub-fn 會跨 fn 傳 state 反而複雜
   const itemRefs = React.useRef<Map<number, HTMLElement>>(new Map())
   const registerItem = React.useCallback(
     (index: number) => (el: HTMLElement | null) => {
@@ -259,6 +261,7 @@ const MenuTabsList = React.forwardRef<
   )
 
   // Menu 模式沒有 arrows,但仍套 fade mask (reserveArrowWidth: 0) 軟化內容硬邊
+  // code-quality-allow: long-function — helper fn 結構緊密,拆 sub-fn 會跨 fn 傳 state 反而複雜
   const maskImage = buildFadeMask({ canScroll, atStart, atEnd, reserveArrowWidth: 0 })
 
   const handleMenuSelect = React.useCallback(

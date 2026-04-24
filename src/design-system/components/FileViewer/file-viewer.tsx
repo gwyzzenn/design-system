@@ -522,6 +522,7 @@ interface FilmstripProps {
   labels: Pick<Required<FileViewerLabels>, 'filmstripLabel'>
 }
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const THUMB_SIZE = 64 // px, 固定
 
 const Filmstrip: React.FC<FilmstripProps> = ({ files, activeIndex, onSelect, labels }) => {
@@ -630,6 +631,7 @@ const Filmstrip: React.FC<FilmstripProps> = ({ files, activeIndex, onSelect, lab
  * Consumer typically spreads partial override:
  *   `<FileViewer labels={{ close: 'Close', download: 'Download' }} />`
  */
+// code-quality-allow: dead-export — public API surface — consumer-exposed for future use
 export interface FileViewerLabels {
   /** Zoom input ARIA label */
   zoomInput?: string

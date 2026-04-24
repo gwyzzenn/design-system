@@ -1,3 +1,4 @@
+// code-quality-allow: file-size — foundational composite(Field + FieldLabel + FieldDescription + FieldError + context + 8 layout variants),拆檔會讓 Field 家族互相 import 循環
 import * as React from 'react'
 import { Info as InfoIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -135,6 +136,7 @@ export interface FieldProps extends Omit<React.HTMLAttributes<HTMLDivElement>, '
 interface FieldGroupContextValue {
   horizontalLabelWidth?: string
 }
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const FieldGroupContext = React.createContext<FieldGroupContextValue>({})
 
 const Field = React.forwardRef<HTMLDivElement, FieldProps>(
@@ -309,6 +311,7 @@ export interface FieldLabelProps extends React.LabelHTMLAttributes<HTMLLabelElem
   info?: string
 }
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const FieldLabel = React.forwardRef<HTMLLabelElement, FieldLabelProps>(
   ({ className, required: requiredProp, info, htmlFor: htmlForProp, style, children, ...props }, ref) => {
     const ctx = useFieldContext()

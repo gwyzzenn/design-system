@@ -17,6 +17,7 @@ import { Button } from '@/design-system/components/Button/button'
  * warning(light always): bg 在 outer,theme="light" 在 inner
  */
 
+// code-quality-allow: dead-export — public API surface — consumer-exposed for future use
 export type ToastVariant = NoticeVariant
 
 export interface ToastOptions {

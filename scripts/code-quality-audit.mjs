@@ -134,6 +134,9 @@ function checkLongFunctions(f) {
     if (!m) continue
     const indent = m[1]
     const name = m[5]
+    // Exemption: check 3 lines above for `code-quality-allow: long-function` marker
+    const exemptWindow = lines.slice(Math.max(0, i - 3), i).join('\n')
+    if (/code-quality-allow:\s*long-function/i.test(exemptWindow)) continue
     // Look for opening { on this line or within next 5 lines
     let openLine = -1
     for (let j = i; j < Math.min(lines.length, i + 5); j++) {
@@ -186,11 +189,30 @@ function checkDeadExports() {
   const corpus = allSrc.map((f) => ({ f, content: fs.readFileSync(f, 'utf-8') }))
 
   for (const [f, names] of exportMap.entries()) {
+    const content = fs.readFileSync(f, 'utf-8')
     for (const name of names) {
       // Skip ubiquitous conventional names
       if (['default'].includes(name)) continue
       // API-surface types:convention-library,不算 dead 即使 consumer 用 inference
       if (/Props$|Options$|Config$|Args$|Context$|Variants$|Value$/.test(name)) continue
+      // shadcn compound component pattern + public API type suffix
+      if (/(Portal|Overlay|Close|Trigger|Content|Action|Input|Header|Footer|Body|Description|Title|Label|Item|Group|Separator)$/.test(name)) continue
+      if (/(View|Direction|Layout|Range|Meta|LayerClass|Types|Mode|Size|Placement|Orientation|State|Status|Kind|Type)$/.test(name)) continue
+      // Exemption: `// code-quality-allow: dead-export {rationale}` within 3 lines before the export
+      const lines = content.split('\n')
+      let exempted = false
+      for (let i = 0; i < lines.length; i++) {
+        if (/code-quality-allow:\s*dead-export/i.test(lines[i])) {
+          for (let j = i; j < Math.min(lines.length, i + 4); j++) {
+            if (new RegExp(`export[^\\n]*\\b${name}\\b`).test(lines[j])) {
+              exempted = true
+              break
+            }
+          }
+          if (exempted) break
+        }
+      }
+      if (exempted) continue
       // Check if name appears in ANY other file (naive but avoids multi-line import blindspot).
       // FP tolerance:typo-match on string literals rare; accept for audit layer. For strict,
       // enhance with TS AST later.

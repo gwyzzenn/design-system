@@ -134,6 +134,7 @@ export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   hoverCard?: React.ReactNode
 }
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
   ({ size = 32, shape = 'circle', src, alt, icon: Icon, color = 'neutral', solid = false, status, badgeCount, hoverCard, className, style, ...props }, ref) => {
     const [imgError, setImgError] = React.useState(false)

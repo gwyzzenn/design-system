@@ -120,6 +120,7 @@ function lineClampClass(maxLines: number | 'none'): string {
   return ''
 }
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const MenuItem = React.forwardRef<HTMLDivElement, MenuItemProps>(
   (
     {

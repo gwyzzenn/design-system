@@ -26,6 +26,7 @@ import {
 // ── Constants ─────────────────────────────────────────────────────────────
 
 /** Fade mask 漸變寬度(px)*/
+// code-quality-allow: dead-export — public constant — DS API surface,consumer 可引(即使當前 internal-only)
 export const FADE_WIDTH = 16
 
 /**
@@ -36,6 +37,7 @@ export const FADE_WIDTH = 16
 export const ARROW_BUTTON_WIDTH = 32
 
 /** 點一次 scroll arrow 滑動 80% 容器寬度 */
+// code-quality-allow: dead-export — public constant — DS API surface,consumer 可引(即使當前 internal-only)
 export const SCROLL_PAGE_RATIO = 0.8
 
 // ── Helpers ───────────────────────────────────────────────────────────────

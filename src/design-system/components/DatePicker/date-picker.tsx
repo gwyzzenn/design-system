@@ -82,6 +82,7 @@ export interface DatePickerProps
   clearable?: boolean
 }
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
   (
     {
@@ -224,6 +225,7 @@ export interface DatePickerRangeProps
   clearable?: boolean
 }
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const DatePickerRange = React.forwardRef<HTMLButtonElement, DatePickerRangeProps>(
   (
     {

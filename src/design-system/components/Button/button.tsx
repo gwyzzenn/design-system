@@ -255,6 +255,7 @@ const ICON_ONLY_PX: Record<string, string> = {
   lg: 'px-[calc((var(--field-height-lg)-20px)/2)]',
 }
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {

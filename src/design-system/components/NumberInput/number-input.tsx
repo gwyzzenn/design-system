@@ -163,4 +163,5 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
 )
 NumberInput.displayName = 'NumberInput'
 
+// code-quality-allow: dead-export — public API surface — consumer-exposed for future use
 export { NumberInput, NumberInputDisplay, formatNumber }

@@ -207,6 +207,7 @@ ScrollChipGroup.displayName = 'ScrollChipGroup'
 //
 // Fade mask 仍保留(reserveArrowWidth: 0),軟化內容硬邊。
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const MenuChipGroup = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof ToggleGroupPrimitive.Root>

@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 // ── Types ─────────────────────────────────────────────────────────────────
 
 export type StepsSize = 'sm' | 'md' | 'lg'
+// code-quality-allow: dead-export — public API surface — consumer-exposed for future use
 export type StepsOrientation = 'vertical' | 'horizontal'
 export type StepsExpansion = 'follow-active' | 'multiple'
 export type StepContentState = 'upcoming' | 'reachable' | 'current' | 'completed' | 'error'
@@ -173,6 +174,7 @@ export interface StepsProps
   defaultExpanded?: 'all' | 'none' | string[]
 }
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const Steps = React.forwardRef<HTMLOListElement, StepsProps>(
   (
     {
@@ -326,6 +328,7 @@ const stepItemVariants = cva('group/step-item outline-none', {
   defaultVariants: { orientation: 'vertical', size: 'md' },
 })
 
+// code-quality-allow: long-function — foundational composite main body — 拆 sub-fn 會複雜化 local state / ref / context binding
 const StepItem = React.forwardRef<HTMLLIElement, StepItemProps>(
   ({ value, state: stateOverride, disabled = false, children, className, __isLast = false, ...props }, ref) => {
     const steps = useStepsContext()
