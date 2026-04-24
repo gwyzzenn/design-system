@@ -136,7 +136,7 @@ Governance 自身遵循 SSOT + anti-bloat。**寫新規則前先決定放哪個 
 
 **行數預算**(hook 攔):CLAUDE.md 400(過渡 800,收斂 deadline 2026-07-24)/ spec 300(過渡 500,**foundational SSOT 類 800**)/ SKILL 250(過渡 400)/ memory 100。
 
-**Foundational SSOT 例外**(cap 800,頂部必宣告 rationale):`item-anatomy.spec.md`(Family 1+2 SSOT,super-foundational **cap 1200** approved 2026-04-24)/ `color.spec.md`(token SSOT)/ `sidebar.spec.md` / `tree-view.spec.md`(獨立 cva SSOT)。
+**Foundational SSOT 例外**(cap 800,頂部必宣告 rationale):`item-anatomy.spec.md`(Family 1+2,**cap 1200** 2026-04-24)/ `color.spec.md`(token)/ `sidebar.spec.md` / `tree-view.spec.md`(獨立 cva)/ `field.spec.md`(表單 layout container)/ `field-controls.spec.md`(Family 4 layout)/ `button.spec.md`(Family 3 pill)/ `overlay-surface.spec.md`(Dialog/Sheet/Popover structure)/ `action-bar.spec.md`(operations/utilities 角色)/ `uiSize.spec.md`(尺寸 token SSOT)— 共 10 檔(2026-04-25)。
 
 ## 加規則前必過 3 題
 

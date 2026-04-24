@@ -1,5 +1,8 @@
 # UiSize 設計原則
 
+> **Foundational SSOT rationale**(cap 800,2026-04-25 approved):
+> 尺寸 token SSOT。定義 field-height family `md` default / chrome-header 選型 decision tree(fixed-h vs padding-based + 8 家對照)/ icon-only `calc` 公式。Button / Input / Select / Checkbox / Slider / Tabs 等皆消費,scope 本質 > 單一 token 檔。
+
 元件高度的語義 token，rem 單位。透過 `data-density`（或 `data-ui-size`）切換。
 
 ## Field Height

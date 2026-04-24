@@ -1,5 +1,8 @@
 # Overlay Surface 設計原則
 
+> **Foundational SSOT rationale**(cap 800,2026-04-25 approved):
+> Dialog / Sheet / Popover / Coachmark / HoverCard 等 overlay 元件 structure 跨 pattern SSOT。定義 SurfaceHeader / SurfaceBody / SurfaceFooter sub-components + v5 `data-unbounded` slot trick + padding-based header canonical + dismiss size canonical。多 overlay 元件消費,scope 本質 > 單一 pattern。
+
 ## 定位
 
 Dialog 和 Popover 的**結構化 sub-components 共用 primitive**——提供 Header / Body / Footer 的統一 padding + 分隔線語言。本 pattern 是 **SSOT**,Dialog 與 Popover 不自寫 padding token。

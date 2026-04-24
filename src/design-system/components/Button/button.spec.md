@@ -39,6 +39,9 @@ related:
   SSOT-anchor: "button.spec.md → Pill Layout(Family 3 SSOT)"
 ---
 
+> **Foundational SSOT rationale**(cap 800,2026-04-25 approved):
+> Family 3 (Pill Layout) SSOT owner。SegmentedControlItem / Chip / Tag 繼承 Pill 結構;Dismiss canonical(X icon 色處理)cascade 到全 DS inline actions;Button sm/md/lg 與 Field sm/md/lg size pairing 是系統級 invariant。scope 本質 > 單一元件。
+
 # Button 設計原則
 
 ## 定位

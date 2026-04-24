@@ -1,5 +1,8 @@
 # Action Bar 設計原則
 
+> **Foundational SSOT rationale**(cap 800,2026-04-25 approved):
+> 跨 pattern operations / utilities 角色系統 SSOT。Toolbar / DataTable / FileViewer / Dialog 等 action region 皆消費本 spec 的 overflow mechanics / section divider rules / primary 位置 / danger placement。scope 本質 > 單一 pattern。
+
 ## 定位
 
 操作列（Action Bar）是在有限空間內組合多個操作的排列模式，涵蓋 Toolbar、卡片操作列、對話框操作區等場景。
