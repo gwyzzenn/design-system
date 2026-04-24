@@ -18,9 +18,9 @@
 
 | # | Meta-Principle | 能吸收的 bug 類型(舉例,非窮舉) |
 |---|---|---|
-| **M1** | **視覺決策前必消費 SSOT**(元件 / token / pattern / spec)。強制跑 `# SSOT 消費 canonical` 清單,沒列出 = 自創。 | 自發明 `variant="bare"` / Dismiss 用 Button(未用 ItemInlineAction)/ Sheet 表單 gap 沒用 layout-space token / Header 高度沒用 `--chrome-header-height` / Row 沒用 item-anatomy / Toolbar 按鈕群 gap 不對齊 action-bar canonical |
+| **M1** | **視覺決策前必消費 SSOT**(元件 / token / pattern / spec)。強制跑 `# SSOT 消費 canonical` 清單,沒列出 = 自創。 | 自發明 `variant="bare"` / Sheet 表單 gap 沒用 layout-space token / Header 高度沒用 `--chrome-header-height` / Row 沒用 item-anatomy / Toolbar 按鈕群 gap 不對齊 action-bar canonical(Dismiss Button/Inline Action 分界走 item-anatomy「Predicate」SSOT) |
 | **M2** | **消費 3rd-party lib 必驗 rendered DOM**(不信 docs)。任何 `[&\[data-...\]]:` attribute selector 針對第三方元件前,inspect 真實 DOM 有無該 attribute。Library API(fit / zoom / wheel step)先寫 3 行 POC 驗證行為,再寫到元件裡。 | react-day-picker `data-range-*` 不存在 / react-zoom-pan-pinch fit-to-page 算錯(混淆 object-contain 和 transform scale)/ wheel step 10% 太粗 / 未來任何 lib 升級 silent breakage |
-| **M3** | **Portal 逃逸 subtree context**(theme / density / provider)。任何 overlay 元件(DropdownMenu / Popover / Dialog)走 Portal 到 document body,**不繼承觸發點的 subtree attribute**;必顯式 forward `data-theme` / `data-density` / context。 | DropdownMenu 在 dark subtree 變亮 / Tooltip 在 lg density 變 md / 未來任何 Portal 元件的 subtree drift |
+| **M3** | **Portal 逃逸 subtree context**(theme / density / provider)。任何 overlay 元件(DropdownMenu / Popover / Dialog)走 Portal 到 document body,**不繼承觸發點的 subtree attribute**;顯式 forward `data-theme`;`data-density` 部分 overlay 刻意 lock `md`(詳 `density.spec.md`)。 | DropdownMenu 在 dark subtree 變亮 / 未來任何 Portal 元件的 subtree drift |
 | **M4** | **`_Group` 元件必隔離單 item 的 fieldCtx**。當 Group 元件(CheckboxGroup / RadioGroup / SwitchGroup)包在 Field 內,其 child items **不可共用 fieldCtx.id / fieldCtx.hasFieldWrapper**;Group 必建自己的 Context 告訴 items「你在 group 裡」。 | Checkbox 在 CheckboxGroup 內所有 label 抑制(bug)/ 所有 item 共用 id 點擊只 toggle 第一個 / 未來任何 Group 類相同模式 |
 | **M5** | **視覺 canonical 必 spec 聲明所有 state 疊加組合**。單一 state(today / selected / hover / disabled)有視覺定義不夠;**所有兩兩疊加、三疊加組合也要在 spec 有明文**。 | DatePicker `today + selected` bar 色隱形(藍 bar 在藍底)/ `hover + disabled` ring 仍顯示 / `range + today` 指示器重疊 / 未來任何新 state 上線 |
 | **M6** | **Stakeholder-visible 產出 → 強制進階稽核才出稿**(不是 merge 後補)。任何「有視覺可以給 stakeholder 看」的產出(新元件 / 元件新功能 / 新產品頁 / 比稿)**必過進階完整稽核**(6 維 + 全截圖視覺驗證)。日常 dev 可用高效模式,stakeholder gate 不可。 | FileViewer 初版不看 action-bar spec / button 間距錯 / dismiss 用 Button / header 沒 token / 視覺不整齊上給人看 |
@@ -803,7 +803,7 @@ Internal primitive vs public-facing 元件的分類 test 見 `components/README.
 **規則**:任何新 slot(status indicator / inline action / hover-swap button)放進既有 flex row 之前,**必須**執行以下 3 步 mechanical check,不可憑直覺:
 
 1. **grep 該行既有 interactive slot 的 box 尺寸**:
-   - 先讀 row host 元件的 spec(例:FileItem spec line 100「用 Button 非 Inline Action」+ line 107「compact=xs 24 / rich=sm 28」)
+   - 先讀 row host 元件的 spec(例:FileItem rich row=56 用 Button xs 24 固定 / compact row=24 用 Inline Action — 依 item-anatomy「≤24 cap」canonical)
    - grep 該 row 的 stories 看 consumer 實際傳什麼 Button/action
 2. **新 slot 的 box 尺寸 = 既有 slot 尺寸**(嚴格相等,不是「差不多」):
    - 不同:`gap-*` token 會被 overflow / overshoot 吃掉,實際視覺 gap 不等於宣告值
@@ -813,7 +813,7 @@ Internal primitive vs public-facing 元件的分類 test 見 `components/README.
    - 例:`ItemInlineActionButton` 的 16 px box + 24 px hover-bg overflow → hover 時視覺變寬,`gap-2`(8 px) 實際剩 ~4 px
 
 **失敗案例(作為記憶 anchor)**:
-- 2026-04-19 FileItem status-slot hover-swap:原本用 `ItemInlineActionButton` 16 px(不符 spec line 100「用 Button」),hover-bg 24 px overflow 吃掉 4 px `gap-2`,造成 status ↔ delete 實際 gap 變 ~4 px 違反 8 px 規格。修法:改用 Button 同 consumer size(compact xs 24 / rich sm 28),slot 容器等同 Button 尺寸。
+- 2026-04-19 FileItem status-slot hover-swap:原本用 `ItemInlineActionButton` 16 px(不符 spec「rich 用 Button」),hover-bg 24 px overflow 吃掉 4 px `gap-2`,造成 status ↔ delete 實際 gap 變 ~4 px 違反 8 px 規格。修法 2026-04-22 後對齊 ≤24 cap canonical:rich row=56 用 Button xs 24 / compact row=24 用 Inline Action。
 
 **世界級 DS 的幾何鐵律**:同 flex 列的互動元素統一 box 尺寸,gap token 才能如實呈現——這是跨元件治理層的不變量,不是元件內部細節。
 
