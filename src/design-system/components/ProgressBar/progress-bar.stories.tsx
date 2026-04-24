@@ -36,7 +36,7 @@ export const Default: Story = {
   args: { value: 45, status: 'inProgress', affix: 'value' },
   render: (args) => (
     <div className="w-[360px]">
-      <ProgressBar {...args} />
+      <ProgressBar {...args} aria-label="進度 45%" />
     </div>
   ),
 }

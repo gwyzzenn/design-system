@@ -110,11 +110,13 @@ const FileItem = React.forwardRef<HTMLDivElement, FileItemProps>(
     // 消費 ProgressBar 元件(SSOT);不再自 roll bar。
     // height override:compact mode 用 2px(極密集 row layout),rich mode 用預設 4px。
     // 這是 ProgressBar `height` prop 的唯一合法 consumer(見 progress-bar.tsx docblock)。
+    // a11y(2026-04-25 axe aria-progressbar-name):aria-label 用 file name 作 context。
     const progressBar = hasStatus ? (
       <ProgressBar
         value={progressWidth}
         status={PROGRESS_STATUS_MAP[status!]}
         height={isRich ? undefined : 2}
+        aria-label={`${name} 上傳進度`}
       />
     ) : null
 

@@ -34,8 +34,8 @@ export const Default: Story = {
           不 parallel 展示多 sizes 因為 DS 不「提供各種 sizes」讓 consumer 挑,而是透過原則
           在 consumer 端自動決定(見 spec.md「Size canonical」)。 */}
       <CircularProgress />
-      <CircularProgress value={60} />
-      <CircularProgress value={90} affix="value" />
+      <CircularProgress value={60} aria-label="進度 60%" />
+      <CircularProgress value={90} affix="value" aria-label="進度 90%" />
     </div>
   ),
 }
