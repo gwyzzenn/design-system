@@ -17,13 +17,11 @@ System prompt body — agent 收到 prompt + 本檔內容 作為 context。
 
 **vs 一般 general-purpose Agent**:registered agent 有 scoped tools(不能亂改檔)+ 特化 system prompt(專業知識內建)+ 更易 audit。
 
-## 當前居民(3 pilot,2026-04-24)
+## 當前居民(0,2026-04-24 retired)
 
-| Agent | 消費者 | Scoped tools |
-|-------|--------|-------------|
-| `ds-dim-auditor` | `/design-system-audit` Phase 1(22-dim parallel scan) | Read / Grep / Glob(**禁 Write**)|
-| `visual-auditor` | `/visual-audit` / `/component-quality-gate` Phase 4.5 Layer B | Read / Bash / Grep |
-| `baseline-matrix-builder` | `/baseline-audit` / `/design-system-audit` P1 prerequisite | Read / Grep / Glob(**禁 Write**)|
+**原 6 個 pilot agents(ds-dim-auditor / visual-auditor / baseline-matrix-builder / governance-health-analyst / performance-auditor / ux-auditor)已 retire 2026-04-24**:Claude Code runtime 此版本不 surface project-level agents 到 `subagent_type` 參數(try invoke 得 "Agent type not found" error)。Skills 改用 `subagent_type: 'Explore'`(built-in)+ dim-specific prompt 達到同效。
+
+Dir 保留 + 本 charter 保留 — 等未來 Claude Code runtime 支援 project agents 再重建。
 
 ## 這裡**不收**(反例)
 
@@ -52,7 +50,8 @@ System prompt body — agent 收到 prompt + 本檔內容 作為 context。
         → NO: 用 skill 或 command
 ```
 
-## 本 pilot 的 rationale(2026-04-24)
+## 本 pilot 的 rationale(2026-04-24)→ 已 retire
 
-User 提問:`/design-system-audit` 22 dim audit 把 findings 都擠進 main context = pollution。但 audit 又有 user CP(P2 triage)→ 不能全移 agent。
-**解法**:skill 保留 CP 流程,但 skill Phase 1 內部 parallel 調 sub-agent 改用 registered `ds-dim-auditor`(scoped tools,更乾淨 return summary),user UX 不變但 backend 升級。
+原設計意圖:skill 保留 CP 流程,內部 parallel 調 scoped-tools sub-agent 減 main context pollution。Retire 原因:runtime 限制 — project agents 未 surface 到 Agent tool 的 `subagent_type` enum。
+
+**current workaround**:skill 改用 `subagent_type: 'Explore'`(built-in,Read/Grep/Glob/Bash/WebFetch 已可滿足 audit 類工作),加 `thoroughness` 參數 + dim-specific prompt 達到同效。

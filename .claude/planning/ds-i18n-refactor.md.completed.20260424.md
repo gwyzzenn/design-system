@@ -1,9 +1,9 @@
 # DS i18n Refactor — 40 hardcoded CJK label locations
 
-**Status**: Planned, not started(2026-04-24 by `check_hardcoded_strings.sh` 首跑發現)
+**Status**: ✅ **Shipped**(2026-04-24 Route A,commits `3e64129` + `b56d0f3`)
 **Goal**: DS primitives 的內建 CJK 預設文案走系統化 i18n 路徑(prop override / provider / i18n lib),consumer 換語言時**零 fork DS**
-**Estimated scope**: 2-3 天 focused(40 locations × 決策 + 改 prop signature + consumer 測試)
-**開工 trigger**: user 說「做 i18n / DS 要支援多語 / 開工 i18n-refactor」
+**Executed scope**: Route A — 7 form primitives 加 prop override + 12 inline action 加 `// i18n-allow` 標記 + FileViewer labels object + hook v2 block-level 支援
+**Future Route B trigger**(若要升級 i18n Provider): user 說「升級到 i18n Provider / DS 要發 npm package」
 
 ## 背景
 
