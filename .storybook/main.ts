@@ -5,9 +5,22 @@ const config: StorybookConfig = {
   stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
   
   addons: [
-    "@storybook/addon-essentials", // 核心：包含 Controls, Actions, Viewport 等
-    "@storybook/addon-a11y",         // 無障礙檢查 (對設計系統很重要)
+    // essentials 含 Controls, Actions, Viewport, Backgrounds, **Measure**(Alt+hover 顯示
+    // spacing / margin / padding / border pixel overlay,類 Figma Dev Mode 的 spacing inspector),
+    // Highlight, Toolbars, Docs。
+    // **Outline disabled**(user 2026-04-24 判定 outline / grid 類 addon 對 DS audit 沒實際用)。
+    {
+      name: "@storybook/addon-essentials",
+      options: { outline: false },
+    },
+    "@storybook/addon-a11y",         // 無障礙檢查(對 DS 很重要)
     "@storybook/addon-docs",         // 自動生成文件
+    // pseudo-states:強制觸發 `:hover / :focus / :active / :disabled / :visited` 視覺 —
+    // 類 Figma prototype interactions,audit / stakeholder review 必裝。
+    "storybook-addon-pseudo-states",
+    // addon-html:選了元件後在右側 panel 看 rendered HTML + 套用的 className list,
+    // 是 Figma Dev Mode「點元件看 code」最接近的 Storybook 等效。
+    "@whitespace/storybook-addon-html",
   ],
 
   framework: {
