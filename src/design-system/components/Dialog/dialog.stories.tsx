@@ -201,15 +201,16 @@ export const LongContent = {
               item 用 Family 2 reading mode(prefix Avatar 40 + content title+description)
               對應 user Image #16 期望 + overlay-surface.spec.md 規則 3.1 hover bg context 判斷 */}
           <DialogBody variant="list">
-            <div className="flex flex-col">
+            <div role="list" className="flex flex-col">
               {members.map((m, i) => (
                 // item-anatomy Family 2:[prefix Avatar 40] [content: title + description(--item-gap-label-desc-scanning gap)]
                 // `px-2 rounded-md` → content(avatar / text)在 hover bg 內有 8px breathing
                 // (非背景元素不可直接觸 affordance bg 邊 — 真實 invariant,對齊 Material / Polaris 世界級)
                 // description 色 = text-fg-secondary(neutral-8);separator = full-width 「｜」
-                <button
+                <div
                   key={m.empNum}
-                  className="flex items-center gap-3 py-2 px-[var(--layout-space-loose)] rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left"
+                  role="listitem"
+                  className="flex items-center gap-3 py-2 px-[var(--layout-space-loose)] rounded-md hover:bg-neutral-hover"
                 >
                   {/* Person avatar canonical:hover 必出現 NameCard(DS-wide rule,見 avatar.spec.md)
                       世界級 Slack / Figma / Linear / Notion 的 person avatar 全預設 hover → profile popover */}
@@ -239,7 +240,7 @@ export const LongContent = {
                       {roles[i % roles.length]}｜{m.empId}｜{m.empNum}
                     </span>
                   </div>
-                </button>
+                </div>
               ))}
             </div>
           </DialogBody>
@@ -310,7 +311,7 @@ export const ListBody = {
             <DialogTitle>成員列表</DialogTitle>
           </DialogHeader>
           <DialogBody variant="list">
-            <div className="flex flex-col">
+            <div role="list" className="flex flex-col">
               {[
                 { name: 'Alan Chen', role: 'Design', empId: 'D-0042', empNum: 'EMP-1001' },
                 { name: 'Betty Wu', role: 'Engineering', empId: 'E-0183', empNum: 'EMP-1002' },
@@ -320,9 +321,10 @@ export const ListBody = {
                 { name: 'Fiona Lin', role: 'Design', empId: 'D-0098', empNum: 'EMP-1006' },
               ].map((m, i) => (
                 // variant="list" canonical v3:item `px-2 rounded-md` → content 在 hover bg 內有 breathing
-                <button
+                <div
                   key={m.empNum}
-                  className="flex items-center gap-3 py-2 px-[var(--layout-space-loose)] rounded-md hover:bg-neutral-hover focus-visible:bg-neutral-hover focus-visible:outline-none text-left"
+                  role="listitem"
+                  className="flex items-center gap-3 py-2 px-[var(--layout-space-loose)] rounded-md hover:bg-neutral-hover"
                 >
                   {/* Person avatar canonical:hover 必出現 NameCard */}
                   <Avatar
@@ -351,7 +353,7 @@ export const ListBody = {
                       {m.role}｜{m.empId}｜{m.empNum}
                     </span>
                   </div>
-                </button>
+                </div>
               ))}
             </div>
           </DialogBody>
@@ -380,7 +382,7 @@ export const ListBody = {
             <DialogTitle>選擇標籤</DialogTitle>
           </DialogHeader>
           <DialogBody variant="list">
-            <div className="flex flex-col">
+            <div role="list" className="flex flex-col">
               {['Bug', 'Feature', 'Improvement', 'Research', 'Documentation', 'Refactor', 'Test'].map((t) => (
                 // 小 item 純文字 label → 用 **MenuItem** primitive(世界級 Linear Cmd+K / Polaris OptionList
                 // / Atlassian Modal+Menu 共通 pattern:menu-like 內容在 dialog 內用 menu primitive)
