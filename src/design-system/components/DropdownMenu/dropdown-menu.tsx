@@ -447,8 +447,8 @@ export const dropdownMenuMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
+    bg: ['bg-neutral-hover', 'bg-surface-raised', 'bg-transparent'],
+    fg: ['text-fg-disabled', 'text-fg-muted'],
     ring: [],
   },
 } as const

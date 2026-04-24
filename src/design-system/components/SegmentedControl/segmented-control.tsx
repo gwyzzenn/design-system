@@ -288,9 +288,9 @@ export const segmentedControlMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
-    ring: [],
+    bg: ['bg-surface'],
+    fg: ['text-fg-disabled', 'text-fg-secondary', 'text-foreground'],
+    ring: ['ring-ring'],
   },
 } as const
 

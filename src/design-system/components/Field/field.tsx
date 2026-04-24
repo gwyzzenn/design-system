@@ -514,8 +514,8 @@ export const fieldMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
+    bg: [],
+    fg: ['text-error-text', 'text-fg-disabled', 'text-fg-muted', 'text-fg-secondary', 'text-foreground'],
     ring: [],
   },
 } as const

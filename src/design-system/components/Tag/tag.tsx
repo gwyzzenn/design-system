@@ -226,8 +226,8 @@ export const tagMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
+    bg: ['bg-neutral-active', 'bg-neutral-hover', 'bg-secondary', 'bg-transparent'],
+    fg: ['text-foreground', 'text-inverse-fg'],
     ring: [],
   },
   defaultVariant: 'neutral',

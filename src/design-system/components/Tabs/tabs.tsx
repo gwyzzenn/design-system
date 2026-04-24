@@ -443,9 +443,9 @@ export const tabsMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
-    ring: [],
+    bg: ['bg-primary-hover', 'bg-transparent'],
+    fg: ['text-fg-disabled', 'text-fg-secondary', 'text-foreground'],
+    ring: ['ring-ring'],
   },
   defaultSize: 'md',
 } as const

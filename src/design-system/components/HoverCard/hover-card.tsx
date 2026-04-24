@@ -66,8 +66,8 @@ export const hoverCardMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
+    bg: ['bg-surface-raised'],
+    fg: ['--foreground'],
     ring: [],
   },
 } as const

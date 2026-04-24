@@ -175,9 +175,9 @@ export const radioGroupMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
-    ring: [],
+    bg: ['bg-disabled', 'bg-surface'],
+    fg: ['text-fg-disabled', 'text-fg-secondary', 'text-foreground', 'text-primary'],
+    ring: ['ring-ring'],
   },
   defaultSize: 'md',
 } as const

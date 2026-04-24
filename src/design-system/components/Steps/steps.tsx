@@ -840,8 +840,8 @@ export const stepsMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
+    bg: ['bg-primary'],
+    fg: ['--fg-disabled', '--foreground', '--on-emphasis', 'text-error-text', 'text-fg-disabled', 'text-fg-muted', 'text-fg-secondary', 'text-foreground'],
     ring: [],
   },
 } as const

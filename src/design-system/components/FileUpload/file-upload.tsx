@@ -312,9 +312,9 @@ export const fileUploadMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
+    bg: ['bg-neutral-hover', 'bg-primary-subtle', 'bg-surface'],
     fg: [],
-    ring: [],
+    ring: ['ring-ring'],
   },
 } as const
 

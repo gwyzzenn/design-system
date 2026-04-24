@@ -483,8 +483,8 @@ export const timePickerMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
+    bg: ['bg-neutral-hover', 'bg-primary', 'bg-transparent'],
+    fg: ['text-fg-disabled', 'text-fg-muted', 'text-foreground'],
     ring: [],
   },
 } as const

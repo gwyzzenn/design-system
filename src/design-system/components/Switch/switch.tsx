@@ -242,9 +242,9 @@ export const switchMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
-    ring: [],
+    bg: ['bg-primary'],
+    fg: ['text-fg-disabled', 'text-fg-secondary', 'text-foreground', 'text-primary'],
+    ring: ['ring-ring'],
   },
   defaultSize: 'md',
 } as const

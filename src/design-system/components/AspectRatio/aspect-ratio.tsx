@@ -48,7 +48,7 @@ export const aspectRatioMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
+    bg: [],
     fg: [],
     ring: [],
   },

@@ -110,8 +110,8 @@ export const toastMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
+    bg: ['bg-error', 'bg-info', 'bg-surface-raised', 'bg-warning'],
+    fg: ['text-foreground'],
     ring: [],
   },
 } as const

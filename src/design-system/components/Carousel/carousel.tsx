@@ -353,9 +353,9 @@ export const carouselMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
+    bg: [],
     fg: [],
-    ring: [],
+    ring: ['ring-ring'],
   },
 } as const
 

@@ -178,8 +178,8 @@ export const noticeMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
+    bg: [],
+    fg: ['text-error-text', 'text-fg-muted', 'text-fg-secondary', 'text-info-text', 'text-success-text', 'text-warning-text'],
     ring: [],
   },
 } as const

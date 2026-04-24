@@ -134,8 +134,8 @@ export const overflowIndicatorMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
+    bg: ['bg-muted'],
+    fg: ['text-foreground'],
     ring: [],
   },
 } as const

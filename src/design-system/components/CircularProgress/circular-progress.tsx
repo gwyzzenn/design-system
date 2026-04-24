@@ -192,8 +192,8 @@ export const circularProgressMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
+    bg: [],
+    fg: ['text-fg-muted', 'text-foreground', 'text-primary'],
     ring: [],
   },
 } as const

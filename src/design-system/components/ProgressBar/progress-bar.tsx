@@ -147,8 +147,8 @@ export const progressBarMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
+    bg: ['bg-error', 'bg-primary', 'bg-secondary', 'bg-success'],
+    fg: ['text-foreground'],
     ring: [],
   },
 } as const

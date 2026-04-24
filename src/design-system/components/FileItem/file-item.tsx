@@ -316,8 +316,8 @@ export const fileItemMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
+    bg: ['bg-neutral-hover', 'bg-secondary', 'bg-surface'],
+    fg: ['text-fg-muted', 'text-fg-secondary'],
     ring: [],
   },
 } as const

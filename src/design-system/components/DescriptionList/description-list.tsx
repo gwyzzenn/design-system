@@ -131,8 +131,8 @@ export const descriptionListMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
+    bg: [],
+    fg: ['text-fg-secondary', 'text-foreground'],
     ring: [],
   },
 } as const

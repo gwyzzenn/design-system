@@ -26,7 +26,7 @@ export const skeletonMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
+    bg: ['bg-muted'],
     fg: [],
     ring: [],
   },

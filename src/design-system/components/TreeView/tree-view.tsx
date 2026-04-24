@@ -1000,9 +1000,9 @@ export const treeViewMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
-    ring: [],
+    bg: ['bg-neutral-hover', 'bg-primary', 'bg-primary-subtle', 'bg-surface'],
+    fg: ['text-fg-disabled', 'text-fg-muted', 'text-fg-secondary', 'text-foreground'],
+    ring: ['ring-ring'],
   },
   defaultSize: 'md',
 } as const

@@ -389,8 +389,8 @@ export const comboboxMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
+    bg: ['bg-disabled', 'bg-transparent'],
+    fg: ['text-fg-disabled', 'text-fg-muted'],
     ring: [],
   },
 } as const

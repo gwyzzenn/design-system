@@ -145,8 +145,8 @@ export const textareaMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
+    bg: ['bg-disabled', 'bg-surface'],
+    fg: ['text-fg-disabled', 'text-fg-muted', 'text-foreground'],
     ring: [],
   },
   defaultSize: 'md',

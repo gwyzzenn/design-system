@@ -85,8 +85,8 @@ export const badgeMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
+    bg: ['bg-info', 'bg-info-subtle', 'bg-notification', 'bg-secondary'],
+    fg: ['text-fg-muted', 'text-info-text'],
     ring: [],
   },
   defaultVariant: 'low',

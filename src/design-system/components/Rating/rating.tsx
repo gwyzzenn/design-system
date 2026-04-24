@@ -287,9 +287,9 @@ export const ratingMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
+    bg: ['bg-transparent'],
     fg: [],
-    ring: [],
+    ring: ['ring-ring'],
   },
 } as const
 

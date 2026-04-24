@@ -149,7 +149,7 @@ export const sliderMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
+    bg: ['bg-muted', 'bg-primary', 'bg-secondary', 'bg-surface'],
     fg: [],
     ring: [],
   },

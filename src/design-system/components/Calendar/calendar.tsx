@@ -396,9 +396,9 @@ export const calendarMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
-    ring: [],
+    bg: ['bg-muted', 'bg-neutral-hover', 'bg-primary', 'bg-surface'],
+    fg: ['text-fg-disabled', 'text-fg-muted', 'text-foreground'],
+    ring: ['ring-ring'],
   },
 } as const
 

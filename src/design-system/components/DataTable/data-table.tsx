@@ -510,8 +510,8 @@ export const dataTableMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
+    bg: ['bg-muted', 'bg-neutral-hover', 'bg-surface'],
+    fg: ['text-fg-muted', 'text-fg-secondary', 'text-foreground'],
     ring: [],
   },
 } as const

@@ -1007,9 +1007,9 @@ export const fileViewerMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
-    ring: [],
+    bg: ['bg-muted', 'bg-surface', 'bg-surface-raised'],
+    fg: ['text-fg-muted', 'text-foreground'],
+    ring: ['ring-primary', 'ring-ring'],
   },
 } as const
 

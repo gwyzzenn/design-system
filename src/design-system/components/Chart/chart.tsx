@@ -360,8 +360,8 @@ export const chartMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
+    bg: ['bg-surface-raised', 'bg-transparent'],
+    fg: ['text-fg-muted', 'text-fg-secondary', 'text-foreground'],
     ring: [],
   },
 } as const

@@ -1,6 +1,11 @@
 # Story Auto-Compile 系統(C)— 完整規劃
 
-**Status**:Planned, not started(2026-04-24)
+**Status**:Phase 1-4 完成 2026-04-25(57/59 aligned 0 drift);Phase 5 由實際使用驅動,尚無 consumer 需求不動。
+- Phase 1(tsx `componentMeta`):56 元件 migrate 完成 + 2 已完成合規 + Button 手動 world-class refs
+- Phase 2(spec YAML frontmatter):variants / sizes auto-fill + Badge/Tag world-class refs 填 + `componentMeta.tokens` 自動 grep 填(2026-04-25)
+- Phase 3(compile script):`scripts/compile-stories.mjs --all --check` 0 drift
+- Phase 4(drift detection hook):`check_story_compile_drift.sh` PreToolUse 自動 verify
+- Phase 5(自動產生 canonical story rows):deferred,待有 consumer 需求
 **Goal**:stories 的 canonical 部分(variant 矩陣 / token 對照 / do-don't 列表)由 **spec.md + tsx 自動編譯產生**,人只寫「real-product scenarios」(Jira/Stripe 劇情)。保證 stories 永遠跟 spec + tsx 同步,零漂移。
 
 **User 原始願景**:「可以被程式化 → tsx / 不可程式化 → spec.md / stories 由兩者自動舉一反三」— 本系統實踐第 3 條。

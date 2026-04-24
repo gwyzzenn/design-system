@@ -325,9 +325,9 @@ export const avatarMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
-    ring: [],
+    bg: ['bg-surface-raised'],
+    fg: ['--foreground', '--on-emphasis'],
+    ring: ['ring-ring'],
   },
 } as const
 

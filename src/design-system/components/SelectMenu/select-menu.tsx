@@ -352,8 +352,8 @@ export const selectMenuMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
+    bg: ['bg-surface-raised', 'bg-transparent'],
+    fg: ['text-fg-muted'],
     ring: [],
   },
 } as const

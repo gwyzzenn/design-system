@@ -158,8 +158,8 @@ export const alertMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
+    bg: ['bg-error', 'bg-error-subtle', 'bg-info', 'bg-info-subtle', 'bg-muted', 'bg-success', 'bg-success-subtle', 'bg-surface-raised', 'bg-warning', 'bg-warning-subtle'],
+    fg: ['text-foreground'],
     ring: [],
   },
 } as const

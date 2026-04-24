@@ -188,9 +188,9 @@ export const dateGridMeta = {
   },
   states: ['default', 'hover', 'active', 'focus-visible', 'disabled'],
   tokens: {
-    bg: [], // TODO: grep tsx for bg-* tokens
-    fg: [],
-    ring: [],
+    bg: ['bg-disabled', 'bg-neutral-hover', 'bg-primary', 'bg-primary-hover', 'bg-transparent'],
+    fg: ['text-fg-disabled', 'text-fg-muted', 'text-fg-secondary', 'text-foreground'],
+    ring: ['ring-primary', 'ring-ring'],
   },
 } as const
 
