@@ -5,18 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "predev": "node scripts/ensure-lucide-icon.mjs",
     "build": "tsc -b && vite build",
-    "prebuild": "node scripts/ensure-lucide-icon.mjs",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
-    "prestorybook": "node scripts/ensure-lucide-icon.mjs",
     "build-storybook": "storybook build --output-dir storybook-static",
-    "prebuild-storybook": "node scripts/ensure-lucide-icon.mjs",
     "tokens:export": "node scripts/export-tokens.mjs",
     "visual-audit": "node scripts/visual-audit.mjs --auto-start",
     "visual-audit:headed": "node scripts/visual-audit.mjs --auto-start --headed",
-    "postinstall": "node scripts/ensure-lucide-icon.mjs && node scripts/ensure-playwright-browsers.mjs"
+    "postinstall": "node scripts/ensure-playwright-browsers.mjs"
   },
   "dependencies": {
     "@babel/runtime": "^7.29.2",
