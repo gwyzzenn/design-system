@@ -4,13 +4,19 @@
 
 Spec + scope + execution plan 已寫完但未執行的工作。AI session 間持續性的 on-disk 設計文件,**不受 memory 快取 / compaction / MEMORY.md 行數 cap 影響**。
 
-## 當前居民(3 檔,2026-04-24)
+## 當前居民(3 檔,2026-04-24 更新)
 
 | Plan | 狀態 | 開工 trigger(user 說) |
 |------|------|----------------------|
-| `ds-devmode.md` | Planned | 「開工 ds-devmode / 做 Figma Dev Mode addon」 |
-| `story-auto-compile.md` | Phase 1-3 POC done,Phase 4 infra done,Phase 4 migration pending | 「ds 完整 audit / 做 migration / phase 4」(也 auto-chain by audit Dim 23)|
-| `row-primitive-consolidation.md` | Phase 1+2 done(Sidebar / TreeView 共用 ROW_PADDING_BY_SIZE),full MenuItem consume deferred | 「開工 row primitive consolidation」 |
+| `story-auto-compile.md` | Phase 1-3 POC + Phase 4 infra done;**58 / 59 元件 migration 未跑**(目前 1 元件 canonical aligned) | 「做 migration / phase 4」(也 auto-chain by audit Dim 23)|
+| `row-primitive-consolidation.md` | Phase 0 GO/NO-GO 評估 done;**Phase 1 SidebarMenuButton refactor + Phase 2 TreeItem visual base 未跑**(ROW_PADDING_BY_SIZE token 已抽,但 cva consume 未做) | 「開工 row primitive consolidation / 消除 SidebarMenuButton 獨立實作 risk」 |
+| `ds-i18n-refactor.md` | 40 hardcoded CJK label locations 首次列完(17 個 .tsx 檔)— hook 偵測 + 列表 done,**fix 未做** | 「做 i18n / DS 要支援多語 / 開工 i18n-refactor」 |
+
+## 歷史完成檔(archived)
+
+| Plan | 完成日 | 檔名 |
+|------|-------|------|
+| DS Devmode Addon | 2026-04-24 | `ds-devmode.md.completed.20260424.md` |
 
 ## 這裡**不收**(反例 + 正確去處)
 
