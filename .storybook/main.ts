@@ -15,11 +15,8 @@ const config: StorybookConfig = {
     },
     "@storybook/addon-a11y",         // 無障礙檢查(對 DS 很重要)
     "@storybook/addon-docs",         // 自動生成文件
-    // pseudo-states:強制觸發 `:hover / :focus / :active / :disabled / :visited` 視覺 —
-    // 類 Figma prototype interactions,audit / stakeholder review 必裝。
-    "storybook-addon-pseudo-states",
     // addon-html:選了元件後在右側 panel 看 rendered HTML + 套用的 className list,
-    // 是 Figma Dev Mode「點元件看 code」最接近的 Storybook 等效。
+    // 為 custom DS Inspect addon(`.storybook/addons/ds-inspect/`)的補強。
     "@whitespace/storybook-addon-html",
   ],
 
