@@ -7,14 +7,14 @@
 3. **改一處必看三處**——code / spec / story 三方聯動是常態,不是例外。改 cva `defaultVariants`、改 variant、改 token 前先 grep 該元件所有檔案,一次改完。
 4. **範例必須是真實業務場景**——Jira / Stripe / Notion / Figma 等可辨識的情境;禁止 `Option A/B/C`、「按鈕一」、極端不現實、ASCII art。Storybook 的受眾是任何打開它的人,不是作者。
 5. **猶豫就問,不往前推**——遇到無前例的設計決策:(a) 先 grep 既有 pattern,(b) 讀近親元件 spec,(c) 仍不確定就停下問使用者。**禁止憑直覺造新 pattern**——這是本專案最常被糾正的錯誤。
-6. **大原則吸收瑣碎,記憶索引不該長**——同類 bug 反覆被糾正 = 規則寫太細、meta 層沒抓住。真正該寫的是「哪一類 meta-pattern 誤用」,不是「哪一個具體 bug」。失敗記憶索引應該長**不大**;若一直長,代表 meta-principle 漏寫或沒執行。見 `# Meta-Pattern 預警` 的 15 條大原則。**AI 不需要被 user 提醒才去找 root invariant**——rule 震盪(寫成 A → 被糾 → 寫成 not A)發生時 AI 必**自己**停下,跑 M12 benchmark + invariant test。**User 就同主題第 2 次問 → 必主動截圖 verify**(M13),不靠第 3 次才醒。**User 說「所有 X」= DS-wide 聲明,當下做完 + 建 hook 防線,不拖 tech debt**。**每次對話達成 canonical 結論 → AUTO 跑整合 pipeline**(M14:world-class benchmark → spec → code → hook → CLAUDE.md → memory → 驗證,5 層至少 3 層,不等 user 催)。使用者 tell me once,我不該要 tell me twice。
+6. **大原則吸收瑣碎,記憶索引不該長**——同類 bug 反覆被糾正 = 規則寫太細、meta 層沒抓住。真正該寫的是「哪一類 meta-pattern 誤用」,不是「哪一個具體 bug」。失敗記憶索引應該長**不大**;若一直長,代表 meta-principle 漏寫或沒執行。見 `# Meta-Pattern 預警` 的 17 條大原則。**AI 不需要被 user 提醒才去找 root invariant**——rule 震盪(寫成 A → 被糾 → 寫成 not A)發生時 AI 必**自己**停下,跑 M12 benchmark + invariant test。**User 就同主題第 2 次問 → 必主動截圖 verify**(M13),不靠第 3 次才醒。**User 說「所有 X」= DS-wide 聲明,當下做完 + 建 hook 防線,不拖 tech debt**。**每次對話達成 canonical 結論 → AUTO 跑整合 pipeline**(M14:world-class benchmark → spec → code → hook → CLAUDE.md → memory → 驗證,5 層至少 3 層,不等 user 催)。使用者 tell me once,我不該要 tell me twice。
 
 每條規則展開請讀後面對應章節(`# Spec 規則`、`# UI 開發規則`、`# Story`、`# 命名與語言一致性` 等)。
 
 
-# Meta-Pattern 預警(15 條大原則)
+# Meta-Pattern 預警(17 條大原則)
 
-**mindset #6 的具體化**。每條能吸收數十個具體 bug,是失敗記憶索引的上游。接到任務先過這 15 條,再跑 `# 任務導航表`。
+**mindset #6 的具體化**。每條能吸收數十個具體 bug,是失敗記憶索引的上游。接到任務先過這 17 條,再跑 `# 任務導航表`。
 
 | # | Meta-Principle | 能吸收的 bug 類型(舉例,非窮舉) |
 |---|---|---|
@@ -64,21 +64,19 @@
 | D5 | 視覺品質 | `/visual-audit`(Layer A mechanical + B AI) |
 | D6 | 設計原則自檢(4 子維)| `design-system-audit/references/principle-audit-protocol.md` |
 
-**觸發**:新元件 / feature / 比稿 → Tier 1 強制;日常 → Tier 2 scope=changed;release / 季度 → Tier 3 scope=all;spec-only 改可跳視覺。Hook `check_stakeholder_visual_audit.sh` pre-commit 偵測新視覺檔 + 未跑 Tier 1 → block。世界級(Figma / Material / Polaris)共識 3-tier。
-
-**禁止**:Stakeholder artifact 沒過 Tier 1 就 review / 日常硬跑 Tier 3(developer 會跳)/ Tier 3 無限期推遲。
+**觸發**:新元件 / feature / 比稿 → Tier 1 強制;日常 → Tier 2 scope=changed;release / 季度 → Tier 3 scope=all;spec-only 改可跳視覺。Hook `check_stakeholder_visual_audit.sh` pre-commit 擋未跑 Tier 1 的新視覺檔。**禁止**:Stakeholder artifact 跳 Tier 1 / 日常硬跑 Tier 3 / Tier 3 無限期推遲。
 
 ## 一致性稽核必 Phase 0 先全掃再判
 
-單元件看必漏系統 drift(Notice title-desc mt-0.5 漏 Dialog/Tooltip/Coachmark;DateGrid today bar 漏 state-stacking;Checkbox disabled 漏 Radio/Switch/SelectionItem)。`/design-system-audit` / `/visual-audit` 的 consistency phase 一律 Phase 0 全掃 → Phase 1+ 判 → Phase F 報告,無例外。
+單元件看必漏系統 drift(歷史案例:Notice title-desc mt-0.5 漏 Dialog/Tooltip/Coachmark 等)。`/design-system-audit` / `/visual-audit` 的 consistency phase 一律 Phase 0 全掃 → Phase 1+ 判 → Phase F 報告,無例外。
 
 ## Canonical 優先順序(衝突 ladder)
 
-1. **WCAG mechanical floor**(最高)— 對比 / keyboard / ARIA。Layer A 實作 WCAG 2.1 豁免(incidental text / disabled / logotype / decorative)不誤報
+1. **WCAG mechanical floor**(最高)— Layer A 實作 WCAG 2.1 豁免(incidental / disabled / logotype / decorative)不誤報
 2. **DS spec + CLAUDE.md**(次高)— documented rationale 偏離 = `deviation ✓`
 3. **世界級對照**(reference,非 canonical)— spec 有 rationale 故意不跟 → AI 不 flag
 
-**流程**:Mechanical assertion → 查 rationale → 有 = `deviation ✓`,無 = P0;AI judgement → 必先讀元件 spec.md,spec 當 hard constraint,世界級當 reference 不 override。WCAG 法規硬底;DS spec 是 design language 存在意義;世界級是參考(mindset #1 允許「對齊 or 說為什麼」)。
+**流程**:Mechanical assertion → 查 rationale → 有 = `deviation ✓`,無 = P0;AI judgement → 必讀元件 spec.md 當 hard constraint,世界級當 reference 不 override。
 
 ## Consistency audit 三件套
 
@@ -91,14 +89,7 @@
 
 ## 稽核 vs 執行 分權(auto-mode 邊界)
 
-**稽核 = 提議,執行 = 人 sign-off**。核心公式:
-
-```
-動 canonical 的 substantive meaning → STOP(提議,等 user sign-off)
-對齊 canonical / 表達統一 / 補 pointer → AUTO(直接修)
-```
-
-**Substantive keyword**:「canonical / 聲明 / 必須 / SSOT / rationale / 為什麼 / 不允許 / 禁止」— 觸及 + 動 meaning → STOP。
+**稽核 = 提議,執行 = 人 sign-off**。**核心公式**:動 canonical substantive meaning → **STOP**;對齊 canonical / 表達統一 / 補 pointer → **AUTO**。**Substantive keyword**:「canonical / 聲明 / 必須 / SSOT / rationale / 為什麼 / 不允許 / 禁止」— 觸及 + 動 meaning → STOP。
 
 | AUTO-fix | STOP(提議等 sign-off) |
 |----------|----------------------|
@@ -110,7 +101,7 @@
 | hardcoded class / px → token 名 / pointer | 擴 SSOT 納入新 branch |
 | Rule A prose 移除 class → 遷 anatomy | Rationale 疑似過時 |
 
-**Why**:Canonical 是共識產物,非個人判斷。AI 自改 canonical 造成 session 標準漂移。D6 scan 走 `design-system-audit/references/principle-audit-protocol.md`;audit skill report 必含「提議討論(待 user sign-off)」專區 + Phase F「Self-improvement capture」。
+**Why**:Canonical 是共識產物非個人判斷。D6 scan → `design-system-audit/references/principle-audit-protocol.md`;audit report 必含「提議討論」專區 + Phase F capture。
 
 
 
@@ -143,9 +134,9 @@ Governance 自身遵循 SSOT + anti-bloat。**寫新規則前先決定放哪個 
 | **L2 — Per-commit** | PostToolUse | `log_governance_fires.sh` → `.claude/logs/hook-fires.jsonl` |
 | **L3 — Periodic deep**(季度 / audit --deep)| `/knowledge-prune` skill(retire ≥ 5%)| Phase F report |
 
-**行數預算**(hook 攔):CLAUDE.md 400(過渡 800)/ spec 300(過渡 500,**foundational SSOT 類 800**)/ SKILL 250(過渡 400)/ memory 100。過渡期至 2026-07-24 收斂到 400。
+**行數預算**(hook 攔):CLAUDE.md 400(過渡 800,收斂 deadline 2026-07-24)/ spec 300(過渡 500,**foundational SSOT 類 800**)/ SKILL 250(過渡 400)/ memory 100。
 
-**Foundational SSOT 類 spec**(cap 800,2026-04-24 加):涵蓋 cross-pattern 或 cross-component canonical 的 SSOT spec,scope 本質 > 單一元件,不可拆不失原則。該 spec 頂部 frontmatter 或首段必寫 `**foundational SSOT rationale**: {涵蓋 X / 為何不可拆}`。現況 4 檔:`item-anatomy.spec.md`(Family 1+2 SSOT,**super-foundational cap 1200 exception approved 2026-04-24**)/ `color.spec.md`(token SSOT,cap 800)/ `sidebar.spec.md` / `tree-view.spec.md`(獨立 cva SSOT,cap 800)。
+**Foundational SSOT 例外**(cap 800,頂部必宣告 rationale):`item-anatomy.spec.md`(Family 1+2 SSOT,super-foundational **cap 1200** approved 2026-04-24)/ `color.spec.md`(token SSOT)/ `sidebar.spec.md` / `tree-view.spec.md`(獨立 cva SSOT)。
 
 ## 加規則前必過 3 題
 
@@ -153,22 +144,11 @@ Governance 自身遵循 SSOT + anti-bloat。**寫新規則前先決定放哪個 
 2. **Rule-of-3**:同概念 ≥ 3 處 → 選 SSOT,其他 pointer only
 3. 7 天後還會 fire 嗎?不確定 → 不寫,先進 session 記憶觀察
 
-## Retire 鐵律(反 append-only)
+## Retire 鐵律 + Phase F capture(反 append-only)
 
-季度 retire ≥ 5%(M1-Mn / MEMORY / skills / hooks)。候選:6 月無 fire 的 hook / 3 月無 invoke 的 skill / 被上游 Meta 吸收的具體 bug 條目。**上游加 = 下游減**。
+**季度 retire ≥ 5%**(M1-Mn / MEMORY / skills / hooks)。候選:6 月無 fire hook / 3 月無 invoke skill / 被上游 Meta 吸收的具體 bug。**上游加 = 下游減**。違反 trigger:新增 Meta 未檢討下游 / MEMORY stale / Rule-of-3 violation / 聲稱自動無 fire log。
 
-**違反 trigger**:新增 Meta-Pattern 未檢討舊條目合併 / MEMORY stale / 同概念 3 處都完整寫(Rule-of-3 violation)/ 聲稱「定期 / 自動」無 fire log(寫進 3 hook:`stop_harvest_corrections` / `session_start_governance_check` / `log_governance_fires`)。
-
-## Audit Phase F 強制「Self-improvement capture」
-
-```markdown
-## Self-improvement capture
-- 新發現 FP pattern: {描述 + 回填位置} OR "無新 FP"
-- 新確立 meta-pattern: {描述 + 提議位置} OR "無新 pattern"
-- 修完的矛盾 / 糾正: {list + 回填位置} OR "無糾正"
-```
-
-**User 糾正回填 home 判斷**:個人偏好 → `memory/feedback_*.md`;DS 本質 → CLAUDE.md;audit skill 改進 → `skills/*/references/`。
+**Audit Phase F 強制「Self-improvement capture」**:每 audit 結束必寫 3 欄(新 FP pattern / 新 meta-pattern / 修完的矛盾,各含「OR 無」)。**User 糾正回填 home**:個人偏好 → `memory/feedback_*.md`;DS 本質 → CLAUDE.md;audit skill 改進 → `skills/*/references/`。
 
 
 # SSOT 消費 canonical(做 X 前必查 Y)
@@ -395,25 +375,15 @@ Internal primitive vs public-facing 元件的分類 test 見 `components/README.
 | **Padding source 分層規則** | Chrome `layout-space token` / 元件內 slot `p-N` / 精確幾何 `calc()` 三 canonical |
 | **Icon size 來源分層規則** | Row 讀 Context / Button 自 mapping / 一次性對齊 uiSize token |
 
-## Row primitives 共用 item-anatomy 公式
+## Row primitive / 清 imports 後 runtime / 一句話 pointer
 
-寫任何新 row 元件前,讀 `patterns/element-anatomy/item-anatomy.spec.md`(Family 1+2 深度 SSOT)。Audit grep guard 和 SidebarMenuButton 獨立實作風險在該 spec「自我檢查」節。
-
-## 清 unused imports 後必須跑 runtime 驗證
-
-`tsc -b` 必要但不充分(曾漏抓 JSX 內 identifier 和未宣告 export)。任何 import/export 異動後:
-1. `npx tsc -b`(**禁用 `--noEmit`**,root tsconfig `files: []` 會 silent pass)
-2. grep `export {}` 確認每個 identifier 都有定義
-3. `npm run storybook` 實際載入動到的 story
-4. 互動操作確認動態 path
-
-## 一句話 Pointer
-
-- **Inline Action vs Button**:判斷樹 + 場景表 → `patterns/element-anatomy/item-anatomy.spec.md`「Inline Action 設計規格」
-- **Separator vs CSS border**:誰決定「這裡要分隔」→ `components/Separator/separator.spec.md`
-- **陰影**:一律 `--elevation-*`;禁 `shadow-sm/md/lg/xl/2xl` / 硬寫;`shadow-none` OK → `tokens/elevation/elevation.spec.md`
-- **視覺容器 breathing**:有明確邊界(bg/border/shadow)→ 必 inner padding → `patterns/element-anatomy/element-anatomy.spec.md`
-- **選擇 / 狀態視覺**:使用既有 state prop,指示器對應 selection model → item-anatomy「選擇 / 狀態視覺規則」
+- **新 row 元件**:先讀 `patterns/element-anatomy/item-anatomy.spec.md`(Family 1+2 深度 SSOT)含「自我檢查」節
+- **清 unused imports / export 異動後**:`npx tsc -b`(**禁 `--noEmit`**,`files: []` silent pass)→ grep `export {}` 定義 → `npm run storybook` 載 story → 互動驗動態 path
+- **Inline Action vs Button**:判斷樹 → item-anatomy.spec.md「Inline Action 設計規格」
+- **Separator vs CSS border**:誰決定分隔 → `separator.spec.md`
+- **陰影**:必 `--elevation-*`;禁 `shadow-sm/md/lg/xl/2xl` / 硬寫;`shadow-none` OK → `elevation.spec.md`
+- **視覺容器 breathing**:有邊界(bg / border / shadow)→ 必 inner padding → `element-anatomy.spec.md`
+- **選擇 / 狀態視覺**:用既有 state prop,指示器對應 selection model → item-anatomy.spec.md
 
 
 # Tailwind 使用規則
