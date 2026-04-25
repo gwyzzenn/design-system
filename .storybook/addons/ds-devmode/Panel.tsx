@@ -206,7 +206,58 @@ const copyText = async (text: string) => {
   }
 }
 
-type TokenByPropEntry = { tokens: string[]; resolved: string; source: 'author' | 'speculative' }
+type TokenByPropEntry = { tokens: string[]; resolved: string; source: 'author' | 'speculative'; raw?: string }
+
+type TokenByPropEntryWithRaw = TokenByPropEntry & { raw?: string }
+
+/**
+ * Render author raw expression(calc / var combo)— 高亮全 var() token name
+ * + 在右側 → 接 resolved value。對齊 Chrome / FF / Safari「raw → resolved」idiom。
+ *
+ * 例:`calc((var(--field-height-sm) - 16px - 2px) / 2)` → `5px`
+ *      ─ var token highlighted with underline + tooltip resolved chain
+ *      ─ calc / px / numeric 部分維持原 raw 文字
+ *      ─ 整段右側接「→ 5px」 顯實際值
+ */
+const renderAuthorRaw = (raw: string, resolved: string, tokensByProp: TokenByPropEntryWithRaw): React.ReactNode => {
+  // 切割 raw 成 segments:var() 部分 highlighted,其餘 plain
+  const parts: React.ReactNode[] = []
+  const re = /var\((--[a-zA-Z0-9-_]+)(?:,\s*([^)]+))?\)/g
+  let lastIdx = 0
+  let m: RegExpExecArray | null
+  let segIdx = 0
+  while ((m = re.exec(raw))) {
+    if (m.index > lastIdx) {
+      parts.push(<span key={`p-${segIdx++}`}>{raw.slice(lastIdx, m.index)}</span>)
+    }
+    const tokenName = m[1]
+    const fallback = m[2]
+    parts.push(
+      <span key={`v-${segIdx++}`} style={{ color: '#7A4EE8' }}>
+        var(
+        <span
+          title={`token: ${tokenName}\nresolved: ${resolved}`}
+          style={{ color: '#C4423A', textDecoration: 'underline', textDecorationStyle: 'solid' }}
+        >
+          {tokenName}
+        </span>
+        {fallback ? <>, <span style={{ color: 'var(--sb-fg-muted, #888)' }}>{fallback}</span></> : null}
+        )
+      </span>
+    )
+    lastIdx = re.lastIndex
+  }
+  if (lastIdx < raw.length) {
+    parts.push(<span key={`p-${segIdx++}`}>{raw.slice(lastIdx)}</span>)
+  }
+  return (
+    <>
+      <span style={{ fontFamily: '"SF Mono", Menlo, monospace' }}>{parts}</span>
+      <span style={{ color: 'var(--sb-fg-muted, #888)', margin: '0 6px' }}>→</span>
+      <strong style={{ color: '#1F2532' }}>{resolved}</strong>
+    </>
+  )
+}
 
 const renderValue = (
   prop: string,
@@ -216,21 +267,14 @@ const renderValue = (
   const hit = tokenByProp.get(prop)
   const color = extractColor(v)
 
-  // 'author' source = stylesheet 真實寫的 var(),顯示為 authoritative purple
+  // 'author' source = stylesheet 真實寫的 var()(可能含 calc / 多 var) — 顯完整 raw → resolved
   if (hit && hit.tokens.length && hit.source === 'author') {
-    const token = hit.tokens[0]
     return (
       <>
         {color && isColor(color) && (
           <span style={{ ...styles.tokenChip, background: color }} />
         )}
-        <span style={{ color: '#7A4EE8' }}>{`var(`}</span>
-        <span title={`source:author,resolved:${hit.resolved}`} style={{ color: '#C4423A', textDecoration: 'underline', textDecorationStyle: 'solid' }}>
-          {token}
-        </span>
-        <span style={{ color: '#7A4EE8' }}>{`, `}</span>
-        <span>{hit.resolved}</span>
-        <span style={{ color: '#7A4EE8' }}>{`)`}</span>
+        {renderAuthorRaw(hit.raw || `var(${hit.tokens[0]})`, hit.resolved, hit)}
       </>
     )
   }
@@ -275,11 +319,16 @@ const Section: React.FC<{
   const codeText = entries
     .map(([k, v]) => {
       const hit = tokenByProp.get(k)
-      // Code view 只用 author source 顯示 var(),speculative 不顯示避免 misleading copy-paste
-      const display =
-        hit && hit.tokens.length && hit.source === 'author'
-          ? `var(${hit.tokens[0]}, ${hit.resolved})`
-          : v
+      // Code view:author source 顯完整 raw expression(calc + var combo)→ resolved 註釋
+      // Speculative 不顯避免 misleading copy-paste
+      let display: string
+      if (hit && hit.tokens.length && hit.source === 'author') {
+        const raw = hit.raw || `var(${hit.tokens[0]})`
+        // Show "raw  /* → resolved */" if raw differs from resolved (formula present)
+        display = raw === hit.resolved ? raw : `${raw};  /* → ${hit.resolved} */`
+        return `${k}: ${display.replace(/;\s*\/\*/, ' /* ')};`  // clean repeat ;
+      }
+      display = v
       return `${k}: ${display};`
     })
     .join('\n')
@@ -445,7 +494,7 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
   if (!active) return null
 
   const tokenByProp = new Map<string, TokenByPropEntry>()
-  payload?.tokenUsage.forEach(t => tokenByProp.set(t.property, { tokens: t.tokens, resolved: t.resolved, source: t.source }))
+  payload?.tokenUsage.forEach(t => tokenByProp.set(t.property, { tokens: t.tokens, resolved: t.resolved, source: t.source, raw: t.raw }))
   const groups = payload ? splitByGroup(payload.computed) : { layout: {}, style: {} }
 
   const setModeAndBroadcast = (next: DevmodeMode) => {
@@ -515,9 +564,13 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
                 const allCss = Object.entries(payload.computed)
                   .map(([k, v]) => {
                     const hit = tokenByProp.get(k)
-                    return hit && hit.tokens.length && hit.source === 'author'
-                      ? `${k}: var(${hit.tokens[0]}, ${hit.resolved});`
-                      : `${k}: ${v};`
+                    if (hit && hit.tokens.length && hit.source === 'author') {
+                      const raw = hit.raw || `var(${hit.tokens[0]})`
+                      return raw === hit.resolved
+                        ? `${k}: ${raw};`
+                        : `${k}: ${raw}; /* → ${hit.resolved} */`
+                    }
+                    return `${k}: ${v};`
                   })
                   .join('\n')
                 const sel = `${payload.tag}${payload.id ? `#${payload.id}` : ''}${payload.className ? `.${String(payload.className).split(/\s+/).filter(Boolean).join('.')}` : ''}`

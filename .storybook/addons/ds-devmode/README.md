@@ -1,86 +1,148 @@
 # DS Devmode — Storybook Addon
 
-Figma Dev Mode-grade inspect experience inside Storybook. Click any element in
-the canvas to pin it; a right-side panel shows anatomy, computed CSS, and
-reverse-looked-up DS token usage. A redline overlay renders purple outline +
-blue padding hatching + red distance labels to the parent.
+**DS-aware inspector inside Storybook**。Click any canvas element → 看見它的:
+
+1. **Token**(author 寫的 `var(--primary)`)
+2. **公式**(完整 `calc((var(--field-height-sm) - 16px - 2px) / 2)` raw expression)
+3. **實際值**(browser computed `5px`)
+
+**核心定位**:**用最少 click,看清楚一個 element 的 spacing / token / formula / 實際值**。對齊 Figma Dev Mode 測量 + Chrome DevTools 調試,專為**我們自家 DS tokens** 優化(source-first 反查,非 speculation)。
+
+可以跟 Figma 不一樣,甚至超越 — 只要持續服務「**click → 快速簡單看見 CSS 完整 spec**」的核心。
 
 ## What it gives you
 
+### Inspect 核心(Figma Dev Mode 風)
+
 | Feature | How |
 |---|---|
-| **Click-to-pin / hover-live** | Toolbar toggle or `Alt+I`; `Esc` unpins |
-| **Anatomy box** | Border + Padding + inner size (border-box); edge distances to parent |
-| **Redline overlay** | Purple element outline, blue hatching on padding, red dashed lines + numeric labels to parent edges |
-| **Computed CSS** | Grouped Layout / Style, filters browser defaults |
-| **Token reverse lookup** | Scans `:root` custom properties → matches any computed value (`#0065EA` → `var(--primary, #0065EA)`) with resolved chain |
-| **List / Code view** | List = semantic; Code = copy-ready CSS block |
-| **Copy** | Per-section copy button |
+| **Click-to-pin / hover-live** | Toolbar toggle / `Alt+I` / Touch tap-to-pin |
+| **Source-first token display** | Author 寫 `padding: calc((var(--field-height-sm) - 16px) / 2)` → panel 完整顯 raw expression(token 高亮)→ resolved 值,**公式不丟** |
+| **Anatomy box(4-rect 完整 box model)** | Margin / Border / Padding / Content,4 邊距離 label 完整 |
+| **Redline overlay** | 紫 outline + 藍 padding 斜紋 + 紅距離(2px solid + halo + T-cap 端點 + dimension extension lines) |
+| **Sibling distance** | Pin 後 hover 其他元素 → edge-to-edge gap(Figma-style)|
+| **Auto-layout(flex/grid)** | Container 自動顯 gap / direction / justify / align |
 
-## Why built (vs. existing addons)
+### 調試擴展(Chrome DevTools 風)
 
-- `@storybook/addon-measure`: only Alt+hover, no click-pin, no token resolution
-- `@whitespace/storybook-addon-html`: shows rendered HTML + className list; no computed style or token reverse-lookup
-- `storybook-addon-pseudo-states`: off-topic (hover state driver), not an inspector
-- Figma **Code Connect / Storybook Connect**: reverse direction (Figma-side)
+| Feature | How |
+|---|---|
+| **Pseudo-state force** | Pin 後 toggle `:hover` / `:focus` / `:active` 看 styled state |
+| **DOM tree breadcrumb** | Panel 顯父鏈(html › body › ... › element) |
+| **Arrow keys walk DOM** | ↑ parent / ↓ first child / ←→ sibling |
+| **Copy all CSS** | One-click copy 整段 selector + declarations(含 token + 公式 + resolved 註釋) |
 
-So we built a local addon that matches Figma Dev Mode's inspect UX against our
-own design tokens.
+### 操作
+
+| Mode / Key | Action |
+|---|---|
+| `Alt+I` | Toggle Off / Live(touch:Off / Pin) |
+| click | Pin element |
+| Pin 後 hover 別元素 | 顯 sibling distance(Figma-style)|
+| `Esc` | Unpin(back to Live;touch 回 Off) |
+| `↑↓←→` | 已 pin 時走 DOM tree |
+
+## 你會看到什麼(範例)
+
+點擊 iconOnly button 後,panel 顯:
+
+```
+button.bg-primary.text-on-emphasis.h-field-md...
+
+[ Margin 0/0/0/0 ]
+  [ Border 1px ]
+    [ Padding ]
+      28 × 28 (border-box)
+
+Auto-layout: flex
+  direction  row
+  justify    center
+  align      center
+  gap        4px
+
+:state  [none] [:hover] [:focus] [:active]
+
+Layout
+  height           var(--field-height-md)  → 32px
+  background-color var(--primary)          → oklch(0.59 0.24 257)
+  padding-inline   calc((var(--field-height-sm) - 16px - 2px) / 2)  → 5px
+
+Style
+  color            var(--on-emphasis)      → oklch(1 0 0)
+  font-size        var(--font-body-size)   → 14px
+  ...
+
+[Copy all CSS]
+```
+
+每行**raw 公式 → resolved 值**並列,**完整保留 token + calc + 實際值**。
+
+## Why built(vs. 既有)
+
+- `@storybook/addon-measure`:只 Alt+hover,無 click-pin / 無 token / 無公式
+- `@whitespace/storybook-addon-html`:HTML + class 列表,無 computed / 無 token
+- `storybook-addon-pseudo-states`:hover 模擬器,非 inspector
+- **Chrome DevTools**:強但 generic,**不認得我們的 DS tokens**(無 reverse / source 反查)
+- **Figma Dev Mode**:Figma side,測 design 不測 storybook
+- **本 addon**:**combines Figma 的 measurement idiom + Chrome 的調試 + DS-aware token 解析**,full-context inspect for our system
 
 ## Architecture
 
 ```
 .storybook/addons/ds-devmode/
-├── preset.ts                    addon entry (managerEntries + previewAnnotations)
-├── manager.tsx                  toolbar button + panel register
-├── preview.ts                   canvas iframe: listeners + overlay driver
+├── preset.ts                    addon entry
+├── manager.tsx                  toolbar + panel register
+├── preview.ts                   canvas iframe driver
+│                                  (click / hover / arrow / touch / pseudo-state force)
 ├── Panel.tsx                    right-side panel UI
+│                                  (anatomy / breadcrumb / Copy all / state toggle /
+│                                   auto-layout / layout / style / list-code view)
 ├── constants.ts                 ADDON_ID / EVENTS / Payload types
 └── utils/
-    ├── dom-geometry.ts          getBoundingClientRect + distances-to-parent
-    ├── computed-style.ts        getComputedStyle + default filter, grouped layout/style
-    ├── token-reverse-lookup.ts  :root custom-property scan + value→name map
-    └── overlay.ts               imperative redline renderer (inside iframe)
+    ├── dom-geometry.ts          rect + distances-to-parent
+    ├── computed-style.ts        getComputedStyle + default filter
+    ├── token-reverse-lookup.ts  source-first(extractSourceVars walks
+    │                              CSSLayerBlockRule recursively)+ fallback
+    │                              speculative reverse-lookup
+    └── overlay.ts               imperative redline + T-caps + extension lines
 ```
 
-## Keyboard
+## Token / Formula / Resolved 顯示邏輯
 
-| Key | Action |
-|---|---|
-| `Alt+I` | Toggle Off ↔ Live |
-| click (while Live) | Pin element |
-| `Esc` | Unpin (back to Live) |
+每 property 過兩階段:
 
-## Pin vs. Live
+1. **Source-first**(authoritative):walk matched stylesheet rules + inline style,抓含 `var()` 的 declarations。Author 寫了什麼就顯什麼(完整 raw expression,含 calc / 多 var)。
+2. **Reverse-lookup**(fallback):若 source 無 var(),掃 `:root` custom properties,找 candidate tokens with same resolved value。標 'speculative',淡灰 hint 顯示「ⓘ N candidates」避免誤導。
 
-- **Live** (default once toggled on): hover any canvas element → panel + overlay update in real time.
-- **Pin**: click an element; panel freezes on it. Hover elsewhere doesn't replace it. Interact with other controls in the canvas — the pinned element's geometry refreshes on scroll / resize so animated flows can be inspected frame-by-frame (re-click to sample a new frame).
+Display formula:`<raw with token highlighted> → <resolved>`
 
-## Token reverse-lookup
-
-On each inspect:
-
-1. Read all CSS custom properties declared on `:root` (cached, 2 s TTL).
-2. Resolve each `var(...)` expression down to the final value (up to 10 hops).
-3. Build a reverse map: resolved value → list of custom-property names.
-4. For each computed property on the target element, look up its value in the reverse map.
-5. Display `var(--token-name, resolved-value)` with the color chip + hover tooltip showing the chain (`--primary → --color-blue-6 → #0065EA`).
-
-This means any element that sets its color / padding / radius via a token will
-show the token name even though the browser returns the already-resolved value.
+```
+padding-inline: calc((var(--field-height-sm) - 16px - 2px) / 2)  → 5px
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          token underlined,hover 看 resolved chain
+```
 
 ## Reusability
 
-- New components / new stories need **zero** addon changes — it's DOM-level.
-- Works on every viewport / density / theme — reads live computed styles.
-- Works on interactive flows: in Pin mode, re-click at each frame to sample.
+- 新元件 / 新 stories 0 改 — 純 DOM-level
+- 任何 viewport / density / theme — read live computed
+- Touch device:auto-detect,tap-to-pin(skip hover-live)
+- Tailwind v4 nested @layer rules:source-first 遞迴 walk CSSLayerBlockRule,token 抓得到
 
 ## Reading the overlay
 
 | Visual | Meaning |
 |---|---|
-| **Purple solid outline** | Selected element bounds |
+| **Purple solid outline 2px + white halo** | Pinned element bounds |
+| **Cyan solid outline 2px + white halo** | Sibling hover(Figma-style distance target) |
 | **Purple dashed outline** | Immediate parent bounds |
-| **Blue hatching** | Computed padding (drawn on the inside of the 4 edges) |
-| **Red dashed line + badge** | Distance from element edge to parent edge (px) |
-| **Purple top badge** | Element label (`#id` / `.className` / tag) |
+| **Blue 45° hatching** | Computed padding(drawn inside 4 edges) |
+| **Red 2px line + T-cap stubs + extension lines** | Distance from element edge to target edge,T-cap 兩端標位 unambiguous |
+| **Red label with halo** | Distance value(px) |
+| **Purple top badge** | Element selector |
+
+## Performance
+
+- `extractSourceVars` 遞迴遍 stylesheet rules — 大 stylesheet(1000+ rules)觀察 < 50ms
+- TokenMap 2s TTL cache
+- Overlay imperative DOM(no React iframe-side)— 1 paint per emit

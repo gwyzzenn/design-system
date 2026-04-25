@@ -29,8 +29,11 @@ export interface InspectPayload {
   computed: Record<string, string>
   tokenUsage: Array<{
     property: string
+    /** Author 在 stylesheet 寫的 raw expression(可能含 calc / 多個 var)。Source-first 用此 for full formula display。 */
     raw: string
+    /** 全部 var() token names(順序:外到內) */
     tokens: string[]
+    /** Browser computed 最終值 */
     resolved: string
     /** 'author' = 從 source stylesheet/inline 抓的(可信);'speculative' = reverse-lookup 候選(同值多 token 推測,可能 misleading) */
     source: 'author' | 'speculative'
