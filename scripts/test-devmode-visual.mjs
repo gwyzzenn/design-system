@@ -38,7 +38,7 @@ const tests = [
   {
     name: 'tag-with-border',
     storyId: 'design-system-components-tag-展示--with-icon',
-    targetSelector: 'span[class*="inline-flex"][class*="border"]',
+    targetSelector: 'div.inline-flex.rounded-md.border',
     desc: 'Tag — has border-transparent 1px, expects Border 1/1/1/1',
   },
   {
