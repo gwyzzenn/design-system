@@ -68,25 +68,22 @@ export default meta
 type Story = StoryObj<typeof Button>
 
 // ── 基本 variants ──────────────────────────────────────────────
+// 5 variants 合併為單一 AllVariants story(2026-04-25 Dim 24 audit consolidation)。
+// 原個別 Primary/Secondary/Tertiary/Text/Link 是 `args:{variant}` minimal stub,重複
+// ColorMatrix(anatomy)的 variant 視覺。合併保留每 variant 的 real-world 場景示意。
+// 「何時用哪 variant」由 principles.VariantRule + DangerRule + OrderRule 教。
 
-export const Primary: Story = {
-  args: { variant: 'primary', children: '新增' },
-}
-
-export const Secondary: Story = {
-  args: { variant: 'secondary', children: '儲存草稿' },
-}
-
-export const Tertiary: Story = {
-  args: { variant: 'tertiary', children: '取消' },
-}
-
-export const Text: Story = {
-  args: { variant: 'text', children: '查看更多' },
-}
-
-export const Link: Story = {
-  args: { variant: 'link', children: '前往設定' },
+export const AllVariants: Story = {
+  name: 'All variants(對照)',
+  render: () => (
+    <div className="flex flex-wrap items-center gap-3">
+      <Button variant="primary">新增</Button>
+      <Button variant="secondary">儲存草稿</Button>
+      <Button variant="tertiary">取消</Button>
+      <Button variant="text">查看更多</Button>
+      <Button variant="link">前往設定</Button>
+    </div>
+  ),
 }
 
 export const Pressed: Story = {
