@@ -83,7 +83,8 @@ const makeDiv = (cssText: string, text?: string) => {
 // outlines remain readable on any bg(white / dark / busy / colored)。
 // World-class 對照:Chrome ruler / Figma annotation / Photoshop guides 3+。
 const HALO_LABEL = '0 0 0 1px #fff, 0 1px 3px rgba(0,0,0,0.35)'
-const HALO_OUTLINE = '0 0 0 2px rgba(255,255,255,0.85), 0 0 0 4px rgba(0,0,0,0.15)'
+const HALO_OUTLINE = '0 0 0 2px rgba(255,255,255,0.85)'  // 純白 halo,移除外層裝飾色 halo
+                                                         // (Chrome / Figma / Sketch 都不畫此層)
 
 const distanceLabel = (value: number, left: string, top: string, transform: string) => {
   // White-bg + red-text(2026-04-25 v4)— 對齊 addon-measure canvas-rendered 派
@@ -177,12 +178,13 @@ export function clearOverlay() {
  * 兩軸獨立計算,可能都畫(diagonal)或只一軸(aligned)或都不畫(overlap / contain)。
  */
 function drawSiblingDistance(root: HTMLElement, a: DOMRect, b: DOMRect) {
-  // sibling outline(青 cyan,跟主元素 purple 對比,Figma 慣例)
+  // Sibling outline(青 cyan,跟主元素 purple 對比,Figma 慣例)— 同 element outline:
+  // 2px solid + 白 halo,移除外層裝飾色 halo(冗餘)。
   root.appendChild(
     makeDiv(
       `position:absolute;left:${b.left - 1}px;top:${b.top - 1}px;
        width:${b.width}px;height:${b.height}px;
-       border:2px solid #00A8B3;box-shadow:0 0 0 2px rgba(255,255,255,0.85), 0 0 0 4px rgba(0,168,179,0.25);
+       border:2px solid #00A8B3;box-shadow:0 0 0 2px rgba(255,255,255,0.85);
        box-sizing:content-box;pointer-events:none;`,
     ),
   )
@@ -330,11 +332,13 @@ export function drawOverlay({ element, mode, label, sibling }: DrawOptions) {
     left: parseFloat(cs.paddingLeft) || 0,
   }
 
-  // 1. Purple outline around element
+  // 1. Purple outline around element — 2px solid 已足夠識別 + 白 halo for busy-bg visibility。
+  //    移除外層裝飾紫 halo(對齊 Chrome / Figma / Sketch — 純 outline + 可選 visibility halo,
+  //    無多重裝飾 halo)。
   const outline = makeDiv(
     `position:absolute;left:${rect.left - 1}px;top:${rect.top - 1}px;
      width:${rect.width}px;height:${rect.height}px;
-     border:2px solid #B668FF;box-shadow:0 0 0 2px rgba(255,255,255,0.85), 0 0 0 4px rgba(182,104,255,0.25);
+     border:2px solid #B668FF;box-shadow:0 0 0 2px rgba(255,255,255,0.85);
      box-sizing:content-box;`,
   )
   root.appendChild(outline)
