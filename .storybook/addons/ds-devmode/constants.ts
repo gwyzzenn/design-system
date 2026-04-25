@@ -26,6 +26,15 @@ export interface InspectPayload {
   padding: { top: number; right: number; bottom: number; left: number }
   margin: { top: number; right: number; bottom: number; left: number }
   border: { top: number; right: number; bottom: number; left: number }
+  /** Position offsets — 對齊 Chrome `MetricsSidebarPane.ts` 的 5-layer model。`type` = static 時
+   * 4 邊值無意義(panel 顯 N/A)。non-static(absolute/relative/fixed/sticky)才有意義。 */
+  position: {
+    type: string
+    top: string
+    right: string
+    bottom: string
+    left: string
+  }
   computed: Record<string, string>
   tokenUsage: Array<{
     property: string

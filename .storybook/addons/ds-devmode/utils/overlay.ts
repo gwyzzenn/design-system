@@ -2,23 +2,30 @@
  * Redline overlay rendered inside the canvas iframe document.
  * Built imperatively (no React) — cheap + no iframe bundling concerns.
  *
- * Occlusion canonical(2026-04-25,對齊 Chrome DevTools `tool_highlight.ts`):
- * - **Canvas overlay = visual hint**(允許粗糙,絕不遮 element)。
- * - **Panel = canonical**(任何 value 都能在 Panel 看到 — 4-rect anatomy / 4 邊 padding /
- *   margin / distancesToParent / Author CSS)。
+ * Visual idiom mix(2026-04-25):
+ * - Element badge + 18×12 size gate → 對齊 **Chrome `tool_highlight.ts`**(實際 source
+ *   verified:`drawElementTitle` arrow-width + arrowInset 同源)。
+ * - Distance line + T-cap + extension lines + red label → **Sketch / Figma / CAD redline 派**
+ *   (Chrome 沒 inter-element distance 測量功能,inspector_overlay 無此 component)。
+ * - Padding/margin per-side 數字 → **不畫於 canvas**(Chrome 只畫色塊,per-side 數字僅
+ *   在 panel — 我們同 idiom)。
+ *
+ * Panel canonical:任何 value 都能在 Panel 看到 — 4-rect anatomy(margin/border/padding/
+ * content + position 5 層,Chrome `MetricsSidebarPane.ts` 同源)/ 4 邊 padding / margin /
+ * distancesToParent / Author CSS。
  *
  * 落地規則:
- * - Property badge:rect.width < 18 OR rect.height < 12 → suppress(Chrome 18px 同源)。
- * - Distance label(parent / sibling):line length < 12 → 不畫數字,只畫 line + T-cap。
- * - Padding 數字 label:**完全不畫**(對齊 Chrome — Chrome 的 padding/margin 也是只有色塊,
- *   per-side 數字僅在 panel)。色塊 hatch 保留。
+ * - Property badge:rect.width < BADGE_MIN_W OR rect.height < BADGE_MIN_H → suppress。
+ * - Distance label:line length < LABEL_MIN_LINE → 不畫數字,只畫 line + T-cap。
+ * - Compact label style(font 10px / padding 1px 4px / halo 1px)— 比 11px+halo 2px 省 ~10px
+ *   寬度,小距離 fit 範圍擴大。
  */
 const OVERLAY_ID = '__ds_devmode_overlay__'
 
 // Threshold constants(對齊 Chrome inspector_overlay/tool_highlight.ts)
 const BADGE_MIN_W = 18  // Chrome 同值:arrowWidth + 2 * arrowInset
 const BADGE_MIN_H = 12  // 我們 redline 派 minimum;< 12 連 outline 視覺都太小,badge 多餘
-const LABEL_MIN_LINE = 12  // distance label 寬約 22-24px,< 12px 線時 label 必越界遮元件
+const LABEL_MIN_LINE = 8  // compact label(font 10px + pad 1x4 + halo 1px)實測寬 ~14px,8px 線可放下
 
 interface DrawOptions {
   element: Element
@@ -72,14 +79,16 @@ const makeDiv = (cssText: string, text?: string) => {
 // Visibility halo — 2px white shadow ring around elements ensures redlines /
 // outlines remain readable on any bg(white / dark / busy / colored)。
 // World-class 對照:Chrome ruler / Figma annotation / Photoshop guides 3+。
-const HALO_LABEL = '0 0 0 2px #fff, 0 1px 4px rgba(0,0,0,0.4)'
+const HALO_LABEL = '0 0 0 1px #fff, 0 1px 3px rgba(0,0,0,0.35)'
 const HALO_OUTLINE = '0 0 0 2px rgba(255,255,255,0.85), 0 0 0 4px rgba(0,0,0,0.15)'
 
 const distanceLabel = (value: number, left: string, top: string, transform: string) => {
+  // Compact style(2026-04-25)— font 10px / padding 1x4 / halo 1px,實測 label 寬 ~14px,
+  // 比舊樣式(11px / 2x7 / halo 2px → ~26px)省 ~12px,小距離 occlusion 大幅降。
   const d = makeDiv(
     `position:absolute;left:${left};top:${top};transform:${transform};
-     background:#EC4436;color:#fff;padding:2px 7px;border-radius:3px;
-     font-weight:700;font-size:11px;line-height:1.4;
+     background:#EC4436;color:#fff;padding:1px 4px;border-radius:2px;
+     font-weight:600;font-size:10px;line-height:1.3;
      box-shadow:${HALO_LABEL};white-space:nowrap;z-index:1;`,
     String(Math.round(value)),
   )

@@ -367,7 +367,8 @@ const Section: React.FC<{
 }
 
 const AnatomyBox: React.FC<{ payload: InspectPayload }> = ({ payload }) => {
-  const { distancesToParent, padding, margin, border, rect } = payload
+  const { distancesToParent, padding, margin, border, position, rect } = payload
+  const isPositioned = position && position.type !== 'static'
   const w = Math.round(rect.width)
   const h = Math.round(rect.height)
   // Content size = rect - border - padding(對齊 Chrome DevTools box model 第 4 層 inner-most)。
@@ -376,14 +377,24 @@ const AnatomyBox: React.FC<{ payload: InspectPayload }> = ({ payload }) => {
   const iw = Math.max(0, w - padding.left - padding.right - border.left - border.right)
   const ih = Math.max(0, h - padding.top - padding.bottom - border.top - border.bottom)
   // Margin layer container — Chrome 4-rect box model:margin → border → padding → content
+  // (+ position outer layer 對齊 Chrome `MetricsSidebarPane.ts` 5-layer model:position →
+  //   margin → border → padding → content,non-static element 才顯 position 層)
   const marginOuter: React.CSSProperties = {
     position: 'relative',
     border: '1px dashed rgba(155, 99, 0, 0.45)',
     padding: 14,
     background: 'repeating-linear-gradient(45deg, rgba(247, 142, 30, 0.08) 0 3px, transparent 3px 6px)',
+    marginTop: isPositioned ? 14 : 4,
+  }
+  const positionOuter: React.CSSProperties = {
+    position: 'relative',
+    border: '1px dotted rgba(123, 68, 196, 0.5)',
+    padding: 14,
+    background: 'rgba(123, 68, 196, 0.04)',
     marginTop: 4,
   }
-  return (
+  const positionFmt = (v: string) => v === 'auto' || v === '' ? '—' : v
+  const anatomy = (
     <div style={marginOuter}>
       <span style={{ ...styles.edgeLabel, position: 'absolute', top: -9, left: 8, background: 'var(--sb-bg, #fff)', padding: '0 4px', color: '#A36100' }}>
         Margin {margin.top}/{margin.right}/{margin.bottom}/{margin.left}
@@ -407,9 +418,7 @@ const AnatomyBox: React.FC<{ payload: InspectPayload }> = ({ payload }) => {
         )}
         <div style={styles.borderBox}>
           <span style={{ ...styles.edgeLabel, position: 'absolute', top: -9, left: 8, background: 'var(--sb-bg, #fff)', padding: '0 4px' }}>
-            {border.top || border.right || border.bottom || border.left
-              ? `Border ${border.top}/${border.right}/${border.bottom}/${border.left}`
-              : 'Border'}
+            Border {border.top}/{border.right}/{border.bottom}/{border.left}
           </span>
           <span style={{ ...styles.edgeLabel, color: '#0065EA' }}>{padding.left}</span>
           <div style={styles.paddingBox}>
@@ -433,6 +442,15 @@ const AnatomyBox: React.FC<{ payload: InspectPayload }> = ({ payload }) => {
           border-box
         </div>
       </div>
+    </div>
+  )
+  if (!isPositioned) return anatomy
+  return (
+    <div style={positionOuter}>
+      <span style={{ ...styles.edgeLabel, position: 'absolute', top: -9, left: 8, background: 'var(--sb-bg, #fff)', padding: '0 4px', color: '#7B44C4' }}>
+        Position {position!.type} · {positionFmt(position!.top)}/{positionFmt(position!.right)}/{positionFmt(position!.bottom)}/{positionFmt(position!.left)}
+      </span>
+      {anatomy}
     </div>
   )
 }

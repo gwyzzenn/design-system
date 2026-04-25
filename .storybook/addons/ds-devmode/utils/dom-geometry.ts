@@ -29,6 +29,13 @@ export function measureElement(el: Element): InspectPayload {
     bottom: pxFromStyle(cs.borderBottomWidth),
     left: pxFromStyle(cs.borderLeftWidth),
   }
+  const position = {
+    type: cs.position,
+    top: cs.top,
+    right: cs.right,
+    bottom: cs.bottom,
+    left: cs.left,
+  }
 
   const distancesToParent = pr
     ? {
@@ -49,6 +56,7 @@ export function measureElement(el: Element): InspectPayload {
     padding,
     margin,
     border,
+    position,
     computed: {}, // filled in Stage 2
     tokenUsage: [], // filled in Stage 2
   }
