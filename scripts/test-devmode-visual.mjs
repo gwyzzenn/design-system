@@ -21,19 +21,25 @@ const tests = [
     name: 'avatar-status-dot',
     storyId: 'design-system-components-avatar-設計原則--with-badge-overlay-rule',
     targetSelector: '[aria-hidden="true"][class*="absolute"][class*="rounded-full"]',
-    desc: 'Avatar status dot — position:absolute, tiny ~8x8, expects:Position layer render + small canvas',
+    desc: 'Avatar status dot — position:absolute, tiny ~8x8',
   },
   {
-    name: 'button-link-tight',
+    name: 'button-link-span',
     storyId: 'design-system-components-button-展示--all-variants',
     targetSelector: 'button:has-text("前往設定") span.px-1',
-    desc: 'Button link variant span — distance ~7-13px, expects:compact label fits',
+    desc: 'Button link span — distance interior idiom(parent padding 12 扣後 = 0)',
+  },
+  {
+    name: 'button-itself',
+    storyId: 'design-system-components-button-展示--all-variants',
+    targetSelector: 'button:has-text("新增")',
+    desc: 'Button itself — distance to story container content area',
   },
   {
     name: 'tag-with-border',
-    storyId: 'design-system-components-tag-展示--all-variants',
-    targetSelector: 'span[class*="rounded"]',
-    desc: 'Tag — has border, expects:Border 1/1/1/1 visible + yellow dashed',
+    storyId: 'design-system-components-tag-展示--with-icon',
+    targetSelector: '[class*="rounded-full"][class*="border"]',
+    desc: 'Tag with border:1 — expects Border 1/1/1/1',
   },
 ]
 

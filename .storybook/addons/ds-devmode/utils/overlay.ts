@@ -26,6 +26,9 @@ const OVERLAY_ID = '__ds_devmode_overlay__'
 const BADGE_MIN_W = 18  // Chrome 同值:arrowWidth + 2 * arrowInset
 const BADGE_MIN_H = 12  // 我們 redline 派 minimum;< 12 連 outline 視覺都太小,badge 多餘
 const LABEL_MIN_LINE = 8  // compact label(font 10px + pad 1x4 + halo 1px)實測寬 ~14px,8px 線可放下
+const MAX_LINE = 200  // 超過此長度的 redline 無視覺價值且必跨過其他元件遮擋(常見:page-wide
+                     // parent container 邊到元件 1000+ px),改 panel canonical(值在那裡)
+                     // Trade-off vs 完整視覺:>200px 線視覺資訊量低,Panel 顯數字更實用
 
 interface DrawOptions {
   element: Element
@@ -369,50 +372,58 @@ export function drawOverlay({ element, mode, label, sibling }: DrawOptions) {
     // top
     if (rect.top > parent.top) {
       const dist = rect.top - parent.top
-      root.appendChild(redLine(`left:${cx}px;top:${parent.top}px;width:2px;height:${dist}px;`))
-      root.appendChild(tCapHorizontal(cx, parent.top))
-      root.appendChild(tCapHorizontal(cx, rect.top))
-      if (dist >= LABEL_MIN_LINE) {
-        root.appendChild(
-          distanceLabel(dist, `${cx}px`, `${parent.top + dist / 2}px`, 'translate(-50%,-50%)'),
-        )
+      if (dist <= MAX_LINE) {
+        root.appendChild(redLine(`left:${cx}px;top:${parent.top}px;width:2px;height:${dist}px;`))
+        root.appendChild(tCapHorizontal(cx, parent.top))
+        root.appendChild(tCapHorizontal(cx, rect.top))
+        if (dist >= LABEL_MIN_LINE) {
+          root.appendChild(
+            distanceLabel(dist, `${cx}px`, `${parent.top + dist / 2}px`, 'translate(-50%,-50%)'),
+          )
+        }
       }
     }
     // bottom
     if (rect.bottom < parent.bottom) {
       const dist = parent.bottom - rect.bottom
-      root.appendChild(redLine(`left:${cx}px;top:${rect.bottom}px;width:2px;height:${dist}px;`))
-      root.appendChild(tCapHorizontal(cx, rect.bottom))
-      root.appendChild(tCapHorizontal(cx, parent.bottom))
-      if (dist >= LABEL_MIN_LINE) {
-        root.appendChild(
-          distanceLabel(dist, `${cx}px`, `${rect.bottom + dist / 2}px`, 'translate(-50%,-50%)'),
-        )
+      if (dist <= MAX_LINE) {
+        root.appendChild(redLine(`left:${cx}px;top:${rect.bottom}px;width:2px;height:${dist}px;`))
+        root.appendChild(tCapHorizontal(cx, rect.bottom))
+        root.appendChild(tCapHorizontal(cx, parent.bottom))
+        if (dist >= LABEL_MIN_LINE) {
+          root.appendChild(
+            distanceLabel(dist, `${cx}px`, `${rect.bottom + dist / 2}px`, 'translate(-50%,-50%)'),
+          )
+        }
       }
     }
     const cy = rect.top + rect.height / 2
     // left
     if (rect.left > parent.left) {
       const dist = rect.left - parent.left
-      root.appendChild(redLine(`left:${parent.left}px;top:${cy}px;width:${dist}px;height:2px;`))
-      root.appendChild(tCapVertical(parent.left, cy))
-      root.appendChild(tCapVertical(rect.left, cy))
-      if (dist >= LABEL_MIN_LINE) {
-        root.appendChild(
-          distanceLabel(dist, `${parent.left + dist / 2}px`, `${cy}px`, 'translate(-50%,-50%)'),
-        )
+      if (dist <= MAX_LINE) {
+        root.appendChild(redLine(`left:${parent.left}px;top:${cy}px;width:${dist}px;height:2px;`))
+        root.appendChild(tCapVertical(parent.left, cy))
+        root.appendChild(tCapVertical(rect.left, cy))
+        if (dist >= LABEL_MIN_LINE) {
+          root.appendChild(
+            distanceLabel(dist, `${parent.left + dist / 2}px`, `${cy}px`, 'translate(-50%,-50%)'),
+          )
+        }
       }
     }
     // right
     if (rect.right < parent.right) {
       const dist = parent.right - rect.right
-      root.appendChild(redLine(`left:${rect.right}px;top:${cy}px;width:${dist}px;height:2px;`))
-      root.appendChild(tCapVertical(rect.right, cy))
-      root.appendChild(tCapVertical(parent.right, cy))
-      if (dist >= LABEL_MIN_LINE) {
-        root.appendChild(
-          distanceLabel(dist, `${rect.right + dist / 2}px`, `${cy}px`, 'translate(-50%,-50%)'),
-        )
+      if (dist <= MAX_LINE) {
+        root.appendChild(redLine(`left:${rect.right}px;top:${cy}px;width:${dist}px;height:2px;`))
+        root.appendChild(tCapVertical(rect.right, cy))
+        root.appendChild(tCapVertical(parent.right, cy))
+        if (dist >= LABEL_MIN_LINE) {
+          root.appendChild(
+            distanceLabel(dist, `${rect.right + dist / 2}px`, `${cy}px`, 'translate(-50%,-50%)'),
+          )
+        }
       }
     }
     // Parent content area outline(2026-04-25 v2)— 對齊 Figma idiom:redline 終點 = 此邊界。
