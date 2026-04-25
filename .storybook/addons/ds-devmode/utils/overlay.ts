@@ -422,16 +422,18 @@ export function drawOverlay({ element, mode, label, sibling }: DrawOptions) {
     const badgeAbove = rect.top - 24 >= 4
     const badgeTop = badgeAbove ? rect.top - 24 : rect.bottom + 4
     const badge = makeDiv(
+      // 對齊 Chrome `tool_highlight.css` `.section-name` font 10 + `.tooltip-content`
+      // radius 3 + 整體 compact 風;color 紫 #B668FF 是 redline 派 pinned-element identity。
       `position:absolute;left:${rect.left}px;top:${badgeTop}px;
-       background:#B668FF;color:#fff;padding:2px 8px;border-radius:4px;
-       font-size:11px;font-weight:500;display:inline-flex;align-items:center;gap:4px;
+       background:#B668FF;color:#fff;padding:2px 7px;border-radius:3px;
+       font-size:10px;font-weight:500;display:inline-flex;align-items:center;gap:3px;
        box-shadow:0 2px 6px rgba(0,0,0,0.2);pointer-events:none;white-space:nowrap;`,
       label,
     )
     badge.className = '__ds-label'
-    // diamond icon
+    // diamond icon — 7×7 對齊 badge 10px font scale(原 8×8 比 font 大 1px,輕微比例違和)
     const icon = makeDiv(
-      `width:8px;height:8px;background:#fff;transform:rotate(45deg);display:inline-block;margin-right:2px;`,
+      `width:7px;height:7px;background:#fff;transform:rotate(45deg);display:inline-block;margin-right:2px;`,
     )
     badge.prepend(icon)
     root.appendChild(badge)
