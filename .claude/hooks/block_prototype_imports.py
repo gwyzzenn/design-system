@@ -6,8 +6,11 @@ import sys
 import time
 
 # Per-hook fire logging(enables /knowledge-prune D2 dead-hook detection)
+# Resolve project root from this script's location(stable; cwd may be anywhere
+# depending on how Claude Code invokes the hook)to avoid stray .claude/ trees.
 try:
-    _log_dir = os.path.join(os.environ.get('CLAUDE_PROJECT_DIR', os.getcwd()), '.claude', 'logs')
+    _project_root = os.environ.get('CLAUDE_PROJECT_DIR') or os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    _log_dir = os.path.join(_project_root, '.claude', 'logs')
     os.makedirs(_log_dir, exist_ok=True)
     with open(os.path.join(_log_dir, 'hook-fires-per-hook.jsonl'), 'a') as _f:
         _f.write(json.dumps({'ts': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()), 'hook': os.path.basename(__file__)}) + '\n')

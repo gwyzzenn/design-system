@@ -11,7 +11,12 @@
 
 log_hook_fire() {
   local hook_name="${1:-$(basename "${BASH_SOURCE[1]:-$0}")}"
-  local log_dir="${CLAUDE_PROJECT_DIR:-$(pwd)}/.claude/logs"
+  # Resolve project root from this helper's location(stable; cwd may be anywhere
+  # depending on how Claude Code invokes the hook)to avoid stray .claude/ trees.
+  local _self_dir
+  _self_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  local _resolved_root="${_self_dir%/.claude/hooks}"
+  local log_dir="${CLAUDE_PROJECT_DIR:-$_resolved_root}/.claude/logs"
   local log_file="$log_dir/hook-fires-per-hook.jsonl"
 
   mkdir -p "$log_dir" 2>/dev/null || return 0
