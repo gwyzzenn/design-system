@@ -5,7 +5,7 @@ import { EVENTS, type InspectPayload, type DevmodeMode, type ForceState } from '
 const styles: Record<string, React.CSSProperties> = {
   root: {
     padding: '12px 16px',
-    fontSize: 12,
+    fontSize: 11,  // 對齊 Chrome Styles panel 11px(原 12 偏鬆,精簡 + 資訊密度提升)
     fontFamily: '-apple-system, "SF Pro Text", system-ui, sans-serif',
     color: 'var(--sb-fg, #1F2532)',
     height: '100%',
@@ -16,12 +16,12 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    fontSize: 11,
+    fontSize: 10,  // section head 縮小:Chrome MetricsSidebarPane / Styles section labels 都 10px
     fontWeight: 600,
     textTransform: 'uppercase',
     letterSpacing: '0.04em',
     color: 'var(--sb-fg-muted, #65727F)',
-    margin: '12px 0 6px',
+    margin: '8px 0 4px',  // 從 12 6 緊湊到 8 4
   },
   badge: {
     display: 'inline-block',
@@ -36,7 +36,7 @@ const styles: Record<string, React.CSSProperties> = {
     position: 'relative',
     border: '1px solid rgba(128,128,128,0.25)',
     borderRadius: 6,
-    padding: '36px 40px',
+    padding: '24px 28px',  // 從 36 40 壓縮 — 更接近 Chrome MetricsSidebarPane 的 compact 派
     background: 'var(--sb-bg-subtle, rgba(0,0,0,0.02))',
     marginTop: 4,
   },
@@ -551,7 +551,9 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
           <button style={styles.toggleBtn(mode === 'live')} onClick={() => setModeAndBroadcast('live')}>Live</button>
           <button style={styles.toggleBtn(mode === 'pin')} onClick={() => setModeAndBroadcast('pin')} disabled={!payload}>Pin</button>
         </div>
-        <span style={{ marginLeft: 'auto', fontSize: 10, color: 'var(--sb-fg-muted, #65727F)' }}>Alt+I toggle · Esc unpin · ↑↓→← walk DOM · <b style={{ color: '#EC4436' }}>Pin 後 hover 任一元素 → 顯示元件↔元件 edge-to-edge 距離</b> · H 暫清 label · 觸控:tap 即 pin</span>
+        <span style={{ marginLeft: 'auto', fontSize: 10, color: 'var(--sb-fg-muted, #65727F)' }}>
+          Alt+I toggle · Esc unpin · ↑↓←→ DOM · <b style={{ color: '#EC4436' }}>hover 別元素 = 量距</b> · H 暫清 · 觸控 tap pin
+        </span>
       </div>
 
       {!payload && (
