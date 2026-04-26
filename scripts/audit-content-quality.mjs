@@ -37,6 +37,7 @@ const violations = {
   missingName: [],
   placeholderContent: [],  // Option A/B/C / Lorem / 抽象代號
   emptyStory: [],          // story render returns empty
+  englishPlaceholder: [],  // 中文 stories 內 hardcoded English placeholder(Hover me / Click me / Test 123)
 };
 let autoFixed = 0;
 
@@ -139,6 +140,26 @@ for (const file of walk(COMPONENTS_DIR)) {
     }
   }
 
+  // === Check 4d: English placeholder text in JSX(中文 DS 內英文 demo text)===
+  // 偵測 JSX 內的 hardcoded English UI text(只 1-3 個英文單字 + space):
+  //   `>Hover me<` / `>Click me<` / `>Test 123<` / `>Submit<`(等)
+  // 若 file 含 ≥ 1 中文字符(說明本是中文 stories),且 JSX 內出現此 pattern → flag
+  if (!isAnatomy || file.endsWith('.anatomy.stories.tsx')) {
+    const hasChinese = /[\u4e00-\u9fa5]/.test(stripped);
+    if (hasChinese) {
+      // JSX text node pattern: `>{2-3 short English words}<`
+      // Match e.g. "Hover me", "Click me", "Test 123", "Try it"
+      const englishJsxPattern = />\s*((?:Hover|Click|Try|Press|Submit|Cancel|Save|OK|Close|Open|Toggle|Tap)\s+(?:me|here|now|it|this|that)|(?:Hello|Hi)\s+world|Test\s+\d+|Lorem\s+\w+)\s*</gi;
+      const placeholders = [...stripped.matchAll(englishJsxPattern)];
+      if (placeholders.length > 0) {
+        violations.englishPlaceholder.push({
+          file: basename(file),
+          samples: placeholders.slice(0, 3).map(m => m[1])
+        });
+      }
+    }
+  }
+
   // === Check 4c: Empty story render(無 visible JSX)===
   if (!isAnatomy) {
     const renderEmpty = /render:\s*\(\s*\)\s*=>\s*\(\s*<\s*(div|>)\s*\/>\s*\)/g;
@@ -167,7 +188,7 @@ for (const file of walk(COMPONENTS_DIR)) {
   if (modified) writeFileSync(file, content);
 }
 
-const totalViolations = violations.numbering.length + violations.nonAnatomyNumbering.length + violations.linkTo.length + violations.stub.length + violations.missingName.length + violations.placeholderContent.length + violations.emptyStory.length;
+const totalViolations = violations.numbering.length + violations.nonAnatomyNumbering.length + violations.linkTo.length + violations.stub.length + violations.missingName.length + violations.placeholderContent.length + violations.emptyStory.length + violations.englishPlaceholder.length;
 
 console.log('=== Content quality audit ===\n');
 console.log(`Mode: ${fix ? 'fix' : 'check'}`);
@@ -191,6 +212,13 @@ if (violations.placeholderContent.length > 0) {
 if (violations.emptyStory.length > 0) {
   console.log(`\n[P0] Empty story render: ${violations.emptyStory.length}`);
   violations.emptyStory.slice(0, 10).forEach(v => console.log(`  • ${v.file}`));
+}
+
+if (violations.englishPlaceholder.length > 0) {
+  console.log(`\n[P0] English placeholder in 中文 stories: ${violations.englishPlaceholder.length} files`);
+  violations.englishPlaceholder.slice(0, 10).forEach(v =>
+    console.log(`  • ${v.file}: ${v.samples.map(s => `"${s}"`).join(', ')}`)
+  );
 }
 
 if (violations.linkTo.length > 0) {

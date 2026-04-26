@@ -32,7 +32,7 @@ export const Default: Story = {
     <Tooltip defaultOpen>
       <TooltipTrigger asChild>
         <Button variant="secondary" startIcon={Info}>
-          Hover me
+          將滑鼠移至上方
         </Button>
       </TooltipTrigger>
       <TooltipContent>

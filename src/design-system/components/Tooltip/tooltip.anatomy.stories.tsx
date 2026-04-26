@@ -131,7 +131,7 @@ export const Overview = {
             <span className="text-[11px] text-fg-muted font-medium">Live 範例</span>
             <Tooltip defaultOpen>
               <TooltipTrigger asChild>
-                <Button variant="secondary" startIcon={Info} size="sm">Hover me</Button>
+                <Button variant="secondary" startIcon={Info} size="sm">滑鼠移上</Button>
               </TooltipTrigger>
               <TooltipContent side="top">這是一個 Tooltip</TooltipContent>
             </Tooltip>

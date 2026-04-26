@@ -316,7 +316,7 @@ export const StateBehavior: Story = {
             <TabsList>
               <TabsTrigger value="selected">Selected(當前)</TabsTrigger>
               <TabsTrigger value="unselected">Unselected</TabsTrigger>
-              <TabsTrigger value="hover">Hover me ↓</TabsTrigger>
+              <TabsTrigger value="hover">懸停 ↓</TabsTrigger>
               <TabsTrigger value="disabled" disabled>Disabled</TabsTrigger>
             </TabsList>
           </Tabs>
