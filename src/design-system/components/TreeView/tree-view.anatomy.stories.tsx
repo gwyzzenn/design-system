@@ -12,7 +12,7 @@ export default meta
 type Story = StoryObj
 
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -94,7 +94,7 @@ interface InspectorArgs {
 }
 
 export const Inspector: Story = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   parameters: {
     docs: {
       description: {
@@ -166,7 +166,7 @@ export const Inspector: Story = {
 }
 
 export const SizeMatrix: Story = {
-  name: '4. 尺寸對照表',
+  name: '尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -215,7 +215,7 @@ export const SizeMatrix: Story = {
 }
 
 export const ColorMatrix: Story = {
-  name: '3. 色彩對照表',
+  name: '色彩對照表',
   render: () => {
     const [selected, setSelected] = React.useState<Set<string>>(new Set(['beach']))
     return (
@@ -291,7 +291,7 @@ export const ColorMatrix: Story = {
 }
 
 export const IndentMatrix: Story = {
-  name: '6. Indent 與 Tree Guide',
+  name: 'Indent 與 Tree Guide',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -329,7 +329,7 @@ export const IndentMatrix: Story = {
 }
 
 export const StateBehavior: Story = {
-  name: '5. 狀態行為',
+  name: '狀態行為',
   render: () => {
     const [selected, setSelected] = React.useState<Set<string>>(new Set(['resume']))
     return (
@@ -370,7 +370,7 @@ export const StateBehavior: Story = {
 }
 
 export const KeyboardMatrix: Story = {
-  name: '7. 鍵盤導覽(ARIA tree)',
+  name: '鍵盤導覽(ARIA tree)',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>

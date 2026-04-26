@@ -12,7 +12,7 @@ export default meta
 type Story = StoryObj
 
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -75,7 +75,7 @@ export const Overview: Story = {
 }
 
 export const Inspector: Story = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   parameters: {
     docs: { description: { story: '右側 Controls 切 Steps props 即時 render,取代 Figma inspect。切 `value` 切換 current step、改 `orientation` / `size` 對照排列與尺寸,切 `linear` 看 upcoming step 是否可點。' } },
   },
@@ -124,7 +124,7 @@ export const Inspector: Story = {
 }
 
 export const OrientationMatrix: Story = {
-  name: '6. 方向',
+  name: '方向',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -156,7 +156,7 @@ export const OrientationMatrix: Story = {
 }
 
 export const ColorMatrix: Story = {
-  name: '3. 色彩對照表',
+  name: '色彩對照表',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -237,7 +237,7 @@ export const ColorMatrix: Story = {
 }
 
 export const SizeMatrix: Story = {
-  name: '4. 尺寸對照表',
+  name: '尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>
@@ -351,7 +351,7 @@ const ErrorInterrupt = () => {
 }
 
 export const StateBehavior: Story = {
-  name: '5. 狀態行為',
+  name: '狀態行為',
   render: () => (
     <div className="flex flex-col gap-10">
       <div className="flex flex-col gap-1">
@@ -410,7 +410,7 @@ export const StateBehavior: Story = {
 }
 
 export const IndentAlignment: Story = {
-  name: '7. 欄位節奏',
+  name: '欄位節奏',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

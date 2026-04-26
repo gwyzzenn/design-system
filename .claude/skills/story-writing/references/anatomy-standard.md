@@ -22,28 +22,28 @@
 
 每個 `.anatomy.stories.tsx` 的 `export const` 識別名稱必須用英文、中文 story 顯示名必須**強制 `name:` 覆寫**,且兩者**一字不差對齊**以下 canonical:
 
-| 順序 | `export const` | 中文 story `name`(強制覆寫,含編號前綴) |
+| 順序 | `export const` | 中文 story `name`(強制覆寫,**不加序號**) |
 |------|--------------|---------------------|
-| 1 | `Overview` | `'1. 元件總覽'` |
-| 2 | `Inspector` | `'2. 元件檢閱器'` |
-| 3 | `ColorMatrix` | `'3. 色彩對照表'` |
-| 4 | `SizeMatrix` | `'4. 尺寸對照表'` |
-| 5 | `StateBehavior` | `'5. 狀態行為'` |
-| 6 | `Accessibility` | `'6. 無障礙與鍵盤'`(互動元件強制,純視覺 indicator N/A)|
-| 7+ | 元件特有 | `'7. XXX'` / `'8. XXX'` 依順序編號(中文命名,見下方擴充規則) |
+| 1 | `Overview` | `'元件總覽'` |
+| 2 | `Inspector` | `'元件檢閱器'` |
+| 3 | `ColorMatrix` | `'色彩對照表'` |
+| 4 | `SizeMatrix` | `'尺寸對照表'` |
+| 5 | `StateBehavior` | `'狀態行為'` |
+| 6 | `Accessibility` | `'無障礙與鍵盤'`(互動元件強制,純視覺 indicator N/A)|
+| 7+ | 元件特有 | 中文命名,見下方擴充規則 |
 
 ```ts
 export const Overview = {
-  name: '1. 元件總覽',  // ← 強制覆寫,不可省
+  name: '元件總覽',  // ← 強制覆寫,不可省
   render: () => (...),
 } satisfies Story
 ```
 
-### 為什麼強制 `name:` 覆寫 + 編號
+### 為什麼強制 `name:` 覆寫(不加序號)
 
-- **強制中文覆寫**:不覆寫時 Storybook sidebar 顯示英文 identifier(`Overview`),中英混雜破壞中文 spec 一致性。39/57 元件未覆寫,在 sidebar 呈現英文,這是 governance bug
-- **強制編號**:Storybook sidebar 不依 `export` 順序,改依 story `name` 字母排序。中文無字母序,sidebar 會亂序;加編號前綴強制排序 canonical 化,順序跟 anatomy-standard 這份文件一致
-- **世界級對照**:Polaris(Anatomy / Variants / States)/ Material(Anatomy / Guidelines)/ Atlassian(Examples / Code) 的 Storybook 皆為每個 story 明確標題,從不靠 identifier 帶出 sidebar 名稱
+- **強制中文覆寫**:不覆寫時 Storybook sidebar 顯示英文 identifier(`Overview`),中英混雜破壞中文 spec 一致性
+- **不加序號**(2026-04-26 起 user 反饋):序號無價值且容易跳號(N/A skip 後 1 2 3 5 視覺破碎)。Sidebar 排序由 `export` 順序決定(Storybook 預設 `storySort: 'function'` 已對應 export 順序;若依字母排,本系統元件數有限,人工順序可接受)
+- **世界級對照**:Polaris(Anatomy / Variants / States)/ Material(Anatomy / Guidelines)/ Atlassian(Examples / Code) 的 Storybook 皆為每個 story 明確標題,**無一使用序號前綴**
 
 ### Canonical 是**預設 6 section 都要建**(含 Accessibility),N/A 是嚴格例外
 
@@ -99,38 +99,38 @@ import type { Meta, StoryObj } from '@storybook/react'
 - `name:` 值 ≠ canonical 中文(含編號前綴) → violation
 - 缺 6-canonical 某項且 spec.md 無 rationale → violation
 
-## 1. 元件總覽
+## 元件總覽(Overview)
 
 - Anatomy 圖——標示所有 slot(標準版面 + iconOnly 等變體版面)
 - Variant 一覽——每個 variant 一行:渲染元件 + 一句話角色描述
 - Props 速查表——prop / type / default / 說明
 
-## 2. 元件檢閱器(取代 Figma inspect)
+## 元件檢閱器(Inspector,取代 Figma inspect)
 
 - 控制項:variant / danger / state / size / iconOnly(依元件調整)
 - 左側:即時預覽 + 尺寸藍圖
 - 右側:Inspect 面板,分區顯示 Color / Layout / Typography / Style
 - **State 使用開發術語**:default / hover / active / disabled(不用 rest)
 
-## 3. 色彩對照表
+## 色彩對照表(ColorMatrix)
 
 - Variant × State 矩陣
 - 每格:渲染元件 + bg / text / border token 標註(含即時色塊)
 - 標準 variant 與 danger variant 分開
 
-## 4. 尺寸對照表
+## 尺寸對照表(SizeMatrix)
 
 - Size token 對照表(每個 size 的所有 token 一覽)
 - 含 iconOnly 等變體模式的覆寫說明
 - 視覺預覽矩陣(Variant × Size,含變體模式)
 
-## 5. 狀態行為
+## 狀態行為(StateBehavior)
 
 - 每個互動狀態的前後對照(如 loading spinner 替換規則)
 - 所有 variant 的 disabled 渲染(含變體模式)
 - 元件特有狀態(如 checked toggle)
 
-## 6. 無障礙與鍵盤(2026-04-24 新增,對齊 Material / Polaris / Atlassian 專章)
+## 無障礙與鍵盤(Accessibility,2026-04-24 新增,對齊 Material / Polaris / Atlassian 專章)
 
 **對齊世界級**:Material 3 / Polaris / Atlassian DSP 三家元件文件皆有 A11y + Keyboard 專章。散在 StateBehavior(focus/disabled)+ principles(do/don't)不夠突出,designer / audit 找 a11y 資訊需要翻多檔。
 

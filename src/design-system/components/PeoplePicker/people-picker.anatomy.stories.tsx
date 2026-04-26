@@ -10,14 +10,14 @@ export default meta
 type Story = StoryObj
 
 const SAMPLE_PEOPLE = [
-  { name: '8. Ada Chen', avatarUrl: 'https://i.pravatar.cc/80?img=1' },
-  { name: '9. Alice Wang', avatarUrl: 'https://i.pravatar.cc/80?img=5' },
-  { name: '10. Bob Chen', avatarUrl: 'https://i.pravatar.cc/80?img=12' },
-  { name: '11. Diana Lin', avatarUrl: 'https://i.pravatar.cc/80?img=20' },
+  { name: 'Ada Chen', avatarUrl: 'https://i.pravatar.cc/80?img=1' },
+  { name: 'Alice Wang', avatarUrl: 'https://i.pravatar.cc/80?img=5' },
+  { name: 'Bob Chen', avatarUrl: 'https://i.pravatar.cc/80?img=12' },
+  { name: 'Diana Lin', avatarUrl: 'https://i.pravatar.cc/80?img=20' },
 ]
 
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -82,7 +82,7 @@ export const Overview: Story = {
 }
 
 export const Inspector: Story = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   parameters: {
     docs: { description: { story: '右側 Controls 切 props 即時 render,取代 Figma inspect。切 `mode` 看 edit / readonly / disabled 視覺差異,切 `size` 對照 field-height tier。' } },
   },
@@ -110,7 +110,7 @@ export const Inspector: Story = {
 }
 
 export const ModeMatrix: Story = {
-  name: '6. Mode 對照',
+  name: 'Mode 對照',
   render: () => (
     <div className="flex flex-col gap-4 max-w-md">
       <div>
@@ -136,7 +136,7 @@ export const ModeMatrix: Story = {
 }
 
 export const SizeMatrix: Story = {
-  name: '4. 尺寸對照表',
+  name: '尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -183,7 +183,7 @@ export const SizeMatrix: Story = {
 }
 
 export const ColorMatrix: Story = {
-  name: '3. 色彩對照表',
+  name: '色彩對照表',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -279,7 +279,7 @@ export const ColorMatrix: Story = {
 }
 
 export const StateBehavior: Story = {
-  name: '5. 狀態行為',
+  name: '狀態行為',
   render: () => (
     <div className="flex flex-col gap-10 max-w-md">
       <div>
@@ -354,7 +354,7 @@ export const StateBehavior: Story = {
 }
 
 export const PersonValueType: Story = {
-  name: '7. PersonValue 型別',
+  name: 'PersonValue 型別',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>

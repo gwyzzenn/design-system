@@ -29,7 +29,7 @@ type Story = StoryObj
 // ── Overview ──────────────────────────────────────────────────────────────────
 
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -140,7 +140,7 @@ const InspectorDemo = () => {
 }
 
 export const Inspector: Story = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   render: () => (
     <div>
       <H3>互動 ratio 切換</H3>
@@ -165,7 +165,7 @@ const STD_RATIOS = [
 ]
 
 export const StandardRatios: Story = {
-  name: '3. 標準 ratio 視覺對照',
+  name: '標準 ratio 視覺對照',
   render: () => (
     <div>
       <H3>DS 標準 ratio</H3>

@@ -25,7 +25,7 @@ export default meta
 type Story = StoryObj
 
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -77,7 +77,7 @@ export const Overview: Story = {
 }
 
 export const TokenMatrix: Story = {
-  name: '2. Token 規則(--divider vs --border)',
+  name: 'Token 規則(--divider vs --border)',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

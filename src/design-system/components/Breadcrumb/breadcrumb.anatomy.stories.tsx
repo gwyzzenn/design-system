@@ -26,7 +26,7 @@ type Story = StoryObj
 type InspectorStory = StoryObj<InspectorArgs>
 
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -71,7 +71,7 @@ export const Overview: Story = {
 }
 
 export const Inspector: InspectorStory = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   parameters: {
     docs: {
       description: {
@@ -145,7 +145,7 @@ export const Inspector: InspectorStory = {
 }
 
 export const ColorMatrix: Story = {
-  name: '3. 色彩對照表',
+  name: '色彩對照表',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -245,7 +245,7 @@ export const ColorMatrix: Story = {
 }
 
 export const SizeMatrix: Story = {
-  name: '4. 尺寸對照表',
+  name: '尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -283,7 +283,7 @@ export const SizeMatrix: Story = {
 }
 
 export const StateBehavior: Story = {
-  name: '5. 狀態行為',
+  name: '狀態行為',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -358,7 +358,7 @@ export const StateBehavior: Story = {
 }
 
 export const UsageExamples: Story = {
-  name: '6. 真實場景',
+  name: '真實場景',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>
@@ -411,7 +411,7 @@ export const UsageExamples: Story = {
 
 export const CollapseMatrix: Story = {
   // renumbered to 7 (was 6) to accommodate ColorMatrix(3) + UsageExamples(6)
-  name: '7. 長路徑收合(Ellipsis)',
+  name: '長路徑收合(Ellipsis)',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>

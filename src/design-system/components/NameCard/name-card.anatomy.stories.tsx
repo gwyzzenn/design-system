@@ -35,7 +35,7 @@ type InspectorStory = StoryObj<InspectorArgs>
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -138,7 +138,7 @@ export const Overview: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const Inspector: InspectorStory = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   parameters: {
     docs: {
       description: {
@@ -147,7 +147,7 @@ export const Inspector: InspectorStory = {
     },
   },
   args: {
-    name: '7. Ada Chen',
+    name: 'Ada Chen',
     subtitle: 'Design Engineer · Engineering',
     status: 'online',
     withStatusMessage: true,
@@ -200,7 +200,7 @@ export const Inspector: InspectorStory = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const SectionMatrix: Story = {
-  name: '5. Section 組合(minimal → full)',
+  name: 'Section 組合(minimal → full)',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -294,7 +294,7 @@ export const SectionMatrix: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const ColorMatrix: Story = {
-  name: '3. 色彩對照表',
+  name: '色彩對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -353,7 +353,7 @@ export const ColorMatrix: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const HoverCardIntegration: Story = {
-  name: '6. HoverCard 整合(觸發行為)',
+  name: 'HoverCard 整合(觸發行為)',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -364,9 +364,9 @@ export const HoverCardIntegration: Story = {
         </Desc>
         <div className="border border-border rounded-lg p-6 flex items-center gap-8">
           {[
-            { name: '8. Ada Chen', subtitle: 'Design Engineer', status: 'online' as const },
-            { name: '9. Alice Wang', subtitle: 'Frontend Engineer', status: 'busy' as const },
-            { name: '10. Bob Chen', subtitle: 'PM, Growth', status: 'away' as const },
+            { name: 'Ada Chen', subtitle: 'Design Engineer', status: 'online' as const },
+            { name: 'Alice Wang', subtitle: 'Frontend Engineer', status: 'busy' as const },
+            { name: 'Bob Chen', subtitle: 'PM, Growth', status: 'away' as const },
           ].map(p => (
             <HoverCard key={p.name}>
               <HoverCardTrigger asChild>
@@ -421,7 +421,7 @@ export const HoverCardIntegration: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const StateBehavior: Story = {
-  name: '4. 狀態行為',
+  name: '狀態行為',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>

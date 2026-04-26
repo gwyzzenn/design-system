@@ -30,7 +30,7 @@ const sampleEvents: CalendarEvent[] = [
 
 // ── 1. 元件總覽 ────────────────────────────────────────────────────────────────
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="h-screen p-4 bg-canvas">
       <Calendar events={sampleEvents} />
@@ -40,7 +40,7 @@ export const Overview: Story = {
 
 // ── 2. 元件檢閱器 ────────────────────────────────────────────────────────────
 export const Inspector: Story = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   parameters: {
     docs: { description: { story: '右側 Controls 切 props 即時 render,取代 Figma inspect。view 目前只支援 `month`(week / day 為 tech debt,已 disable)。' } },
     layout: 'fullscreen',
@@ -68,7 +68,7 @@ export const Inspector: Story = {
 // ── 3. 色彩對照表(事件 color 類別 + Cell / Event tile token)─────────────────────
 // 跳過 4. SizeMatrix(rationale 見 calendar.spec.md「MVP vs 後續增量」,MVP 只 md;lg 為 tech debt)
 export const ColorMatrix: Story = {
-  name: '3. 色彩對照表',
+  name: '色彩對照表',
   render: () => {
     const colorEvents: CalendarEvent[] = (
       ['blue', 'green', 'orange', 'purple', 'red', 'yellow'] as const
@@ -189,7 +189,7 @@ export const ColorMatrix: Story = {
 
 // ── 5. 狀態行為 ─────────────────────────────────────────────────────────────
 export const StateBehavior: Story = {
-  name: '4. 狀態行為',
+  name: '狀態行為',
   render: () => (
     <div className="h-screen p-4 bg-canvas">
       <div className="mb-2 text-body text-fg-muted space-y-1">

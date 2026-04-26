@@ -19,7 +19,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -79,7 +79,7 @@ export const Overview: Story = {
 }
 
 export const Inspector: Story = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   parameters: {
     docs: { description: { story: '右側 Controls 切 SegmentedControl props 即時 render,取代 Figma inspect。改 `value` 看選中狀態、切 `size` 對照 field-height tier、切 `fullWidth` 看 hug vs 等分。' } },
   },
@@ -123,7 +123,7 @@ export const Inspector: Story = {
 }
 
 export const SizeMatrix: Story = {
-  name: '3. 尺寸對照表',
+  name: '尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -157,7 +157,7 @@ export const SizeMatrix: Story = {
 }
 
 export const StateBehavior: Story = {
-  name: '4. 狀態行為',
+  name: '狀態行為',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -210,7 +210,7 @@ export const StateBehavior: Story = {
 }
 
 export const FullWidthMatrix: Story = {
-  name: '5. fullWidth 行為',
+  name: 'fullWidth 行為',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -252,7 +252,7 @@ export const FullWidthMatrix: Story = {
 }
 
 export const IconOnlyMatrix: Story = {
-  name: '6. iconOnly(group-level)',
+  name: 'iconOnly(group-level)',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

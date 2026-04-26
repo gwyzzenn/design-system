@@ -10,7 +10,7 @@ export default meta
 type Story = StoryObj
 
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -56,7 +56,7 @@ export const Overview: Story = {
 }
 
 export const Inspector: Story = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   parameters: {
     docs: { description: { story: '右側 Controls 切 props 即時 render,取代 Figma inspect。調整 `min` / `max` / `step` / `defaultValue` 看值域行為,切 `size` 看容器高度 tier(track / thumb 視覺固定)。' } },
   },
@@ -87,7 +87,7 @@ export const Inspector: Story = {
 }
 
 export const ColorMatrix: Story = {
-  name: '3. 色彩對照表',
+  name: '色彩對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -118,7 +118,7 @@ export const ColorMatrix: Story = {
 }
 
 export const SizeMatrix: Story = {
-  name: '4. 尺寸對照表',
+  name: '尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>
@@ -138,7 +138,7 @@ export const SizeMatrix: Story = {
 }
 
 export const StateBehavior: Story = {
-  name: '5. 狀態行為',
+  name: '狀態行為',
   render: () => (
     <div className="flex flex-col gap-6 max-w-md">
       <div>
@@ -169,7 +169,7 @@ export const StateBehavior: Story = {
 }
 
 export const ColorBindingRule: Story = {
-  name: '6. Range ↔ Thumb border 綁定規則',
+  name: 'Range ↔ Thumb border 綁定規則',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -198,7 +198,7 @@ export const ColorBindingRule: Story = {
 }
 
 export const KeyboardMatrix: Story = {
-  name: '7. 鍵盤操作(Radix 原生)',
+  name: '鍵盤操作(Radix 原生)',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>

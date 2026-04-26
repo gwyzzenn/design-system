@@ -197,7 +197,7 @@ const BpZone = ({ w, color, label, sub }: { w: number; color: typeof Z.pad; labe
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const Overview = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-4">
@@ -212,8 +212,8 @@ export const Overview = {
             <span className="text-[11px] text-fg-muted font-medium">edit — link 狀態</span>
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-2">
               {[
-                { name: '5. link text', color: 'info' },
-                { name: '6. Pencil action', color: 'error' },
+                { name: 'link text', color: 'info' },
+                { name: 'Pencil action', color: 'error' },
               ].map((s) => (
                 <span key={s.name} className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
                   style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color})` }}>{s.name}</span>
@@ -227,7 +227,7 @@ export const Overview = {
             <span className="text-[11px] text-fg-muted font-medium">edit — input 狀態</span>
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-2">
               {[
-                { name: '7. bareInput', color: 'success' },
+                { name: 'bareInput', color: 'success' },
               ].map((s) => (
                 <span key={s.name} className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
                   style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color})` }}>{s.name}</span>
@@ -467,7 +467,7 @@ const InspectorInner = () => {
 }
 
 export const Inspector = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
@@ -484,7 +484,7 @@ export const Inspector = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const ColorMatrix = {
-  name: '3. 色彩對照表',
+  name: '色彩對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-1">
@@ -650,7 +650,7 @@ export const ColorMatrix = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const SizeMatrix = {
-  name: '4. 尺寸對照表',
+  name: '尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-1">

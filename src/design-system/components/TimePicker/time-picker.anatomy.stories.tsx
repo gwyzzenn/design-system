@@ -25,7 +25,7 @@ export default meta
 type Story = StoryObj<typeof TimePicker>
 
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => <TimePicker value="09:00" onChange={() => {}} />,
 }
 
@@ -34,7 +34,7 @@ export const Overview: Story = {
  * 兩層色彩分別繼承不同 SSOT,本 story 展示整合對照。
  */
 export const ColorMatrix: Story = {
-  name: '3. 色彩對照表',
+  name: '色彩對照表',
   render: () => {
     const Swatch = ({ value }: { value: string }) => (
       <span className="inline-block w-3 h-3 rounded-sm border border-black/10 align-middle mr-1.5" style={{ backgroundColor: `var(${value})` }} />
@@ -156,7 +156,7 @@ export const ColorMatrix: Story = {
 
 /** 尺寸矩陣 sm / md(預設) / lg */
 export const SizeMatrix: Story = {
-  name: '4. 尺寸對照表',
+  name: '尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-3">
@@ -177,7 +177,7 @@ export const SizeMatrix: Story = {
 
 /** Mode / error 狀態 matrix */
 export const ModeMatrix: Story = {
-  name: '5. 模式對照',
+  name: '模式對照',
   render: () => (
     <div className="flex flex-col gap-3 w-60">
       <TimePicker value="09:00" onChange={() => {}} placeholder="edit(預設)" aria-label="edit mode demo" />
@@ -192,7 +192,7 @@ export const ModeMatrix: Story = {
 
 /** Panel 精度:showSeconds 三欄 vs 兩欄 / minuteStep 粒度 */
 export const PrecisionMatrix: Story = {
-  name: '6. 精度對照',
+  name: '精度對照',
   render: () => (
     <div className="flex flex-col gap-3 w-80">
       <div>
@@ -221,7 +221,7 @@ export const PrecisionMatrix: Story = {
 
 /** Inspector — live props 調整驗規格 */
 export const Inspector: Story = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   args: {
     value: '09:00',
     size: 'md',

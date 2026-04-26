@@ -17,7 +17,7 @@ export default meta
 type Story = StoryObj
 
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -96,7 +96,7 @@ interface InspectorArgs {
 }
 
 export const Inspector: Story = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   parameters: {
     docs: {
       description: {
@@ -166,7 +166,7 @@ export const Inspector: Story = {
 }
 
 export const OrientationMatrix: Story = {
-  name: '6. Orientation × Control 矩陣',
+  name: 'Orientation × Control 矩陣',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -236,7 +236,7 @@ export const OrientationMatrix: Story = {
 }
 
 export const SizeMatrix: Story = {
-  name: '4. 尺寸對照表',
+  name: '尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -273,7 +273,7 @@ export const SizeMatrix: Story = {
 }
 
 export const StateBehavior: Story = {
-  name: '5. 狀態行為',
+  name: '狀態行為',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -348,7 +348,7 @@ export const StateBehavior: Story = {
 }
 
 export const ColorMatrix: Story = {
-  name: '3. 色彩對照表',
+  name: '色彩對照表',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -456,7 +456,7 @@ export const ColorMatrix: Story = {
 }
 
 export const FieldGroupBehavior: Story = {
-  name: '7. FieldGroup — 多 Field 堆疊',
+  name: 'FieldGroup — 多 Field 堆疊',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>

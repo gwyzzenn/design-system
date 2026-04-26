@@ -902,7 +902,7 @@ const InspectorInner = () => {
 }
 
 export const Inspector = {
-  name: '1. 檢閱器',
+  name: '檢閱器',
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
@@ -922,7 +922,7 @@ export const Inspector = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const AlignmentThreshold = {
-  name: '2. 對齊容器（24px 閾值）',
+  name: '對齊容器（24px 閾值）',
   render: () => (
     <div className="flex flex-col gap-10">
       <div className="flex flex-col gap-1">
@@ -1093,7 +1093,7 @@ export const AlignmentThreshold = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const ReadingModes = {
-  name: '3. 閱讀模式比較',
+  name: '閱讀模式比較',
   render: () => (
     <div className="flex flex-col gap-10">
       <div className="flex flex-col gap-1">
@@ -1199,7 +1199,7 @@ export const ReadingModes = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const IconColorsAndPresets = {
-  name: '4. Icon 色彩 + 消費元件預設',
+  name: 'Icon 色彩 + 消費元件預設',
   render: () => (
     <div className="flex flex-col gap-10">
       <div className="flex flex-col gap-1">
@@ -1429,7 +1429,7 @@ export const IconColorsAndPresets = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const IconActionPrimitiveDecision = {
-  name: '5. Icon Action Primitive 決策',
+  name: 'Icon Action Primitive 決策',
   render: () => (
     <div className="flex flex-col gap-10">
       <div className="flex flex-col gap-1">

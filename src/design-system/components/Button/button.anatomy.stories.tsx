@@ -188,7 +188,7 @@ const TokenValue = ({ value }: { value: string }) => (
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const Overview = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-4">
@@ -201,7 +201,7 @@ export const Overview = {
           <div className="flex flex-col gap-2 items-start">
             <span className="text-[11px] text-fg-muted font-medium">標準</span>
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-2">
-              {[{ name: '6. startIcon', color: 'info' }, { name: '6. startIcon', color: 'success' }, { name: '6. startIcon', color: 'warning' }, { name: '6. startIcon', color: 'magenta' }].map((s) => (
+              {[{ name: 'startIcon', color: 'info' }, { name: 'startIcon', color: 'success' }, { name: 'startIcon', color: 'warning' }, { name: 'startIcon', color: 'magenta' }].map((s) => (
                 <span key={s.name} className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
                   style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color})` }}>{s.name}</span>
               ))}
@@ -467,7 +467,7 @@ const InspectorInner = () => {
 }
 
 export const Inspector = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
@@ -484,7 +484,7 @@ export const Inspector = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const ColorMatrix = {
-  name: '3. 色彩對照表',
+  name: '色彩對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-1">
@@ -541,7 +541,7 @@ export const ColorMatrix = {
 const SIZES: SizeKey[] = ['xs', 'sm', 'md', 'lg']
 
 export const SizeMatrix = {
-  name: '4. 尺寸對照表',
+  name: '尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-1">
@@ -629,7 +629,7 @@ export const SizeMatrix = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const StateBehavior = {
-  name: '5. 狀態行為',
+  name: '狀態行為',
   render: () => (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-1">

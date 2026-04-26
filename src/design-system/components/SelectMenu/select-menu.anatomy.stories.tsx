@@ -59,7 +59,7 @@ const labelGroups: SelectMenuGroupConfig[] = [
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => {
     const [value, setValue] = useState<string>('in_progress')
     return (
@@ -229,7 +229,7 @@ export const Overview: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const Inspector: Story = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   render: () => <SelectMenuInspector />,
 }
 
@@ -399,7 +399,7 @@ RowSizeProvider value=${size} 傳遞到所有 item slot (MenuItem / ItemIcon / I
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const ModeMatrix: Story = {
-  name: '3. 功能模式對照表',
+  name: '功能模式對照表',
   render: () => {
     const [single, setSingle] = useState<string>('todo')
     const [multi, setMulti] = useState<string[]>(['bug'])
@@ -592,7 +592,7 @@ export const ModeMatrix: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const SizeMatrix: Story = {
-  name: '4. 尺寸對照表',
+  name: '尺寸對照表',
   render: () => {
     const [sm, setSm] = useState<string>('todo')
     const [md, setMd] = useState<string>('todo')
@@ -683,7 +683,7 @@ export const SizeMatrix: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const StateBehavior: Story = {
-  name: '5. 狀態行為',
+  name: '狀態行為',
   render: () => {
     const [empty, setEmpty] = useState<string[]>([])
     const [grouped, setGrouped] = useState<string[]>([])

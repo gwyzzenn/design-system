@@ -18,7 +18,7 @@ export default meta
 type Story = StoryObj
 
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -70,7 +70,7 @@ export const Overview: Story = {
 }
 
 export const Inspector: Story = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   parameters: {
     docs: { description: { story: '右側 Controls 切 props 即時 render,取代 Figma inspect。調整 `cols` / `direction` / `divided` 看 CSS grid 配置變化。' } },
   },
@@ -99,7 +99,7 @@ export const Inspector: Story = {
 }
 
 export const ColsMatrix: Story = {
-  name: '3. cols(1 / 2 / 3)',
+  name: 'cols(1 / 2 / 3)',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -151,7 +151,7 @@ export const ColsMatrix: Story = {
 }
 
 export const StateBehavior: Story = {
-  name: '4. 狀態行為',
+  name: '狀態行為',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>

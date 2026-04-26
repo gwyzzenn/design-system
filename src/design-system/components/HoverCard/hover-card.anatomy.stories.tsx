@@ -18,7 +18,7 @@ export default meta
 type Story = StoryObj
 
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -76,7 +76,7 @@ export const Overview: Story = {
 }
 
 export const VisualVariants: Story = {
-  name: '2. Consumer 的兩種常見視覺',
+  name: 'Consumer 的兩種常見視覺',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

@@ -16,7 +16,7 @@ type Story = StoryObj
 type InspectorStory = StoryObj<AlertProps>
 
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -54,7 +54,7 @@ export const Overview: Story = {
 }
 
 export const Inspector: InspectorStory = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   parameters: {
     docs: {
       description: {
@@ -94,7 +94,7 @@ export const Inspector: InspectorStory = {
 }
 
 export const ColorMatrix: Story = {
-  name: '3. 色彩對照表',
+  name: '色彩對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -139,7 +139,7 @@ export const ColorMatrix: Story = {
 }
 
 export const PlacementMatrix: Story = {
-  name: '4. Placement(inline vs fixed)',
+  name: 'Placement(inline vs fixed)',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -181,7 +181,7 @@ export const PlacementMatrix: Story = {
 }
 
 export const StateBehavior: Story = {
-  name: '5. 狀態行為',
+  name: '狀態行為',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

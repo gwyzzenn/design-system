@@ -39,7 +39,7 @@ const STATUS_TOKEN: Record<StatusKey, { fill: string; desc: string; affixIcon?: 
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const Overview = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-10">
       {/* Anatomy 圖 */}
@@ -273,7 +273,7 @@ const InspectorInner = () => {
 }
 
 export const Inspector = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   render: () => (
     <div className="flex flex-col gap-4">
       <H3>元件檢閱器</H3>
@@ -290,7 +290,7 @@ export const Inspector = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const ColorMatrix = {
-  name: '3. 色彩對照表',
+  name: '色彩對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <H3>Status × Token 對照</H3>
@@ -348,7 +348,7 @@ export const ColorMatrix = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const AffixBehavior = {
-  name: '4. Affix 行為',
+  name: 'Affix 行為',
   render: () => (
     <div className="flex flex-col gap-8">
       <H3>Affix 三種模式</H3>

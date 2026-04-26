@@ -71,7 +71,7 @@ const subscriptionConfig = {
 // ── Stories ────────────────────────────────────────────────────────────────
 
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -145,7 +145,7 @@ interface InspectorArgs {
 }
 
 export const Inspector: Story = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   parameters: {
     docs: {
       description: {
@@ -223,7 +223,7 @@ export const Inspector: Story = {
 }
 
 export const CategoryTokens: Story = {
-  name: '4. 類別配色 Token',
+  name: '類別配色 Token',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -247,7 +247,7 @@ export const CategoryTokens: Story = {
 }
 
 export const ColorMatrix: Story = {
-  name: '3. 色彩對照表',
+  name: '色彩對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

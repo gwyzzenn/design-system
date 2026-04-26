@@ -41,7 +41,7 @@ type Story = StoryObj
 type InspectorStory = StoryObj<InspectorArgs>
 
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -95,7 +95,7 @@ export const Overview: Story = {
 }
 
 export const Inspector: InspectorStory = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   parameters: {
     docs: {
       description: {
@@ -137,7 +137,7 @@ export const Inspector: InspectorStory = {
 }
 
 export const ScenarioMatrix: Story = {
-  name: '3. 常見場景',
+  name: '常見場景',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>
@@ -170,7 +170,7 @@ export const ScenarioMatrix: Story = {
 }
 
 export const SlotCombinations: Story = {
-  name: '4. Slot 組合(description only → full)',
+  name: 'Slot 組合(description only → full)',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>

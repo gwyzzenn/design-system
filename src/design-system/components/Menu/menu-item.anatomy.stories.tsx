@@ -199,7 +199,7 @@ const MenuContainer = ({ children, width = 320 }: { children: React.ReactNode; w
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const Overview = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-8">
       {/* Anatomy */}
@@ -214,11 +214,11 @@ export const Overview = {
             <span className="text-[11px] text-fg-muted font-medium">完整結構</span>
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-2">
               {[
-                { name: '5. checkbox', color: 'warning' },
-                { name: '6. startIcon | avatar', color: 'info' },
-                { name: '7. label', color: 'success' },
-                { name: '8. description', color: 'magenta' },
-                { name: '9. tag', color: 'warning' },
+                { name: 'checkbox', color: 'warning' },
+                { name: 'startIcon | avatar', color: 'info' },
+                { name: 'label', color: 'success' },
+                { name: 'description', color: 'magenta' },
+                { name: 'tag', color: 'warning' },
               ].map((s) => (
                 <span key={s.name} className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
                   style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color})` }}>{s.name}</span>
@@ -529,7 +529,7 @@ const InspectorInner = () => {
 }
 
 export const Inspector = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
@@ -546,7 +546,7 @@ export const Inspector = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const ColorMatrix = {
-  name: '3. 色彩對照表',
+  name: '色彩對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-1">
@@ -656,7 +656,7 @@ export const ColorMatrix = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const SizeMatrix = {
-  name: '4. 尺寸對照表',
+  name: '尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-1">

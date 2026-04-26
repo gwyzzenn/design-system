@@ -18,7 +18,7 @@ type Story = StoryObj
 type InspectorStory = StoryObj<SwitchProps>
 
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -57,7 +57,7 @@ export const Overview: Story = {
 }
 
 export const Inspector: InspectorStory = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   parameters: {
     docs: {
       description: {
@@ -89,7 +89,7 @@ export const Inspector: InspectorStory = {
 }
 
 export const SizeMatrix: Story = {
-  name: '3. 尺寸對照表',
+  name: '尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -124,7 +124,7 @@ export const SizeMatrix: Story = {
 }
 
 export const StateBehavior: Story = {
-  name: '4. 狀態行為',
+  name: '狀態行為',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -180,7 +180,7 @@ export const StateBehavior: Story = {
 }
 
 export const LabelIntegration: Story = {
-  name: '5. label / description 整合',
+  name: 'label / description 整合',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

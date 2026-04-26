@@ -167,7 +167,7 @@ const BpZone = ({ w, color, label, sub }: { w: number; color: typeof Z.pad; labe
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const Overview = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-8">
       {/* Anatomy */}
@@ -181,7 +181,7 @@ export const Overview = {
           <div className="flex flex-col gap-2 items-start">
             <span className="text-[11px] text-fg-muted font-medium">純文字</span>
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-1">
-              {[{ name: '5. label', color: 'success' }].map((s) => (
+              {[{ name: 'label', color: 'success' }].map((s) => (
                 <span key={s.name} className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
                   style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color})` }}>{s.name}</span>
               ))}
@@ -191,7 +191,7 @@ export const Overview = {
           <div className="flex flex-col gap-2 items-start">
             <span className="text-[11px] text-fg-muted font-medium">icon + dismiss</span>
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-1">
-              {[{ name: '6. icon', color: 'info' }, { name: '6. icon', color: 'success' }, { name: '6. icon', color: 'error' }].map((s) => (
+              {[{ name: 'icon', color: 'info' }, { name: 'icon', color: 'success' }, { name: 'icon', color: 'error' }].map((s) => (
                 <span key={s.name} className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
                   style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color})` }}>{s.name}</span>
               ))}
@@ -201,7 +201,7 @@ export const Overview = {
           <div className="flex flex-col gap-2 items-start">
             <span className="text-[11px] text-fg-muted font-medium">avatar</span>
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-1">
-              {[{ name: '7. avatar', color: 'warning' }, { name: '7. avatar', color: 'success' }].map((s) => (
+              {[{ name: 'avatar', color: 'warning' }, { name: 'avatar', color: 'success' }].map((s) => (
                 <span key={s.name} className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
                   style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color})` }}>{s.name}</span>
               ))}
@@ -406,7 +406,7 @@ const InspectorInner = () => {
 }
 
 export const Inspector = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
@@ -423,7 +423,7 @@ export const Inspector = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const ColorMatrix = {
-  name: '3. 色彩對照表',
+  name: '色彩對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-1">
@@ -556,7 +556,7 @@ export const ColorMatrix = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const SizeMatrix = {
-  name: '4. 尺寸對照表',
+  name: '尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-1">

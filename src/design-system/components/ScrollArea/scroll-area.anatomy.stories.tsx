@@ -56,7 +56,7 @@ const WideTable = () => (
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -151,7 +151,7 @@ export const Overview: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const Inspector: Story = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>
@@ -247,7 +247,7 @@ const InspectRow = ({ label, children }: { label: string; children: React.ReactN
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const ColorMatrix: Story = {
-  name: '3. 色彩對照表',
+  name: '色彩對照表',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>
@@ -289,7 +289,7 @@ export const ColorMatrix: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const SizeMatrix: Story = {
-  name: '4. 尺寸對照表',
+  name: '尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>
@@ -347,7 +347,7 @@ export const SizeMatrix: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const OrientationBehavior: Story = {
-  name: '5. Orientation 行為',
+  name: 'Orientation 行為',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

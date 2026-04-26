@@ -69,7 +69,7 @@ const SIZE_SPECS: Record<
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -225,7 +225,7 @@ export const Overview: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const Inspector: Story = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   render: () => <SelectionInspector />,
 }
 
@@ -383,7 +383,7 @@ ${prefix === 'avatar' ? `avatar size = ${useBlock ? spec.avatarBlockPx : spec.av
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const PrefixAlignment: Story = {
-  name: '3. Prefix 對齊規則(24px 閾值)',
+  name: 'Prefix 對齊規則(24px 閾值)',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -488,7 +488,7 @@ export const PrefixAlignment: Story = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const SizeMatrix: Story = {
-  name: '4. 尺寸對照表',
+  name: '尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>

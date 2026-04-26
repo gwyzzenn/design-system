@@ -31,11 +31,11 @@ interface Product {
 }
 
 const SAMPLE_DATA: Product[] = [
-  { name: '10. Wireless Headphones', category: 'electronics', stock: 'in_stock', price: 2490, available: true, launchDate: '2026-01-15' },
-  { name: '11. Office Chair', category: 'furniture', stock: 'low_stock', price: 8900, available: true, launchDate: '2025-11-02' },
-  { name: '12. Green Tea 100 Bags', category: 'food', stock: 'in_stock', price: 350, available: true, launchDate: '2026-03-20' },
-  { name: '13. USB-C Hub', category: 'electronics', stock: 'out_of_stock', price: 1290, available: false, launchDate: '2025-12-01' },
-  { name: '14. Linen Shirt', category: 'clothing', stock: 'in_stock', price: 1580, available: true, launchDate: '2026-02-14' },
+  { name: 'Wireless Headphones', category: 'electronics', stock: 'in_stock', price: 2490, available: true, launchDate: '2026-01-15' },
+  { name: 'Office Chair', category: 'furniture', stock: 'low_stock', price: 8900, available: true, launchDate: '2025-11-02' },
+  { name: 'Green Tea 100 Bags', category: 'food', stock: 'in_stock', price: 350, available: true, launchDate: '2026-03-20' },
+  { name: 'USB-C Hub', category: 'electronics', stock: 'out_of_stock', price: 1290, available: false, launchDate: '2025-12-01' },
+  { name: 'Linen Shirt', category: 'clothing', stock: 'in_stock', price: 1580, available: true, launchDate: '2026-02-14' },
 ]
 
 const STATUS_OPTIONS = [
@@ -54,7 +54,7 @@ const CATEGORY_OPTIONS = [
 // ── Stories ────────────────────────────────────────────────────────────────
 
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
@@ -105,7 +105,7 @@ interface InspectorArgs {
 }
 
 export const Inspector: Story = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   parameters: {
     docs: {
       description: {
@@ -165,7 +165,7 @@ export const Inspector: Story = {
 }
 
 export const ColumnTypes: Story = {
-  name: '4. Column Type 自動渲染',
+  name: 'Column Type 自動渲染',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
@@ -210,7 +210,7 @@ export const ColumnTypes: Story = {
 }
 
 export const RowHeightMatrix: Story = {
-  name: '5. Row Height Tier(閱讀 vs 掃描模式)',
+  name: 'Row Height Tier(閱讀 vs 掃描模式)',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
@@ -248,7 +248,7 @@ export const RowHeightMatrix: Story = {
 }
 
 export const AlignmentRule: Story = {
-  name: '6. 對齊規則(跨產業共識)',
+  name: '對齊規則(跨產業共識)',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
@@ -286,7 +286,7 @@ export const AlignmentRule: Story = {
 }
 
 export const Features: Story = {
-  name: '7. 功能特性(排序 / 虛擬捲動)',
+  name: '功能特性(排序 / 虛擬捲動)',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
@@ -324,7 +324,7 @@ export const Features: Story = {
 }
 
 export const ColorMatrix: Story = {
-  name: '3. 色彩對照表',
+  name: '色彩對照表',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -459,7 +459,7 @@ export const ColorMatrix: Story = {
 }
 
 export const EmptyState: Story = {
-  name: '8. 空狀態',
+  name: '空狀態',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
@@ -478,7 +478,7 @@ export const EmptyState: Story = {
 }
 
 export const BorderedProp: Story = {
-  name: '9. bordered prop(預設 true)',
+  name: 'bordered prop(預設 true)',
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [

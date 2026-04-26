@@ -36,7 +36,7 @@ export default meta
 type Story = StoryObj
 
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -90,7 +90,7 @@ export const Overview: Story = {
 }
 
 export const UsageInButton: Story = {
-  name: '2. 在 Button loading 狀態內',
+  name: '在 Button loading 狀態內',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>
@@ -120,7 +120,7 @@ export const UsageInButton: Story = {
 }
 
 export const UsageInline: Story = {
-  name: '3. Inline 使用',
+  name: 'Inline 使用',
   render: () => (
     <div className="flex flex-col gap-6">
       <div>

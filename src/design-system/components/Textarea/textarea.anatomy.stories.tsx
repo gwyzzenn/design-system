@@ -16,7 +16,7 @@ export default meta
 type Story = StoryObj
 
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -69,7 +69,7 @@ export const Overview: Story = {
 }
 
 export const Inspector: Story = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   parameters: {
     docs: { description: { story: '右側 Controls 切 props 即時 render,取代 Figma inspect。切 `mode` 看 edit / readonly / disabled 外觀差異,調 `rows` 看高度、切 `error` 看錯誤邊框。' } },
   },
@@ -97,7 +97,7 @@ export const Inspector: Story = {
 }
 
 export const SizeMatrix: Story = {
-  name: '4. 尺寸對照表',
+  name: '尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-6 max-w-md">
       <div>
@@ -115,7 +115,7 @@ export const SizeMatrix: Story = {
 }
 
 export const ModeMatrix: Story = {
-  name: '5. Mode 對照(edit / readonly / disabled)',
+  name: 'Mode 對照(edit / readonly / disabled)',
   render: () => (
     <div className="flex flex-col gap-6 max-w-md">
       <div>
@@ -155,7 +155,7 @@ export const ModeMatrix: Story = {
 }
 
 export const ColorMatrix: Story = {
-  name: '3. 色彩對照表',
+  name: '色彩對照表',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -244,7 +244,7 @@ export const ColorMatrix: Story = {
 }
 
 export const RowsResizeMatrix: Story = {
-  name: '6. Rows 與 Resize',
+  name: 'Rows 與 Resize',
   render: () => (
     <div className="flex flex-col gap-6 max-w-md">
       <div>

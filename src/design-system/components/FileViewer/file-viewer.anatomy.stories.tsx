@@ -28,7 +28,7 @@ const sampleFiles: FileInfo[] = [
   {
     id: 'doc-1',
     url: img('spec-hero', 1600, 1000),
-    name: '7. dashboard-spec-cover.png',
+    name: 'dashboard-spec-cover.png',
     mimeType: 'image/png',
     size: 612_000,
     description: 'Dashboard v2 spec 封面圖 — 設計 review 用。',
@@ -41,7 +41,7 @@ const sampleFiles: FileInfo[] = [
   {
     id: 'doc-2',
     url: img('spec-flow', 1600, 1000),
-    name: '8. user-onboarding-flow.jpg',
+    name: 'user-onboarding-flow.jpg',
     mimeType: 'image/jpeg',
     size: 484_000,
     description: '使用者首次引導流程圖 — 含 5 個決策點。',
@@ -49,7 +49,7 @@ const sampleFiles: FileInfo[] = [
   {
     id: 'doc-3',
     url: img('spec-token', 1600, 1000),
-    name: '9. token-sync-checklist.jpg',
+    name: 'token-sync-checklist.jpg',
     mimeType: 'image/jpeg',
     size: 392_000,
     description: 'Design token 同步 checklist — 與 engineering 對齊。',
@@ -76,7 +76,7 @@ const OpenViewer: React.FC<{
 // ─── 1. Overview ─────────────────────────────────────────────────────────────
 
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -284,7 +284,7 @@ export const Overview: Story = {
 // ─── 2. Inspector ────────────────────────────────────────────────────────────
 
 export const Inspector: Story = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   render: () => {
     const [showFilmstrip, setShowFilmstrip] = React.useState(true)
     const [readOnly, setReadOnly] = React.useState(false)
@@ -459,7 +459,7 @@ export const Inspector: Story = {
 // ─── 3. ColorMatrix ──────────────────────────────────────────────────────────
 
 export const ColorMatrix: Story = {
-  name: '3. 色彩對照表',
+  name: '色彩對照表',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -595,7 +595,7 @@ export const ColorMatrix: Story = {
 // ─── 4. SizeMatrix ───────────────────────────────────────────────────────────
 
 export const SizeMatrix: Story = {
-  name: '4. 尺寸對照表',
+  name: '尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -735,7 +735,7 @@ export const SizeMatrix: Story = {
 // ─── 5. StateBehavior ────────────────────────────────────────────────────────
 
 export const StateBehavior: Story = {
-  name: '5. 狀態行為',
+  name: '狀態行為',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -1000,7 +1000,7 @@ export const StateBehavior: Story = {
 // ─── 6. Extras:Renderer Registry ─────────────────────────────────────────────
 
 export const RendererRegistry: Story = {
-  name: '6. 延伸機制(registerFileRenderer)',
+  name: '延伸機制(registerFileRenderer)',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>

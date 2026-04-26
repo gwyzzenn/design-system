@@ -33,7 +33,7 @@ const DemoMedia = ({
 // ── 1. Overview ──────────────────────────────────────────────────────────────
 
 export const Overview: Story = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -111,7 +111,7 @@ export const Overview: Story = {
 // ── 2. Inspector ─────────────────────────────────────────────────────────────
 
 export const Inspector: Story = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   render: () => {
     const [hasImage, setHasImage] = React.useState(true)
     const [hasStep, setHasStep] = React.useState(true)
@@ -194,7 +194,7 @@ export const Inspector: Story = {
 // ── 3. Color ─────────────────────────────────────────────────────────────────
 
 export const ColorMatrix: Story = {
-  name: '3. 色彩對照表',
+  name: '色彩對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -223,7 +223,7 @@ export const ColorMatrix: Story = {
 // ── 4. Size ──────────────────────────────────────────────────────────────────
 
 export const SizeMatrix: Story = {
-  name: '4. 尺寸對照表',
+  name: '尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -263,7 +263,7 @@ export const SizeMatrix: Story = {
 // ── 5. State / Multi-step Behavior ───────────────────────────────────────────
 
 export const StateBehavior: Story = {
-  name: '5. 狀態行為',
+  name: '狀態行為',
   render: () => {
     const [singleOpen, setSingleOpen] = React.useState(true)
 

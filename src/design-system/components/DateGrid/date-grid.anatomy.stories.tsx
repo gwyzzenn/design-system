@@ -78,7 +78,7 @@ const AnatomyBox = ({
 )
 
 export const Overview = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-10">
       <div>
@@ -185,7 +185,7 @@ const PropRow = ({ label, children }: { label: string; children: React.ReactNode
 )
 
 export const Inspector = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   render: () => {
     const InspectorInner = () => {
       const today = new Date()
@@ -300,7 +300,7 @@ export const Inspector = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const ColorMatrix = {
-  name: '3. 色彩對照表',
+  name: '色彩對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -375,7 +375,7 @@ export const ColorMatrix = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const SizeMatrix = {
-  name: '4. 尺寸對照表',
+  name: '尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -462,7 +462,7 @@ export const SizeMatrix = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const StateBehavior = {
-  name: '5. 狀態行為',
+  name: '狀態行為',
   render: () => {
     const ModeDemo = () => {
       const today = new Date()

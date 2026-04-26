@@ -199,7 +199,7 @@ const BpZone = ({ w, color, label, sub }: { w: number; color: typeof Z.pad; labe
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const Overview = {
-  name: '1. 元件總覽',
+  name: '元件總覽',
   render: () => (
     <div className="flex flex-col gap-8">
       {/* Anatomy — edit mode single-line */}
@@ -213,12 +213,12 @@ export const Overview = {
             <span className="text-[11px] text-fg-muted font-medium">有值 + clearable</span>
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-1">
               {[
-                { name: '6. Tag', color: 'error' },
-                { name: '7. Tag', color: 'error' },
-                { name: '8. +N', color: 'warning' },
-                { name: '9. select(hidden)', color: 'success' },
-                { name: '10. clear', color: 'magenta' },
-                { name: '11. chevron', color: 'info' },
+                { name: 'Tag', color: 'error' },
+                { name: 'Tag', color: 'error' },
+                { name: '+N', color: 'warning' },
+                { name: 'select(hidden)', color: 'success' },
+                { name: 'clear', color: 'magenta' },
+                { name: 'chevron', color: 'info' },
               ].map((s, i) => (
                 <span key={`${s.name}-${i}`} className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
                   style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color})` }}>{s.name}</span>
@@ -230,8 +230,8 @@ export const Overview = {
             <span className="text-[11px] text-fg-muted font-medium">空值</span>
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-2">
               {[
-                { name: '12. select(placeholder)', color: 'success' },
-                { name: '13. chevron', color: 'info' },
+                { name: 'select(placeholder)', color: 'success' },
+                { name: 'chevron', color: 'info' },
               ].map((s) => (
                 <span key={s.name} className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
                   style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color})` }}>{s.name}</span>
@@ -251,10 +251,10 @@ export const Overview = {
         <div className="flex flex-col gap-2 items-start">
           <div className="inline-flex items-start border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-1 flex-wrap w-64">
             {[
-              { name: '14. Tag', color: 'error' },
-              { name: '15. Tag', color: 'error' },
-              { name: '16. Tag', color: 'error' },
-              { name: '17. Tag', color: 'error' },
+              { name: 'Tag', color: 'error' },
+              { name: 'Tag', color: 'error' },
+              { name: 'Tag', color: 'error' },
+              { name: 'Tag', color: 'error' },
             ].map((s, i) => (
               <span key={i} className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
                 style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color})` }}>{s.name}</span>
@@ -277,9 +277,9 @@ export const Overview = {
             <span className="text-[11px] text-fg-muted font-medium">有值</span>
             <div className="inline-flex items-center border-2 border-dashed border-primary/30 rounded-md px-3 py-2.5 gap-1">
               {[
-                { name: '18. Tag', color: 'error' },
-                { name: '19. Tag', color: 'error' },
-                { name: '20. +N?', color: 'warning' },
+                { name: 'Tag', color: 'error' },
+                { name: 'Tag', color: 'error' },
+                { name: '+N?', color: 'warning' },
               ].map((s, i) => (
                 <span key={i} className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
                   style={{ borderColor: `var(--${s.color})`, backgroundColor: `var(--${s.color}-subtle)`, color: `var(--${s.color})` }}>{s.name}</span>
@@ -507,7 +507,7 @@ const InspectorInner = () => {
 }
 
 export const Inspector = {
-  name: '2. 元件檢閱器',
+  name: '元件檢閱器',
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
@@ -524,7 +524,7 @@ export const Inspector = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const ColorMatrix = {
-  name: '3. 色彩對照表',
+  name: '色彩對照表',
   render: () => {
     const editStates: StateKey[] = ['default', 'hover', 'focus', 'disabled']
     return (
@@ -629,7 +629,7 @@ export const ColorMatrix = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const SizeMatrix = {
-  name: '4. 尺寸對照表',
+  name: '尺寸對照表',
   render: () => (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-1">
@@ -754,7 +754,7 @@ export const SizeMatrix = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const StateBehavior = {
-  name: '5. 狀態行為',
+  name: '狀態行為',
   render: () => {
     const allValues = ['electronics', 'furniture', 'food', 'lifestyle', 'clothing']
     const [overflowV, setOverflowV] = useState(allValues)

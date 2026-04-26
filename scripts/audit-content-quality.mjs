@@ -30,7 +30,7 @@ function* walk(dir) {
 }
 
 const violations = {
-  numbering: [],          // anatomy extras 缺 number
+  numbering: [],          // anatomy stories 不該有序號(2026-04-26 起 deprecated)
   nonAnatomyNumbering: [], // showcase/principles 不該有 numbering
   linkTo: [],
   stub: [],
@@ -58,36 +58,25 @@ for (const file of walk(COMPONENTS_DIR)) {
   let content = readFileSync(file, 'utf-8');
   let modified = false;
 
-  // === Check 1: Anatomy numbering(extras 必須繼續編 6,7,...)===
+  // === Check 1: Anatomy numbering — DEPRECATED 2026-04-26 ===
+  // user 反饋:序號(`'1. 元件總覽'` 等)無價值且容易跳號。改成 anatomy story name
+  // 一律不加序號(`'元件總覽'` 等)。--fix 自動 strip 已有序號;--check report violation。
   if (isAnatomy) {
     const lines = content.split('\n');
-    const nameMatches = [];
-    let maxNum = 0;
+    let stripped = false;
     for (let i = 0; i < lines.length; i++) {
-      const m = lines[i].match(/name:\s*['"]([^'"]+)['"]/);
+      const m = lines[i].match(/(name:\s*['"])(\d+)\.\s*([^'"]+)(['"])/);
       if (m) {
-        const num = m[1].match(/^(\d+)\.\s*/);
-        if (num) maxNum = Math.max(maxNum, parseInt(num[1]));
-        nameMatches.push({ idx: i, name: m[1], num: num ? parseInt(num[1]) : null });
-      }
-    }
-    if (maxNum > 0) {
-      let next = maxNum + 1;
-      for (const nm of nameMatches) {
-        if (nm.num === null) {
-          if (fix) {
-            const newName = `${next}. ${nm.name}`;
-            lines[nm.idx] = lines[nm.idx].replace(/(name:\s*['"])([^'"]+)(['"])/, `$1${newName}$3`);
-            next++;
-            modified = true;
-            autoFixed++;
-          } else {
-            violations.numbering.push({ file: basename(file), name: nm.name });
-          }
+        if (fix) {
+          lines[i] = lines[i].replace(/(name:\s*['"])(\d+)\.\s*/, '$1');
+          stripped = true;
+          autoFixed++;
+        } else {
+          violations.numbering.push({ file: basename(file), name: `${m[2]}. ${m[3]}` });
         }
       }
-      if (modified) content = lines.join('\n');
     }
+    if (stripped) { content = lines.join('\n'); modified = true; }
   }
 
   // === Check 2: Cross-reference plain text without LinkTo(only principles)===
@@ -341,12 +330,13 @@ console.log(`Mode: ${fix ? 'fix' : 'check'}`);
 if (autoFixed > 0) console.log(`Auto-fixed: ${autoFixed} numbering drift`);
 
 if (violations.numbering.length > 0) {
-  console.log(`\n[P1] Anatomy numbering missing: ${violations.numbering.length}`);
+  console.log(`\n[P1] Anatomy stories 不該有序號(2026-04-26 deprecated): ${violations.numbering.length}`);
+  console.log(`  跑 --fix 自動 strip 序號`);
   violations.numbering.slice(0, 10).forEach(v => console.log(`  • ${v.file}: "${v.name}"`));
 }
 
 if (violations.nonAnatomyNumbering.length > 0) {
-  console.log(`\n[P0] Non-anatomy stories with numbering(only anatomy uses numbers): ${violations.nonAnatomyNumbering.length} files`);
+  console.log(`\n[P0] Stories with numbering(序號全 deprecated 2026-04-26): ${violations.nonAnatomyNumbering.length} files`);
   violations.nonAnatomyNumbering.slice(0, 10).forEach(v => console.log(`  • ${v.file}: ${v.names.join(', ')}`));
 }
 
