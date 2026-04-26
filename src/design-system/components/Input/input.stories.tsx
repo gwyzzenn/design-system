@@ -61,9 +61,9 @@ export const SizeAlignment: Story = {
   ),
 }
 
-/* ── startIcon ── */
-export const WithStartIcon: Story = {
-  name: 'Start Icon',
+/* ── Icon slot ── */
+export const WithIcon: Story = {
+  name: 'With Icon',
   render: () => (
     <div className="flex flex-col gap-4 max-w-sm">
       <Input startIcon={Search} placeholder="搜尋商品..." />

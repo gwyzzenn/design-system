@@ -23,6 +23,50 @@ const meta: Meta<typeof Accordion> = {
 export default meta
 type Story = StoryObj<typeof Accordion>
 
+// ── Default — 最 minimal 結構展示 ─────────
+
+export const Default: Story = {
+  name: 'Default',
+  render: () => (
+    <div className="max-w-[480px]">
+      <Accordion type="single" collapsible defaultValue="item-1">
+        <AccordionItem value="item-1">
+          <AccordionTrigger>第一個區塊</AccordionTrigger>
+          <AccordionContent>展開內容區。</AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-2">
+          <AccordionTrigger>第二個區塊</AccordionTrigger>
+          <AccordionContent>另一段內容。</AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    </div>
+  ),
+}
+
+// ── States — closed / open / disabled 並列 ─────────
+
+export const States: Story = {
+  name: 'States',
+  render: () => (
+    <div className="max-w-[480px]">
+      <Accordion type="multiple" defaultValue={['open']}>
+        <AccordionItem value="closed">
+          <AccordionTrigger>Closed item</AccordionTrigger>
+          <AccordionContent>(預設 closed)</AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="open">
+          <AccordionTrigger>Open item</AccordionTrigger>
+          <AccordionContent>(預設 open,展開內容區)</AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="disabled" disabled>
+          <AccordionTrigger>Disabled item</AccordionTrigger>
+          <AccordionContent>(disabled,不可開啟)</AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    </div>
+  ),
+}
+
 // ── FAQ(single + collapsible)——Stripe / Notion 類說明頁 ─────────
 
 export const FAQ: Story = {

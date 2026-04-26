@@ -70,10 +70,14 @@ done
 # No spec.md → can't verify traits, exit silent(not all components have spec yet)
 [ -z "$SPEC_FILE" ] && exit 0
 
-# Extract traits array from frontmatter
+# Extract traits array from frontmatter — only `  - traitName` lines after `traits:`
 TRAITS=""
 if head -30 "$SPEC_FILE" | grep -q "^traits:"; then
-  TRAITS=$(head -30 "$SPEC_FILE" | sed -n '/^traits:/,/^[a-zA-Z]/p' | grep -oE '[a-zA-Z]+' | grep -v '^traits$' | tr '\n' ' ')
+  TRAITS=$(awk '
+    /^traits:/ { in_traits = 1; next }
+    in_traits && /^  - / { sub(/^  - /, ""); print; next }
+    in_traits && !/^  / { in_traits = 0 }
+  ' "$SPEC_FILE" | tr '\n' ' ')
 fi
 
 # No traits declared → can't verify(may be pre-migration), exit silent
@@ -96,6 +100,12 @@ check_present() {
   echo "$STORY_EXPORTS" | grep -qE "^${pattern}$"
 }
 
+# Fuzzy: any story name containing the pattern(BorderStates / AllStates → States)
+check_contains() {
+  local pattern="$1"
+  echo "$STORY_EXPORTS" | grep -qE "${pattern}"
+}
+
 # Universal: Default story
 if ! check_present "Default" && ! check_present "AllVariants"; then
   VIOLATIONS="${VIOLATIONS}\n  • [P1 warn] Missing universal 'Default' or 'AllVariants' story"
@@ -115,8 +125,9 @@ for trait in $TRAITS; do
       fi
       ;;
     hasInteractiveStates)
-      if ! check_present "Disabled" && ! check_present "States"; then
-        VIOLATIONS="${VIOLATIONS}\n  • [P0] hasInteractiveStates trait → missing Disabled / States story"
+      # Accept exact Disabled / States / Modes OR fuzzy *States / *Modes
+      if ! check_contains "(Disabled|States|Modes)"; then
+        VIOLATIONS="${VIOLATIONS}\n  • [P0] hasInteractiveStates trait → missing Disabled / States / Modes story"
       fi
       ;;
     isOverlay)

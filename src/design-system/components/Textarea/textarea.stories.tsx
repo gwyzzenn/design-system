@@ -43,8 +43,8 @@ export const Modes: Story = {
   ),
 }
 
-export const Error: Story = {
-  name: 'Error 狀態',
+export const WithError: Story = {
+  name: 'With Error',
   render: () => (
     <div className="max-w-md">
       <Textarea error defaultValue="格式不正確的內容" />
