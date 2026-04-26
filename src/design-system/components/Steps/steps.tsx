@@ -355,7 +355,7 @@ const StepItem = React.forwardRef<HTMLLIElement, StepItemProps>(
       }
     }, [clickable, steps, value])
 
-    const itemCtx: StepItemContextValue = {
+    const itemCtx = React.useMemo<StepItemContextValue>(() => ({
       value,
       state,
       focused,
@@ -364,7 +364,7 @@ const StepItem = React.forwardRef<HTMLLIElement, StepItemProps>(
       expanded,
       isLast: __isLast,
       activate,
-    }
+    }), [value, state, focused, disabled, clickable, expanded, __isLast, activate])
 
     const isVertical = steps.orientation === 'vertical'
 

@@ -281,16 +281,22 @@ function CustomCombobox({
     return <ReadonlyMultiSelect mode={resolvedMode} size={size} options={options} value={value} wrap={wrap} className={className} />
   }
 
-  const items = value.map(v => ({ value: v, label: options.find(o => o.value === v)?.label ?? v }))
+  const items = React.useMemo(
+    () => value.map(v => ({ value: v, label: options.find(o => o.value === v)?.label ?? v })),
+    [value, options]
+  )
   const tagAreaRef = React.useRef<HTMLDivElement>(null)
   const tagHeight = size === 'sm' ? 20 : 24
 
   const handleRemove = (v: string) => onChange?.(value.filter(x => x !== v))
 
   // searchIn='trigger' 時由 trigger input 過濾，不走 SelectMenu 內建搜尋
-  const filteredOptions = searchable && searchIn === 'trigger' && search
-    ? options.filter(o => o.label.toLowerCase().includes(search.toLowerCase()))
-    : options
+  const filteredOptions = React.useMemo(
+    () => (searchable && searchIn === 'trigger' && search
+      ? options.filter(o => o.label.toLowerCase().includes(search.toLowerCase()))
+      : options),
+    [searchable, searchIn, search, options]
+  )
 
   // 轉換 SelectOption → SelectMenuOption
   const menuOptions: SelectMenuOption[] = React.useMemo(

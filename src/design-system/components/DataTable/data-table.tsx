@@ -330,13 +330,20 @@ function DataTableInner<TData>(
   }
 
   // ── Region helpers ──
+  // hoist region id Sets 一次,避免 n_rows × n_regions 重建(virtual mode 1000+ rows 場景效益顯著)
+  const leftIds = React.useMemo(() => new Set(leftCols.map(c => c.id)), [leftCols])
+  const centerIds = React.useMemo(() => new Set(centerCols.map(c => c.id)), [centerCols])
+  const rightIds = React.useMemo(() => new Set(rightCols.map(c => c.id)), [rightCols])
+  const colsToIds = (cols: Column<TData, unknown>[]) =>
+    cols === leftCols ? leftIds : cols === rightCols ? rightIds : centerIds
+
   const getRegionHeaders = (cols: Column<TData, unknown>[]) => {
-    const ids = new Set(cols.map(c => c.id))
+    const ids = colsToIds(cols)
     return table.getHeaderGroups()[0]?.headers.filter(h => ids.has(h.id)) ?? []
   }
 
   const getRegionCells = (row: typeof rows[number], cols: Column<TData, unknown>[]) => {
-    const ids = new Set(cols.map(c => c.id))
+    const ids = colsToIds(cols)
     return row.getVisibleCells().filter(c => ids.has(c.column.id))
   }
 
