@@ -151,7 +151,7 @@ export const WhenToUse: Story = {
 }
 
 export const ContentTypeChoice: Story = {
-  name: '1. SidebarMenu vs TreeView 的選擇',
+  name: 'SidebarMenu vs TreeView 的選擇',
   render: () => (
     <div className="flex flex-col gap-10">
       <Section
@@ -245,7 +245,7 @@ export const ContentTypeChoice: Story = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export const GroupHeaderRules: Story = {
-  name: '2. 群組 / Label 使用原則',
+  name: '群組 / Label 使用原則',
   render: () => (
     <div className="flex flex-col gap-10">
       <Section
@@ -326,7 +326,7 @@ export const GroupHeaderRules: Story = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export const SettingsScenario: Story = {
-  name: '3. Settings 類有子頁的頁面',
+  name: 'Settings 類有子頁的頁面',
   render: () => (
     <div className="flex flex-col gap-10">
       <Section
@@ -395,7 +395,7 @@ export const SettingsScenario: Story = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export const IconModeRules: Story = {
-  name: '4. Icon 模式的 4 條鐵律',
+  name: 'Icon 模式的 4 條鐵律',
   render: () => (
     <div className="flex flex-col gap-10">
       <Section
@@ -445,7 +445,7 @@ export const IconModeRules: Story = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export const ActiveState: Story = {
-  name: '5. Active state 跨群組單一',
+  name: 'Active state 跨群組單一',
   render: () => (
     <div className="flex flex-col gap-10">
       <Section

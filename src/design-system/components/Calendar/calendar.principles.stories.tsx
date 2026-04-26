@@ -47,7 +47,7 @@ export const WhenToUse: Story = {
 }
 
 export const VsDatePicker: Story = {
-  name: '1. Calendar vs DatePicker',
+  name: 'Calendar vs DatePicker',
   render: () => (
     <div className="space-y-6">
       <Rule
@@ -80,7 +80,7 @@ export const VsDatePicker: Story = {
 
 // ── 原則 2:Event color 是類別語意,不是 severity ─────────────────────────────
 export const ColorSemantic: Story = {
-  name: '2. Event color 類別語意',
+  name: 'Event color 類別語意',
   render: () => (
     <div className="space-y-6">
       <Rule
@@ -104,7 +104,7 @@ export const ColorSemantic: Story = {
 
 // ── 原則 3:MVP scope — 月 view only ─────────────────────────────────────────
 export const MvpScope: Story = {
-  name: '3. MVP scope',
+  name: 'MVP scope',
   render: () => (
     <div className="space-y-6">
       <Rule
@@ -125,7 +125,7 @@ export const MvpScope: Story = {
 
 // ── 原則 4:What NOT to put in Calendar ─────────────────────────────────────────
 export const WhenNotToUse: Story = {
-  name: '4. 何時不用',
+  name: '何時不用',
   render: () => (
     <div className="space-y-4 text-body text-fg-secondary max-w-3xl">
       <div className="text-body-lg font-medium text-foreground">何時不用 Calendar</div>

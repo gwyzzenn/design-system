@@ -29,7 +29,15 @@ function* walk(dir) {
   }
 }
 
-const violations = { numbering: [], linkTo: [], stub: [], missingName: [] };
+const violations = {
+  numbering: [],          // anatomy extras 缺 number
+  nonAnatomyNumbering: [], // showcase/principles 不該有 numbering
+  linkTo: [],
+  stub: [],
+  missingName: [],
+  placeholderContent: [],  // Option A/B/C / Lorem / 抽象代號
+  emptyStory: [],          // story render returns empty
+};
 let autoFixed = 0;
 
 for (const file of walk(COMPONENTS_DIR)) {
@@ -98,7 +106,48 @@ for (const file of walk(COMPONENTS_DIR)) {
     violations.stub.push({ file: basename(file), count: stubs.length });
   }
 
-  // === Check 4: Missing `name:` zh-CN(showcase + principles)===
+  // === Check 4a: Numbering in non-anatomy(violation — only anatomy uses numbering)===
+  if (!isAnatomy) {
+    const numberedNames = [...content.matchAll(/name:\s*['"](\d+\.\s*[^'"]+)['"]/g)];
+    if (numberedNames.length > 0) {
+      violations.nonAnatomyNumbering.push({
+        file: basename(file),
+        names: numberedNames.slice(0, 5).map(m => m[1])
+      });
+    }
+  }
+
+  // === Check 4b: Placeholder / abstract content(forbidden per CLAUDE.md `# Story`)===
+  // Strip comments first(/* */ + // + leading * lines)to avoid false positives
+  // when rules are *referenced* in comments.
+  const stripped = content
+    .replace(/\/\*[\s\S]*?\*\//g, '')        // /* ... */
+    .replace(/^\s*\*.*$/gm, '')              // leading * (jsdoc)
+    .replace(/\/\/.*$/gm, '');               // // line comments
+
+  const forbiddenPatterns = [
+    { re: /Option\s+[A-Z](?:\s|<|"|')/g, label: 'Option A/B/C' },
+    { re: /Variant\s+[A-Z](?:\s|<|"|')/g, label: 'Variant X' },
+    { re: /\bLorem ipsum/gi, label: 'Lorem ipsum' },
+    { re: /\bfoo\s*bar\b/gi, label: 'foo bar' },
+    { re: /按鈕[一二三四五]/g, label: '按鈕一/二/三' },
+  ];
+  for (const { re, label } of forbiddenPatterns) {
+    const matches = stripped.match(re);
+    if (matches && matches.length > 0) {
+      violations.placeholderContent.push({ file: basename(file), label, count: matches.length });
+    }
+  }
+
+  // === Check 4c: Empty story render(無 visible JSX)===
+  if (!isAnatomy) {
+    const renderEmpty = /render:\s*\(\s*\)\s*=>\s*\(\s*<\s*(div|>)\s*\/>\s*\)/g;
+    if (renderEmpty.test(content)) {
+      violations.emptyStory.push({ file: basename(file) });
+    }
+  }
+
+  // === Check 5: Missing `name:` zh-CN(showcase + principles)===
   if (!isAnatomy) {
     const exportMatches = [...content.matchAll(/^export const ([A-Z]\w+)(?:\s*:\s*Story)?\s*=\s*\{/gm)];
     let missingNames = 0;
@@ -118,7 +167,7 @@ for (const file of walk(COMPONENTS_DIR)) {
   if (modified) writeFileSync(file, content);
 }
 
-const totalViolations = violations.numbering.length + violations.linkTo.length + violations.stub.length + violations.missingName.length;
+const totalViolations = violations.numbering.length + violations.nonAnatomyNumbering.length + violations.linkTo.length + violations.stub.length + violations.missingName.length + violations.placeholderContent.length + violations.emptyStory.length;
 
 console.log('=== Content quality audit ===\n');
 console.log(`Mode: ${fix ? 'fix' : 'check'}`);
@@ -127,6 +176,21 @@ if (autoFixed > 0) console.log(`Auto-fixed: ${autoFixed} numbering drift`);
 if (violations.numbering.length > 0) {
   console.log(`\n[P1] Anatomy numbering missing: ${violations.numbering.length}`);
   violations.numbering.slice(0, 10).forEach(v => console.log(`  • ${v.file}: "${v.name}"`));
+}
+
+if (violations.nonAnatomyNumbering.length > 0) {
+  console.log(`\n[P0] Non-anatomy stories with numbering(only anatomy uses numbers): ${violations.nonAnatomyNumbering.length} files`);
+  violations.nonAnatomyNumbering.slice(0, 10).forEach(v => console.log(`  • ${v.file}: ${v.names.join(', ')}`));
+}
+
+if (violations.placeholderContent.length > 0) {
+  console.log(`\n[P0] Placeholder / abstract content(forbidden per CLAUDE.md # Story): ${violations.placeholderContent.length}`);
+  violations.placeholderContent.slice(0, 10).forEach(v => console.log(`  • ${v.file}: ${v.count}× "${v.label}"`));
+}
+
+if (violations.emptyStory.length > 0) {
+  console.log(`\n[P0] Empty story render: ${violations.emptyStory.length}`);
+  violations.emptyStory.slice(0, 10).forEach(v => console.log(`  • ${v.file}`));
 }
 
 if (violations.linkTo.length > 0) {
