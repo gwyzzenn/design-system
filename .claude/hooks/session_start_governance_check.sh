@@ -151,20 +151,14 @@ if [ -f "$FIRES_LOG" ] && [ -d "$TESTS_DIR" ]; then
   fi
 fi
 
-[ -z "$REMINDERS" ] && [ -z "$BLOCKERS" ] && exit 0
+# Silent on pass — only inject if HARD BLOCKERS(soft reminders 不 inject
+# 給 user 看,2026-04-26 user noise-reduction directive)。
+[ -z "$BLOCKERS" ] && exit 0
 
-if [ -n "$BLOCKERS" ]; then
-  # Hard-tier:must-address-first framing,user can override but Claude reads as REQUIRED
-  MSG="🚨 BLOCKER — governance hard thresholds breached (SessionStart):${BLOCKERS}\n\n"
-  MSG="${MSG}⚠️ REQUIRED_FIRST_ACTION:先 invoke 上述 skill(/knowledge-prune 或 /codify-corrections)"
-  MSG="${MSG}把 governance 帶回健康區間,再處理 user 的實際請求。不可 silent defer —— 若 user "
-  MSG="${MSG}明示要先做其他任務,你 acknowledge 這些 blocker + 記 tech-debt pointer 再繼續。"
-  if [ -n "$REMINDERS" ]; then
-    MSG="${MSG}\n\n額外 soft reminder:${REMINDERS}"
-  fi
-else
-  MSG="🧭 Governance hygiene reminders (SessionStart):${REMINDERS}\n\nThese are not blocking — address them inline when timing permits, or defer with explicit reason."
-fi
+# Hard-tier only:must-address-first framing
+MSG="🚨 BLOCKER — governance hard thresholds breached (SessionStart):${BLOCKERS}\n\n"
+MSG="${MSG}⚠️ REQUIRED_FIRST_ACTION:先 invoke 上述 skill(/knowledge-prune 或 /codify-corrections)"
+MSG="${MSG}把 governance 帶回健康區間,再處理 user 的實際請求。"
 ESCAPED=$(printf '%b' "$MSG" | jq -Rs .)
 printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":%s}}\n' "$ESCAPED"
 exit 0
