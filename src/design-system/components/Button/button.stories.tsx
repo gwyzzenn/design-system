@@ -134,12 +134,12 @@ export const Danger: Story = {
 // principles story(含視覺 + do/don't + 規則註解),display 層重複教相同原則 = noise。
 // 需要 startIcon / endIcon 的 quick reference → 參考 `.principles.stories.tsx`。
 
-// ── icon / badge slots(start + end + badge 對照,對齊 Polaris)──────────
+// ── icon slots(start / end 對照,對齊 Polaris)──────────────────────────
 
 export const WithIcon: Story = {
-  // Manual story 拆分原則(CLAUDE.md `# Story`)— startIcon / endIcon / badge 同
-  // 元件不同 slot rules,各自 section 對照展示。對齊 Polaris pattern。
-  name: 'icon / badge slots',
+  // Manual story 拆分原則(CLAUDE.md `# Story`)— startIcon / endIcon 同 slot rule
+  // (LucideIcon prop slot,size 由元件控)→ 合併對照 grid。
+  name: 'icon slots',
   args: { size: 'sm' },
   render: (args) => (
     <div className="flex flex-col gap-4">
@@ -153,8 +153,21 @@ export const WithIcon: Story = {
         <Button size={args.size} variant="tertiary" endIcon={ChevronDown}>展開選單</Button>
         <Button size={args.size} variant="primary" endIcon={ChevronDown}>新增項目</Button>
       </div>
+    </div>
+  ),
+}
+
+// ── badge slot(獨立 rule,跟 Chip 一致)────────────────────────────────
+
+export const WithBadge: Story = {
+  // badge 是獨立 slot rule(inline 在 pill 內),不合進 WithIcon — 對齊 Chip 一致。
+  // Compound(badge + endIcon)順帶展示 layering 真實情境(教 layering coexistence)。
+  name: 'badge slot',
+  args: { size: 'sm' },
+  render: (args) => (
+    <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
-        <p className="w-full text-caption text-fg-muted">badge — inline 計數(可獨立 / 配 startIcon)</p>
+        <p className="w-full text-caption text-fg-muted">badge — inline 計數</p>
         <Button size={args.size} variant="tertiary" startIcon={Bell} badge={<Badge count={3} />}>通知</Button>
         <Button size={args.size} variant="tertiary" badge={<Badge count={12} />}>訊息</Button>
       </div>
