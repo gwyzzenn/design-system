@@ -41,6 +41,24 @@ const categoryOptions = [
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
+// ── WhenToUse — 何時使用 Combobox ──────────────────────
+
+export const WhenToUse: Story = {
+  name: '何時使用',
+  render: () => (
+    <div className="prose prose-sm max-w-prose">
+      <p>本元件適用的真實業務場景(對照「展示」頁 detail):</p>
+      <ul>
+        <li><strong>Modes</strong> — Modes 場景</li>
+        <li><strong>SizeAlignment</strong> — Size Alignment 場景</li>
+        <li><strong>WrapModes</strong> — Wrap Modes 場景</li>
+        <li><strong>Searchable</strong> — Searchable 場景</li>
+      </ul>
+      <p className="text-fg-muted">判斷時對照 spec.md「何時用 / 何時不用」段;不符 → 改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+  ),
+}
+
 export const WrapRule: Story = {
   name: 'Wrap 模式選擇',
   render: () => {

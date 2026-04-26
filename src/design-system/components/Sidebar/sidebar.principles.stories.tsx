@@ -123,6 +123,24 @@ const renderMainNav = (_activeId?: string) => (
 
 // ═══════════════════════════════════════════════════════════════════════════
 
+// ── WhenToUse — 何時使用 Sidebar ──────────────────────
+
+export const WhenToUse: Story = {
+  name: '何時使用',
+  render: () => (
+    <div className="prose prose-sm max-w-prose">
+      <p>本元件適用的真實業務場景(對照「展示」頁 detail):</p>
+      <ul>
+        <li><strong>IconCollapse</strong> — Icon Collapse 場景</li>
+        <li><strong>MixedContent</strong> — Mixed Content 場景</li>
+        <li><strong>Offcanvas</strong> — Offcanvas 場景</li>
+        <li><strong>IntegrationSidebar</strong> — Integration Sidebar 場景</li>
+      </ul>
+      <p className="text-fg-muted">判斷時對照 spec.md「何時用 / 何時不用」段;不符 → 改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+  ),
+}
+
 export const ContentTypeChoice: Story = {
   name: '1. SidebarMenu vs TreeView 的選擇',
   render: () => (

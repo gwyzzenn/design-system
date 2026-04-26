@@ -39,6 +39,24 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
+// ── WhenToUse — 何時使用 Separator ──────────────────────
+
+export const WhenToUse: Story = {
+  name: '何時使用',
+  render: () => (
+    <div className="prose prose-sm max-w-prose">
+      <p>本元件適用的真實業務場景(對照「展示」頁 detail):</p>
+      <ul>
+        <li><strong>Horizontal</strong> — Horizontal 場景</li>
+        <li><strong>Vertical</strong> — Vertical 場景</li>
+        <li><strong>InDropdownMenu</strong> — In Dropdown Menu 場景</li>
+        <li><strong>BetweenSections</strong> — Between Sections 場景</li>
+      </ul>
+      <p className="text-fg-muted">判斷時對照 spec.md「何時用 / 何時不用」段;不符 → 改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+  ),
+}
+
 export const WhoDecidesRule: Story = {
   name: '分隔的決策者:Separator vs CSS border',
   render: () => (

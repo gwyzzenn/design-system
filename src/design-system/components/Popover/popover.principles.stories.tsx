@@ -60,6 +60,21 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
+// ── WhenToUse — 何時使用 Popover ──────────────────────
+
+export const WhenToUse: Story = {
+  name: '何時使用',
+  render: () => (
+    <div className="prose prose-sm max-w-prose">
+      <p>本元件適用的真實業務場景(對照「展示」頁 detail):</p>
+      <ul>
+        <li><strong>FilterPanel</strong> — Filter Panel 場景</li>
+      </ul>
+      <p className="text-fg-muted">判斷時對照 spec.md「何時用 / 何時不用」段;不符 → 改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+  ),
+}
+
 export const VsDialogRule: Story = {
   name: 'Popover vs Dialog',
   render: () => (

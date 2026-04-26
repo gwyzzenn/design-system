@@ -47,6 +47,24 @@ const Demo = ({ title, children }: { title: string; children: React.ReactNode })
 
 // ── Stories ──────────────────────────────────────────────────────────────────
 
+// ── WhenToUse — 何時使用 DateGrid ──────────────────────
+
+export const WhenToUse: Story = {
+  name: '何時使用',
+  render: () => (
+    <div className="prose prose-sm max-w-prose">
+      <p>本元件適用的真實業務場景(對照「展示」頁 detail):</p>
+      <ul>
+        <li><strong>Single</strong> — Single 場景</li>
+        <li><strong>Multiple</strong> — Multiple 場景</li>
+        <li><strong>Range</strong> — Range 場景</li>
+        <li><strong>Inline</strong> — Inline 場景</li>
+      </ul>
+      <p className="text-fg-muted">判斷時對照 spec.md「何時用 / 何時不用」段;不符 → 改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+  ),
+}
+
 export const ModeRule: Story = {
   name: 'Mode 選擇',
   render: () => {

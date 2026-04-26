@@ -40,6 +40,23 @@ const team: PersonValue[] = [
 
 // ── 定位與分界 ───────────────────────────────────────────────────────────────
 
+// ── WhenToUse — 何時使用 PeoplePicker ──────────────────────
+
+export const WhenToUse: Story = {
+  name: '何時使用',
+  render: () => (
+    <div className="prose prose-sm max-w-prose">
+      <p>本元件適用的真實業務場景(對照「展示」頁 detail):</p>
+      <ul>
+        <li><strong>Single</strong> — Single 場景</li>
+        <li><strong>Multi</strong> — Multi 場景</li>
+        <li><strong>SizeAlignment</strong> — Size Alignment 場景</li>
+      </ul>
+      <p className="text-fg-muted">判斷時對照 spec.md「何時用 / 何時不用」段;不符 → 改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+  ),
+}
+
 export const VsSelectRule: Story = {
   name: '定位：選人 vs 選分類',
   render: () => {

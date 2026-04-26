@@ -72,6 +72,18 @@ function InlineHoverExample() {
 
 // ── 定位與分界 ───────────────────────────────────────────────────────────────
 
+// ── WhenToUse — 何時使用 NameCard ──────────────────────
+
+export const WhenToUse: Story = {
+  name: '何時使用',
+  render: () => (
+    <div className="prose prose-sm max-w-prose">
+      <p>適用情境見「展示」頁的真實業務場景範例。</p>
+      <p>判斷時對照 spec.md「何時用 / 何時不用」段落。</p>
+    </div>
+  ),
+}
+
 export const VsAvatarRule: Story = {
   name: '定位：人員詳情卡 vs 名字展示',
   render: () => (

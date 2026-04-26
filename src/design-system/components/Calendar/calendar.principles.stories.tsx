@@ -22,6 +22,23 @@ const Rule: React.FC<{ title: string; note: string; children: React.ReactNode }>
 )
 
 // ── 原則 1:Calendar vs DatePicker ─────────────────────────────────────────
+// ── WhenToUse — 何時使用 Calendar ──────────────────────
+
+export const WhenToUse: Story = {
+  name: '何時使用',
+  render: () => (
+    <div className="prose prose-sm max-w-prose">
+      <p>本元件適用的真實業務場景(對照「展示」頁 detail):</p>
+      <ul>
+        <li><strong>TeamCalendar</strong> — Team Calendar 場景</li>
+        <li><strong>ContentPublishingSchedule</strong> — Content Publishing Schedule 場景</li>
+        <li><strong>EmptyCalendar</strong> — Empty Calendar 場景</li>
+      </ul>
+      <p className="text-fg-muted">判斷時對照 spec.md「何時用 / 何時不用」段;不符 → 改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+  ),
+}
+
 export const VsDatePicker: Story = {
   name: '1. Calendar vs DatePicker',
   render: () => (
@@ -100,7 +117,7 @@ export const MvpScope: Story = {
 }
 
 // ── 原則 4:What NOT to put in Calendar ─────────────────────────────────────────
-export const NonGoals: Story = {
+export const WhenNotToUse: Story = {
   name: '4. 何時不用',
   render: () => (
     <div className="space-y-4 text-body text-fg-secondary max-w-3xl">

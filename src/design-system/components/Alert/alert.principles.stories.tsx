@@ -25,6 +25,24 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
   <p className={`text-footnote leading-normal ${warn ? 'text-error font-medium' : 'text-fg-muted'}`}>{children}</p>
 )
 
+// ── WhenToUse — 何時使用 Alert ──────────────────────
+
+export const WhenToUse: Story = {
+  name: '何時使用',
+  render: () => (
+    <div className="prose prose-sm max-w-prose">
+      <p>本元件適用的真實業務場景(對照「展示」頁 detail):</p>
+      <ul>
+        <li><strong>SubtleSingleLine</strong> — Subtle Single Line 場景</li>
+        <li><strong>SolidSingleLine</strong> — Solid Single Line 場景</li>
+        <li><strong>SubtleWithDescription</strong> — Subtle With Description 場景</li>
+        <li><strong>SolidWithDescription</strong> — Solid With Description 場景</li>
+      </ul>
+      <p className="text-fg-muted">判斷時對照 spec.md「何時用 / 何時不用」段;不符 → 改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+  ),
+}
+
 export const VsToastVsDialogRule: Story = {
   name: 'Alert vs Toast vs Dialog',
   render: () => (

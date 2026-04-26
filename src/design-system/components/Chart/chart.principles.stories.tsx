@@ -133,6 +133,24 @@ const groupedCategoriesConfig = {
 
 // Stories ─────────────────────────────────────────────────────────────────────
 
+// ── WhenToUse — 何時使用 Chart ──────────────────────
+
+export const WhenToUse: Story = {
+  name: '何時使用',
+  render: () => (
+    <div className="prose prose-sm max-w-prose">
+      <p>本元件適用的真實業務場景(對照「展示」頁 detail):</p>
+      <ul>
+        <li><strong>BarChartRevenue</strong> — Bar Chart Revenue 場景</li>
+        <li><strong>LineChartResponseTime</strong> — Line Chart Response Time 場景</li>
+        <li><strong>DonutChartTrafficSource</strong> — Donut Chart Traffic Source 場景</li>
+        <li><strong>StackedAreaChartExpenses</strong> — Stacked Area Chart Expenses 場景</li>
+      </ul>
+      <p className="text-fg-muted">判斷時對照 spec.md「何時用 / 何時不用」段;不符 → 改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+  ),
+}
+
 export const ChartTypeRule: Story = {
   name: '何時用哪種 Chart',
   render: () => (
@@ -296,7 +314,7 @@ export const FiveCategoryLimitRule: Story = {
   ),
 }
 
-export const ForbiddenRule: Story = {
+export const WhenNotToUse: Story = {
   name: '禁止事項',
   render: () => (
     <div>

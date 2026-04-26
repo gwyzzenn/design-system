@@ -22,6 +22,24 @@ type Story = StoryObj<typeof TimePicker>
  * 世界級(Google Calendar / Outlook / Notion Calendar)開會排時間都是 15 分鐘粒度——
  * minuteStep=1 讓使用者困在挑「9:07 還是 9:08」,失去會議排程本質。
  */
+// ── WhenToUse — 何時使用 TimePicker ──────────────────────
+
+export const WhenToUse: Story = {
+  name: '何時使用',
+  render: () => (
+    <div className="prose prose-sm max-w-prose">
+      <p>本元件適用的真實業務場景(對照「展示」頁 detail):</p>
+      <ul>
+        <li><strong>MeetingSlot</strong> — Meeting Slot 場景</li>
+        <li><strong>FlightDepartureTime</strong> — Flight Departure Time 場景</li>
+        <li><strong>ShopBusinessHours</strong> — Shop Business Hours 場景</li>
+        <li><strong>EventTimestamp</strong> — Event Timestamp 場景</li>
+      </ul>
+      <p className="text-fg-muted">判斷時對照 spec.md「何時用 / 何時不用」段;不符 → 改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+  ),
+}
+
 export const RuleMinuteStepForMeetings: Story = {
   name: 'Rule:會議類情境一律 minuteStep=15',
   render: () => (

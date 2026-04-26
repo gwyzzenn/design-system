@@ -182,7 +182,7 @@ export const SizeMatchContextRule: Story = {
   ),
 }
 
-export const ForbiddenRule: Story = {
+export const WhenNotToUse: Story = {
   name: '禁止事項',
   render: () => (
     <div>

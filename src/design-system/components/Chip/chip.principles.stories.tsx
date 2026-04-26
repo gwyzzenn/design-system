@@ -32,6 +32,24 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
 
 // ── 定位與分界 ───────────────────────────────────────────────────────────────
 
+// ── WhenToUse — 何時使用 Chip ──────────────────────
+
+export const WhenToUse: Story = {
+  name: '何時使用',
+  render: () => (
+    <div className="prose prose-sm max-w-prose">
+      <p>本元件適用的真實業務場景(對照「展示」頁 detail):</p>
+      <ul>
+        <li><strong>SingleSelection</strong> — Single Selection 場景</li>
+        <li><strong>LayoutWrap</strong> — Layout Wrap 場景</li>
+        <li><strong>LayoutScroll</strong> — Layout Scroll 場景</li>
+        <li><strong>LayoutMenu</strong> — Layout Menu 場景</li>
+      </ul>
+      <p className="text-fg-muted">判斷時對照 spec.md「何時用 / 何時不用」段;不符 → 改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+  ),
+}
+
 export const VsSegmentedRule: Story = {
   name: '定位：多選濾鏡 vs 互斥檢視',
   render: () => {
@@ -182,7 +200,7 @@ export const SelectedStyleRule: Story = {
 
 // ── 禁止 ────────────────────────────────────────────────────────────────
 
-export const ForbiddenRule: Story = {
+export const WhenNotToUse: Story = {
   name: '禁止：Chip 不做的事',
   render: () => (
     <div>

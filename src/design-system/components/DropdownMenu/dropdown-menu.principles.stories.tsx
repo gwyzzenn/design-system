@@ -42,6 +42,24 @@ const Label = ({ children, warn }: { children: React.ReactNode; warn?: boolean }
   <p className={`text-footnote leading-normal ${warn ? 'text-error font-medium' : 'text-fg-muted'}`}>{children}</p>
 )
 
+// ── WhenToUse — 何時使用 DropdownMenu ──────────────────────
+
+export const WhenToUse: Story = {
+  name: '何時使用',
+  render: () => (
+    <div className="prose prose-sm max-w-prose">
+      <p>本元件適用的真實業務場景(對照「展示」頁 detail):</p>
+      <ul>
+        <li><strong>Groups</strong> — Groups 場景</li>
+        <li><strong>WithSuffix</strong> — With Suffix 場景</li>
+        <li><strong>SubMenu</strong> — Sub Menu 場景</li>
+        <li><strong>CheckboxItems</strong> — Checkbox Items 場景</li>
+      </ul>
+      <p className="text-fg-muted">判斷時對照 spec.md「何時用 / 何時不用」段;不符 → 改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+    </div>
+  ),
+}
+
 export const VsSelectMenuRule: Story = {
   name: 'DropdownMenu vs SelectMenu（執行 vs 選值）',
   render: () => (

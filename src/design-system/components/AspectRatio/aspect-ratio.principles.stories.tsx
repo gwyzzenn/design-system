@@ -260,7 +260,7 @@ export const PlaceholderAndSkeleton: Story = {
   ),
 }
 
-export const Prohibitions: Story = {
+export const WhenNotToUse: Story = {
   name: '禁止事項',
   render: () => (
     <div>
