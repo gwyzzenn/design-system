@@ -482,6 +482,61 @@ export const BulkActionsFooterForm: Story = {
   },
 }
 
+/* ── L2 Selection — Shift-click + 鍵盤(Cmd+A / Esc)── */
+export const SelectionKeyboardAndShift: Story = {
+  name: 'L2 Selection — Shift-click 區間 + 鍵盤(Cmd+A / Esc)',
+  render: () => {
+    const [selection, setSelection] = React.useState<string[]>([])
+    const data = generateLargeData(15)
+    return (
+      <div className="flex flex-col gap-2 max-w-4xl">
+        <p className="text-caption text-fg-muted">
+          試試:點第一 row checkbox → <kbd>Shift</kbd>+點第五 row → 1-5 全選 ·
+          整 table 點任意 row 後按 <kbd>Cmd/Ctrl+A</kbd> 全選 · 按 <kbd>Esc</kbd> 清除 ·
+          checkbox focus 時按 <kbd>Space</kbd> 帶 <kbd>Shift</kbd> 也能擴選。
+        </p>
+        <div className="text-caption font-mono text-fg-muted">selection: {JSON.stringify(selection)}</div>
+        <DataTable
+          columns={baseColumns}
+          data={data}
+          height="400px"
+          selectable
+          selection={selection}
+          onSelectionChange={setSelection}
+          getRowId={(row) => row.sku}
+        />
+      </div>
+    )
+  },
+}
+
+/* ── L2 Selection — Single mode(每次只選一個)── */
+export const SelectionSingleMode: Story = {
+  name: 'L2 Selection — Single mode',
+  render: () => {
+    const [selection, setSelection] = React.useState<string[]>([])
+    return (
+      <div className="flex flex-col gap-2 max-w-4xl">
+        <p className="text-caption text-fg-muted">
+          <code>selectable=&quot;single&quot;</code>:每次只選一個,點新 row 自動清舊 row。
+          Header checkbox 抑制(single 沒「全選」概念)。<br />
+          <span className="text-fg-muted italic">v1 視覺仍用 Checkbox(行為正確);Radio 完整整合是 future enhancement。</span>
+        </p>
+        <div className="text-caption font-mono text-fg-muted">selected: {selection[0] ?? '(none)'}</div>
+        <DataTable
+          columns={baseColumns}
+          data={sampleData}
+          height="auto"
+          selectable="single"
+          selection={selection}
+          onSelectionChange={setSelection}
+          getRowId={(row) => row.sku}
+        />
+      </div>
+    )
+  },
+}
+
 /* ── L2 Selection — disabled rows + filter 互動 ── */
 export const SelectionDisabledRows: Story = {
   name: 'L2 Selection — Disabled rows(只 disable checkbox)',

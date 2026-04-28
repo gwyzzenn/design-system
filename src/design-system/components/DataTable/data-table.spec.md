@@ -384,8 +384,9 @@ preserveSelectionOnFilter?: boolean   // default false
 
 - 每個 row checkbox 必有 `aria-label`:consumer 提供 `getRowAriaLabel?: (row) => string`,fallback `"Select row"`
 - header checkbox `aria-label="Select all visible rows"`
-- 鍵盤:`Space` toggle / `Shift+Space` 擴 / `Cmd+A` 選全可見 / `Esc` clear
+- 鍵盤:`Space` toggle / `Shift+Space` 擴 range / `Cmd/Ctrl+A` 選全可見 / `Esc` clear
 - Selection 變更可選 `aria-live="polite"` 通知(consumer-implemented)
+- **Single mode 視覺 v1**:沿用 Checkbox(behavior 正確 — replace selection;header checkbox 抑制)。Radio 完整整合(對齊 Material / Polaris world-class)需 RadioGroup root 包整 table,複雜度過高,列 future enhancement。
 
 ### 九、L2 禁止事項
 

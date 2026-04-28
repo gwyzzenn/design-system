@@ -190,6 +190,8 @@ function DataTableInner<TData>(
     defaultValue: defaultSelection ?? [],
     onChange: onSelectionChange,
   })
+  // Shift-click anchor:存最後一次「單擊」的 row id,shift-click 時做區間選
+  const anchorRowIdRef = React.useRef<string | null>(null)
   // 注入 checkbox column(enabled 時)
   const columnsWithSelection = React.useMemo(() => {
     if (!enabled) return columns
@@ -350,6 +352,8 @@ function DataTableInner<TData>(
       const isDisabled = isRowSelectable ? !isRowSelectable(rowOriginal) : false
       const isChecked = selectionSet.has(rowId)
       const ariaLabel = getRowAriaLabel?.(rowOriginal) ?? 'Select row'
+      // Shift-click 需從 mousedown event 取 shiftKey;Radix Checkbox onCheckedChange 不帶 event
+      // 改用 onClick 攔截 + 自己 handle toggle
       return (
         <div
           key={cell.id}
@@ -360,10 +364,21 @@ function DataTableInner<TData>(
           <Checkbox
             size={size === 'lg' ? 'lg' : 'md'}
             checked={isChecked}
-            onCheckedChange={() => toggleRow(rowId, rowOriginal)}
             disabled={isDisabled}
             aria-label={ariaLabel}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation()
+              if (isDisabled) return
+              e.preventDefault()  // 攔截 Radix 內部 toggle,自己 toggle 帶 shiftKey
+              toggleRow(rowId, rowOriginal, { shiftKey: e.shiftKey })
+            }}
+            onKeyDown={(e) => {
+              // Space:Radix 已處理 toggle,但要帶 shiftKey 區間選 → 攔截
+              if (e.key === ' ' && mode === 'multi' && !isDisabled) {
+                e.preventDefault()
+                toggleRow(rowId, rowOriginal, { shiftKey: e.shiftKey })
+              }
+            }}
           />
         </div>
       )
@@ -435,19 +450,66 @@ function DataTableInner<TData>(
     }
   }
 
-  const toggleRow = (rowId: string, rowOriginal: TData) => {
+  const toggleRow = (rowId: string, rowOriginal: TData, opts?: { shiftKey?: boolean }) => {
     if (isRowSelectable && !isRowSelectable(rowOriginal)) return
     if (mode === 'single') {
       setSelection(selectionSet.has(rowId) ? [] : [rowId])
-    } else {
-      setSelection(prev => {
-        const set = new Set(prev)
-        if (set.has(rowId)) set.delete(rowId)
-        else set.add(rowId)
-        return Array.from(set)
-      })
+      anchorRowIdRef.current = rowId
+      return
     }
+    // multi 模式
+    const anchor = anchorRowIdRef.current
+    if (opts?.shiftKey && anchor && anchor !== rowId) {
+      // 區間選:從 anchor 到 rowId(在 visible 順序內),全 toggle 成 willCheck 狀態
+      const visibleIds = rows.map(r => r.id)
+      const a = visibleIds.indexOf(anchor)
+      const b = visibleIds.indexOf(rowId)
+      if (a !== -1 && b !== -1) {
+        const [from, to] = a < b ? [a, b] : [b, a]
+        const rangeIds = visibleIds.slice(from, to + 1).filter(id => {
+          const row = rows.find(r => r.id === id)
+          return row && (!isRowSelectable || isRowSelectable(row.original))
+        })
+        // Mail / GitHub 慣例:shift-click 把 range 全變「rowId 點擊後該變的狀態」
+        const willCheck = !selectionSet.has(rowId)
+        setSelection(prev => {
+          const set = new Set(prev)
+          rangeIds.forEach(id => willCheck ? set.add(id) : set.delete(id))
+          return Array.from(set)
+        })
+        return
+      }
+    }
+    // 一般 toggle + 更新 anchor
+    setSelection(prev => {
+      const set = new Set(prev)
+      if (set.has(rowId)) set.delete(rowId)
+      else set.add(rowId)
+      return Array.from(set)
+    })
+    anchorRowIdRef.current = rowId
   }
+
+  // ── Cmd+A / Esc 鍵盤 handler(table-level)──
+  const tableKeyboardHandler = React.useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (!enabled) return
+      // Cmd/Ctrl+A:選全可見(扣 disabled)— 對齊 Mail / GitHub / Linear 慣例
+      if ((e.metaKey || e.ctrlKey) && e.key === 'a' && mode === 'multi') {
+        e.preventDefault()
+        setSelection(prev => Array.from(new Set([...prev, ...selectableVisibleIds])))
+        return
+      }
+      // Esc:clear selection
+      if (e.key === 'Escape' && selection.length > 0) {
+        e.preventDefault()
+        setSelection([])
+        anchorRowIdRef.current = null
+        return
+      }
+    },
+    [enabled, mode, selection.length, selectableVisibleIds, setSelection]
+  )
 
   // ── Header cell ──
   const headerCellEl = (header: ReturnType<typeof table.getHeaderGroups>[number]['headers'][number], showDivider: boolean) => {
@@ -575,6 +637,8 @@ function DataTableInner<TData>(
       data-table-size={size}
       className={cn(dataTableVariants({ bordered }), className)}
       role="table" aria-rowcount={rows.length + 1}
+      tabIndex={enabled ? 0 : undefined}
+      onKeyDown={enabled ? tableKeyboardHandler : undefined}
       onMouseOver={enterLeaveHandlers.onMouseOver}
       onMouseOut={enterLeaveHandlers.onMouseOut}
       {...props}
