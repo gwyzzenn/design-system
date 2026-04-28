@@ -102,6 +102,8 @@ function renderTypedValue(value: unknown, meta?: Record<string, any>, autoRowHei
 // ── Constants ────────────────────────────────────────────────────────────────
 
 const CELL_PX = '0.75rem'
+// L2 selection 內部 column id(避免 magic string 重複)
+const SELECT_COL_ID = '__select__'
 const cellPadding: React.CSSProperties = { paddingBlock: 'var(--table-cell-py)', paddingInline: CELL_PX }
 const HEADER_BG = 'bg-muted'
 
@@ -192,11 +194,12 @@ function DataTableInner<TData>(
   })
   // Shift-click anchor:存最後一次「單擊」的 row id,shift-click 時做區間選
   const anchorRowIdRef = React.useRef<string | null>(null)
+
   // 注入 checkbox column(enabled 時)
   const columnsWithSelection = React.useMemo(() => {
     if (!enabled) return columns
     const selectColumn: ColumnDef<TData, any> = {
-      id: '__select__',
+      id: SELECT_COL_ID,
       size: 40,
       enableSorting: false,
       enableResizing: false,
@@ -210,7 +213,7 @@ function DataTableInner<TData>(
   const effectivePinnedLeft = React.useMemo(() => {
     if (!enabled) return pinnedLeftColumns ?? []
     const list = pinnedLeftColumns ?? []
-    return list.includes('__select__') ? list : ['__select__', ...list]
+    return list.includes(SELECT_COL_ID) ? list : [SELECT_COL_ID, ...list]
   }, [pinnedLeftColumns, enabled])
 
   const table = useReactTable({
@@ -346,7 +349,7 @@ function DataTableInner<TData>(
 
   const cellEl = (cell: ReturnType<typeof rows[number]['getVisibleCells']>[number], isLastInRow = false) => {
     // L2 selection:__select__ 欄自訂 render(row checkbox)
-    if (enabled && cell.column.id === '__select__') {
+    if (enabled && cell.column.id === SELECT_COL_ID) {
       const rowId = cell.row.id
       const rowOriginal = cell.row.original
       const isDisabled = isRowSelectable ? !isRowSelectable(rowOriginal) : false
@@ -439,7 +442,13 @@ function DataTableInner<TData>(
       : visibleSelectedCount === selectableVisibleIds.length ? true
       : 'indeterminate'
 
-  const toggleHeaderCheckbox = () => {
+  // visibleIdToRow Map(shift-click 區間選 lookup,避免 O(n) `rows.find()`)
+  const visibleIdToRow = React.useMemo(
+    () => new Map(rows.map(r => [r.id, r])),
+    [rows]
+  )
+
+  const toggleHeaderCheckbox = React.useCallback(() => {
     if (headerCheckedState === true) {
       // 清掉本頁可見已選(保留可見外的 selection)
       const visibleSet = new Set(selectableVisibleIds)
@@ -448,9 +457,9 @@ function DataTableInner<TData>(
       // 選全可見(扣除 disabled);保留可見外的既有 selection
       setSelection(prev => Array.from(new Set([...prev, ...selectableVisibleIds])))
     }
-  }
+  }, [headerCheckedState, selectableVisibleIds, setSelection])
 
-  const toggleRow = (rowId: string, rowOriginal: TData, opts?: { shiftKey?: boolean }) => {
+  const toggleRow = React.useCallback((rowId: string, rowOriginal: TData, opts?: { shiftKey?: boolean }) => {
     if (isRowSelectable && !isRowSelectable(rowOriginal)) return
     if (mode === 'single') {
       setSelection(selectionSet.has(rowId) ? [] : [rowId])
@@ -467,7 +476,7 @@ function DataTableInner<TData>(
       if (a !== -1 && b !== -1) {
         const [from, to] = a < b ? [a, b] : [b, a]
         const rangeIds = visibleIds.slice(from, to + 1).filter(id => {
-          const row = rows.find(r => r.id === id)
+          const row = visibleIdToRow.get(id)
           return row && (!isRowSelectable || isRowSelectable(row.original))
         })
         // Mail / GitHub 慣例:shift-click 把 range 全變「rowId 點擊後該變的狀態」
@@ -488,7 +497,7 @@ function DataTableInner<TData>(
       return Array.from(set)
     })
     anchorRowIdRef.current = rowId
-  }
+  }, [isRowSelectable, mode, selectionSet, rows, visibleIdToRow, setSelection])
 
   // ── Cmd+A / Esc 鍵盤 handler(table-level)──
   const tableKeyboardHandler = React.useCallback(
@@ -514,7 +523,7 @@ function DataTableInner<TData>(
   // ── Header cell ──
   const headerCellEl = (header: ReturnType<typeof table.getHeaderGroups>[number]['headers'][number], showDivider: boolean) => {
     // L2 selection:__select__ 欄自訂 render(tri-state header checkbox)
-    if (enabled && header.column.id === '__select__') {
+    if (enabled && header.column.id === SELECT_COL_ID) {
       return (
         <div
           key={header.id}
