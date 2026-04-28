@@ -157,15 +157,16 @@ Row action 的 affordance 是「次要功能」,不是 primary CTA。Button chro
 ```
 ✅ canonical 佈局:
 ┌─ Alert ────────────── [⟲] [↗] │ [X] ┐   ← chrome corner action group
-│ [icon] Title                        │      ⟲ share → Button iconOnly sm variant="text"
-│ Description                         │      close X → Button iconOnly sm dismiss
-│                   [CTA1] [CTA2]     │      Separator `h-5 mx-1` 分群
+│ [icon] Title                        │      ⟲ share → Button iconOnly xs variant="text"
+│ Description                         │      close X → Button iconOnly xs dismiss
+│                   [CTA1] [CTA2]     │      ButtonDivider 分群(自帶 mx-1)
 └─────────────────────────────────────┘   ← body action row(Button sm,有 variant chrome)
 
-**Corner action group 視覺規則**:
+**Corner action group 視覺規則**(2026-04-28 對齊 same-row consistency + button-group SSOT):
+- Corner 所有 action **同 size**(notification banner family = xs;dialog header chrome 也是 xs 對齊 chrome-header-height 公式)
 - Corner 所有 action 一律 `variant="text"`(跟 dismiss 同視覺權重,避免填色 chrome 跟 body CTA 搶焦點)
-- Close X 走 `dismiss` prop 套 fg-muted 弱化
-- Separator 用 `h-5 mx-1`(visible 分群,不太窄不太寬)
+- Close X 走 `dismiss` prop 套 fg-muted 弱化(不靠改 size)
+- 分群用 `<ButtonDivider />`(自帶 mx-1 = 與相鄰 Button 形成 8px gap + 4px 自身 = 12px 視覺距離),不用 `<Separator orientation="vertical" className="h-5 mx-1" />`(後者是 inline-action era leftover)
 
 ❌ 禁止:
 │ Title     [CTA1] [CTA2] [X] │   ← 同 row 混 CTA + dismiss(違反 same-row;

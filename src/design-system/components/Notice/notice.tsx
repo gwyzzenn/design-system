@@ -61,8 +61,8 @@ const NOTICE_LAYOUT = [
 export interface NoticeProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   variant?: NoticeVariant
-  title: string
-  description?: string
+  title: React.ReactNode
+  description?: React.ReactNode
   endContent?: React.ReactNode
   dismissible?: boolean
   onDismiss?: () => void

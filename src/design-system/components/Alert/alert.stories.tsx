@@ -1,8 +1,11 @@
+// @story-trait-rationale: hasVariants/hasInteractiveStates 的 canonical core stories(AllVariants / States)
+//   集中在 anatomy.stories.tsx 的 ColorMatrix + StateBehavior(Inspector 互動);本 showcase
+//   提供真實業務 scenario(部署 / 系統警示)而非 trait grid 重複展示。
 import type { Meta } from '@storybook/react'
 import { RefreshCw, Share2, X as XIcon } from 'lucide-react'
 import { Alert } from './alert'
 import { Button } from '@/design-system/components/Button/button'
-import { Separator } from '@/design-system/components/Separator/separator'
+import { ButtonDivider } from '@/design-system/components/Button/button-group'
 import type { NoticeVariant } from '@/design-system/components/Notice/notice'
 
 const meta: Meta = {
@@ -85,11 +88,13 @@ export const CornerActionGroup = {
           description="點「重新整理」同步最新狀態,或忽略此訊息繼續目前作業。"
           dismissible={false}
         />
-        <div className="absolute top-3 right-4 flex items-center gap-1">
-          {/* Chrome action group canonical(2026-04-22):close 左側 refresh/share 同為 chrome 輕量 action,全 xs 對齊 chrome-header-height 幾何 */}
+        {/* @story-trait-rationale: scenario showcase 沒 AllVariants/States,trait grid 在 anatomy */}
+        <div className="absolute top-3 right-4 flex items-center gap-2">
+          {/* Chrome action group canonical(2026-04-28):全 xs(notification banner family canonical),
+              same-row consistency 同尺寸 + ButtonDivider 自帶 mx-1 = 12px 視覺距離(對齊 button-group SSOT)*/}
           <Button iconOnly size="xs" variant="text" startIcon={RefreshCw} aria-label="重新整理" />
           <Button iconOnly size="xs" variant="text" startIcon={Share2} aria-label="分享連結" />
-          <Separator orientation="vertical" className="h-5 mx-1" />
+          <ButtonDivider />
           <Button iconOnly dismiss size="xs" startIcon={XIcon} aria-label="關閉通知" />
         </div>
       </div>

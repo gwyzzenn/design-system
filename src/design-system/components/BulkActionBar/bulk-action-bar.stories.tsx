@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { Trash2, Archive, Tag as TagIcon, MoveRight, Download } from 'lucide-react'
 import { BulkActionBar } from './bulk-action-bar'
 import { Button } from '@/design-system/components/Button/button'
+import { Alert } from '@/design-system/components/Alert/alert'
 
 const meta: Meta<typeof BulkActionBar> = {
   title: 'Design System/Components/BulkActionBar/展示',
@@ -34,70 +35,7 @@ export const Default: Story = {
   },
 }
 
-// 大 dataset scenario:單頁看不完 5370 筆檔案,本頁全選後出現 hint
-export const WithDatasetExtend: Story = {
-  name: '大 dataset 擴充選取(hint banner state 1)',
-  render: () => {
-    const TOTAL = 5370
-    const VISIBLE = 50
-    const [selection, setSelection] = useState<string[]>(
-      Array.from({ length: VISIBLE }, (_, i) => `file-${i}`)
-    )
-    const [allSelected, setAllSelected] = useState(false)
-    return (
-      <BulkActionBar
-        selection={selection}
-        onClear={() => { setSelection([]); setAllSelected(false) }}
-        actions={
-          <>
-            <Button variant="tertiary" size="sm" startIcon={Download}>下載</Button>
-            <Button variant="tertiary" size="sm" startIcon={Trash2} danger>刪除</Button>
-          </>
-        }
-        dataset={{
-          total: TOTAL,
-          visibleCount: VISIBLE,
-          isAllSelected: allSelected,
-          onSelectAll: () => setAllSelected(true),
-          onClearAll: () => { setSelection([]); setAllSelected(false) },
-        }}
-      />
-    )
-  },
-}
-
-// hint banner state 2:已點擊「擴充選取全部」之後
-export const DatasetAllSelected: Story = {
-  name: '大 dataset 已全選(hint banner state 2)',
-  render: () => {
-    const TOTAL = 5370
-    const VISIBLE = 50
-    const [selection, setSelection] = useState<string[]>(
-      Array.from({ length: VISIBLE }, (_, i) => `file-${i}`)
-    )
-    return (
-      <BulkActionBar
-        selection={selection}
-        onClear={() => setSelection([])}
-        actions={
-          <>
-            <Button variant="tertiary" size="sm" startIcon={Download}>下載</Button>
-            <Button variant="tertiary" size="sm" startIcon={Trash2} danger>刪除</Button>
-          </>
-        }
-        dataset={{
-          total: TOTAL,
-          visibleCount: VISIBLE,
-          isAllSelected: true,
-          onSelectAll: () => {},
-          onClearAll: () => setSelection([]),
-        }}
-      />
-    )
-  },
-}
-
-// Filter 模式:`preserveSelectionOnFilter=true` 時 hidden 數顯示在 count 區 inline
+// Filter 模式:hidden 數量顯示在 count 區 inline
 export const WithFilterHidden: Story = {
   name: 'Filter 隱藏 selected(inline 進 count 區)',
   render: () => {
@@ -118,38 +56,126 @@ export const WithFilterHidden: Story = {
   },
 }
 
-// Footer 模式:邊界 border-top + hint 在主 bar 上方(對齊 ref 圖)
-export const PlacementBottom: Story = {
-  name: 'Footer placement(table-in-form 場景)',
+// Hint banner via Alert primitive(擴 dataset 提示)— 對齊 ref 圖
+// hint banner 唯一 trigger condition:本頁全選 + 還有 dataset 沒選到
+export const HintBannerExtendDataset: Story = {
+  name: 'Hint banner — 用 Alert 擴 dataset',
   render: () => {
     const TOTAL = 5370
-    const VISIBLE = 3
-    const [selection, setSelection] = useState<string[]>(['f-1', 'f-2', 'f-3'])
+    const VISIBLE = 50
+    const [selection, setSelection] = useState<string[]>(
+      Array.from({ length: VISIBLE }, (_, i) => `file-${i}`)
+    )
     const [allSelected, setAllSelected] = useState(false)
     return (
-      <div className="flex flex-col gap-0 max-w-3xl border border-border rounded-md">
-        <div className="p-8 text-fg-muted text-caption">(table content placeholder)</div>
-        <BulkActionBar
-          placement="bottom"
-          selection={selection}
-          onClear={() => { setSelection([]); setAllSelected(false) }}
-          actions={
-            <>
-              <Button variant="tertiary" size="sm" startIcon={Download}>下載</Button>
-              <Button variant="tertiary" size="sm" startIcon={Trash2} danger>移除</Button>
-            </>
+      <div className="flex flex-col">
+        <Alert
+          variant="info"
+          placement="fixed"
+          dismissible={false}
+          title={
+            allSelected ? (
+              <>
+                已選取全部 {TOTAL} 個項目。{' '}
+                <button
+                  type="button"
+                  onClick={() => { setSelection([]); setAllSelected(false) }}
+                  className="text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                >
+                  清除選取項目
+                </button>
+              </>
+            ) : (
+              <>
+                已選取本頁全部 {selection.length} 個。{' '}
+                <button
+                  type="button"
+                  onClick={() => setAllSelected(true)}
+                  className="text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                >
+                  點此選取全部 {TOTAL} 個項目
+                </button>
+              </>
+            )
           }
-          dataset={{
-            total: TOTAL,
-            visibleCount: VISIBLE,
-            isAllSelected: allSelected,
-            onSelectAll: () => setAllSelected(true),
-            onClearAll: () => { setSelection([]); setAllSelected(false) },
-          }}
         />
-        {/* Page-level Submit consumer 自擺,不是 BulkActionBar 內建 */}
-        <div className="flex justify-end px-3 py-2 border-t border-divider">
-          <Button variant="primary" size="sm">送出</Button>
+        <div className="border-t border-divider">
+          <BulkActionBar
+            selection={selection}
+            onClear={() => { setSelection([]); setAllSelected(false) }}
+            actions={
+              <>
+                <Button variant="tertiary" size="sm" startIcon={Download}>下載</Button>
+                <Button variant="tertiary" size="sm" startIcon={Trash2} danger>刪除</Button>
+              </>
+            }
+          />
+        </div>
+      </div>
+    )
+  },
+}
+
+// Fixed-bottom 完整場景(對齊 ref 圖,consumer 自己 wrap)
+export const FixedBottomFooter: Story = {
+  name: 'Fixed bottom — table-in-form 場景(對齊 ref 圖)',
+  render: () => {
+    const TOTAL = 5370
+    const [selection, setSelection] = useState<string[]>(['f-1', 'f-2', 'f-3'])
+    const [allSelected, setAllSelected] = useState(false)
+
+    return (
+      <div className="relative h-[400px] border border-border rounded-md overflow-hidden">
+        {/* table content placeholder */}
+        <div className="p-8 text-fg-muted text-caption">
+          (table 內容 — 多選後 BulkActionBar 由下方浮起,Alert hint banner 黏在 BulkActionBar 上方)
+        </div>
+
+        {/* Fixed-bottom wrapper — consumer 自組;Alert(自帶 padding)+ BulkActionBar(loose/tight padding) */}
+        <div className="absolute bottom-0 inset-x-0 bg-canvas">
+          <Alert
+            variant="info"
+            placement="fixed"
+            dismissible={false}
+            title=""
+            description={
+              allSelected ? (
+                <>
+                  已選取全部 {TOTAL} 個項目。{' '}
+                  <button
+                    type="button"
+                    onClick={() => { setSelection([]); setAllSelected(false) }}
+                    className="text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                  >
+                    清除選取項目
+                  </button>
+                </>
+              ) : (
+                <>
+                  已選取本頁全部 {selection.length} 個。{' '}
+                  <button
+                    type="button"
+                    onClick={() => setAllSelected(true)}
+                    className="text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                  >
+                    點此選取全部 {TOTAL} 個項目
+                  </button>
+                </>
+              )
+            }
+          />
+          <div className="border-t border-divider">
+            <BulkActionBar
+              selection={selection}
+              onClear={() => { setSelection([]); setAllSelected(false) }}
+              actions={
+                <>
+                  <Button variant="tertiary" size="sm" startIcon={Download}>下載</Button>
+                  <Button variant="tertiary" size="sm" startIcon={Trash2} danger>移除</Button>
+                </>
+              }
+            />
+          </div>
         </div>
       </div>
     )

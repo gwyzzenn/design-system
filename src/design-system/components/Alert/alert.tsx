@@ -59,8 +59,8 @@ export interface AlertProps
     VariantProps<typeof alertVariants> {
   variant?: NoticeVariant
   appearance?: 'subtle' | 'solid'
-  title: string
-  description?: string
+  title: React.ReactNode
+  description?: React.ReactNode
   endContent?: React.ReactNode
   dismissible?: boolean
   onDismiss?: () => void

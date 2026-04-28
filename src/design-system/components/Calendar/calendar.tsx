@@ -220,7 +220,7 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function Calend
           'px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]',
         )}
       >
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           <Button
             variant="text"
             size="sm"

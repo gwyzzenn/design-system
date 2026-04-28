@@ -2,6 +2,7 @@ import LinkTo from '@storybook/addon-links/react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { Trash2, Archive } from 'lucide-react'
 import { BulkActionBar } from './bulk-action-bar'
+import { Alert } from '@/design-system/components/Alert/alert'
 import { Button } from '@/design-system/components/Button/button'
 
 const meta: Meta = {
@@ -39,8 +40,8 @@ export const UsageGuidance: Story = {
           <p>BulkActionBar 是「選取狀態驅動」的批次操作列,跟 selection state 生命週期綁定。真實業務場景:</p>
           <ul className="space-y-1">
             <li><LinkTo kind="Design System/Components/BulkActionBar/展示" name="基本"><span className="text-primary hover:underline cursor-pointer">基本</span></LinkTo>(email inbox 多選 archive / delete)</li>
-            <li><LinkTo kind="Design System/Components/BulkActionBar/展示" name="大 dataset 擴充選取(hint banner state 1)"><span className="text-primary hover:underline cursor-pointer">大 dataset 擴充選取</span></LinkTo>(table 單頁看不完 5370 筆,本頁全選後浮 hint 擴 dataset)</li>
-            <li><LinkTo kind="Design System/Components/BulkActionBar/展示" name="Footer placement(table-in-form 場景)"><span className="text-primary hover:underline cursor-pointer">Footer placement</span></LinkTo>(file picker / member picker form 場景)</li>
+            <li><LinkTo kind="Design System/Components/BulkActionBar/展示" name="Hint banner — 用 Alert 擴 dataset"><span className="text-primary hover:underline cursor-pointer">擴 dataset hint banner</span></LinkTo>(table 單頁看不完 5370 筆,本頁全選後浮 hint 擴 dataset)</li>
+            <li><LinkTo kind="Design System/Components/BulkActionBar/展示" name="Fixed bottom — table-in-form 場景(對齊 ref 圖)"><span className="text-primary hover:underline cursor-pointer">Fixed bottom</span></LinkTo>(file picker / member picker form 場景)</li>
           </ul>
           <p className="text-fg-muted mt-3">判斷不確定:對照 spec.md「何時用 / 何時不用」段。</p>
         </div>
@@ -117,7 +118,7 @@ export const ActionVariantRule: Story = {
     <div>
       <Rule
         title="✅ 批次 action 用 tertiary,destructive 用 tertiary + danger"
-        note="批次操作是『可取消的入口』(點下後一般會走 confirmation dialog)。primary 留給 dialog 內最終確認那顆。對齊 button.spec.md 「Inline destructive 不用 primary」canonical"
+        note="批次操作是『可取消的入口』(點下後一般會走 confirmation dialog)。primary 留給 dialog 內最終確認那顆。對齊 button.spec.md「Inline destructive 不用 primary」canonical"
       >
         <BulkActionBar
           selection={['a', 'b', 'c']}
@@ -153,27 +154,43 @@ export const ActionVariantRule: Story = {
 }
 
 export const HintBannerRule: Story = {
-  name: 'Hint banner 顯示時機',
+  name: 'Hint banner — 用 Alert 不自刻',
   render: () => (
     <div>
       <Rule
-        title="✅ 三條件全成立才顯示 hint banner"
-        note="(1) 提供 dataset prop / (2) dataset.total > visibleCount(單頁看不完)/ (3) 本頁可見已全選。三條件之一不成立就不顯示 — 避免小 dataset 顯示無意義 hint"
+        title="✅ 擴 dataset 提示用 Alert(variant=info, placement=fixed)+ ReactNode title 帶 inline link"
+        note="不在 BulkActionBar 內部 hardcode hint banner。Alert 既有 placement=fixed 已支援(rounded-none border-none),title 接 ReactNode 後可塞 inline button 自然 inline 連結。banner 黏在 BulkActionBar 上方 / 下方,共浮起"
       >
-        <BulkActionBar
-          selection={Array.from({ length: 50 }, (_, i) => `f-${i}`)}
-          dataset={{ total: 5370, visibleCount: 50, isAllSelected: false, onSelectAll: () => {}, onClearAll: () => {} }}
-          actions={<Button variant="tertiary" size="sm">下載</Button>}
-          onClear={() => {}}
-        />
-        <Label>↑ 5370 dataset / 本頁 50 全選 → hint 浮現「擴 dataset」CTA</Label>
+        <div className="border border-divider rounded-md overflow-hidden">
+          <Alert
+            variant="info"
+            placement="fixed"
+            dismissible={false}
+            title={
+              <>
+                已選取本頁全部 50 個。{' '}
+                <button type="button" className="text-primary hover:underline">
+                  點此選取全部 5370 個項目
+                </button>
+              </>
+            }
+          />
+          <div className="border-t border-divider">
+            <BulkActionBar
+              selection={Array.from({ length: 50 }, (_, i) => `f-${i}`)}
+              actions={<Button variant="tertiary" size="sm">下載</Button>}
+              onClear={() => {}}
+            />
+          </div>
+        </div>
+        <Label>↑ Alert + BulkActionBar 兩 bar 黏一起,inline link 流暢呈現</Label>
       </Rule>
 
       <Rule
-        title="❌ 小 dataset 全可見也顯示 hint"
-        note="dataset.total === visibleCount(全可見)時,沒有「擴 dataset」需求,顯示 hint 就 noise"
+        title="❌ 自刻 hint banner / 用 contrast 底色 div"
+        note="banner 是 Alert 的職責(自帶 a11y role / aria-live / 視覺一致性)。自刻會破壞跟其他 Alert 的視覺一致性,也漏 a11y"
       >
-        <Label warn>(範例省略)規則上不會發生,元件內部會抑制</Label>
+        <Label warn>(範例省略)有 Alert 元件不用是浪費</Label>
       </Rule>
 
       <Rule

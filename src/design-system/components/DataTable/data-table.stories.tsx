@@ -6,6 +6,7 @@ import { DataTable } from './data-table'
 import { Button } from '@/design-system/components/Button/button'
 import { Empty } from '@/design-system/components/Empty/empty'
 import { BulkActionBar } from '@/design-system/components/BulkActionBar/bulk-action-bar'
+import { Alert } from '@/design-system/components/Alert/alert'
 import './column-types' // ColumnMeta declaration merging
 
 // ── Sample Data ──────────────────────────────────────────────────────────────
@@ -430,19 +431,23 @@ export const BulkActionsTopReplace: Story = {
   },
 }
 
-/* ── L2 Selection — Bottom footer pattern(table-in-form,file picker 風)── */
+/* ── L2 Selection — Fixed-bottom + Alert hint banner(對齊 ref 圖)── */
 export const BulkActionsFooterForm: Story = {
-  name: 'L2 Selection — Bottom footer form',
+  name: 'L2 Selection — Fixed-bottom footer + Alert hint',
   render: () => {
-    const [selection, setSelection] = React.useState<string[]>(['PRD-001', 'PRD-002', 'PRD-003'])
-    const [datasetAllSelected, setDatasetAllSelected] = React.useState(false)
+    const [selection, setSelection] = React.useState<string[]>([])
+    const [allSelected, setAllSelected] = React.useState(false)
     const TOTAL = 5370
+    const VISIBLE = sampleData.length
+    const showHint = !allSelected
+      ? selection.length === VISIBLE && TOTAL > VISIBLE  // 本頁全選且 dataset 有更多
+      : true  // dataset 全選 hint 切「清除」
     return (
-      <div className="flex flex-col border border-border rounded-md max-w-4xl">
-        {/* Table content(無 toolbar,純資料展示)*/}
+      <div className="relative h-[500px] border border-border rounded-md overflow-hidden">
+        {/* Table content */}
         <DataTable
           columns={baseColumns}
-          data={sampleData.slice(0, 3)}
+          data={sampleData}
           height="auto"
           bordered={false}
           selectable
@@ -450,33 +455,55 @@ export const BulkActionsFooterForm: Story = {
           onSelectionChange={setSelection}
           getRowId={(row) => row.sku}
         />
-        {/* BulkActionBar bottom placement,左 actions + 右 page-Submit */}
-        <div className="flex items-stretch border-t border-divider">
-          <div className="flex-1">
-            <BulkActionBar
-              placement="bottom"
-              selection={selection}
-              onClear={() => { setSelection([]); setDatasetAllSelected(false) }}
-              actions={
-                <>
-                  <Button variant="tertiary" size="sm">下載</Button>
-                  <Button variant="tertiary" size="sm" danger>移除</Button>
-                </>
-              }
-              dataset={{
-                total: TOTAL,
-                visibleCount: 3,
-                isAllSelected: datasetAllSelected,
-                onSelectAll: () => setDatasetAllSelected(true),
-                onClearAll: () => { setSelection([]); setDatasetAllSelected(false) },
-              }}
-            />
+        {/* Fixed-bottom wrapper:Alert 黏 BulkActionBar 上方 — 對齊 ref 圖 */}
+        {selection.length > 0 && (
+          <div className="absolute bottom-0 inset-x-0 bg-canvas">
+            {showHint && (
+              <Alert
+                variant="info"
+                placement="fixed"
+                dismissible={false}
+                title={
+                  allSelected ? (
+                    <>
+                      已選取全部 {TOTAL} 個項目。{' '}
+                      <button
+                        type="button"
+                        onClick={() => { setSelection([]); setAllSelected(false) }}
+                        className="text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                      >
+                        清除選取項目
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      已選取本頁全部 {selection.length} 個。{' '}
+                      <button
+                        type="button"
+                        onClick={() => setAllSelected(true)}
+                        className="text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                      >
+                        點此選取全部 {TOTAL} 個項目
+                      </button>
+                    </>
+                  )
+                }
+              />
+            )}
+            <div className="border-t border-divider">
+              <BulkActionBar
+                selection={selection}
+                onClear={() => { setSelection([]); setAllSelected(false) }}
+                actions={
+                  <>
+                    <Button variant="tertiary" size="sm">下載</Button>
+                    <Button variant="tertiary" size="sm" danger>移除</Button>
+                  </>
+                }
+              />
+            </div>
           </div>
-          {/* Page-level Submit consumer 自擺,跟 BulkActionBar 同 footer */}
-          <div className="flex items-center px-3 border-l border-divider">
-            <Button variant="primary" size="sm">送出</Button>
-          </div>
-        </div>
+        )}
       </div>
     )
   },
