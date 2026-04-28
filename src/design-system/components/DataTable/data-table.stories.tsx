@@ -388,63 +388,27 @@ export const VirtualScroll: Story = {
   },
 }
 
-/* ── L2 Selection — Top inline replace pattern(table-as-page,Linear / Notion 風)── */
-export const BulkActionsTopReplace: Story = {
-  name: 'L2 Selection — Top toolbar replace',
-  render: () => {
-    const [selection, setSelection] = React.useState<string[]>([])
-    return (
-      <div className="flex flex-col gap-2">
-        {/* Top:常駐 toolbar OR BulkActionBar(視 selection 切換) */}
-        {selection.length === 0 ? (
-          <div className="flex items-center justify-between border border-border rounded-md px-3 py-2 bg-surface">
-            <div className="text-body text-fg-secondary">3 商品 · 篩選 / 搜尋(consumer 自組 toolbar)</div>
-            <Button variant="primary" size="sm">+ 新增商品</Button>
-          </div>
-        ) : (
-          <div className="border border-border rounded-md">
-            <BulkActionBar
-              selection={selection}
-              onClear={() => setSelection([])}
-              actions={
-                <>
-                  <Button variant="tertiary" size="sm" startIcon={Pencil}>編輯</Button>
-                  <Button variant="tertiary" size="sm" startIcon={Trash2} danger>刪除</Button>
-                </>
-              }
-            />
-          </div>
-        )}
-        {/* DataTable 帶 selection */}
-        <DataTable
-          columns={baseColumns}
-          data={sampleData}
-          height="auto"
-          selectable
-          selection={selection}
-          onSelectionChange={setSelection}
-          getRowId={(row) => row.sku}
-          getRowAriaLabel={(row) => `Select ${row.sku}`}
-        />
-      </div>
-    )
-  },
-}
-
-/* ── L2 Selection — Fixed-bottom + Alert hint banner(對齊 ref 圖)── */
-export const BulkActionsFooterForm: Story = {
-  name: 'L2 Selection — Fixed-bottom footer + Alert hint',
+/* ── L2 Selection — DataTable + BulkActionBar inline composition(canonical) ──
+   保留 toolbar 功能(filter / sort / search 在選取期間仍可用)— 對齊 Linear / Notion /
+   Apple Mail / iOS Files / 你 ref 圖 additive 派 */
+export const WithBulkActions: Story = {
+  name: 'L2 Selection — 含 BulkActionBar(canonical)',
   render: () => {
     const [selection, setSelection] = React.useState<string[]>([])
     const [allSelected, setAllSelected] = React.useState(false)
     const TOTAL = 5370
     const VISIBLE = sampleData.length
     const showHint = !allSelected
-      ? selection.length === VISIBLE && TOTAL > VISIBLE  // 本頁全選且 dataset 有更多
-      : true  // dataset 全選 hint 切「清除」
+      ? selection.length === VISIBLE && TOTAL > VISIBLE  // 本頁全選 + dataset 有更多 → 顯示「擴 dataset」hint
+      : true  // dataset 全選 → hint 切「清除」CTA
     return (
-      <div className="relative h-[500px] border border-border rounded-md overflow-hidden">
-        {/* Table content */}
+      <div className="flex flex-col border border-border rounded-md overflow-hidden">
+        {/* Toolbar 永遠保留(filter / sort / search / + 新增 — selection 期間仍可用)*/}
+        <div className="flex items-center justify-between px-3 py-2 border-b border-divider bg-surface">
+          <div className="text-body text-fg-secondary">商品 · {sampleData.length} 筆 · 篩選 / 搜尋(consumer 自組 toolbar)</div>
+          <Button variant="primary" size="sm">+ 新增商品</Button>
+        </div>
+
         <DataTable
           columns={baseColumns}
           data={sampleData}
@@ -455,53 +419,52 @@ export const BulkActionsFooterForm: Story = {
           onSelectionChange={setSelection}
           getRowId={(row) => row.sku}
         />
-        {/* Fixed-bottom wrapper:Alert 黏 BulkActionBar 上方 — 對齊 ref 圖 */}
+
+        {/* Inline composition:Alert hint banner 黏 BulkActionBar 上方,接在 table 下方 */}
+        {showHint && (
+          <Alert
+            variant="info"
+            placement="fixed"
+            dismissible={false}
+            title={
+              allSelected ? (
+                <>
+                  已選取全部 {TOTAL} 個項目。{' '}
+                  <button
+                    type="button"
+                    onClick={() => { setSelection([]); setAllSelected(false) }}
+                    className="text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                  >
+                    清除選取項目
+                  </button>
+                </>
+              ) : (
+                <>
+                  已選取本頁全部 {selection.length} 個。{' '}
+                  <button
+                    type="button"
+                    onClick={() => setAllSelected(true)}
+                    className="text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                  >
+                    點此選取全部 {TOTAL} 個項目
+                  </button>
+                </>
+              )
+            }
+          />
+        )}
         {selection.length > 0 && (
-          <div className="absolute bottom-0 inset-x-0 bg-canvas">
-            {showHint && (
-              <Alert
-                variant="info"
-                placement="fixed"
-                dismissible={false}
-                title={
-                  allSelected ? (
-                    <>
-                      已選取全部 {TOTAL} 個項目。{' '}
-                      <button
-                        type="button"
-                        onClick={() => { setSelection([]); setAllSelected(false) }}
-                        className="text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-                      >
-                        清除選取項目
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      已選取本頁全部 {selection.length} 個。{' '}
-                      <button
-                        type="button"
-                        onClick={() => setAllSelected(true)}
-                        className="text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-                      >
-                        點此選取全部 {TOTAL} 個項目
-                      </button>
-                    </>
-                  )
-                }
-              />
-            )}
-            <div className="border-t border-divider">
-              <BulkActionBar
-                selection={selection}
-                onClear={() => { setSelection([]); setAllSelected(false) }}
-                actions={
-                  <>
-                    <Button variant="tertiary" size="sm">下載</Button>
-                    <Button variant="tertiary" size="sm" danger>移除</Button>
-                  </>
-                }
-              />
-            </div>
+          <div className="border-t border-divider">
+            <BulkActionBar
+              selection={selection}
+              onClear={() => { setSelection([]); setAllSelected(false) }}
+              actions={
+                <>
+                  <Button variant="tertiary" size="sm">下載</Button>
+                  <Button variant="tertiary" size="sm" danger>移除</Button>
+                </>
+              }
+            />
           </div>
         )}
       </div>

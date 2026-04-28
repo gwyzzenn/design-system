@@ -38,128 +38,101 @@ traits:
 
 ## 近親元件分界
 
-| 元件 | 觸發 | 內容 | 視覺權重 |
-|---|---|---|---|
-| **BulkActionBar** | `selection.length > 0` | 批次 actions + count + dataset escape hatch | 高(selection 期間取代 toolbar 或 fixed 浮起)|
-| **Action Bar pattern** | 永遠 | 業務 actions + 工具 actions | 中(常駐 chrome) |
-| **Toolbar**(action-bar 變體)| 永遠 | filter / sort / search 等資料操作 | 中 |
-| **Notice / Toast** | 系統訊息 | 訊息 + 1-2 actions | 低-中 |
+| 元件 | 觸發 | 視覺權重 |
+|---|---|---|
+| **BulkActionBar** | `selection.length > 0` | 高(selection 期間浮現)|
+| **Action Bar pattern** | 永遠 | 中(常駐 chrome) |
+| **Toolbar**(action-bar 變體)| 永遠 | 中 |
+| **Notice / Toast / Alert** | 系統訊息 | 低-中 |
 
-判斷:**「沒選取就消失嗎?」** 是 → BulkActionBar;否 → Action Bar / Toolbar。
+判斷:**「沒選取就消失嗎?」** 是 → BulkActionBar;否 → Action Bar / Toolbar / Notice。
 
 ---
 
 ## 結構
 
-BulkActionBar 是 horizontal 容器:
-
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│ [Action 1] [Action 2] [Action ...]   |   {N} selected · M hidden by filter  ✕ │
-│  ↑ 批次 actions (consumer 提供)         ↑ count + filter status      ↑ clear │
+│ [✕] [{N} 已選 · M hidden by filter] │ [Action 1] [Action 2]   │
+│  ↑ clear  ↑ count + filter inline     ↑ batch actions(consumer)│
 └──────────────────────────────────────────────────────────────┘
 ```
 
-### Hint banner(只在「擴 dataset」場景出現)
+- 全 sm Buttons(`same-row consistency`,close X 同 size)
+- `gap-2`(8px)+ `<ButtonDivider />`(自帶 mx-1 = 12px 視覺距離)
+- `px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]`
+- 自然高度 52md / 60lg(對齊 SurfaceFooter / DataTable toolbar canonical)
+- `selection.length === 0` → 回 null 不佔 layout
 
-**顯示條件**(全部成立才顯示):
-- consumer 提供 `dataset` prop
-- `dataset.total > 可見 row 數量`(單頁看不完)
-- 本頁所有可見 row 已全選
+### Slot
 
-兩 state 切換:
+- **`actions`**:consumer 提供 sm Buttons;`variant=tertiary`(主)/ `tertiary danger`(destructive)— **不用 primary**(留 dialog 確認最終 action)
+- **count 區**:`{N} 已選`(內建)+ inline filter hidden status `· {M} 個被 filter 隱藏`(`hiddenByFilter` prop 傳入時)
+- **clear**:`<Button iconOnly size=sm variant=text dismiss />`(內建,觸發 `onClear`)
 
-```
-ℹ 已選取本頁全部 N 個。點此選取全部 M 個項目          ← state 1: page selected,可擴 dataset
-ℹ 已選取全部 M 個項目。清除選取項目                    ← state 2: dataset 全選
-```
+### 不含 page-level primary / 不含 hint banner
 
-**位置**(視 placement scenario):
-- Top inline replace 模式 → hint banner 顯示在主 bar **下方**(往 table 方向延伸),避免跟 page chrome 衝突
-- Bottom footer form 模式 → hint banner 在主 bar **上方**(對齊 ref 圖)
+- **page-level Submit / Save**:跟 selection 無關,consumer 自擺,不耦合 BulkActionBar 生命週期
+- **Hint banner**(擴 dataset 提示):用 `<Alert variant="info" placement="fixed">` 黏在 BulkActionBar 上方,**不在 BulkActionBar 內部 hardcode**。Alert 的 `title` 接 ReactNode 可塞 inline `<button>` 連結
 
-**永不顯示 hint banner 的場景**:
-- 小 dataset 全可見(沒「擴 dataset」需求,顯示是 noise)
-- consumer 沒提供 `dataset` prop
-- 本頁尚未全選(user 還在挑選)
+---
 
-### Slot 結構
+## Placement — inline composition canonical(撤 top-replace 派)
 
-- **`actions` slot**:批次 actions(Button variant=`tertiary` 為主,destructive 用 `tertiary` + `danger`,**不用 primary** — primary 留給 dialog 確認的最終 action);consumer 提供
-- **count 區**:`{N} selected`(內建)+ filter hidden status `· {M} hidden by filter` inline(`preserveSelectionOnFilter=true` + 有 hidden 時)
-- **dismiss 區**:`X` icon-only Button(內建,觸發 `onClear`)
-- **hint banner**(條件顯示,見上):2-state 切換,獨立區塊
+BulkActionBar 是 plain block(無 positioning 邏輯),consumer 用 flex column 容器自然排列。Selection > 0 時 Alert + BulkActionBar 接在 DataTable 下方,**toolbar 永遠保留**(filter / sort / search 在 selection 期間仍可用)。
 
-### 不含 page-level primary
-
-BulkActionBar **不含 page-level Submit / Save 按鈕**。Page-level primary 由 consumer 在 page footer 自行提供(不論 BulkActionBar 在 top 或 bottom)。**理由**:Page-level action 跟 selection 無關,不該耦合 BulkActionBar 生命週期。
-
-範例(footer 模式 = consumer 自組 layout):
 ```tsx
-<footer className="...">
-  <BulkActionBar selection={...} actions={...} />
-  <Button variant="primary">Submit</Button>  {/* consumer 自擺 */}
-</footer>
+<div className="flex flex-col">
+  <Toolbar />                                    {/* 永遠保留,selection 期間可用 */}
+  <DataTable selection={...} ... />
+  {showHint && <Alert variant="info" placement="fixed" title={<>...inline link CTA...</>} />}
+  {selection.length > 0 && <BulkActionBar selection={...} actions={...} />}
+</div>
 ```
 
----
+**為什麼撤 top-replace**:Polaris IndexTable / Material DataGrid / GitHub / Gmail 等「替代 toolbar」做法在 selection 期間**喪失 filter / sort / search 功能**,user workflow 斷裂(「我選了 50 個再 filter 出 status=error 子集 batch action」這種常見 workflow 卡關)。本 DS 採 Linear / Notion / Apple Mail / iOS Files / Notion / Atlassian additive 派 — toolbar 永遠保留。
 
-## Placement(2 canonical scenarios)
+### Layout 行為(4 use case 全 covered by inline composition)
 
-BulkActionBar 不限定 placement,consumer 看 context 自擺:
+| Use case | DataTable 設定 | Inline composition 結果 |
+|---|---|---|
+| 1️⃣ Page 中一段 | `height="auto"` | BulkActionBar 自然接在 table 下方 ✓ |
+| 2️⃣ Container fill(dialog body 等)| `height="100%"` | flex column,table flex-1,BulkActionBar 接尾 ✓ |
+| 3️⃣ Viewport-fill app | `height="100%"` 配 flex-1 | table 自動讓位 ✓ |
+| 4️⃣ 長 page scroll(BulkActionBar 不可 scroll 走)| auto | consumer **自行套** `<div className="sticky bottom-0">` 或 `fixed bottom-0` wrapper |
 
-### Scenario A:Top inline replace(table-as-page)
-- 場景:Linear / Notion / Polaris IndexTable / Material DataGrid 風 — 整頁就是 table
-- placement:取代既有 toolbar 同位置(無 layout shift)
-- 對齊 Linear / Notion / Polaris IndexTable / Material / Stripe / Airtable / Salesforce / GitHub Issues 共識(8/8)
-
-### Scenario B:Bottom footer(table-in-form)
-- 場景:File picker / member picker / form 內含 table — 有 page-level Submit
-- placement:固定 footer bar,BulkActionBar 在左,consumer page-Submit 在右
-- 對齊 iOS Mail batch / 標準 form footer 慣例
-
-兩個 scenario 在 BulkActionBar showcase stories 提供完整範例。
+case 4 比較少見,consumer 知道自己 layout 時自加 wrapper 即可,DS primitive 不該替消費者決定 positioning。
 
 ---
 
-## API 草案
+## API
 
 ```ts
 interface BulkActionBarProps {
-  /** 已選 ID,length === 0 時自動隱藏 */
-  selection: string[] | readonly string[]
-  /** Clear 觸發,user 點 X icon 或 ESC */
+  /** 已選 ID,length === 0 時自動隱藏(回 null) */
+  selection: readonly string[]
+  /** Clear 觸發,user 點 X icon(consumer 在 page-level 監聽 Esc 觸發) */
   onClear?: () => void
-  /** 批次 actions(Button / DropdownMenu 等;consumer 提供) */
+  /** 批次 actions(consumer 提供 sm Button,variant=tertiary 或 tertiary+danger,不用 primary) */
   actions?: React.ReactNode
-  /** 大 dataset escape hatch — total / onSelectAll / onClearAll / 是否已 dataset 全選 */
-  dataset?: {
-    total: number
-    visibleCount: number      // 本頁可見 row 數,內部判斷 visible-fully-selected
-    onSelectAll: () => void
-    onClearAll: () => void
-    isAllSelected: boolean    // hint 切 state 1 ↔ state 2
-  }
-  /** Filter 模式:傳入 hidden 數量,顯示在 count 區 inline 「{N} selected · {M} hidden by filter」 */
+  /** Filter 模式:hidden 數量,顯示在 count 區 inline 「{N} 已選 · {M} 個被 filter 隱藏」 */
   hiddenByFilter?: number
-  /** Placement(影響 hint banner 位置上 / 下),default 'top' */
-  placement?: 'top' | 'bottom'
-  /** i18n labels(對齊 Material `localeText` / Polaris `i18n` 慣例) */
-  labels?: {
-    count?: (n: number) => string                              // default 「{n} 已選」
-    clear?: string                                              // default 「清除選取」(X icon aria-label)
-    hiddenSuffix?: (hidden: number) => string                   // default 「· {hidden} 個被 filter 隱藏」
-    hintPageSelected?: (page: number, total: number) => string  // default 「已選取本頁全部 {page} 個。」
-    hintExtendCTA?: (total: number) => string                   // default 「點此選取全部 {total} 個」
-    hintDatasetSelected?: (total: number) => string             // default 「已選取全部 {total} 個。」
-    hintClearCTA?: string                                       // default 「清除選取項目」
-    toolbarAriaLabel?: string                                   // default 「批次操作」
-  }
+  /** i18n labels(Partial,merge with default;對齊 Material localeText / Polaris i18n 慣例) */
+  labels?: Partial<BulkActionBarLabels>
   className?: string
+}
+
+interface BulkActionBarLabels {
+  count: (n: number) => string         // default 「已選 {n} 項」
+  clear: string                         // default 「清除選取」(X aria-label)
+  hiddenSuffix: (hidden: number) => string  // default 「· {hidden} 個被 filter 隱藏」
+  toolbarAriaLabel: string              // default 「批次操作」
 }
 ```
 
-完整 default labels 由 component 內 export 為 `BULK_ACTION_BAR_DEFAULT_LABELS` constant,consumer 可 spread 後 override 部分 key(對齊 Material `defaultLocale` 模式)。
+完整 default labels 由 component 內 export `BULK_ACTION_BAR_DEFAULT_LABELS`,consumer 可 spread 後 override(對齊 Material `defaultLocale` 模式)。
+
+**Hint banner(擴 dataset 提示)不在本 API**:由 consumer 用 `<Alert variant="info" placement="fixed">` 配 ReactNode title 帶 inline link 自組,黏在 BulkActionBar 上方。Alert / Notice 的 `title` + `description` 已支援 ReactNode(2026-04-28)。
 
 ---
 

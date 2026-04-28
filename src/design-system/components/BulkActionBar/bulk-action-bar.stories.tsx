@@ -58,8 +58,8 @@ export const WithFilterHidden: Story = {
 
 // Hint banner via Alert primitive(擴 dataset 提示)— 對齊 ref 圖
 // hint banner 唯一 trigger condition:本頁全選 + 還有 dataset 沒選到
-export const HintBannerExtendDataset: Story = {
-  name: 'Hint banner — 用 Alert 擴 dataset',
+export const WithExtendDatasetHint: Story = {
+  name: '含擴 dataset hint banner(用 Alert)',
   render: () => {
     const TOTAL = 5370
     const VISIBLE = 50
@@ -116,29 +116,30 @@ export const HintBannerExtendDataset: Story = {
   },
 }
 
-// Fixed-bottom 完整場景(對齊 ref 圖,consumer 自己 wrap)
-export const FixedBottomFooter: Story = {
-  name: 'Fixed bottom — table-in-form 場景(對齊 ref 圖)',
+// Inline composition full scenario(對齊 ref 圖)
+// 多選後 Alert hint banner + BulkActionBar 接在 table 下方(inline composition,
+// 不用 fixed positioning。consumer 用 flex column 容器即可,table 自然讓位)
+export const WithDataTableContainer: Story = {
+  name: '完整 inline composition(對齊 ref 圖)',
   render: () => {
     const TOTAL = 5370
     const [selection, setSelection] = useState<string[]>(['f-1', 'f-2', 'f-3'])
     const [allSelected, setAllSelected] = useState(false)
 
     return (
-      <div className="relative h-[400px] border border-border rounded-md overflow-hidden">
+      <div className="flex flex-col border border-border rounded-md overflow-hidden">
         {/* table content placeholder */}
-        <div className="p-8 text-fg-muted text-caption">
-          (table 內容 — 多選後 BulkActionBar 由下方浮起,Alert hint banner 黏在 BulkActionBar 上方)
+        <div className="p-8 text-fg-muted text-caption flex-1 min-h-[200px]">
+          (table 內容 — Alert hint banner + BulkActionBar inline 黏接在下方)
         </div>
 
-        {/* Fixed-bottom wrapper — consumer 自組;Alert(自帶 padding)+ BulkActionBar(loose/tight padding) */}
-        <div className="absolute bottom-0 inset-x-0 bg-canvas">
+        {/* Inline composition:Alert + BulkActionBar 接在 container 末端 */}
+        {selection.length > 0 && (
           <Alert
             variant="info"
             placement="fixed"
             dismissible={false}
-            title=""
-            description={
+            title={
               allSelected ? (
                 <>
                   已選取全部 {TOTAL} 個項目。{' '}
@@ -164,6 +165,8 @@ export const FixedBottomFooter: Story = {
               )
             }
           />
+        )}
+        {selection.length > 0 && (
           <div className="border-t border-divider">
             <BulkActionBar
               selection={selection}
@@ -176,7 +179,7 @@ export const FixedBottomFooter: Story = {
               }
             />
           </div>
-        </div>
+        )}
       </div>
     )
   },

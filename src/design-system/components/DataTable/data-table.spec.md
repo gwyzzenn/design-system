@@ -368,17 +368,22 @@ preserveSelectionOnFilter?: boolean   // default false
 - **opt-in `preserveSelectionOnFilter={true}`** → 給 productivity scope(Linear / Airtable 用法),保留 hidden selected,BulkActionBar 顯示「{visible} selected ({hidden} hidden by filter)」
 - sort 套用 → selection 全保留(sort 不影響可見性)
 
-### 七、BulkActionBar 整合
+### 七、BulkActionBar 整合(inline composition canonical)
 
-`BulkActionBar` 是**獨立 primitive**,不內建在 DataTable。Consumer 自己擺 placement(top inline replace / bottom footer / 任何位置)。
+`BulkActionBar` 是**獨立 primitive**,不內建在 DataTable。Consumer 用 flex column 容器 inline composition,**toolbar 永遠保留**(filter / sort / search 在 selection 期間仍可用 — additive 派,對齊 Linear / Notion / Apple Mail / iOS Files):
 
-- DataTable 暴露 selection state
-- Consumer 接 `selection.length > 0` 條件 show / hide BulkActionBar
-- 兩個 canonical scenarios(showcase 提供):
-  - **Top inline replace**:Linear / Notion / Polaris / Material consensus,BulkActionBar 取代 toolbar
-  - **Bottom footer form**:file picker / member picker(如本案 ref),BulkActionBar 在 footer 左 + page-Submit 在 footer 右
+```tsx
+<div className="flex flex-col">
+  <Toolbar />                        {/* selection 期間仍可用 */}
+  <DataTable selection={...} ... />
+  {showHint && <Alert variant="info" placement="fixed" title={<>...inline link CTA...</>} />}
+  {selection.length > 0 && <BulkActionBar selection={...} actions={...} />}
+</div>
+```
 
-詳見 `../BulkActionBar/bulk-action-bar.spec.md`。
+- Toolbar 永遠保留(selection 期間不喪失 filter / sort 功能)
+- Hint banner(擴 dataset)用 `<Alert variant="info" placement="fixed">` + ReactNode title 帶 inline link
+- 4 use case(page section / container fill / viewport fill / long page scroll)詳見 `../BulkActionBar/bulk-action-bar.spec.md`「Layout 行為」段
 
 ### 八、a11y 預設
 
