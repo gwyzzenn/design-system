@@ -22,13 +22,19 @@
    DataTable 水平捲軸永遠可見(AG Grid 流派,AR44 canonical)
    ────────────────────────────────────────────────────────────
    macOS 預設捲軸「滾動時才顯示」—— 在 overflow 容器上看不到 scrollbar,
-   觸控 / keyboard 使用者完全不知道有 overflow 內容。AG Grid 流派強制顯示。
+   觸控 / keyboard 使用者完全不知道有 overflow 內容。AG Grid 流派強制顯示 H 軸。
    用 data attribute 精準鎖定 DataTable 內部 overflow-x-scroll 容器,不影響其他
    元件的 scroll area。
+
+   ── 關鍵 fix(2026-04-30):scope 只給 :horizontal ──
+   原本 `::-webkit-scrollbar { display:block }` 套到雙軸 → V 軸也被強制顯
+   (即使無 overflow),使 content 小時仍見 V 捲軸 + 觸發 ~2px scrollHeight
+   discrepancy 讓 hasVScroll=true。修正:`:horizontal` only,V 軸跟隨
+   browser default(只在 overflow 顯)。
 */
-[data-datatable-hscroll]::-webkit-scrollbar {
+[data-datatable-hscroll]::-webkit-scrollbar:horizontal {
   height: 10px;
-  display: block;
+  /* 移 display:block — 讓 browser overflow 時自動顯,不顯示空 bar */
 }
 [data-datatable-hscroll]::-webkit-scrollbar-track {
   background: var(--color-neutral-2);

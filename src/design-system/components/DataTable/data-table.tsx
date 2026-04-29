@@ -308,6 +308,31 @@ function DataTableInner<TData>(
     overscan, enabled: useVirtual,
   })
 
+  // ── isFillHeight body maxHeight JS 計算(2026-04-30)──
+  // CSS `%` height 在 flex column min-h-0 + auto basis 場景下,Chromium 不可靠 shrink
+  // (實測:outer maxHeight 100% bind parent,但 body 不 shrink 反映 outer 約束 → outer
+  // overflow-hidden 切掉 content,V scroll 不 trigger)。
+  // 改用 ResizeObserver 算 body avail = outer rect - header rect → set centerBody
+  // maxHeight = pixel value(不是 %)。content 大 → V scroll;content 小 → centerBody
+  // = content,outer = intrinsic,沒留白。
+  const [bodyMaxHeight, setBodyMaxHeight] = React.useState<number | null>(null)
+  React.useLayoutEffect(() => {
+    if (!isFillHeight) { setBodyMaxHeight(null); return }
+    const compute = () => {
+      if (!tableRef.current) return
+      const outerH = tableRef.current.getBoundingClientRect().height
+      const headerEl = tableRef.current.firstElementChild as HTMLElement | null
+      const headerH = headerEl?.getBoundingClientRect().height ?? 0
+      setBodyMaxHeight(Math.max(0, outerH - headerH))
+    }
+    compute()
+    const obs = new ResizeObserver(compute)
+    if (tableRef.current) obs.observe(tableRef.current)
+    // outer 也跟 parent 大小變化(parent flex-1 縮)
+    if (tableRef.current?.parentElement) obs.observe(tableRef.current.parentElement)
+    return () => obs.disconnect()
+  }, [isFillHeight])
+
   // JS scroll sync(AR44 user-reported UX fix):
   // 原本 V scroll 在 body-viewport(外層),center-body H scroll 於其內部底部 = 所有 row 都 render 下方。
   // Virtualized 1800px 內容 → H scrollbar 在 1800px 下方,user 必須 V-scroll 到底才看見 → UX bug。
@@ -754,7 +779,7 @@ function DataTableInner<TData>(
     const rowEl = (row: typeof rows[number], idx: number, opts?: { virtual?: boolean; start?: number; isLast?: boolean }) => {
       const showBorder = bordered !== false ? !opts?.isLast : true
       return (
-        <div key={row.id} ref={isCenter && opts?.virtual ? virtualizer.measureElement : undefined} data-index={isCenter && opts?.virtual ? idx : undefined} data-row-index={idx} role="row" aria-rowindex={idx + 2} className={cn('flex', autoRowHeight ? 'items-start' : 'items-center', !autoRowHeight && rowHeight, opts?.virtual && 'absolute w-full', showBorder && 'border-b border-divider', 'transition-colors data-[hovered]:bg-neutral-hover')} style={opts?.virtual ? { transform: `translateY(${opts.start}px)` } : undefined} {...hoverProps(idx)}>
+        <div key={row.id} ref={isCenter && opts?.virtual ? virtualizer.measureElement : undefined} data-index={isCenter && opts?.virtual ? idx : undefined} data-row-index={idx} role="row" aria-rowindex={idx + 2} className={cn('flex', autoRowHeight ? 'items-start' : 'items-center', !autoRowHeight && rowHeight, !autoRowHeight && 'overflow-hidden', opts?.virtual && 'absolute w-full', showBorder && 'border-b border-divider', 'transition-colors data-[hovered]:bg-neutral-hover')} style={opts?.virtual ? { transform: `translateY(${opts.start}px)` } : undefined} {...hoverProps(idx)}>
           {getRegionCells(row, cols).map((cell, ci, arr) => cellEl(cell, ci === arr.length - 1 && !(isRight && hasRowActions)))}
           {isRight && hasRowActions && (
             <div role="cell" className="flex items-center justify-end shrink-0 gap-2 flex-1" style={cellPadding}>
@@ -795,11 +820,12 @@ function DataTableInner<TData>(
       ref={(el) => { tableRef.current = el; if (typeof ref === 'function') ref(el); else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = el }}
       data-table-size={size}
       className={cn(dataTableVariants({ bordered }), isFillHeight && 'flex flex-col', className)}
-      // isFillHeight:`maxHeight: 100%` 而非 `height: 100%` — content 小時 outer = intrinsic
-      // (header + body),不浪費空間;content 大或 window 縮 < content 時 outer 撐到 cap,
-      // body via flex shrink + min-h-0 收縮,centerBody V scroll trigger。
-      // **共識**:用 height: 100% 強制填滿會造成 content 小時下方留白(see Image #6 bug)。
-      style={isFillHeight ? { maxHeight: height } : undefined}
+      // isFillHeight:`height: 100%` 強制填滿 wrapper(Notion / Airtable / Linear canonical)
+      // 配合 body flex-1 min-h-0 → body = outer - header,centerBody.maxHeight 用 JS 算的 px。
+      // 等同 100% 但 bypass CSS flex 場景下的不可靠 shrink。
+      // 視覺:content 小時 centerBody = content 高,下方仍是 outer bg-surface(canonical 看起來
+      // 像「table 區還有空間給更多 row」),不留 wrapper 外的空白。
+      style={isFillHeight ? { height } : undefined}
       role="table" aria-rowcount={rows.length + 1}
       tabIndex={enabled ? 0 : undefined}
       onKeyDown={enabled ? tableKeyboardHandler : undefined}
@@ -840,19 +866,20 @@ function DataTableInner<TData>(
            三個 region(left / center / right)各自 maxHeight + overflowY,JS 同步 scrollTop。
            Pinned 區 overflow-y:hidden(看不到自己的 V scrollbar),V scroll 真正發生在 center。
            isFillHeight 時 body div 加 min-h-0 讓它在 outer flex column 內可被 flex shrink — region maxHeight: 100% 才能 bind 到實際分配的高度。 */}
-      {/* body 在 isFillHeight 用 `min-h-0` + 預設 flex-shrink:1,**不**加 flex-1。
-          原因:flex-1 強制 body 撐滿 outer,content 小時 body 比 content 大 → 下方留白
-          (Image #6 bug)。預設 `flex: 0 1 auto` + min-h-0 = body intrinsic = content,
-          但被 outer maxHeight 約束時可 shrink 反映 outer 分配空間,centerBody maxHeight: 100%
-          自動 trigger V scroll。content 小 = body small no waste;content 大 = body shrinks → V scroll. */}
-      <div ref={bodyRef} className={cn('flex items-start', isFillHeight && 'min-h-0 min-w-0')}>
+      {/* body 在 isFillHeight 用 `flex-1 min-h-0 min-w-0`:flex-1 讓 body 填滿 outer 剩餘空間
+          (outer 是 height: 100%,body flex-1 = outer - header)。centerBody.maxHeight 用 JS
+          算的 px(bypass CSS % 在 flex 場景的不可靠 shrink)。
+          content 小:centerBody = content 高(intrinsic),body 內側餘空間是 outer bg-surface;
+          content 大 / window 縮:JS computed bodyMaxHeight 約束 centerBody → V scroll trigger。 */}
+      <div ref={bodyRef} className={cn('flex items-start', isFillHeight && 'flex-1 min-h-0 min-w-0')}>
         {hasLeft && (
           <div
             ref={leftBodyRef}
             className="shrink-0 overflow-hidden border-r border-divider"
             style={{
               width: leftWidth || undefined,
-              ...(hasHeightConstraint ? { maxHeight: height } : {}),
+              // isFillHeight 用 JS 算的 px;固定 px(300px 等)直接套
+              ...(isFillHeight && bodyMaxHeight != null ? { maxHeight: bodyMaxHeight } : hasHeightConstraint ? { maxHeight: height } : {}),
             }}
           >
             {renderBodyRows(leftCols, false, false, leftWidth)}
@@ -870,7 +897,15 @@ function DataTableInner<TData>(
           // trade-off:V scroll 出現時 body 內側少 15px,header 不縮 → 右端微 misalign,
           // 但 content fit 視覺乾淨優先(Mac 用戶 overlay scrollbar 不可見)。
           className="flex-1 min-w-0 overflow-x-auto overflow-y-auto"
-          style={hasHeightConstraint ? { maxHeight: height } : undefined}
+          // isFillHeight:用 JS 算的 px(bodyMaxHeight),bypass CSS % 在 flex 場景的不可靠 shrink。
+          // 固定 px(300px etc):直接套 height。
+          style={
+            isFillHeight && bodyMaxHeight != null
+              ? { maxHeight: bodyMaxHeight }
+              : hasHeightConstraint
+                ? { maxHeight: height }
+                : undefined
+          }
           onScroll={onCenterBodyScroll}
         >
           <div className="w-max min-w-full">
@@ -883,7 +918,7 @@ function DataTableInner<TData>(
             className="shrink-0 overflow-hidden border-l border-divider"
             style={{
               width: rightWidth || undefined,
-              ...(hasHeightConstraint ? { maxHeight: height } : {}),
+              ...(isFillHeight && bodyMaxHeight != null ? { maxHeight: bodyMaxHeight } : hasHeightConstraint ? { maxHeight: height } : {}),
             }}
           >
             {renderBodyRows(rightCols, false, true, rightWidth)}
