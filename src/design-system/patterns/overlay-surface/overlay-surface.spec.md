@@ -426,19 +426,9 @@ const CHROME_UNBOUNDED_SLOT =
 
 ---
 
-## Control + List 視覺對稱原則(2026-04-29 codified)
+## Control + List 視覺對稱原則 → SSOT 規則 3 補充
 
-**Scope**:overlay body 內**僅 1 個控件 + 1 個 list** 的典型(search-above-list / dropdown-with-search-filter)。多 control / 多 list / 含 form fields 走一般 layout-space 規則,不適用本則。
-
-控件 wrapper `pt-[var(--layout-space-tight)]` **省 pb**,list 沿用 `py-2`,item 沿用 `py-1.5`(SelectionItem 公式)。
-
-**視覺**:控件上 12md / 下 list-pt 8 + item-py 6 = 14md → **2px 視覺差 ≤ 閾值,視覺對稱**。
-
-**Why 不對稱 = 視覺對稱**:list item hover bg + 內 py 視覺重量補償;對稱 `pt-tight pb-tight` 反堆 26px 鬆散。
-
-**世界級**:Notion column visibility / Linear filter / Material grid filter / Airtable column toggle / GitHub Primer dropdown — 全派(控件上方 chrome gap、下方緊接 list)。
-
-**禁止**:控件 wrapper pt+pb 對稱 / list wrapper 加 pt-tight 重複 / 用 `<PopoverBody>` 包控件後接 list(PopoverBody pb-tight 雙倍累加)。
+→ `tokens/layoutSpace/layoutSpace.spec.md`「規則 3 補充:List 場景的 inline → block 累加」(本原則本質是 inline → block 對稱在 list 場景的特殊化,SSOT 移上游避免重複 — Rule-of-3)。
 
 ---
 

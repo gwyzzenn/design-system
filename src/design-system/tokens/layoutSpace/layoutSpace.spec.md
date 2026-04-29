@@ -80,6 +80,15 @@ CSS `gap` 只能套單一值,form 含混合元件時:
 
 **禁止**:單純因為 form 含一個 `block` 就把 container 整體 `tight`(會讓多數 inline ↔ inline 視覺擠壓)。
 
+#### 補充:List 場景的 inline → block 累加(2026-04-29)
+
+List 通常無邊框 / 底色,「block 視覺重量」由 list item 的 py 提供(非 border / bg)。inline → list 的 gap 計算需累加:**list-`py-2`(8)+ item-`py-1.5`(6)= 14 ≈ tight(12)**,維持「inline → block」對稱(2px ≤ 視覺閾值)。
+
+**實作**:控件 wrapper `pt-[var(--layout-space-tight)]` 上方,**省 pb**(讓 list-pt + item-py 自然累加生對稱視覺距離)。
+
+**典型場景**:overlay body 「1 control + 1 list」(search-above-list / dropdown-with-search-filter / column visibility panel)。
+**N/A**:form fields stack(走 inline ↔ inline = `loose`,本表既有);多 control / 多 list / 含 form fields 走一般 layout-space 規則。
+
 ### 規則 4:底部
 
 | 情境 | 間距 |
