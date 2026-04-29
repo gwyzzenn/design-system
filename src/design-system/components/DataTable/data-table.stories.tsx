@@ -8,7 +8,9 @@ import { Empty } from '@/design-system/components/Empty/empty'
 import { Input } from '@/design-system/components/Input/input'
 import { BulkActionBar } from '@/design-system/components/BulkActionBar/bulk-action-bar'
 import { Alert } from '@/design-system/components/Alert/alert'
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/design-system/components/DropdownMenu/dropdown-menu'
+import { Popover, PopoverTrigger, PopoverContent } from '@/design-system/components/Popover/popover'
+import { Checkbox } from '@/design-system/components/Checkbox/checkbox'
+import { ScrollArea } from '@/design-system/components/ScrollArea/scroll-area'
 import './column-types' // ColumnMeta declaration merging
 
 // ── Sample Data ──────────────────────────────────────────────────────────────
@@ -415,6 +417,7 @@ export const WithBulkActions: Story = {
     const [allSelected, setAllSelected] = React.useState(false)
     const [search, setSearch] = React.useState('')
     const [columnVisibility, setColumnVisibility] = React.useState<Record<string, boolean>>({})
+    const [columnSearch, setColumnSearch] = React.useState('')
     const TOTAL = 5370
     const filteredData = React.useMemo(
       () => search ? sampleData.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.sku.toLowerCase().includes(search.toLowerCase())) : sampleData,
@@ -442,30 +445,71 @@ export const WithBulkActions: Story = {
           </div>
           <div className="flex items-center gap-2">
             <Button variant="text" size="sm" iconOnly startIcon={Filter} aria-label="篩選" />
-            {/* L3 column visibility:Eye 按鈕 → DropdownMenu checkbox 切顯隱(__select__ 自動排除,enableHiding=false)*/}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+            {/* L3 column visibility:Popover panel(對齊 Notion / Airtable column-settings panel)
+                標題 / search input / column list with Checkbox / Show all
+                drag-reorder 留 A.4(跟 column reorder 一起做)*/}
+            <Popover>
+              <PopoverTrigger asChild>
                 <Button variant="text" size="sm" iconOnly startIcon={Eye} aria-label="欄位顯示" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>顯示欄位</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {baseColumns.map((col) => {
-                  const id = (col as any).accessorKey ?? (col as any).id
-                  const headerLabel = typeof (col as any).header === 'string' ? (col as any).header : id
-                  const checked = columnVisibility[id] !== false
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={id}
-                      checked={checked}
-                      onCheckedChange={(c) => setColumnVisibility(prev => ({ ...prev, [id]: c }))}
-                    >
-                      {headerLabel}
-                    </DropdownMenuCheckboxItem>
-                  )
-                })}
-              </DropdownMenuContent>
-            </DropdownMenu>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-72 p-0">
+                <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-tight)] border-b border-divider">
+                  <div className="text-body-strong">欄位顯示</div>
+                </div>
+                <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]">
+                  <Input
+                    size="sm"
+                    placeholder="搜尋欄位…"
+                    value={columnSearch}
+                    onChange={(e) => setColumnSearch(e.target.value)}
+                    startIcon={Search}
+                  />
+                </div>
+                <ScrollArea className="max-h-72">
+                  <div className="px-[var(--layout-space-loose)] pb-[var(--layout-space-tight)] flex flex-col gap-0.5">
+                    {baseColumns
+                      .map((col) => {
+                        const id = (col as any).accessorKey ?? (col as any).id
+                        const headerLabel = typeof (col as any).header === 'string' ? (col as any).header : id
+                        return { id, headerLabel }
+                      })
+                      .filter(({ headerLabel }) =>
+                        columnSearch ? headerLabel.toLowerCase().includes(columnSearch.toLowerCase()) : true
+                      )
+                      .map(({ id, headerLabel }) => {
+                        const checked = columnVisibility[id] !== false
+                        return (
+                          <label
+                            key={id}
+                            className="flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer hover:bg-hover"
+                          >
+                            <Checkbox
+                              size="md"
+                              checked={checked}
+                              onCheckedChange={(c) => setColumnVisibility(prev => ({ ...prev, [id]: !!c }))}
+                            />
+                            <span className={`text-body flex-1 ${!checked ? 'text-fg-muted' : ''}`}>{headerLabel}</span>
+                          </label>
+                        )
+                      })}
+                  </div>
+                </ScrollArea>
+                <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-tight)] border-t border-divider">
+                  <Button
+                    variant="text"
+                    size="sm"
+                    onClick={() => {
+                      const next: Record<string, boolean> = {}
+                      baseColumns.forEach((col) => {
+                        const id = (col as any).accessorKey ?? (col as any).id
+                        next[id] = true
+                      })
+                      setColumnVisibility(next)
+                    }}
+                  >顯示全部</Button>
+                </div>
+              </PopoverContent>
+            </Popover>
             <Button variant="primary" size="sm" startIcon={Plus}>新增商品</Button>
             <Button variant="text" size="sm" iconOnly startIcon={MoreVertical} aria-label="更多" />
           </div>
