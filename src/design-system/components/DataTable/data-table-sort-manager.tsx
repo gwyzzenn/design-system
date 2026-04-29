@@ -195,7 +195,8 @@ function SortRow({
       <div className="w-32 shrink-0">
         <Select size="sm" options={DIRECTION_OPTIONS} value={sort.desc ? 'desc' : 'asc'} onChange={onChangeDir} />
       </div>
-      <Button variant="text" size="sm" iconOnly startIcon={Trash2} aria-label="刪除" onClick={onRemove} />
+      {/* Trash 走 ItemInlineActionButton(same-row consistency:同 row 不混 Inline Action + Button)*/}
+      <ItemInlineActionButton icon={Trash2} size="md" aria-label="刪除" onClick={onRemove} />
     </div>
   )
 }

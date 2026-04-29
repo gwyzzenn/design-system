@@ -265,7 +265,8 @@ function FilterRow({
           placeholder="輸入值…"
         />
       </div>
-      <Button variant="text" size="sm" iconOnly startIcon={Trash2} aria-label="刪除" onClick={onRemove} />
+      {/* Trash 走 ItemInlineActionButton(same-row consistency canonical)*/}
+      <ItemInlineActionButton icon={Trash2} size="md" aria-label="刪除" onClick={onRemove} />
     </div>
   )
 }

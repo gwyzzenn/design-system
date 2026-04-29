@@ -455,12 +455,15 @@ function VisibilityRow({
             />}
       </ItemPrefix>
       <ItemLabel className={locked ? 'text-fg-disabled' : undefined}>{label}</ItemLabel>
-      <Button
-        variant="text" size="sm" iconOnly
-        startIcon={visible ? Eye : EyeOff}
+      {/* Eye toggle 走 ItemInlineActionButton(對齊 same-row consistency canonical:同 row 不混
+          Inline Action + Button — 消除 box size 不一致 gap 斷裂)。size=md = 16+18 hover bg */}
+      <ItemInlineActionButton
+        icon={visible ? Eye : EyeOff}
+        size="md"
         aria-label={visible ? '隱藏此欄' : '顯示此欄'}
         disabled={locked}
         onClick={onToggle}
+        className={locked ? 'cursor-not-allowed opacity-30' : ''}
       />
     </div>
   )
