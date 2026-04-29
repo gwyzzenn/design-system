@@ -477,27 +477,49 @@ Report: `path — violation — suggested correction`
 End: `N files checked, M violations across C categories.` Under 600 words. Don't fix.
 ```
 
-## 15. CLAUDE.md 自身一致性
+## 15. Cross-doc 一致性(CLAUDE.md + spec.md + tsx docblock 全域 drift)
 
 **Type**: Absolute
-**Canonical source**: CLAUDE.md 自身 (內部 consistency)
-**Rationale home**: N/A — duplicated / contradictory / dead-link sections are always bugs
+**Canonical source**: 各 SSOT home(per `# 資訊治理 canonical` 8-home)
+**Rationale home**: N/A — duplicated / contradictory / drift 永遠是 bug
+
+**2026-04-30 擴 scope**:從原「CLAUDE.md 自身」擴到 cross-doc(CLAUDE.md + spec.md +
+tsx docblock + inline comments)— 補本 thread 暴露的 3 個漏洞:
+1. spec.md 兩家描寫同 canonical 不同值(popover 重複 overlay)
+2. tsx docblock claims X 但 spec.md 說 Y(overlay-surface docblock stale 提 xs canonical
+   實際 sm+v5 trick)
+3. 元件升級後 docblock 沒同步(stale upgrade marker)
 
 ```
-Your job: audit CLAUDE.md for internal consistency.
+Your job: audit cross-doc consistency for CLAUDE.md + all spec.md + tsx docblocks.
 
-Checks:
-1. No duplicated rules (e.g., same rule stated in 2 sections)
-2. No contradictions (e.g., section X says "always do A" + section Y says "never do A")
-3. Internal section references resolve: `# Story`, `# Spec 規則` etc. actually exist
+Checks(原 CLAUDE.md 7 條 + 新 cross-doc 3 條):
+
+# CLAUDE.md 自身
+1. No duplicated rules (same rule stated in 2 sections)
+2. No contradictions (section X says "always do A" + Y says "never do A")
+3. Internal section references resolve (`# Story`, `# Spec 規則`等真實存在)
 4. Rule coverage: every item in 「失敗記憶索引」 has an anchor section
 5. Pointer format: `# Section` or `# A → ## B` not mixed
 6. Task navigation table entries all resolve to real sections
 7. Mindset rules referenced in other sections exist
 
-Report: `line N — issue — suggestion`
+# Cross-doc(2026-04-30 擴 scope)
+8. **Cross-spec full duplication**:同 canonical 在 ≥ 2 spec.md 完整描寫(非 pointer)
+   = 違 Rule-of-3。grep 同 keyword 的 H2/H3 段落,若內容超過 5 行雷同 → flag。
+   Example: "Chrome dismiss size canonical" 完整段在 popover.spec.md + overlay-surface.spec.md
+   都有 → 一個必降為 SSOT pointer。
+9. **Docblock-spec drift**:tsx 檔頭 / inline 註解 claim 某 canonical(「v5 unbounded trick
+   2026-04-22」「xs canonical」「sm+trick」等),grep 對應 spec.md 是否一致。
+   Example: overlay-surface.tsx docblock 寫「unbounded 從 xs canonical」但 inline-action.spec.md
+   寫「sm + v5 trick canonical」→ docblock 為 stale,P0 修。
+10. **Stale upgrade markers**:docblock / spec 含日期(`2026-XX-XX`)+ canonical change keyword
+    (`canonical`/`upgrade`/`v\d`),檢查實際 tsx code 是否真用該 canonical。
+    Example: spec 說「2026-04 升 v5 trick」但 tsx 仍 hardcode xs → drift。
 
-End: `Total issues found: M. Categories: [breakdown]`. Under 500 words. Don't fix.
+Report: `file:line — issue — affected files — suggestion`
+
+End: `Total issues found: M. Categories: [breakdown 1-10]`. Under 600 words. Don't fix.
 ```
 
 ---

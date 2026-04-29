@@ -91,7 +91,7 @@ Grouped by theme. Each runs as an independent subagent; many can parallelize.
 | # | Audit | What it catches |
 |---|-------|-----------------|
 | 14 | **命名一致性** | PascalCase folder / kebab-case file / hook naming / spec chapter 中文 / identifier 英文 / single-file 語言統一 |
-| 15 | **CLAUDE.md 自身一致性** | Internal contradictions / duplicated rules / dead internal references / section-heading drift |
+| 15 | **Cross-doc 一致性** | CLAUDE.md 自身 + cross-spec full dup(Rule-of-3)+ tsx docblock-spec drift + stale upgrade markers。詳 `audit-prompts.md` Dim 15 |
 
 ### Group F — Architecture compliance (P1 priority, session-learned)
 
