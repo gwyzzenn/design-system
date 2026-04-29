@@ -426,6 +426,36 @@ const CHROME_UNBOUNDED_SLOT =
 
 ---
 
+## Consumer rule:必消費 primitive 不自刻 chrome(2026-04-29 codified)
+
+寫 Popover / Dialog / Sheet 內容(含 stories / app code / DataTable 類 panel helper)時,**必消費 SurfaceHeader / SurfaceBody / SurfaceFooter primitive**(或上層 PopoverHeader / DialogHeader 等),**禁止自刻 `<div className="px-loose ... border-(b|t)">` 結構取代**。
+
+**Why**(對齊 mindset #2 不憑直覺發明 / 優先消費既有):
+- Primitive 自帶 padding token 一致(`px-loose py-tight`)
+- PopoverHeader 自動渲染 close X(canonical line 72:「所有 PopoverHeader 一律附右上 X」)
+- PopoverTitle 自帶 typography(`text-body font-medium` non-modal 輕量)
+- autofocus targeting:`data-popover-body` 標記讓 PopoverContent autofocus 落在 body 第一個互動元素
+- 自刻 = drift 起點:padding、border、close X、title 大小四向都可能漂移
+
+**禁止 anti-pattern**:
+```tsx
+// ❌ 自刻 overlay header
+<div className="px-[var(--layout-space-loose)] py-[var(--layout-space-tight)] border-b border-divider">
+  <div className="text-body-strong">標題</div>
+</div>
+
+// ✅ 消費 primitive
+<PopoverHeader>
+  <PopoverTitle>標題</PopoverTitle>
+</PopoverHeader>
+```
+
+**Hook 機械化**:`.claude/hooks/check_overlay_handcraft.sh` write-time PostToolUse 攔此 pattern。Escape hatch:加 `// overlay-handcraft-allow: <reason>` 同/前行(罕用,如非 overlay 但借用 layout-space token 的 standalone 卡片 chrome)。
+
+**歷史教訓**:2026-04-29 conv DataTable column visibility / SortManager / FilterPanel 三處同時自刻 chrome,user 抓到 4 個 spec 違反(left-align gap / 缺 close X / title typography 偏 / mindset #2)。Codify 本規則後 + hook 攔截杜絕同類。
+
+---
+
 ## 不屬本 primitive 的職責
 
 - **Close 按鈕渲染**:由 consumer(Dialog / Sheet / Popover)自己包 `<Button iconOnly dismiss>` 在 Header 內,綁各自 Radix Close primitive。SurfaceHeader 本身不渲染 close,避免 pattern 與 consumer 的職責耦合。

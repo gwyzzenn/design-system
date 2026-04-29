@@ -1,0 +1,65 @@
+#!/bin/bash
+# PostToolUse hook: detect hand-crafted overlay chrome violating mindset #2.
+#
+# Catches: <div className="...px-[var(--layout-space-loose)]...border-(b|t) border-divider">
+# in stories.tsx / DataTable helper.tsx / app code — pattern means consumer self-rendered
+# overlay header/footer chrome instead of consuming SurfaceHeader / SurfaceBody / SurfaceFooter
+# (or PopoverHeader / DialogHeader / SheetHeader).
+#
+# Why block: canonical primitives bundle padding + border + close X (Popover) + autofocus +
+# typography (PopoverTitle text-body font-medium). Self-rendering bypasses these = mindset #2
+# violation + silently breaks alignment / close X 一致性。
+#
+# 對齊 patterns/overlay-surface/overlay-surface.spec.md「Consumer rule」+
+# components/Popover/popover.tsx:72「所有 PopoverHeader 一律附右上 X」canonical。
+#
+# Escape hatch:add `// overlay-handcraft-allow: <reason>` on prev/same line for intentional cases
+# (e.g. non-overlay panel that just borrows the layout-space token).
+#
+# WARN-style (additionalContext) — AI reads + fixes next iteration.
+
+# Per-hook fire logging
+source "$(dirname "$0")/_log-fire.sh" 2>/dev/null && log_hook_fire
+
+FILE_PATH=$(jq -r '.tool_input.file_path // empty')
+
+# Scope: tsx files (stories, components, patterns, app, explorations)
+if ! echo "$FILE_PATH" | grep -qE '\.tsx$'; then
+  exit 0
+fi
+# Skip spec.md / anatomy stories (different context)
+if echo "$FILE_PATH" | grep -qE '(\.spec\.md$|\.anatomy\.stories\.tsx$|\.principles\.stories\.tsx$)'; then
+  exit 0
+fi
+if [ ! -f "$FILE_PATH" ]; then
+  exit 0
+fi
+
+# Pattern: <div className="...px-[var(--layout-space-loose)]...border-(b|t) border-divider...">
+PATTERN='<div className="[^"]*px-\[var\(--layout-space-loose\)\][^"]*border-(b|t) border-divider'
+HITS=$(grep -nE "$PATTERN" "$FILE_PATH" 2>/dev/null | head -5)
+
+if [ -n "$HITS" ]; then
+  # filter out lines with allowlist comment
+  FILTERED=""
+  while IFS= read -r line; do
+    line_num=$(echo "$line" | cut -d: -f1)
+    [ -z "$line_num" ] && continue
+    # check current line + previous line for allowlist
+    prev_line=$(sed -n "$((line_num-1))p" "$FILE_PATH" 2>/dev/null)
+    cur_line=$(sed -n "${line_num}p" "$FILE_PATH" 2>/dev/null)
+    if echo "$prev_line $cur_line" | grep -q 'overlay-handcraft-allow:'; then
+      continue
+    fi
+    FILTERED="${FILTERED}${line}\n"
+  done <<< "$HITS"
+
+  if [ -n "$FILTERED" ]; then
+    VIOLATIONS="\n⚠️ Hand-crafted overlay chrome detected(自刻 overlay 結構違 mindset #2):\n${FILTERED}\n  → 改用 primitive:\n    Popover content → PopoverHeader / PopoverBody / PopoverFooter / PopoverTitle\n    Dialog content → DialogHeader / DialogBody / DialogFooter / DialogTitle\n    Generic overlay panel → SurfaceHeader / SurfaceBody / SurfaceFooter (overlay-surface)\n  Why:canonical 自帶 padding token + border + close X(Popover)+ autofocus + title typography。\n  自刻 = 違 layoutSpace 規則 1.1 + popover.tsx「所有 PopoverHeader 一律附右上 X」。\n  Escape hatch:加 \`// overlay-handcraft-allow: <reason>\` 在同/前行。"
+
+    ESCAPED=$(printf "%b" "$VIOLATIONS" | jq -Rs .)
+    cat <<EOJSON
+{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"Overlay primitive consumption 檢查發現違規:${ESCAPED}"}}
+EOJSON
+  fi
+fi

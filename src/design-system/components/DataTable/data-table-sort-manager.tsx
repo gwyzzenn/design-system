@@ -4,6 +4,7 @@ import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
 import { Button } from '@/design-system/components/Button/button'
 import { Select, type SelectOption } from '@/design-system/components/Select/select'
+import { SurfaceHeader, SurfaceBody, SurfaceFooter } from '@/design-system/patterns/overlay-surface/overlay-surface'
 
 /**
  * DataTableSortManager — Notion-style 多欄排序管理 panel
@@ -97,10 +98,9 @@ export function DataTableSortManager<TData>({
   }
 
   return (
-    <div className={cn('w-[480px] bg-surface-raised', className)}>
-      {/* Header */}
-      <div className="flex items-center justify-between gap-2 px-[var(--layout-space-loose)] py-[var(--layout-space-tight)] border-b border-divider">
-        <div className="text-body-strong">排序</div>
+    <div className={cn('w-[480px]', className)}>
+      <SurfaceHeader className="justify-between">
+        <div className="text-body font-medium">排序</div>
         <div className="flex items-center gap-1">
           {onReset && (
             <Button variant="text" size="sm" iconOnly startIcon={RotateCcw} aria-label="重置" onClick={onReset} />
@@ -109,10 +109,9 @@ export function DataTableSortManager<TData>({
             <Button variant="text" size="sm" iconOnly startIcon={XIcon} aria-label="關閉" onClick={onClose} />
           )}
         </div>
-      </div>
+      </SurfaceHeader>
 
-      {/* List */}
-      <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-tight)] flex flex-col gap-2">
+      <SurfaceBody className="flex flex-col gap-2">
         {sorting.length === 0 ? (
           <div className="text-body text-fg-muted py-2">尚未設定排序條件</div>
         ) : (
@@ -163,10 +162,9 @@ export function DataTableSortManager<TData>({
             )
           })
         )}
-      </div>
+      </SurfaceBody>
 
-      {/* Footer */}
-      <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-tight)] border-t border-divider">
+      <SurfaceFooter className="justify-start">
         <Button
           variant="text"
           size="sm"
@@ -176,7 +174,7 @@ export function DataTableSortManager<TData>({
         >
           加排序
         </Button>
-      </div>
+      </SurfaceFooter>
     </div>
   )
 }

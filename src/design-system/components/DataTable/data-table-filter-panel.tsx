@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/design-system/components/Button/button'
 import { Select, type SelectOption } from '@/design-system/components/Select/select'
 import { Input } from '@/design-system/components/Input/input'
+import { SurfaceHeader, SurfaceBody, SurfaceFooter } from '@/design-system/patterns/overlay-surface/overlay-surface'
 
 /**
  * DataTableFilterPanel — ClickUp-style 篩選 panel(MVP flat conditions)
@@ -152,17 +153,15 @@ export function DataTableFilterPanel<TData>({
   }
 
   return (
-    <div className={cn('w-[560px] bg-surface-raised', className)}>
-      {/* Header */}
-      <div className="flex items-center justify-between gap-2 px-[var(--layout-space-loose)] py-[var(--layout-space-tight)] border-b border-divider">
-        <div className="text-body-strong">篩選</div>
+    <div className={cn('w-[560px]', className)}>
+      <SurfaceHeader className="justify-between">
+        <div className="text-body font-medium">篩選</div>
         {onClose && (
           <Button variant="text" size="sm" iconOnly startIcon={XIcon} aria-label="關閉" onClick={onClose} />
         )}
-      </div>
+      </SurfaceHeader>
 
-      {/* List */}
-      <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-tight)] flex flex-col gap-2">
+      <SurfaceBody className="flex flex-col gap-2">
         {conditions.length === 0 ? (
           <div className="text-body text-fg-muted py-2">尚未設定篩選條件</div>
         ) : (
@@ -205,12 +204,11 @@ export function DataTableFilterPanel<TData>({
             )
           })
         )}
-      </div>
+      </SurfaceBody>
 
-      {/* Footer */}
-      <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-tight)] border-t border-divider">
+      <SurfaceFooter className="justify-start">
         <Button variant="text" size="sm" startIcon={Plus} onClick={addCondition}>加條件</Button>
-      </div>
+      </SurfaceFooter>
     </div>
   )
 }
