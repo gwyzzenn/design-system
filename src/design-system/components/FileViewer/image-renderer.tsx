@@ -56,6 +56,21 @@ export const ImageRenderer: React.FC<FileRendererProps> = ({
     onCapabilitiesChange({ zoom: true })
   }, [onCapabilitiesChange])
 
+  // file.url 切換 → reset state,等 onLoad 重 fit。
+  // 原本 bug:cache 命中時 onLoad 不 fire → handleImageLoad 不跑 → zoom 卡上一張的值
+  // (或 shell 設的 100%)→ user 看到「同一張圖每次切過來尺寸不一致」。
+  React.useEffect(() => {
+    setLoaded(false)
+    lastFitModeRef.current = 'fit-page'
+    // cache 命中(<img complete>)→ onLoad 可能不 fire,直接觸發 handleImageLoad 邏輯
+    const img = imgRef.current
+    if (img && img.complete && img.naturalWidth > 0) {
+      // 等下一個 microtask,確保 ref / state 都到位
+      Promise.resolve().then(() => handleImageLoad())
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [file.url])
+
   // 算 fit scale(container 寬高 / image natural 寬高)
   const computeFitScale = React.useCallback((fit: FitMode): number | null => {
     const img = imgRef.current

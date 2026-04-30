@@ -22,6 +22,7 @@ import { Textarea } from '@/design-system/components/Textarea/textarea'
 import { Field, FieldLabel } from '@/design-system/components/Field/field'
 import { DescriptionList, DescriptionItem } from '@/design-system/components/DescriptionList/description-list'
 import { ItemInlineActionButton } from '@/design-system/patterns/element-anatomy/item-anatomy'
+import { ScrollArea } from '@/design-system/components/ScrollArea/scroll-area'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -468,13 +469,14 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
         />
       </div>
 
-      {/* Panel body */}
-      <div
-        className={cn(
-          'flex-1 min-h-0 flex flex-col gap-4',
+      {/* Panel body — header(shrink-0)上常駐 + body 走 ScrollArea(高度小時內容可捲動)。
+          padding/gap 套 inner wrapper(ScrollArea Viewport 是 lib 內部 layout,outer 只 sizing)。
+          原本 bug:body div 沒 overflow-y → 高度不夠時 content 被 cut off。 */}
+      <ScrollArea className="flex-1 min-h-0">
+        <div className={cn(
+          'flex flex-col gap-4',
           'px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]',
-        )}
-      >
+        )}>
         {/* 說明 — 用 DS Field + FieldLabel + Textarea(2026-04-20 B12 決策:
             FileViewer 一律消費 DS Field 家族,不手刻 `<span>label` + raw control) */}
         <Field>
@@ -512,7 +514,8 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
               ))}
           </DescriptionList>
         </div>
-      </div>
+        </div>
+      </ScrollArea>
     </aside>
   )
 }
@@ -763,10 +766,9 @@ const FileViewer = React.forwardRef<HTMLDivElement, FileViewerProps>(function Fi
 
   // Zoom state(shell own,renderer 消費 + 回報)
   const [zoom, setZoom] = React.useState(100)
-  React.useEffect(() => {
-    // 切換檔案時重設 zoom 為 100%
-    setZoom(100)
-  }, [activeIndex])
+  // 切換檔案時不再 setZoom(100)— 把「下一張該怎麼初始化 zoom」的決定權交給 renderer:
+  //   image-renderer 自己 watch file.url change → reset loaded → onLoad → 重 fit-page。
+  //   原本 setZoom(100) 在 cache 命中(onLoad 沒 fire)時會卡 100% 不 fit(user 抓的 bug)。
 
   // Fit request(shell → renderer 指令;nonce 遞增讓重複同 fit 也觸發 renderer)
   const [fitRequest, setFitRequest] = React.useState<{ fit: ZoomFit; nonce: number } | null>(null)
