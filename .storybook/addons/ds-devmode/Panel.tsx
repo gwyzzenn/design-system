@@ -114,7 +114,7 @@ const styles: Record<string, React.CSSProperties> = {
     gap: 8,
   },
   codeLn: {
-    color: 'var(--sb-fg-muted, #a0a0a0)',
+    color: 'var(--sb-fg-muted, #65727F)',
     userSelect: 'none',
   },
   tokenChip: {
@@ -244,7 +244,7 @@ const renderAuthorRaw = (raw: string, resolved: string, tokensByProp: TokenByPro
         >
           {tokenName}
         </span>
-        {fallback ? <>, <span style={{ color: 'var(--sb-fg-muted, #888)' }}>{fallback}</span></> : null}
+        {fallback ? <>, <span style={{ color: 'var(--sb-fg-muted, #65727F)' }}>{fallback}</span></> : null}
         )
       </span>
     )
@@ -256,7 +256,7 @@ const renderAuthorRaw = (raw: string, resolved: string, tokensByProp: TokenByPro
   return (
     <>
       <span style={{ fontFamily: '"SF Mono", Menlo, monospace' }}>{parts}</span>
-      <span style={{ color: 'var(--sb-fg-muted, #888)', margin: '0 6px' }}>→</span>
+      <span style={{ color: 'var(--sb-fg-muted, #65727F)', margin: '0 6px' }}>→</span>
       <strong style={{ color: '#1F2532' }}>{resolved}</strong>
     </>
   )
@@ -293,7 +293,7 @@ const renderValue = (
         <span>{v}</span>
         <span
           title={`同值 token candidates(speculative,author 沒寫 var()):${hit.tokens.join(', ')}`}
-          style={{ marginLeft: 6, fontSize: 10, color: 'var(--sb-fg-muted, #888)', fontStyle: 'italic' }}
+          style={{ marginLeft: 6, fontSize: 10, color: 'var(--sb-fg-muted, #65727F)', fontStyle: 'italic' }}
         >
           ⓘ {allTokens}
         </span>
@@ -354,7 +354,7 @@ const Section: React.FC<{
             <div key={k} style={styles.codeRow}>
               <span style={styles.codeLn}>{i + 1}</span>
               <span>
-                <span style={{ color: 'var(--sb-fg-muted, #7A8896)' }}>{k}</span>
+                <span style={{ color: 'var(--sb-fg-muted, #65727F)' }}>{k}</span>
                 {': '}
                 {renderValue(k, v, tokenByProp)}
                 {';'}
@@ -607,7 +607,7 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
                 <details style={{ fontSize: 11, color: 'var(--sb-fg-muted, #65727F)', flex: 1, minWidth: 0 }}>
                   <summary style={{ cursor: 'pointer', listStyle: 'none', wordBreak: 'break-all' }}>
                     <code>.{classes.slice(0, 5).join(' .')}</code>
-                    <span style={{ color: 'var(--sb-fg-muted, #888)', marginLeft: 4 }}>(+{classes.length - 5} more)</span>
+                    <span style={{ color: 'var(--sb-fg-muted, #65727F)', marginLeft: 4 }}>(+{classes.length - 5} more)</span>
                   </summary>
                   <code style={{ display: 'block', wordBreak: 'break-all', marginTop: 4, paddingLeft: 4, borderLeft: '2px solid rgba(128,128,128,0.2)' }}>
                     .{classes.slice(5).join(' .')}
@@ -709,20 +709,20 @@ export const DsDevmodePanel: React.FC<{ active: boolean }> = ({ active }) => {
                   <div key={`${d.property}-${i}`} style={styles.codeRow}>
                     <span style={styles.codeLn}>{i + 1}</span>
                     <span>
-                      <span style={{ color: 'var(--sb-fg-muted, #7A8896)' }}>{d.property}</span>
+                      <span style={{ color: 'var(--sb-fg-muted, #65727F)' }}>{d.property}</span>
                       {': '}
                       {d.tokens.length > 0
                         ? renderAuthorRaw(d.rawValue, d.resolved, { tokens: d.tokens, resolved: d.resolved, source: 'author', raw: d.rawValue })
                         : d.rawValue !== d.resolved
                         ? <>
                             <span style={{ fontFamily: '"SF Mono", Menlo, monospace' }}>{d.rawValue}</span>
-                            <span style={{ color: 'var(--sb-fg-muted, #888)', margin: '0 6px' }}>→</span>
+                            <span style={{ color: 'var(--sb-fg-muted, #65727F)', margin: '0 6px' }}>→</span>
                             <strong>{d.resolved}</strong>
                           </>
                         : <span>{d.rawValue}</span>}
                       {';'}
                       {d.fromSelector !== 'inline' && (
-                        <span title={`from rule: ${d.fromSelector}`} style={{ marginLeft: 6, fontSize: 9, color: 'var(--sb-fg-muted, #aaa)' }}>
+                        <span title={`from rule: ${d.fromSelector}`} style={{ marginLeft: 6, fontSize: 9, color: 'var(--sb-fg-muted, #65727F)' }}>
                           ← .{d.fromSelector.split(/\s+/).find(s => s.startsWith('.'))?.slice(1).split(':')[0] || d.fromSelector.slice(0, 20)}
                         </span>
                       )}

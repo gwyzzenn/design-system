@@ -921,6 +921,16 @@ const FileViewer = React.forwardRef<HTMLDivElement, FileViewerProps>(function Fi
                 className="relative flex-1 min-w-0 bg-canvas"
                 onMouseMove={handleViewportMouseMove}
                 onMouseLeave={handleViewportMouseLeave}
+                // Backdrop click-to-close(對齊 Google Drive / Dropbox lightbox / Apple Photos canonical):
+                // 點擊 image 周圍的暗色 backdrop 區關閉。檢查 closest('img,button,[role="button"]')
+                // — 命中 = 點到 image 本身 / 互動元素(side arrows / chrome controls 等)→ 不關。
+                // 未命中 = 點到 viewport 內 image 周圍空白(由 image-renderer TransformComponent
+                // 透出 bg-canvas)→ close。
+                onClick={(e) => {
+                  const t = e.target as HTMLElement
+                  if (t.closest('img, button, [role="button"], [role="dialog"] [role="button"]')) return
+                  onOpenChange?.(false)
+                }}
               >
                 {showArrows && activeIndex > 0 && (
                   <div
