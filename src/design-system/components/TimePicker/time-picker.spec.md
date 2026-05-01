@@ -97,11 +97,11 @@ TimePicker 是**單一時間**(時/分/秒)輸入與顯示元件,對齊 Ant Desi
 
 | size | field-height(md density) | Icon | 字體 |
 |------|--------------------------|------|------|
-| sm | 28px | 16px | text-body |
-| md | **32px**(預設) | 16px | text-body |
-| lg | 36px | 20px | text-body-lg |
+| sm | 28px(`h-field-sm`)| 16px | text-body |
+| md | 32px(`h-field-md`,**預設**)| 16px | text-body |
+| lg | 36px(`h-field-lg`)| 20px | text-body-lg |
 
-**field-height family 成員**,default = md(與 Button / Input / DatePicker 共享),見 `tokens/uiSize/uiSize.spec.md`。
+**field-height family 成員**,default = md(與 Button / Input / DatePicker 共享),完整 density-aware 值(lg density: sm=32 / md=36 / lg=40)見 `tokens/uiSize/uiSize.spec.md`。
 
 ---
 
