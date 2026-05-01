@@ -16,7 +16,7 @@ Route B provider 一次注入 label catalog,per-call-site override 仍可(prop >
 
 ```tsx
 // Consumer app root
-import { I18nProvider } from '@/design-system/patterns/i18n/i18n-context'
+import { I18nProvider } from '@/design-system/lib/i18n/i18n-context'
 
 const enLabels = {
   notice: { dismiss: 'Dismiss' },
@@ -33,7 +33,7 @@ const enLabels = {
 DS 元件內部(逐步 migration):
 
 ```tsx
-import { useI18n } from '@/design-system/patterns/i18n/i18n-context'
+import { useI18n } from '@/design-system/lib/i18n/i18n-context'
 
 const { t } = useI18n()
 <Button aria-label={propLabel ?? t('notice', 'dismiss', '關閉通知')} />

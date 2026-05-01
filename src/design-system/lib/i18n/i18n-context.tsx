@@ -20,7 +20,7 @@ import * as React from 'react'
  *
  * ```tsx
  * // Consumer app root
- * import { I18nProvider } from '@/design-system/patterns/i18n/i18n-context'
+ * import { I18nProvider } from '@/design-system/lib/i18n/i18n-context'
  *
  * const labels = {
  *   notice: { dismiss: 'Dismiss' },
@@ -35,7 +35,7 @@ import * as React from 'react'
  *
  * ```tsx
  * // DS component internal(opt-in migration)
- * import { useI18n } from '@/design-system/patterns/i18n/i18n-context'
+ * import { useI18n } from '@/design-system/lib/i18n/i18n-context'
  *
  * const { t } = useI18n()
  * <button aria-label={props.dismissAriaLabel ?? t('notice', 'dismiss', '關閉通知')}>
@@ -57,7 +57,7 @@ import * as React from 'react'
  * Consumer 可透過 module augmentation 擴充 type safety:
  *
  * ```ts
- * declare module '@/design-system/patterns/i18n/i18n-context' {
+ * declare module '@/design-system/lib/i18n/i18n-context' {
  *   interface I18nLabels {
  *     notice?: { dismiss?: string }
  *     fileViewer?: { close?: string; download?: string }

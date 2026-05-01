@@ -18,7 +18,8 @@
 | `action-bar/` | `action-bar.tsx` + `action-bar.spec.md` — toolbar / action row 排列公式 | 任何有按鈕列的頁面 |
 | `horizontal-overflow/` | `useOverflowItems` hook + fade-mask 樣式 | Tabs / ChipGroup |
 | `overlay-surface/` | `SurfaceHeader/Body/Footer` sub-components + padding SSOT | Dialog / Popover / Sheet |
-| `i18n/` | `I18nProvider` + `useI18n()` hook(cross-cutting context primitive,additive 與 Route A prop API 並存) | 全 DS 元件 opt-in consumer(未來逐步 migrate) |
+
+> **note**:i18n 已 relocate 到 `src/design-system/lib/i18n/`(2026-05-01)— patterns/ 純化只收 visual primitive,non-visual cross-cutting 改去 `lib/`(對齊 Material `@mui/material/locale` / Ant ConfigProvider 共識)。詳 `src/design-system/lib/README.md`。
 
 ## 命名鐵律:element-level「anatomy」 vs page-level「layout」
 
@@ -34,6 +35,7 @@ element-level 結構分類永遠用 **anatomy**(Material / Polaris / Atlassian /
 | CLAUDE.md 某段太長想搬出來 | 先看 8-home flowchart:是 runtime pattern 才來這 | 「要搬出 CLAUDE.md」不等於「該放 patterns/」 |
 | 單一元件的規則 | `components/{Name}/{name}.spec.md` | 只 1 個元件影響範圍 |
 | Token 命名規則 | `tokens/` 對應 spec | |
+| Cross-cutting non-visual primitive(i18n / formatters / type modules)| `src/design-system/lib/{topic}/` | 無 visual surface — 對齊 Material `@mui/material/locale` / Ant ConfigProvider 共識 |
 
 ## 新增 pattern 的 criteria(必須全部通過)
 
