@@ -66,6 +66,54 @@
 
 ---
 
+## 世界級對照
+
+對齊 M8(binary strict rule 必 ≥3 家對照),「禁 focus 中報錯」+「禁邊打邊重驗」是本 spec 的 binary strict rule,以下為支撐 rationale。
+
+### 驗證 timing 哲學
+
+| DS | 本 DS | Material 3 | Polaris | Ant Design | Carbon | iOS HIG | Atlassian Forge | GitHub Primer |
+|----|-------|-----------|---------|-----------|--------|---------|-----------------|---------------|
+| 預設 timing | **blur + submit**(無 onChange) | onBlur + 已出錯後 onChange(MUI/RHF default) | onBlur(明寫「don't validate while typing」)| **onChange + onBlur 雙模式**(`validateTrigger=['onChange','onBlur']`) | onBlur + submit | submit / Done(form 內延遲)| onBlur + onSubmit | submit only(極簡)|
+| 已出錯後 | edit 立即清 error / blur 重驗 | re-validate onChange | re-validate onChange | re-validate onChange | edit 清 / blur 重驗 | submit 才驗 | edit 清 / blur 重驗 | submit 才驗 |
+| Submit 失敗 | scroll + focus first error | focus first error | focus first error | scroll + focus | focus first error | shake animation | scroll + focus | inline alert |
+
+### Submit button 狀態哲學
+
+| DS | 本 DS | Material 3 | Polaris | Ant | Stripe Dashboard | Linear | Notion 設定頁 |
+|----|-------|-----------|---------|-----|------------------|--------|---------------|
+| 新建(Create)| **always enabled** | always enabled | always enabled | dirty 才 enable(差異)| always enabled | always enabled | always enabled |
+| 更新(Update)| **disabled-until-dirty** | dirty 才 enable | dirty 才 enable | dirty 才 enable | dirty 才 enable | auto-save(無 explicit save)| disabled-until-dirty |
+
+## 設計哲學
+
+四個關鍵決策,各自有世界級先例支撐:
+
+**(1) Blur-only validation(non-onChange)— 對齊 Polaris / Carbon「don't validate while typing」**
+
+Ant Design default `validateTrigger=['onChange', 'onBlur']` 對使用者 aggressive — 才打「user@」就跳「invalid email」碎念,reader 思路被打斷。Polaris / Carbon / iOS / Atlassian 共識 onBlur + submit,讓使用者「先表達完意圖再評斷」。
+
+捨棄 onChange 即時驗證的代價是「打錯看不到反饋」(打到第 3 位才發現密碼太短),但 Field 內可選 `realtime` mode 提供 hint(非 error)補足,本 spec 規範 default 行為。
+
+**(2) Edit 清 error + blur 重驗(已出錯後),非 onChange 重驗 — 對齊 Carbon / Atlassian 兩階段哲學**
+
+Material/Polaris/Ant 已出錯後 onChange re-validate(改第 1 字 error 又跳回)— 給使用者壓力。Carbon / Atlassian「edit 清 + blur 重驗」哲學:給使用者完整修正空間,離開時才再判決。
+
+對應使用者心智:「修改」是過程,「離開 field」是動作完成的 boundary,在 boundary 評斷比每字評斷尊重 user agency。
+
+**(3) Create always-enabled / Update disabled-until-dirty 不對稱 — 對齊 Stripe / Notion / Linear 現代慣例**
+
+Ant 對「Create」也 disabled-until-dirty(填了所有 required 才亮)— 但這讓使用者第一次進 form 看到 disabled button 困惑「為什麼按不了」。Stripe / Notion / Material 共識:Create 永遠 enabled — 點擊後若 invalid,顯示 error 並 scroll,使用者明確知道為什麼。
+
+Update 場景反向:沒改的 Update 沒提交意義(對齊「intent 才 commit」),disabled 表達「等你做動作」比 enabled 後點擊判斷「沒變化」更直接。對齊 Notion 設定頁 / Figma file rename 慣例。
+
+**(4) 格式驗證 vs 業務驗證分層(blur vs submit)— 對齊 Material/Carbon「local vs cross-cutting validation」哲學**
+
+Email 格式 / URL 格式 / 必填等「single-field 純 syntax」blur 即可判斷;名稱重複(API 查)/ 結束日 ≥ 開始日(跨欄位)等「business / async」必須 submit 才能判 — 強行 blur 觸發 API 對使用者體驗差(每換 field 一次 API call)。
+
+對齊 Material `<TextField error>` + Form layer error 分層 / Carbon「format vs business」雙軌。視覺一致(都紅框 + error message)避免 reader 區分「為什麼這個 error 是 blur 出來那個是 submit 出來」。
+
+
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 
 > 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
