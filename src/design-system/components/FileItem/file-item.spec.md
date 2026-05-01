@@ -42,7 +42,7 @@ traits:
 | Mode | Prefix | Typography | 適用場景 |
 |---|---|---|---|
 | `compact`（預設） | Paperclip icon 16px | 掃描模式 | 批次上傳的一般檔案（CSV、JSON） |
-| `rich` | Avatar 56px square(固定) | 閱讀模式（ListItem md） | 需要縮圖預覽的檔案（圖片、文件） |
+| `rich` | Avatar 48px square(固定) | 閱讀模式（ListItem md） | 需要縮圖預覽的檔案（圖片、文件） |
 
 compact 為預設——多數 upload 清單是「快速掃視多檔」場景，只有需要縮圖預覽才升級為 rich。
 

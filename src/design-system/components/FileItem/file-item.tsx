@@ -18,7 +18,7 @@ import { ItemContent, ItemPrefix } from '@/design-system/patterns/element-anatom
  *   description 只有 error 才顯示。
  *   bar 跟文字左邊對齊（在 icon 右邊的 column 內）。
  *
- * rich: Avatar 56px square 在左（顯示檔案內容縮圖）。右側 content + bar。
+ * rich: Avatar 48px square 在左（顯示檔案內容縮圖）。右側 content + bar。
  *   多行 description（size / status message）。
  *   有 bar → justify-between（bar 底部對齊 avatar）
  *   無 bar → justify-center（文字垂直置中對齊 avatar）
