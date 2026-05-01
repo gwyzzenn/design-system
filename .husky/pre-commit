@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+# Auto-sync memory: harness user-local → repo `.claude/memory/`
+# Why: avoid drift between two memory locations(see CLAUDE.md「Memory」row + memory README)
+node scripts/sync-memory.mjs
+git add .claude/memory/
