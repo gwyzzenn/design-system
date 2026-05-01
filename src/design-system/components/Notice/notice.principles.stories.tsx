@@ -1,6 +1,5 @@
-// @principles-rationale: Merged WhenToUse + WhenNotToUse + Vs*Rule into a single
-// `UsageGuidance` story (3 sections) per 2026-04-26 user mandate to consolidate
-// decision-related stories. Canonical core ≥ 2 satisfied internally.
+// v3 canonical(2026-05-01):≥ 2 stories(UsageGuidance + CompositionRules)對齊
+// Polaris/Material/Ant 共識,取代原 escape rationale。
 import type { Meta, StoryObj } from '@storybook/react'
 import LinkTo from '@storybook/addon-links/react'
 
@@ -61,6 +60,41 @@ export const UsageGuidance: Story = {
           <li><strong>Toast</strong> — 短暫 announcement(auto-dismiss)</li>
         </ul>
         <p className="text-fg-muted">建新 announcement 類元件 → 消費 Notice 不要 hand-craft row(對齊 SSOT 消費 canonical)。</p>
+      </Section>
+    </div>
+  ),
+}
+
+// ── CompositionRules — Notice 兩個 consumer pattern(對齊 Material Banner/Snackbar / Polaris Banner)──────
+
+export const CompositionRules: Story = {
+  name: '組合規則',
+  render: () => (
+    <div>
+      <Section title="Pattern 1 — Alert(persistent inline announcement)">
+        <div className="prose prose-sm max-w-prose">
+          <p>需要「持續顯示直到 user 主動 dismiss」→ <LinkTo kind="Design System/Components/Alert/展示" name="預設"><span className="text-primary hover:underline font-medium cursor-pointer">Alert</span></LinkTo>。Alert 內部消費 Notice + 加上 dismiss button + role="alert" ARIA。</p>
+          <ul>
+            <li>典型場景:付款失敗 banner / workspace 警告 / 重要通知 user 必看</li>
+            <li>對齊世界級:Polaris <code>Banner</code> / Material <code>Banner</code> / Atlassian <code>InlineMessage</code> — 共識用「persistent + dismissible」</li>
+          </ul>
+        </div>
+      </Section>
+
+      <Section title="Pattern 2 — Toast(auto-dismiss floating announcement)">
+        <div className="prose prose-sm max-w-prose">
+          <p>需要「短暫提示,使用者不需 acknowledge」→ <LinkTo kind="Design System/Components/Toast/展示" name="預設"><span className="text-primary hover:underline font-medium cursor-pointer">Toast</span></LinkTo>。Toast 基於 Sonner + 消費 Notice layout,自動 4 秒消失(可調)。</p>
+          <ul>
+            <li>典型場景:儲存成功 / 複製到剪貼簿 / 非關鍵操作回饋</li>
+            <li>對齊世界級:Material <code>Snackbar</code> / Polaris <code>Toast</code> / Sonner — 共識用「auto-dismiss + 浮動 + 不阻塞 task」</li>
+          </ul>
+        </div>
+      </Section>
+
+      <Section title="禁止 — 自刻 announcement row">
+        <div className="prose prose-sm max-w-prose">
+          <p>建新 announcement 類元件(例如 InAppNotification banner)→ 必消費 Notice primitive,不可自刻 <code>&lt;div className="flex p-3 bg-..."&gt;</code>(對齊 M1 SSOT 消費 canonical / 確保 icon 選擇 + variant token 一致)。</p>
+        </div>
       </Section>
     </div>
   ),

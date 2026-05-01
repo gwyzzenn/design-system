@@ -53,3 +53,27 @@ export const UsageGuidance: Story = {
     </div>
   ),
 }
+
+// ── CompositionRules — MenuItem 三個 consumer pattern(對齊 Polaris「Related」+ Radix「Use within」)──────
+
+export const CompositionRules: Story = {
+  name: '組合規則',
+  render: () => (
+    <div className="flex flex-col gap-12">
+      <div className="prose prose-sm max-w-prose">
+        <p>MenuItem 是 Family 1 layout primitive,由三類 consumer 包覆使用,**不直接放在 app code**:</p>
+
+        <h4>Pattern 1 — DropdownMenu + MenuItem(action menu)</h4>
+        <p>使用者點擊觸發某個 action(複製 / 刪除 / 重新命名)→ <LinkTo kind="Design System/Components/DropdownMenu/展示" name="預設"><span className="text-primary hover:underline font-medium cursor-pointer">DropdownMenu</span></LinkTo>(Radix 控制 open / close + keyboard nav,MenuItem 提供 row layout)。</p>
+
+        <h4>Pattern 2 — SelectMenu(Popover + Command + MenuItem)— form value 選擇</h4>
+        <p>使用者選一個 / 多個值寫回 form → <LinkTo kind="Design System/Components/Select/展示" name="預設"><span className="text-primary hover:underline font-medium cursor-pointer">Select</span></LinkTo> / <LinkTo kind="Design System/Components/Combobox/展示" name="預設"><span className="text-primary hover:underline font-medium cursor-pointer">Combobox</span></LinkTo>(內部已組合 SelectMenu + cmdk + MenuItem)。</p>
+
+        <h4>Pattern 3 — ContextMenu + MenuItem(右鍵選單,未來)</h4>
+        <p>右鍵觸發 contextual action → 預留消費者(Radix ContextMenu + MenuItem 同 layout primitive)。</p>
+
+        <p className="text-fg-muted">禁止:在 app code 自刻 menu row(<code>&lt;div className="flex px-2 py-1.5"&gt;</code>)— 必消費 MenuItem(對齊 SSOT 消費 canonical M1 + item-anatomy Family 1 SSOT)。Slot 對齊規則:prefix 24px / content reading-mode 垂直堆疊 / suffix optional — 詳 <code>item-anatomy.spec.md</code>。</p>
+      </div>
+    </div>
+  ),
+}

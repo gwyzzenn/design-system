@@ -53,3 +53,27 @@ export const UsageGuidance: Story = {
     </div>
   ),
 }
+
+// ── CompositionRules — OverflowIndicator 三個 consumer pattern ──────
+
+export const CompositionRules: Story = {
+  name: '組合規則',
+  render: () => (
+    <div className="flex flex-col gap-12">
+      <div className="prose prose-sm max-w-prose">
+        <p>OverflowIndicator 是 internal `+N` pill primitive,由三類 consumer 在「visible 子集 + 隱藏剩餘」場景消費,**不直接放在 app code**:</p>
+
+        <h4>Pattern 1 — Combobox tag overflow(單行模式)</h4>
+        <p>多選 tag 過多無法單行顯示 → <LinkTo kind="Design System/Components/Combobox/展示" name="預設"><span className="text-primary hover:underline font-medium cursor-pointer">Combobox</span></LinkTo> 內部消費 OverflowIndicator;hover `+N` 展開完整清單。對齊 GitHub multi-label / Linear multi-assignee idiom。</p>
+
+        <h4>Pattern 2 — Avatar.Group +N(人員 stack)</h4>
+        <p>Avatar 群組顯示前 N 人 + 剩餘 `+M` → Avatar.Group 內部消費 OverflowIndicator(形狀對齊 Avatar 圓形)。對齊 Slack workspace member preview / Linear team members 慣例。</p>
+
+        <h4>Pattern 3 — Tabs / Breadcrumb 水平溢出</h4>
+        <p>水平容器(Tabs / Breadcrumb)寬度不夠 → 搭配 <code>horizontal-overflow</code> pattern + OverflowIndicator,中段或末端收合成 `…` 或 `+N`。對齊 Material <code>Tabs scrollable</code> + 自動 overflow menu / GitHub Breadcrumb collapse。</p>
+
+        <p className="text-fg-muted">禁止:在 app code 自刻 `+N` <code>&lt;span&gt;</code>(失去 hover popover + 形狀 token 一致性)— 必消費 OverflowIndicator(對齊 M1 SSOT 消費 canonical)。</p>
+      </div>
+    </div>
+  ),
+}

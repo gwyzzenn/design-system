@@ -1,4 +1,5 @@
-// @principles-rationale: UsageGuidance merges WhenToUse + VsCommandRule into single 使用指引 story per refactor task (2026-04-26); only-1-story is fine because SelectMenu is a thin Internal primitive with limited principle surface
+// v3 canonical(2026-05-01):≥ 2 stories(UsageGuidance + CompositionRules)取代原
+// escape rationale,對齊 Polaris/Material/Ant 共識 internal primitive 仍應教 consumer pattern。
 import type { Meta, StoryObj } from '@storybook/react'
 import LinkTo from '@storybook/addon-links/react'
 
@@ -54,6 +55,50 @@ export const UsageGuidance: Story = {
             <li><strong>Command</strong>—命令面板;結果是執行某 action(non-form)</li>
           </ul>
           <p className="text-fg-muted">判斷:結果回 form value → SelectMenu;結果觸發 action → Command。</p>
+        </div>
+      </Section>
+    </div>
+  ),
+}
+
+// ── CompositionRules — SelectMenu 三個 consumer pattern(對齊 Material Select / Polaris Combobox idiom)──────
+
+export const CompositionRules: Story = {
+  name: '組合規則',
+  render: () => (
+    <div>
+      <Section title="Pattern 1 — Select(static 單選 dropdown)">
+        <div className="prose prose-sm max-w-prose">
+          <p>已知選項清單 + 單選回 form → <LinkTo kind="Design System/Components/Select/展示" name="預設"><span className="text-primary hover:underline font-medium cursor-pointer">Select</span></LinkTo>(內部 SelectMenu + cmdk + MenuItem)。對齊 Material <code>Select</code> / Ant <code>Select</code> idiom。</p>
+          <ul>
+            <li>典型場景:Country picker / Status selector / Priority dropdown</li>
+            <li>判斷:選項 ≤ 20 + 不需搜尋 → Select(可選 searchable mode 啟用搜尋)</li>
+          </ul>
+        </div>
+      </Section>
+
+      <Section title="Pattern 2 — Combobox(多選 + 搜尋 + 可建立新值)">
+        <div className="prose prose-sm max-w-prose">
+          <p>多選 + 大量選項需搜尋 + 可創新 tag → <LinkTo kind="Design System/Components/Combobox/展示" name="預設"><span className="text-primary hover:underline font-medium cursor-pointer">Combobox</span></LinkTo>。對齊 GitHub Label picker / Linear Multi-assignee / Notion Multi-select idiom。</p>
+          <ul>
+            <li>典型場景:Tag picker / Multi-assignee / Filter chips multi-value</li>
+            <li>單行模式自動接 OverflowIndicator(`+N`)避免 tag wrap</li>
+          </ul>
+        </div>
+      </Section>
+
+      <Section title="Pattern 3 — PeoplePicker(人員選擇 + Avatar 渲染)">
+        <div className="prose prose-sm max-w-prose">
+          <p>選人員(單 / 多)+ 渲染 avatar + 名稱 + role → <LinkTo kind="Design System/Components/PeoplePicker/展示" name="預設"><span className="text-primary hover:underline font-medium cursor-pointer">PeoplePicker</span></LinkTo>。對齊 Slack mention / Linear assignee / Asana people-search idiom。</p>
+          <ul>
+            <li>典型場景:Task assignee / Document collaborator / Workspace member invite</li>
+          </ul>
+        </div>
+      </Section>
+
+      <Section title="禁止 — App code 直接消費 SelectMenu">
+        <div className="prose prose-sm max-w-prose">
+          <p>不可直接 <code>import &#123; SelectMenu &#125; from '@/design-system/...'</code> 在 app — 必透過 Select / Combobox / PeoplePicker 三個 user-facing wrapper 之一。如有特殊 dropdown 需求(這 3 個都不對),回 DS 開新 wrapper 而不是繞過抽象層。</p>
         </div>
       </Section>
     </div>

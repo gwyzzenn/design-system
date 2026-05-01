@@ -50,3 +50,38 @@ export const UsageGuidance: Story = {
     </div>
   ),
 }
+
+// ── CompositionRules — Command 的兩個 consumer pattern(對齊 Polaris「Related」+ Material「Use within」)──────
+
+export const CompositionRules: Story = {
+  name: '組合規則',
+  render: () => (
+    <div className="flex flex-col gap-12">
+      <div className="prose prose-sm max-w-prose">
+        <p>Command 是 internal primitive,由消費者組合使用,**不直接放在 app code**。以下兩種 world-class 慣例(對齊 Linear / Raycast / VS Code Cmd-K idiom):</p>
+
+        <h4>Pattern 1 — SelectMenu 內嵌 Command(searchable form input)</h4>
+        <p>需要「搜尋 + 選值寫回 form」→ 用 <code>SelectMenu</code>(內部已組合 <code>Popover + Command</code>),<strong>不要</strong>自己組合:</p>
+        <ul>
+          <li><LinkTo kind="Design System/Components/Combobox/展示" name="預設"><span className="text-primary hover:underline font-medium cursor-pointer">Combobox</span></LinkTo>——searchable 多選</li>
+          <li><LinkTo kind="Design System/Components/Select/展示" name="可搜尋"><span className="text-primary hover:underline font-medium cursor-pointer">Select(searchable)</span></LinkTo>——searchable 單選</li>
+          <li><LinkTo kind="Design System/Components/PeoplePicker/展示" name="預設"><span className="text-primary hover:underline font-medium cursor-pointer">PeoplePicker</span></LinkTo>——人員搜尋</li>
+        </ul>
+
+        <h4>Pattern 2 — Popover + Command 組成 Command Palette(Cmd+K)</h4>
+        <p>需要「全域 keyboard 觸發 + 跨頁搜尋 / 動作」→ 自行組合 <code>Popover + Command</code>(對齊 Linear ⌘K / Raycast / VS Code Quick Pick):</p>
+        <pre className="text-xs"><code>{`<Popover open={cmdkOpen}>
+  <Command>
+    <Command.Input placeholder="輸入指令..." />
+    <Command.List>
+      <Command.Group heading="動作">
+        <Command.Item>新建文件</Command.Item>
+      </Command.Group>
+    </Command.List>
+  </Command>
+</Popover>`}</code></pre>
+        <p className="text-fg-muted">禁止:在 app code 自刻 search input + filter list — 必消費 Command primitive(對齊 SSOT 消費 canonical M1)。</p>
+      </div>
+    </div>
+  ),
+}
