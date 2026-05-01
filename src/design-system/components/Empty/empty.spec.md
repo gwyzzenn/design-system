@@ -93,6 +93,32 @@ Empty 只管**水平居中**。垂直定位由 consumer 的容器決定:
 
 ---
 
+## A11y 預設
+
+Empty 是 **non-interactive layout primitive**——本身無 ARIA role(讓 consumer 容器決定 region semantics)。但 consumer 應遵循以下慣例:
+
+| 場景 | Consumer 容器應加 | 為什麼 |
+|------|----------------|------|
+| Table / List 空狀態 | `<table aria-describedby={emptyId}>` 或在容器加 `aria-live="polite"` | screen reader 在資料載入完成時主動通知「無資料」(對齊 Polaris EmptyState pattern) |
+| Search / Filter 無結果 | container `aria-live="polite"` + 文案明確指向搜尋詞(「找不到符合『XXX』的結果」)| 對齊 Material `<NoOptions>` + Atlassian Empty Search idiom — 變動結果需 live region |
+| Page section 暫無內容 | `<section aria-labelledby={titleId}>` + `<h2>` 包 title slot | 對齊 WCAG 2.1 SC 2.4.6 標題明確語意 |
+| 初次引導(有 CTA) | Action Button 自帶 a11y;無需 Empty 層額外 ARIA | CTA 是真實互動 element,自己的 a11y 足夠 |
+
+**Title slot heading level**:Empty 不渲染 heading tag(`<h1>` / `<h2>`),只 `<div>` + 視覺 typography。Consumer 若需 heading semantic,在外層自包 `<h2>{title}</h2>` + 不傳 Empty 的 title prop(避免重複)。
+
+**Icon slot**:LucideIcon 自動渲染 `aria-hidden="true"`(decorative);ReactElement(自帶 Avatar / Illustration)由 consumer 控制 `aria-hidden` / `alt`(若是 `<img>` 必傳 `alt=""` 表示 decorative)。
+
+**Description 不需 live announcement**:Empty 本身是「靜態空狀態提示」(進入時就空),不是「動態變化結果」。動態變化(filter / search 結果切換)由 consumer 在容器層加 `aria-live`,不在 Empty 內。
+
+世界級對照:
+- **Polaris** `<EmptyState>`:容器層 `aria-labelledby` + heading 由 prop 控制 level(consumer 決定 `<h2>` / `<h3>`)
+- **Material** `<NoOptions>`(Autocomplete 內):容器自帶 `role="listbox"` + `aria-live="polite"` 通知無結果
+- **Carbon** `<EmptyState>`:無自帶 ARIA,文檔指引 consumer 在父容器設 `aria-describedby`
+
+本 DS 對齊 Carbon「primitive 不自帶 ARIA,consumer 控制」哲學——避免 Empty 強加 role 跟 consumer 容器衝突。
+
+---
+
 ## 消費範例
 
 ```tsx
