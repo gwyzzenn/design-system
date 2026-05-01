@@ -1,0 +1,9 @@
+[build]
+  command = "npm run build-storybook"
+  publish = "storybook-static"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Per-branch deploy previews 預設啟用(任何 branch push → 自動 preview URL)
+# Production deploy 走 main(production URL = 永遠最新 main 的 storybook)
