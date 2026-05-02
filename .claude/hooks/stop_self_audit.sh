@@ -56,10 +56,14 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
   # 證明本 turn 已驗證,不應 trigger gap。
   RETRACT_RE='(撤回 claim|false claim|沒修好|未驗證|未驗 真實|撤回|不 claim|沒 claim|明確不|明確未|not yet verified|tsc exit 0|tsc:[[:space:]]*0|built in [0-9]+|✓ built|build-storybook exit 0|exit code 0)'
   if echo "$LAST_ASSISTANT" | grep -qiE "$CLAIM_RE" && ! echo "$LAST_ASSISTANT" | grep -qiE "$RETRACT_RE"; then
-    # Check if any verify-class tool_use happened recent turns
-    # (look for npx tsc / bash test / compile-stories / npm run / audit invocations)
+    # Check if any verify-class tool_use happened in THIS turn(after last user msg)
     VERIFY_RE='(npx tsc|bash .claude/hooks/tests|compile-stories|npm run build|npm run test|design-system-audit|visual-audit)'
-    if ! tail -200 "$TRANSCRIPT_PATH" 2>/dev/null | grep -qE "$VERIFY_RE"; then
+    if [ "$LAST_USER_LINE" -gt 0 ]; then
+      THIS_TURN_TOOLS=$(tail -500 "$TRANSCRIPT_PATH" 2>/dev/null | tail -n +$((LAST_USER_LINE+1)))
+    else
+      THIS_TURN_TOOLS=$(tail -200 "$TRANSCRIPT_PATH" 2>/dev/null)
+    fi
+    if ! echo "$THIS_TURN_TOOLS" | grep -qE "$VERIFY_RE"; then
       WARNINGS="${WARNINGS}\n  • Claim-verify gap:你說 verified / done / 完成 等,但本 turn 無 tsc / test / audit 真執行。下輪實跑驗證或撤回 claim。"
       # 標記 CRITICAL — Mechanism 1 升 BLOCKER(2026-04-30 升級):AI claim done 但無驗證
       # = 100+ 次重複 failure mode。不再 silent log,exit `decision: block` 強制 turn 不結束。
