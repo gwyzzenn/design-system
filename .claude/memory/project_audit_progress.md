@@ -4,11 +4,13 @@ description: Pointer + latest audit run summary. Historical detail in git log.
 type: project
 originSessionId: 7fa6c876-f1f7-4537-8cb3-1c97212e5a80
 ---
-## Current state(2026-05-01)
+## Current state(2026-05-01,merged into main)
 
-**DS scope**: 60 components + 4 patterns + 7 token families + new `lib/` home(2026-05-01,i18n inhabitant)。Build green:tsc -b 0 / build-storybook exit 0(verified 2026-05-01)。
+**DS scope**: 60 components + 4 patterns + 7 token families + `lib/` home(i18n inhabitant)。Build green:tsc -b 0 / build-storybook 49s / **hook tests 27/27 pass(0 missing coverage)**。
 
-**Skills(18+)** + **Hooks(26)** — see `.claude/skills/README.md` + `.claude/hooks/README.md`。
+**Skills(18+)** + **Hooks: 11 top-level + 16 lib/**(consolidated 2026-05-01,D8a 達標 ≤ 15)。
+
+**Branch state**: `claude/ds-complete-audit-1Jich` 49 commits + merge commit landed in `main` via `--no-ff` merge(2026-05-01)。Working tree clean。
 
 ## Latest run — 2026-05-01 31-dim sweep + 4-題 deep fix(branch `claude/ds-complete-audit-1Jich`)
 

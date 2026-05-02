@@ -28,10 +28,22 @@ WARNINGS=""
 
 # ── Mechanism 1: Claim-verification gap ─────────────────────────────────────
 if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
-  # Get last assistant turn text(approximate via tail JSON)
-  LAST_ASSISTANT=$(tail -200 "$TRANSCRIPT_PATH" 2>/dev/null | \
-    jq -r 'select(.message.role=="assistant") | .message.content[]?.text // empty' 2>/dev/null | \
-    tail -50)
+  # NOTE(2026-05-01): scope 改 this-turn-only — 之前 tail -50 cross-turn
+  # capture 我前 turn 的「verified」字眼 → trigger false positive on
+  # housekeeping turn(本 turn 沒 claim 卻 fire)。
+  # Now: find last user msg line in transcript,只取之後的 assistant text。
+  LAST_USER_LINE=$(tail -500 "$TRANSCRIPT_PATH" 2>/dev/null | \
+    awk '/"role":"user"/ {n=NR} END {print n+0}')
+  LAST_USER_LINE=${LAST_USER_LINE:-0}
+  if [ "$LAST_USER_LINE" -gt 0 ]; then
+    LAST_ASSISTANT=$(tail -500 "$TRANSCRIPT_PATH" 2>/dev/null | \
+      tail -n +$((LAST_USER_LINE+1)) | \
+      jq -r 'select(.message.role=="assistant") | .message.content[]?.text // empty' 2>/dev/null)
+  else
+    LAST_ASSISTANT=$(tail -200 "$TRANSCRIPT_PATH" 2>/dev/null | \
+      jq -r 'select(.message.role=="assistant") | .message.content[]?.text // empty' 2>/dev/null | \
+      tail -50)
+  fi
 
   # Detect claim keywords
   # NOTE(2026-05-01): 縮窄 CLAIM_RE — 移除「完成 / 沒問題 / 全部 done / 全綠 / 永遠合規」
