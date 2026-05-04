@@ -323,20 +323,16 @@ const CHROME_UNBOUNDED_SLOT =
 >
 > **真實 bug(2026-05-04)**:Filter / Sort panel 內 wrapper div 設 `w-[640px]` 無 flex-col → user 縮視窗時 body 不 scroll,內容被 clip。NameCard 之所以 work 因為它直接是 PopoverContent 唯一 child(無 wrapper)+ 自設 max-h flex-col。
 
-**Invariant**:從 `*Content`(浮層 root)到 `SurfaceBody` 之間的**所有中間 wrapper 都必 `flex flex-col h-full`**(forward chain)。
+**Invariant**:從 `*Content`(浮層 root)到 `SurfaceBody` 之間的**所有中間 wrapper 都必 `flex flex-col h-full min-h-0`**(K11 v2,2026-05-04)。`min-h-0` 必須 — flex item default `min-height: auto` 會讓 content 撐高度,`h-full` 失效;加 `min-h-0` 才能正確 shrink 到 PopoverContent max-h cap。
 
-**panel root 寫 width**:
 ```tsx
-<div ref={ref} className="flex flex-col h-full w-[640px]">  // ✓ chain forward
+<div ref={ref} className="flex flex-col h-full min-h-0 w-[640px]">  // ✓
   <SurfaceHeader />
   <SurfaceBody />
 </div>
 ```
 
-**禁止**:
-```tsx
-<div ref={ref} className="w-[640px]">  // ❌ 斷鏈,SurfaceBody flex-1 失效
-```
+**禁止**:`w-[640px]` 單獨用(❌ 斷鏈)/ `flex flex-col h-full` 無 `min-h-0`(❌ flex item 不 shrink,scroll 失效)。
 
 **DS-wide consumer 必檢點**:`grep '<PopoverContent\|<HoverCardContent\|<DialogContent\|<SheetContent'` 內第一層 wrapper 是否含 `flex flex-col h-full`(若該 panel 用 SurfaceBody)。Hook `check_overlay_panel_scroll_chain.sh` 機械化攔截。
 

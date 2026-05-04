@@ -519,8 +519,10 @@ function DataTableFilterPanelInner<TData>({
     //   panel root 必 forward `flex flex-col h-full` 才能讓 SurfaceBody flex-1 min-h-0 overflow-y-auto 生效
     //   無此 forward → 中間 wrapper 斷鏈 → body 不 scroll(NameCard 因為自身設 max-h flex-col 才繞過)
     //   詳 overlay-surface.spec.md「viewport-aware scroll chain invariant」段
+    // K11 v2 fix(2026-05-04):flex item 預設 min-h:auto 讓 content 撐 height,h-full 失效。
+    // 必加 `min-h-0` 才能讓 panel 在 PopoverContent max-h cap 下正確 shrink + body scroll。
     <div ref={ref} className={cn(
-      'flex flex-col h-full',
+      'flex flex-col h-full min-h-0',
       mode === 'nested'
         ? 'w-[min(760px,calc(100vw-2rem))]'
         : 'w-[min(640px,calc(100vw-2rem))]',

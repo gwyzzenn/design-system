@@ -58,13 +58,14 @@ SUSPECT=$(printf '%s' "$NEW_CONTENT" | awk '
     while (index(line, ">") == 0 && (getline next_line) > 0) {
       line = line " " next_line
     }
-    if (line ~ /w-\[/ && line !~ /flex.*flex-col.*h-full/ && line !~ /h-full.*flex.*flex-col/) {
+    # K11 v2:必同時含 flex flex-col + h-full + min-h-0(flex item default min-h:auto 阻 shrink)
+    if (line ~ /w-\[/ && (line !~ /flex[^"]*flex-col/ || line !~ /h-full/ || line !~ /min-h-0/)) {
       # Check if next ~5 lines contain SurfaceBody
       nextlines = ""
       for (k = 0; k < 30 && (getline next_line) > 0; k++) {
         nextlines = nextlines "\n" next_line
         if (next_line ~ /<SurfaceBody/) {
-          print "[wrapper div w-[...] without flex flex-col h-full, contains SurfaceBody]: " substr(line, 1, 100)
+          print "[panel root w-[...] 缺 flex flex-col h-full min-h-0(flex item shrink 失效),有 SurfaceBody]: " substr(line, 1, 100)
           break
         }
         if (next_line ~ /<\/div>/) break

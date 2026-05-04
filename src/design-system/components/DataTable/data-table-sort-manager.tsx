@@ -104,7 +104,7 @@ export function DataTableSortManager<TData>({
 
   return (
     // **K11 fix(2026-05-04)**:viewport-aware scroll chain invariant — 詳 overlay-surface.spec.md
-    <div className={cn('flex flex-col h-full w-[480px]', className)}>
+    <div className={cn('flex flex-col h-full min-h-0 w-[480px]', className)}>
       {/* Popover 派輕量 chrome — slot 縮 20 匹配 PopoverTitle text-body line-height,header 自然 ~45px */}
       <SurfaceHeader className="[--chrome-slot-h:1.25rem]">
         <PopoverTitle className="flex-1">排序</PopoverTitle>

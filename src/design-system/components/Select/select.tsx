@@ -212,13 +212,43 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
     // 關閉時清搜尋
     React.useEffect(() => { if (!open) setSearch('') }, [open])
 
-    if (resolvedMode !== 'edit') {
-      return <ReadonlyDisplay mode={resolvedMode} size={size} options={options} value={value} display={display} startIcon={StartIcon} className={className} placeholder={placeholder} />
-    }
-
+    // **React #310 fix(2026-05-04)**:所有 hooks 必在任何 early return 前 call,
+    //   否則 disabled→edit 切換時 hook count 變動 → React 死亡。
+    //   原本 useMemo(L280, L291) 在 early return 之後 = latent bug,K13 觸發(filter Op 從 disabled
+    //   變 edit 當 user 選欄位)。修法:把所有 useMemo 提到 early return 之前。
     const selectedOpt = options?.find(o => o.value === value)
     const selectedLabel = selectedOpt?.label ?? ''
     const SelectedIcon = selectedOpt?.icon
+    // ── 過濾選項 ──
+    const filteredOptions = searchable && search
+      ? options.filter(o => o.label.toLowerCase().includes(search.toLowerCase()))
+      : options
+    // ── 轉換 SelectOption → SelectMenuOption(必在 early return 前) ──
+    const menuOptions: SelectMenuOption[] = React.useMemo(
+      () => filteredOptions.map(opt => ({
+        value: opt.value,
+        label: opt.label,
+        icon: isTextDisplay ? opt.icon : undefined,
+        group: opt.group,
+      })),
+      [filteredOptions, isTextDisplay]
+    )
+    // ── Tag display 自訂 label 渲染(必在 early return 前) ──
+    const renderLabel = React.useMemo(() => {
+      if (isTextDisplay) return undefined
+      return (menuOpt: SelectMenuOption) => {
+        const srcOpt = options.find(o => o.value === menuOpt.value)
+        if (srcOpt?.tagVariant) {
+          return <Tag size={size} variant={srcOpt.tagVariant as 'blue' | 'green' | 'red' | 'yellow' | 'neutral'}>{menuOpt.label}</Tag>
+        }
+        return menuOpt.label
+      }
+    }, [isTextDisplay, options, size])
+
+    // Early return AFTER all hooks(disabled / readonly mode 走 ReadonlyDisplay)
+    if (resolvedMode !== 'edit') {
+      return <ReadonlyDisplay mode={resolvedMode} size={size} options={options} value={value} display={display} startIcon={StartIcon} className={className} placeholder={placeholder} />
+    }
 
     const clearEl = showClear ? (
       <span className="relative z-10">
@@ -271,33 +301,7 @@ const CustomSelect = React.forwardRef<HTMLDivElement, SelectProps>(
       </>
     )
 
-    // ── 過濾選項（searchable 時由 trigger input 過濾，不走 SelectMenu 內建搜尋）──
-    const filteredOptions = searchable && search
-      ? options.filter(o => o.label.toLowerCase().includes(search.toLowerCase()))
-      : options
-
-    // ── 轉換 SelectOption → SelectMenuOption ──
-    const menuOptions: SelectMenuOption[] = React.useMemo(
-      () => filteredOptions.map(opt => ({
-        value: opt.value,
-        label: opt.label,
-        icon: isTextDisplay ? opt.icon : undefined,
-        group: opt.group,
-      })),
-      [filteredOptions, isTextDisplay]
-    )
-
-    // ── Tag display: 自訂 label 渲染 ──
-    const renderLabel = React.useMemo(() => {
-      if (isTextDisplay) return undefined
-      return (menuOpt: SelectMenuOption) => {
-        const srcOpt = options.find(o => o.value === menuOpt.value)
-        if (srcOpt?.tagVariant) {
-          return <Tag size={size} variant={srcOpt.tagVariant as 'blue' | 'green' | 'red' | 'yellow' | 'neutral'}>{menuOpt.label}</Tag>
-        }
-        return menuOpt.label
-      }
-    }, [isTextDisplay, options, size])
+    // filteredOptions / menuOptions / renderLabel 已在 early-return 前 hoist(React #310 fix)
 
     const handleValueChange = React.useCallback(
       (newValue: string | string[]) => {
