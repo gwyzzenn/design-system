@@ -309,22 +309,28 @@ function DataTableInner<TData>(
     overscan, enabled: useVirtual,
   })
 
-  // ── isFillHeight body maxHeight JS 計算(2026-04-30)──
+  // ── isFillHeight body maxHeight JS 計算(2026-04-30,Q7 mount-flicker fix 2026-05-04)──
   // CSS `%` height 在 flex column min-h-0 + auto basis 場景下,Chromium 不可靠 shrink
   // (實測:outer maxHeight 100% bind parent,但 body 不 shrink 反映 outer 約束 → outer
   // overflow-hidden 切掉 content,V scroll 不 trigger)。
   // 改用 ResizeObserver 算 body avail = outer rect - header rect → set centerBody
   // maxHeight = pixel value(不是 %)。content 大 → V scroll;content 小 → centerBody
   // = content,outer = intrinsic,沒留白。
+  // **Q7 mount flicker(2026-05-04 user report)**:bodyMaxHeight=null → 第一 render 時
+  // virtualizer scroll element 還沒測 → 0 visible rows → 第二 pass measure 後 → rows 漸進出現
+  // → 用戶看到「rows 一個個冒出來」展開動畫感。fix: `tableReady` flag,measurement 完成前
+  // table outer `visibility: hidden`(保留 layout 但不繪)→ 第一個可見 frame = 完整 table。
   const [bodyMaxHeight, setBodyMaxHeight] = React.useState<number | null>(null)
+  const [tableReady, setTableReady] = React.useState(!isFillHeight)
   React.useLayoutEffect(() => {
-    if (!isFillHeight) { setBodyMaxHeight(null); return }
+    if (!isFillHeight) { setBodyMaxHeight(null); setTableReady(true); return }
     const compute = () => {
       if (!tableRef.current) return
       const outerH = tableRef.current.getBoundingClientRect().height
       const headerEl = tableRef.current.firstElementChild as HTMLElement | null
       const headerH = headerEl?.getBoundingClientRect().height ?? 0
       setBodyMaxHeight(Math.max(0, outerH - headerH))
+      setTableReady(true)
     }
     compute()
     const obs = new ResizeObserver(compute)
@@ -829,7 +835,11 @@ function DataTableInner<TData>(
       // (hug rows);content 大或 window 縮 < content → outer cap 到 100% of parent。
       // 行為:**永遠 hug rows**,只在被約束時才 cap + body shrink + V scroll。
       // 簡單需求:有約束 → rows 沒超就 hug;超就 cap+scroll;RWD 同理。
-      style={isFillHeight ? { maxHeight: height } : undefined}
+      // tableReady=false 時 visibility:hidden(保留 layout 不繪)→ 消除 mount-flicker(Q7)
+      style={{
+        ...(isFillHeight ? { maxHeight: height } : undefined),
+        visibility: tableReady ? undefined : 'hidden',
+      }}
       role="table" aria-rowcount={rows.length + 1}
       tabIndex={enabled ? 0 : undefined}
       onKeyDown={enabled ? tableKeyboardHandler : undefined}
