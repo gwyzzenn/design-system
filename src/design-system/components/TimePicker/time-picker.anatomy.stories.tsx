@@ -242,3 +242,34 @@ export const Inspector: Story = {
     return <TimePicker {...args} value={v} onChange={setV} />
   },
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 7. Accessibility — ARIA roles + keyboard map
+// ═══════════════════════════════════════════════════════════════════════════
+
+export const Accessibility: Story = {
+  name: 'A11y',
+  render: () => (
+    <div className="flex flex-col gap-6 max-w-3xl text-body">
+      <section>
+        <h3 className="text-body font-bold mb-2">ARIA roles</h3>
+        <ul className="list-disc list-inside text-caption text-fg-secondary space-y-1">
+          <li>Trigger:<code>role="combobox"</code> + <code>aria-expanded={`{open}`}</code> + 必含 <code>aria-label</code></li>
+          <li>Panel:每欄(時 / 分 / 秒)<code>role="listbox"</code></li>
+          <li>每 item:<code>role="option"</code> + <code>aria-selected</code> 反映當前 value</li>
+          <li>Screen reader 讀「時間選擇器,當前 9 時 30 分」</li>
+        </ul>
+      </section>
+      <section>
+        <h3 className="text-body font-bold mb-2">鍵盤導覽(WAI-ARIA listbox pattern)</h3>
+        <ul className="list-disc list-inside text-caption text-fg-secondary space-y-1">
+          <li>Trigger:<kbd>Space</kbd> / <kbd>Enter</kbd> 開 panel</li>
+          <li>Panel 開啟:<kbd>Esc</kbd> 關閉 + focus return to trigger</li>
+          <li>Column 內:<kbd>↑</kbd> <kbd>↓</kbd> 切 option</li>
+          <li><kbd>Home</kbd> <kbd>End</kbd> 跳 column 首尾</li>
+          <li><kbd>Tab</kbd> / <kbd>Shift+Tab</kbd> 切換 column(時 → 分 → 秒)</li>
+        </ul>
+      </section>
+    </div>
+  ),
+}

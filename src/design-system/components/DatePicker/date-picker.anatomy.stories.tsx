@@ -919,3 +919,33 @@ export const CalendarTokens = {
     )
   },
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   7. Accessibility — ARIA roles + keyboard map
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export const Accessibility = {
+  name: 'A11y',
+  render: () => (
+    <div className="flex flex-col gap-6 max-w-3xl text-body">
+      <section>
+        <h3 className="text-body font-bold mb-2">ARIA roles</h3>
+        <ul className="list-disc list-inside text-caption text-fg-secondary space-y-1">
+          <li>Trigger:<code>{`<div role="combobox" tabIndex={0}>`}</code> + <code>aria-haspopup="dialog"</code> + <code>aria-expanded={`{open}`}</code></li>
+          <li>Trigger 必含 accessible name(<code>aria-label</code> / 外層 <code>{`<label>`}</code> / fieldCtx label)</li>
+          <li>Popover content:<code>role="dialog"</code> + <code>aria-label="日期選擇"</code>(Range:<code>"日期區間選擇"</code>)</li>
+          <li>Range 雙 trigger:<code>aria-expanded</code> 對應只當該 trigger active 時 true</li>
+        </ul>
+      </section>
+      <section>
+        <h3 className="text-body font-bold mb-2">鍵盤(Radix Popover + react-day-picker v9 內建)</h3>
+        <ul className="list-disc list-inside text-caption text-fg-secondary space-y-1">
+          <li>Trigger:<kbd>Space</kbd> / <kbd>Enter</kbd> 開 popover</li>
+          <li>Popover 開啟:<kbd>Esc</kbd> 關閉 + focus return to trigger</li>
+          <li>DateGrid:<kbd>←</kbd> <kbd>→</kbd> 切日 / <kbd>PgUp</kbd> <kbd>PgDn</kbd> 切月 / <kbd>Home</kbd> <kbd>End</kbd> 行首尾</li>
+          <li>showTime:<kbd>Tab</kbd> 從 calendar 跳到右側 time panel,各 column <kbd>↑</kbd> <kbd>↓</kbd> 切 option</li>
+        </ul>
+      </section>
+    </div>
+  ),
+}

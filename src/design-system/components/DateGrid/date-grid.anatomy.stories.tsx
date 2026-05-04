@@ -546,3 +546,36 @@ export const StateBehavior = {
     )
   },
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   6. Accessibility — react-day-picker v9 內建 grid pattern
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export const Accessibility = {
+  name: 'A11y',
+  render: () => (
+    <div className="flex flex-col gap-6 max-w-3xl text-body">
+      <section>
+        <H3>ARIA roles(react-day-picker v9 內建,本 DS 不重寫)</H3>
+        <ul className="list-disc list-inside text-caption text-fg-secondary space-y-1">
+          <li><code>role="grid"</code> on day grid root</li>
+          <li><code>role="gridcell"</code> + <code>aria-selected</code> on each day button</li>
+          <li>Today cell:<code>aria-current="date"</code></li>
+          <li>Disabled cell:<code>aria-disabled="true"</code></li>
+          <li>Outside-month cell:<code>aria-hidden="true"</code>(視覺顯示但 SR 跳過)</li>
+        </ul>
+      </section>
+      <section>
+        <H3>鍵盤導覽</H3>
+        <ul className="list-disc list-inside text-caption text-fg-secondary space-y-1">
+          <li><kbd>←</kbd> <kbd>→</kbd> 切日(focus-only,不觸發 select)</li>
+          <li><kbd>↑</kbd> <kbd>↓</kbd> 切週</li>
+          <li><kbd>PgUp</kbd> <kbd>PgDn</kbd> 切月</li>
+          <li><kbd>Shift+PgUp</kbd> <kbd>Shift+PgDn</kbd> 切年</li>
+          <li><kbd>Home</kbd> <kbd>End</kbd> 行首 / 行尾</li>
+          <li><kbd>Space</kbd> / <kbd>Enter</kbd> select(觸發 onSelect)</li>
+        </ul>
+      </section>
+    </div>
+  ),
+}
