@@ -72,38 +72,33 @@ const FieldControlGroup = React.forwardRef<HTMLDivElement, FieldControlGroupProp
     return (
       <div
         ref={ref}
-        // ── 派 B 架構(2026-05-04 重構,inspired by Material OutlinedInput NotchedOutline):
-        //   FCG outer 自帶 border + rounded-md + overflow-hidden(group 整體 frame)
-        //   Cells 內部 border-0 + rounded-none + bg-transparent(讓 outer frame 主導)
-        //   Disabled cell 保留 bg-disabled(state 視覺承載,M24)
-        //   Internal divider 用 ::before pseudo(absolute positioned 1px line)
-        //   Cell state(hover/focus/error)用 box-shadow inset 取代 border(避免 outer frame 衝突)
-        //
-        // 為什麼派 B:bg-disabled 在 -ml-px overlap 模式下會 vs edit cell 產生 bg 色差視覺分隔線(派 A 物理限制)。
-        //   派 B 由 outer frame 主導 group integrity,cells 不再彼此 border overlap,
-        //   disabled bg 不會在邊界產生「darker divider」對比放大效應(verified Material OutlinedInput 適配)。
-        // Source:Material OutlinedInput NotchedOutlineRoot(absolute-positioned overlay frame),
-        //   github.com/mui/material-ui/blob/v6.0.0/packages/mui-material/src/OutlinedInput/OutlinedInput.js
+        // ── Ant compact-item 機制(verified):
+        //   [&>*]:relative — 子套 relative 才能 z-index 生效
+        //   [&>*]:z-[2] — default z 2(Ant 同值)
+        //   [&>*+*]:-ml-px — 鄰接子 margin-left -1px 重疊 border
+        //   hover/focus/focus-within → z-3(active border 在最上層,Bootstrap 用 z-5,Ant 用 z-3 我們對齊 Ant)
+        //   first/middle/last radii:對齊 Ant compactItemBorderRadius L67-92
+        // ── Children 自管 width(W-A,Ant idiom);Group 自身僅控制 border/radius/z-index 接合機制
         className={cn(
           block ? 'flex w-full' : 'inline-flex',
           'items-stretch',
-          // outer frame:static border + rounded + overflow-hidden(clip cell corners)
-          //   ⚠️ outer 不套 hover/focus state — state 全 cell-level(派 A UX 一致)
-          'border border-border rounded-md overflow-hidden bg-surface',
-          // cells:lose own border/rounded(let outer frame dominate),保留 own bg
-          '[&>*]:!border-0 [&>*]:!rounded-none',
+          // z-index baseline + active layer
           '[&>*]:relative [&>*]:z-[2]',
-          // suppress native browser focus outline(Safari black ring on inner select etc)
-          '[&_*]:focus-visible:outline-none',
-          // internal divider:::before pseudo on cells[2..]
-          "[&>*+*]:before:content-[''] [&>*+*]:before:absolute [&>*+*]:before:left-0 [&>*+*]:before:top-0 [&>*+*]:before:bottom-0 [&>*+*]:before:w-px [&>*+*]:before:bg-border [&>*+*]:before:pointer-events-none [&>*+*]:before:z-[1]",
-          // cell-level state visuals via box-shadow inset(派 A UX 對齊):
-          //   hover → border-hover ring(該 cell only)
-          //   focus-within → ring color(DS focus,2px inset)
-          //   error → error ring
-          '[&>*:hover]:shadow-[inset_0_0_0_1px_var(--border-hover)] [&>*:hover]:z-[3]',
-          '[&>*:focus-within]:shadow-[inset_0_0_0_2px_var(--ring)] [&>*:focus-within]:z-[3]',
-          '[&>*[data-error]]:shadow-[inset_0_0_0_1px_var(--error)] [&>*[data-error]]:z-[3]',
+          '[&>*:hover]:z-[3] [&>*:focus]:z-[3] [&>*:focus-within]:z-[3]',
+          '[&>*[disabled]]:z-0 [&>*:has([disabled])]:z-0',
+          // border overlap
+          '[&>*+*]:-ml-px',
+          // border radius — 中間 0,首/尾保留外側 radii
+          '[&>*:not(:first-child):not(:last-child)]:rounded-none',
+          '[&>*:first-child:not(:last-child)]:rounded-r-none',
+          '[&>*:last-child:not(:first-child)]:rounded-l-none',
+          // K12 fix(2026-05-04 v4 — Ant Space.Compact idiom 對齊):FCG 內 disabled cell:
+          //   ✓ 保留 global `bg-disabled`(neutral-2 灰底,disabled state 視覺主要承載)
+          //   ✓ 強制 border `border-border`(同 edit cell,group divider 整合性)
+          //   Disabled cells 進 FCG 後視覺:bg-disabled 灰底 + 0.15 alpha border。
+          //   接受「border on gray bg 略深於 border on white bg」是物理對比結果,世界級 Ant/Bootstrap 共識。
+          //   不嘗試 bg-transparent / border-divider 補償(會破壞「disabled 有底色」的 user 設計意圖)
+          '[&>*[data-field-mode="disabled"]]:border-border',
           className,
         )}
         data-field-control-group=""
