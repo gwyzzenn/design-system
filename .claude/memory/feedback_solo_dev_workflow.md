@@ -1,62 +1,73 @@
-# Solo dev workflow — push direct to main,no branch,no PR
+# Solo dev workflow — branch push for preview,user 拍板才 push main
 
-**Codified 2026-05-04** — 本 session 早期我違反此 workflow,user 多次糾正後 codify。
+**Codified 2026-05-04** — 2 次更正:第 1 次我寫「push direct main」是錯的;user 糾正後改寫。
 
-## User 的 workflow 真實狀況
-
-- **Solo dev**(整個 design system 只有 user 一人開發)
-- **單一 chat 連續處理**(不分 session,「下個 session」概念不存在)
-- **Netlify 自動 preview = review 介面**(每次 push 觸發 deploy,user 在 preview URL 看結果)
-
-## 我該做什麼
+## 真實 workflow(2-step gating)
 
 ```
-edit code → git push origin main → Netlify auto-deploy → user check preview → done
+1. AI edit code
+2. AI commit + push 到 working branch        ← Netlify auto-deploy preview URL
+3. User 點 Netlify preview URL 檢查
+4. user 說「push」/「OK」                     ← gate 1
+5. AI merge / push 到 main                    ← Netlify deploy production
+6. (loop)user 說「改 X」→ AI 繼續 step 1
 ```
 
-**不要做**:
-- ❌ 開 `claude/<task>` branch(除非 harness session-start 強制指定)
-- ❌ 建 PR(branch → PR → merge → close 4 步多餘)
-- ❌ split 1 PR 成多 PR(2-way / 5-way 都不適用 solo dev)
-- ❌ 提 fix-forward PR(直接 push main 即可)
-- ❌ 開 hotfix branch(同上)
-- ❌ 任何「等 next session 處理」的 deferred 措辭(user 視 chat 為連續)
+## 為什麼是 2-step
 
-**該做**:
-- ✓ Edit + commit + push origin main 一氣呵成
-- ✓ Netlify deploy 自動觸發,user 看 preview URL
-- ✓ user 說「OK」/「done」/「沒問題」= 完成
-- ✓ user 說「改 X」= 繼續 edit + push
-- ✓ 有設計衝突真需 user 拍板才停下
+- **Netlify deploy-preview 預設啟用 per-branch**(`netlify.toml` 註解寫明:任何 branch push → 自動 preview)
+- **main = production deploy**(用戶可見的真環境)
+- 編輯 → preview 給 user 預檢 → user 拍板 → 才 push main
+- **AI 不主動 push main**,等 user 明確說「push」/「OK」
 
-## 例外:harness 強制指定 branch
+## 一個 chat = 一條 working branch
 
-session 開始時 harness 可能 inject「DEVELOP on branch `claude/<task>-XXX`」directive。此情況:
-- 該 branch 視為「working area」,在它上 push
-- 完成後直接 push main(若 user 同意)OR 走最 minimal merge(squash 1 commit,close branch)
-- **不主動拆多 branch**
+- harness session-start 通常分配 `claude/<task>-XXX` working branch
+- 整個 chat 的所有 edit / commit 都 push 該 branch(觸發多次 preview deploy)
+- user 在 preview 看到滿意 → 說「push」→ merge 該 branch 到 main + delete branch
 
-## 反 pattern(本 session 的錯)
+## 不要做的事
 
-2026-05-02→04 session 我做了:
-1. 把 1 個原始 PR 拆成 2 PR(product + governance)
-2. 開 fix-forward PR(post-merge review 找到 bug)
-3. 開 hotfix PR(我引入的 set -uo pipefail bug)
-4. 留 6 個 stale branch(harness 不允許我 delete remote)
+- ❌ 開 **多** branch(split / fix-forward / hotfix branch)— 1 chat = 1 working branch
+- ❌ 開 PR(直接 merge 即可)
+- ❌ AI 自己決定 push main(沒收到 user「push」指令前不 push main)
+- ❌ 同 chat 留 deferred / 「下個 session 處理」措辭
+- ❌ 邊 edit 邊跳到別的 branch(loop 內穩定 working branch)
 
-→ 結果:**6 個 stale branch user 要手動清** + 5 次 PR 來回 + user 多次說「我就是會在這個聊天不斷處理所有任務」。
+## 該做的事
+
+- ✓ Edit + commit + push working branch(每次 commit 都觸發 preview deploy)
+- ✓ 告訴 user preview URL or 主要 change(讓 user 知道要看什麼)
+- ✓ user 說「push」/「OK」→ merge to main(squash 1 commit OR fast-forward)
+- ✓ merge 後 delete remote branch(避 stale)
+- ✓ 設計衝突真需 user 拍板才停下中間 phase
+- ✓ user 說「改 X」→ 繼續 working branch edit + push
+
+## 例外:harness session-start 沒給 branch
+
+罕見。若無分配 → 開單一 `claude/<task>-XXX` 自命名 working branch,後續同上。
+
+## Trigger phrase reference
+
+User 說以下 → push main:
+- 「push」
+- 「OK」/「好」/「沒問題」(在「請我看 preview」context 下)
+- 「合進去」/ 「合 main」
+
+User 說以下 → 繼續 edit 不 push main:
+- 「改 X」/「不對」
+- 「再看看」/「等等」
+
+## 反 pattern(2026-05-02→04 session 我犯的錯)
+
+1. 把 1 個原始 PR 拆 2 PR(product + governance) — 多餘
+2. 開 fix-forward PR(post-merge review 找到 bug)— 應該繼續同 working branch 修
+3. 開 hotfix PR(我引入 bug)— 應該直接 working branch 修 + push main
+4. 留 6 個 stale branch(harness 不允許 delete remote,user 手動清)
+5. 第一版 memory 寫「push direct main」— 錯解 workflow,跳過 user 預檢
 
 ## 對齊既有 governance
 
-- Mindset #1「對標世界級」≠ 對標「multi-reviewer team workflow」。Polaris / Atlassian 內部也有 solo experiments 走 main 直推。
-- M21「Premature abstraction」延伸:**Premature workflow ceremony 也算 abstraction**(branch + PR 是 multi-dev 的 ceremony,solo 不需)
-- M14 AUTO integrate:同 chat 連續處理 = 把 5-layer pipeline 做完才 stop,不 deferred
-
-## Trigger phrase memory
-
-User 說以下任一 = 直接 push main 完成,不開 branch:
-- 「直接 push」
-- 「不要 branch / 不要 PR」
-- 「都這條 chat 處理」
-- 「不分 session」
-- 「馬不停蹄」(隱含 don't pause for ceremony)
+- Mindset #1「對標世界級」≠ 對標「multi-reviewer team workflow」。也不等於「無 review push main」。
+- M21「Premature abstraction」延伸:**Premature workflow ceremony 也算**(branch + PR 是 multi-dev ceremony,solo 不需多 branch)
+- M14 AUTO integrate:5-layer 完成才 stop;不 deferred / 不分 session
