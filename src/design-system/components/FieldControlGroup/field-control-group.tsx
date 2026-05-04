@@ -92,11 +92,14 @@ const FieldControlGroup = React.forwardRef<HTMLDivElement, FieldControlGroupProp
           '[&>*:not(:first-child):not(:last-child)]:rounded-none',
           '[&>*:first-child:not(:last-child)]:rounded-r-none',
           '[&>*:last-child:not(:first-child)]:rounded-l-none',
-          // K12 fix(2026-05-04):FCG 內 disabled cell 強制保留 border(全域 disabled 是 border-transparent
+          // K12 fix(2026-05-04 v2):FCG 內 disabled cell 強制保留 border(全域 disabled 是 border-transparent
           //   來避免 standalone field 視覺重),但 FCG context 下 group 整體 border integrity 必須 —
-          //   外圈 border + inner divider 健在,單個 cell 是 disabled 仍視覺上屬於同一 group
-          //   World-class 對照:Bootstrap input-group disabled / Ant Space.Compact disabled 同 idiom
-          '[&>*[data-field-mode="disabled"]]:border-border',
+          //   外圈 border + inner divider 健在。
+          //   v2 改用 `border-divider`(--divider neutral-4,比 --border 淺):因 disabled cell 有 bg-disabled
+          //   灰底,跟 border 同色會「視覺對比放大」(1px 線在灰底比在白底更顯眼)。改用較淡的 divider 色
+          //   reduce 灰底放大效應,使分隔線視覺平衡。
+          //   World-class:Bootstrap input-group / Ant Space.Compact disabled 用 lighter divider 同 idiom
+          '[&>*[data-field-mode="disabled"]]:border-divider',
           className,
         )}
         data-field-control-group=""

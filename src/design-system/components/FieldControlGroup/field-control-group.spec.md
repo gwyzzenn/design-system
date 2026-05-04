@@ -130,7 +130,9 @@ interface FieldControlGroupProps extends HTMLAttributes<HTMLDivElement> {
 
 **Disabled border integrity canonical(K12,2026-05-04)**:全域 disabled = `border-transparent`(讓 standalone field 視覺輕量),但**FCG context 下,disabled child 強制 `border-input`** — 確保:(a) FCG 整體外圈 border 健在,(b) inner divider 健在(不會因兩相鄰 disabled cells 都 transparent 而消失)。bg-disabled 仍區分狀態,border 維護群組視覺整合性。對齊 Bootstrap input-group / Ant Space.Compact disabled idiom。
 
-實作:`tsx [&>*[data-field-mode="disabled"]]:border-border`(FCG cva,純 local 不動 global field-wrapper)。
+實作:`tsx [&>*[data-field-mode="disabled"]]:border-divider`(FCG cva,純 local 不動 global field-wrapper)。
+
+**為什麼 `border-divider` 不 `border-border`**:disabled cell 有 `bg-disabled`(灰底 4% alpha),跟 `border-border`(15% alpha 黑線)同色會「視覺對比放大」— 1px 線在灰底比在白底更顯眼。改用較淡的 `--divider`(neutral-4)reduce 對比放大效應,使分隔線視覺平衡。對齊 Bootstrap input-group / Ant Space.Compact disabled idiom。
 | error(子)| 該 child border-error | 3(error 視覺在最上)|
 
 **整 row error**:目前 v1 不支援 row-level error(走 cell-level)。未來若需可走 outer border-error wrapper,但 v1 follow Ant 不做。
