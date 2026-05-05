@@ -14,7 +14,7 @@ import {
   type TableOptions,
   type Column,
 } from '@tanstack/react-table'
-import { useVirtualizer } from '@tanstack/react-virtual'
+import { useVirtualizer, defaultRangeExtractor } from '@tanstack/react-virtual'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { ChevronDown, Calendar, Clock, ArrowUp, ArrowDown, Filter as FilterIcon, EyeOff, X as XIcon, GripVertical } from 'lucide-react'
 import { DndContext, closestCenter, useSensor, useSensors, PointerSensor, KeyboardSensor, type DragEndEvent, type CollisionDetection } from '@dnd-kit/core'
@@ -579,12 +579,41 @@ function DataTableInner<TData>(
   // 在拖到該 id 附近時 stale lookup → 視覺位移 / drop position 錯算。Overscan 拉高讓拖動範圍內
   // 的 rows 全保持 mounted。10 是經驗值(Notion / Airtable virtualized list 也用 10-20 級別)。
   const effectiveOverscan = enableRowDrag ? Math.max(overscan, 10) : overscan
+
+  // L4 row drag × virtualization v4(2026-05-05):active row sticky range extractor。
+  // Root cause(over v3):overscan 拉到 10 仍會在 user 拖 PRD-0001 → 滾到 PRD-0045 時把 source row
+  // 滑出 mounted window → useSortable subscription unmount → dnd-kit activeDraggable lookup miss
+  // → transform fall-back 到 (0,0) → 下一 frame remount → transform 又算回 → 連續閃爍。
+  // Fix:tanstack-virtual `rangeExtractor` 把 active drag row idx 強制注入 mounted set,不論 scroll
+  // 位置在哪都保證該 row 持續 mounted。對齊 tanstack-virtual sticky-item canonical(官方 examples
+  // sticky.story 同手法,sticky idx 永遠在 ext set 內)。
+  // SSOT-vs-DragOverlay 判斷:DragOverlay 需 portal-render full row(3-region 跨 left/center/right
+  // 拼接複雜,且 sticky region pin column 也要跟動)— rangeExtractor 較 surgical、零 layout 影響、
+  // 對既有 useSortable + 3-region transform sync 架構零侵入。
+  // active state ref:activeDragId state 在下游 declared(line ~771)— ref forward 讓 rangeExtractor
+  // 在 hook order 限制下也能讀。setActiveDragId 處同步寫 ref 觸發 virtualizer.measure() 重排。
+  const activeDragIdRef = React.useRef<string | null>(null)
+  const rowsRef = React.useRef(rows)
+  rowsRef.current = rows
+  const stickyRangeExtractor = React.useCallback(
+    (range: Parameters<typeof defaultRangeExtractor>[0]) => {
+      const ext = defaultRangeExtractor(range)
+      const id = activeDragIdRef.current
+      if (!id) return ext
+      const idx = rowsRef.current.findIndex(r => r.id === id)
+      if (idx < 0 || ext.includes(idx)) return ext
+      return [idx, ...ext].sort((a, b) => a - b)
+    },
+    []
+  )
+
   const virtualizer = useVirtualizer({
     count: useVirtual ? rows.length : 0,
     // V scroll 現在在 centerBodyRef(不是外層 bodyRef)
     getScrollElement: () => centerBodyRef.current,
     estimateSize: () => resolvedEstimate,
     overscan: effectiveOverscan, enabled: useVirtual,
+    rangeExtractor: enableRowDrag ? stickyRangeExtractor : undefined,
   })
 
   // ── isFillHeight body maxHeight JS 計算(2026-04-30)──
@@ -769,6 +798,11 @@ function DataTableInner<TData>(
 
   // active drag state(state for invalid signal re-render;ref for fast lookup in collisionDetection)
   const [activeDragId, setActiveDragId] = React.useState<string | null>(null)
+  // sync ref + force virtualizer recompute so rangeExtractor 看得到新 active id(M25 chain invariant)
+  React.useEffect(() => {
+    activeDragIdRef.current = activeDragId
+    if (enableRowDrag && useVirtual) virtualizer.measure()
+  }, [activeDragId, enableRowDrag, useVirtual, virtualizer])
   const [invalidDropActive, setInvalidDropActive] = React.useState(false)
   const invalidRef = React.useRef(false)
   invalidRef.current = invalidDropActive
