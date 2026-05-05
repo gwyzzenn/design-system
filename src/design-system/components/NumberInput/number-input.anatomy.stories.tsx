@@ -217,7 +217,7 @@ export const Overview = {
       {/* Format options */}
       <div className="flex flex-col gap-3">
         <H3>格式化選項</H3>
-        <Desc>格式化在 readonly / disabled 和 NumberInputDisplay 生效。edit 模式輸入 raw 數值（不套格式），確保使用者能直覺地修改。</Desc>
+        <Desc>格式化在 readonly / disabled 和 `mode="display"` 生效。edit 模式輸入 raw 數值（不套格式），確保使用者能直覺地修改。</Desc>
         <div className="flex flex-col gap-2">
           {([
             { label: 'prefix="$"', props: { prefix: '$' }, value: 2490 },

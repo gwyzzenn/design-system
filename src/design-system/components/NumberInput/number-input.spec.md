@@ -57,7 +57,7 @@ NumberInput 是**數值的**輸入與顯示元件。格式化邏輯：`toLocaleS
 
 ## Display
 
-`NumberInputDisplay` 在 table cell 和 Form readonly 共用 `formatNumber()` 格式化函式。
+`<NumberInput mode="display">` 在 table cell 和 Form readonly 共用 `formatNumber()` 格式化函式。
 
 - 有值：格式化輸出（prefix + localized number + suffix）
 - null / undefined：`—`（em dash），`text-fg-muted`

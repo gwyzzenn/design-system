@@ -86,7 +86,7 @@ startIcon 不隨 value 變化——它描述的是 input 的用途，不是 valu
 
 ## Display
 
-`InputDisplay` 是 identity 顯示：
+`<Input mode="display">` 是 identity 顯示：
 - 有值：原樣輸出
 - null / undefined / 空字串：`—`（em dash），`text-fg-muted`
 
