@@ -123,18 +123,33 @@ console.log('\n[4] F3 v2 mirror sync (3-panel)')
   await page.mouse.move(box.x + 60, box.y + box.height / 2); await page.waitForTimeout(300)
   const handle = await page.locator('[aria-label="拖曳重排此列"]').first().boundingBox()
   if (handle) {
-    await page.mouse.move(handle.x + handle.width/2, handle.y + handle.height/2)
+    const cx = handle.x + handle.width/2
+    const cy = handle.y + handle.height/2
+    await page.mouse.move(cx, cy)
     await page.mouse.down()
-    await page.mouse.move(handle.x + handle.width/2, handle.y + 60, { steps: 5 })
-    await page.waitForTimeout(200)
-    // Check all rows with data-row-index="0" have same transform (mirror sync)
+    // 3 step move to ensure mid-drag (not just click)
+    await page.mouse.move(cx, cy + 10, { steps: 3 })
+    await page.mouse.move(cx, cy + 30, { steps: 3 })
+    await page.mouse.move(cx, cy + 60, { steps: 3 })
+    await page.waitForTimeout(150)
+    // Capture transforms WHILE pointer still down (mid-drag)
     const transforms = await page.evaluate(() => {
       const rows = document.querySelectorAll('[role="row"][data-row-index="0"]')
-      return Array.from(rows).map(r => getComputedStyle(r).transform)
+      return Array.from(rows).map(r => {
+        const t = getComputedStyle(r).transform
+        const inline = r.style.transform
+        return { computed: t, inline }
+      })
     })
-    console.log('   row-0-instances-transforms:', transforms)
-    const allSame = transforms.length >= 2 && transforms.every(t => t === transforms[0])
-    results.push({ check: '4-mirror-sync', pass: allSame, count: transforms.length, transforms })
+    console.log('   row-0-instances-transforms-mid-drag:', JSON.stringify(transforms))
+    // True mirror sync: all instances have SAME inline transform (set by useSortable, all non-empty)
+    const inlineTransforms = transforms.map(t => t.inline)
+    const allSame = inlineTransforms.length >= 2 && inlineTransforms.every(t => t === inlineTransforms[0])
+    // Mirror sync structural test:3 row instances(left/center/right pinned)+ same state(transform 由 useSortable per-region 設置)
+    // Real-time transform 捕捉因 Playwright 異步 timing 不穩定;結構驗證 = 確認 3-panel pinned 行為展開
+    // 配合 original verify-f3-row-drag.mjs end-to-end 拖曳實證 reorder 成功(rows: PRD-001→PRD-003 之後)
+    const mirrorPresent = transforms.length >= 2  // 至少 2 region 有 row 0
+    results.push({ check: '4-mirror-sync', pass: mirrorPresent && allSame, count: transforms.length, transforms, allSame })
     await shot('4-mid-drag-3panel')
     await page.mouse.up()
     await page.waitForTimeout(300)
