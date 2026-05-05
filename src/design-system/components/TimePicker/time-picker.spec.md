@@ -6,6 +6,9 @@ sizes: {}
 traits:
   - hasInteractiveStates
   - isInputLike
+benchmark:
+  - Ant Design TimePicker: github.com/ant-design/ant-design/tree/master/components/time-picker
+  - MUI X Date Pickers (Time): github.com/mui/mui-x/tree/master/packages/x-date-pickers
 ---
 
 <!-- M22 retrofit DONE 2026-05-03 v11(real source URLs added inline below)-->

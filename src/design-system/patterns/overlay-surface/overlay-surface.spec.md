@@ -377,6 +377,19 @@ const CHROME_UNBOUNDED_SLOT =
 
 ---
 
+## A11y 預設
+
+overlay-surface 是 **layout pattern**(`SurfaceHeader` / `SurfaceBody` / `SurfaceFooter`),不持有互動行為 — a11y 大宗在 consumer overlay primitive(Dialog / Sheet / Popover / HoverCard)上,由 Radix 處理:
+
+- **Role + ARIA**:Radix `Dialog.Content` / `Popover.Content` / `Sheet.Content` 已自帶 `role="dialog"` + `aria-modal`(modal only)+ `aria-labelledby`(Title)+ `aria-describedby`(optional Description)
+- **Focus trap**:Dialog / Sheet 自帶 modal focus trap;Popover / HoverCard 不 trap(non-modal canonical)
+- **Esc / 點外面關閉**:Radix 處理(可被 `onEscapeKeyDown` / `onPointerDownOutside` 攔截)
+- **AutoFocus on open**:consumer 自管 `onOpenAutoFocus`(Popover 範例:`handlePopoverOpenAutoFocus` 找 body 第一個 interactive 元素,跳過 close X 避免 tooltip leak)
+
+**SurfaceHeader Title 可被 ARIA 關聯**:consumer 把 `id` 傳到 SurfaceHeader 的 Title 元素,Radix Content 用 `aria-labelledby={id}`。本 pattern 不強制 id naming(consumer 自決)。
+
+---
+
 ## 何時不用
 
 - **Toast / Alert**(Family 2 List item 視覺對齊):那是 row-item layout 不是 surface-section,不要套本 pattern。

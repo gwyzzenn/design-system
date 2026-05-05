@@ -9,6 +9,10 @@ sizes:
 traits:
   - hasInteractiveStates
   - isInternal
+benchmark:
+  - Radix Menu primitive: github.com/radix-ui/primitives/tree/main/packages/react/menu
+  - Ant Design Menu: github.com/ant-design/ant-design/tree/master/components/menu
+  - Polaris ActionList: github.com/Shopify/polaris/tree/main/polaris-react/src/components/ActionList
 ---
 
 # MenuItem 設計原則

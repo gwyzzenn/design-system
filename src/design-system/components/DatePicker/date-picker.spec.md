@@ -6,6 +6,10 @@ sizes: {}
 traits:
   - hasInteractiveStates
   - isInputLike
+benchmark:
+  - Ant Design DatePicker: github.com/ant-design/ant-design/tree/master/components/date-picker
+  - MUI X Date Pickers: github.com/mui/mui-x/tree/master/packages/x-date-pickers
+  - react-day-picker: github.com/gpbl/react-day-picker
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->

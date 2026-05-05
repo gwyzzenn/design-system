@@ -5,6 +5,11 @@ variants: {}
 sizes: {}
 traits:
   - isStructural
+benchmark:
+  - Ant Design Table: github.com/ant-design/ant-design/tree/master/components/table
+  - MUI X DataGrid: github.com/mui/mui-x/tree/master/packages/x-data-grid
+  - Polaris IndexTable: github.com/Shopify/polaris/tree/main/polaris-react/src/components/IndexTable
+  - Carbon DataTable: github.com/carbon-design-system/carbon/tree/main/packages/react/src/components/DataTable
 ---
 
 <!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
@@ -59,7 +64,7 @@ TanStack Table 負責邏輯，DataTable 負責視覺與互動。
 | **L1 基礎結構** | 骨架、尺寸、border、色彩、高度模式、行高模式 | ✅ 完成(本文件 L1 段)|
 | **L2 選取** | row selection、checkbox、單/多選、bulk action 整合 | ✅ 完成(本文件 L2 段)|
 | **L3 欄位互動** | 排序(本文件 L3)、resize、reorder、pin、顯示隱藏 | 部分完成(sort 完成,resize/reorder/pin/visibility 待 v2)|
-| **L4 資料操作 + Cell 能力** | 進階篩選(本文件 L4 Filter)、inline edit、nested rows、row drag(本文件 L4 段)| ✅ Filter / Inline edit / Nested rows 完成,row drag API 設計完成 impl 待 v2 |
+| **L4 資料操作 + Cell 能力** | 進階篩選(本文件 L4 Filter)、inline edit、nested rows、row drag(本文件 L4 段)| ✅ Filter / Inline edit / Nested rows / Row drag v1 完成(virtualizer + 3-panel mirror sync 待 v2) |
 | **L5 進階** | 分組、搜尋、tree data v2 enhancements、export CSV/Excel | 待 v2 |
 
 ---
@@ -434,14 +439,22 @@ tableOptions={{ getSubRows, getRowCanExpand, state: { expanded }, onExpandedChan
 - a11y:row `aria-expanded` / `aria-level`
 - Selection cascade:default OFF;`selectionCascade` opt-in 待 v2
 
-### Row drag(Jira-style,API 設計 + impl 待 v2)
+### Row drag(Jira-style,v1 已 ship)
 
-`enableRowDrag?: boolean` + `onRowReorder?: (sourceId, targetId, 'before' | 'after')`。Library:@dnd-kit/sortable(既有)。
+`enableRowDrag?: boolean` + `onRowReorder?: (sourceId, targetId, 'before' | 'after')`。Library:@dnd-kit/sortable + @dnd-kit/core。
 
-- Handle:GripVertical xs iconOnly text,最左(`__select__` 之前),hover-revealed
-- Drop indicator:2px primary 水平線
-- **Sort × Drag 互斥**:sort.length > 0 → drag disabled + Tooltip「排序中無法拖曳」(對齊 Notion / Airtable)
-- Impl pending:虛擬化 + 3-panel 整合複雜,留 v2
+- Handle:GripVertical 14px,最左 synthetic `__drag__` 欄(`__select__` 之前),hover-revealed(`opacity-0 → group-hover/row:opacity-100`)
+- **Sort × Drag 互斥**:sort.length > 0 → drag disabled + Tooltip「排序中無法拖曳,清除排序後可重排」(對齊 Notion / Airtable)
+- **Top-level only**:nested sub-rows(`row.depth > 0`)不在 SortableContext.items;sub-rows 顯示 disabled handle。Cross-parent drop 顯式禁止(同 parent level 才能 reorder)
+- **Position 計算**:active.id vs over.id 視覺位置 → `'after'`(往下拖)/ `'before'`(往上拖),對齊 `@dnd-kit/sortable arrayMove` 慣例
+- **Consumer-managed mutation**:onRowReorder callback 收 (sourceId, targetId, position),consumer 自管 data array splice + state update(對齊 Notion / Airtable / Linear pattern,DS 不持有 row order state)
+- **必填 `getRowId`**:enableRowDrag 為 true 時必傳 `getRowId`,用穩定 row identity 對應 sourceId / targetId。否則 dnd 用 row.index 會在 reorder 後錯位
+
+#### v1 已知限制(待 v2 修)
+
+- **Virtualizer × transform 互動**:長 list 拖動時 `useVirtualizer.measureElement` 跟 `useSortable transform` 可能錯位。短 list (< 50 rows)無感
+- **3-panel mirror 不同步**:有 pinnedLeft 或 pinnedRight 時,只 primary region(left 優先,fallback center)的 row 視覺跟動 transform;mirror region 拖動時不跟隨。完整 sync 需 shared row-translation ref + `useSyncExternalStore`,留 v2
+- **Cross-parent drop**:nested rows 場景,目前只能在同 top-level scope 內重排;子層 row 不能拖到別的 parent 下,留 v2
 
 ---
 

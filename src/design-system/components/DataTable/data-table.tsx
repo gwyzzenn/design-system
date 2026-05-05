@@ -124,7 +124,13 @@ export interface DataTableProps<TData>
    * Sort × Drag 互斥:`sorting.length > 0` 時 drag handle 視覺 disabled + Tooltip
    * 「排序中無法拖曳,清除排序後可重排」。對齊 Notion / Airtable 共識。
    *
-   * **v1 限制**:non-virtualized 模式 only。virtualization + 3-panel pinned 整合留 v2。
+   * **必填 `getRowId`**:enableRowDrag 為 true 時 consumer 必傳 `getRowId`,用穩定 row identity 作 dnd source / target id。否則 dnd 用 row.index 會在 reorder 後錯位(runtime 不會 throw,但 reorder 行為不正確)。
+   *
+   * **v1 已知限制**:
+   * - Virtualizer × transform 互動:長 list (> 50 rows) 拖動可能 measureElement 錯位
+   * - 3-panel mirror sync:只 primary region row 跟動 transform;mirror region 不跟隨
+   * - Cross-parent drop:nested rows 子層只能在同 parent scope 重排,不能跨 parent
+   *
    * 詳 `data-table.spec.md`「L4 Row drag」段。
    */
   enableRowDrag?: boolean

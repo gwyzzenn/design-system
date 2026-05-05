@@ -97,6 +97,10 @@ sm 與 md 視覺相同（純命名 mapping，對齊 Field family）。
 
 詳見 `../Field/field-controls.spec.md`(Mode / Validation)+ `../Field/form-validation.spec.md`(驗證時機)。三 mode 的色彩 / 互動 / aria 規則 Textarea 全部對齊。
 
+### Controlled / Uncontrolled(M26)
+
+native `<textarea>` 自帶 `value` / `defaultValue` / `onChange` triplet — Textarea 是 thin wrapper 直接 forward。3 模式:uncontrolled(只 `defaultValue`)/ controlled(`value` + `onChange`)/ read-only(走 `readOnly` prop,Radix-style)。autoResize 與兩模式都相容(內部 layoutEffect 量 scrollHeight,不影響 value source)。
+
 ### Readonly 特例
 
 不同於 Input 的 readonly（同高度、緊湊底色），Textarea readonly **保留邊框與 padding**——多行內容需要明確的閱讀區域邊界訊號,移除邊框後無法與周圍純文字內容區分。

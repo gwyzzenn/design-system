@@ -6,6 +6,11 @@ sizes: {}
 traits:
   - hasInteractiveStates
   - isInputLike
+benchmark:
+  - Ant Design Input: github.com/ant-design/ant-design/tree/master/components/input
+  - MUI TextField: github.com/mui/material-ui/tree/master/packages/mui-material/src/TextField
+  - Polaris TextField: github.com/Shopify/polaris/tree/main/polaris-react/src/components/TextField
+  - Carbon TextInput: github.com/carbon-design-system/carbon/tree/main/packages/react/src/components/TextInput
 ---
 
 # Input 設計原則

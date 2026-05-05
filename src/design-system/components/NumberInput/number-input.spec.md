@@ -6,6 +6,9 @@ sizes: {}
 traits:
   - hasInteractiveStates
   - isInputLike
+benchmark:
+  - Ant Design InputNumber: github.com/ant-design/ant-design/tree/master/components/input-number
+  - MUI TextField (number): github.com/mui/material-ui/tree/master/packages/mui-material/src/TextField
 ---
 
 # NumberInput 設計原則

@@ -6,6 +6,10 @@ sizes: {}
 traits:
   - hasInteractiveStates
   - isInternal
+benchmark:
+  - react-day-picker (shadcn Calendar base): github.com/gpbl/react-day-picker
+  - Ant Design DatePicker: github.com/ant-design/ant-design/tree/master/components/date-picker
+  - MUI X Date Pickers: github.com/mui/mui-x/tree/master/packages/x-date-pickers
 ---
 
 <!-- M22 retrofit DONE 2026-05-03 v11(real source URLs added inline below)-->
