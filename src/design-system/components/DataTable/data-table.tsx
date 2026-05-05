@@ -403,7 +403,9 @@ function DataTableInner<TData>(
     [onCellCommit],
   )
   // 判 column meta.editable 對特定 row 是否成立(支援 fn)
+  // column meta 是 free-form consumer bag(同 renderTypedValue any policy),不適合窄型化
   const isCellEditable = React.useCallback(
+    // any-allow: free-form consumer meta — same rationale as L143 renderTypedValue
     (meta: Record<string, any> | undefined, row: unknown): boolean => {
       const e = meta?.editable
       if (typeof e === 'function') return e(row) === true

@@ -135,7 +135,7 @@ CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap
 
 # 失敗記憶索引(技術沉默陷阱 only)
 
-設計判斷類已被 M1-M20 吸收(見 `.claude/rules/meta-patterns.md`);具體歷史詳 `.claude/skills/design-system-audit/references/historical-bugs.md`。
+設計判斷類已被 M1-M25 吸收(見 `.claude/rules/meta-patterns.md`);具體歷史詳 `.claude/skills/design-system-audit/references/historical-bugs.md`。
 
 | 技術陷阱 | 一行 anchor |
 |--------|-----------|
@@ -157,7 +157,7 @@ Vite + React + TypeScript + Tailwind v4 + shadcn/ui + Storybook + 自訂 Design 
 
 僅在相關檔案打開時載入,降低本檔 token 成本:
 
-- `.claude/rules/meta-patterns.md` — 20 M-rules(always loads,fundamental)
+- `.claude/rules/meta-patterns.md` — 25 M-rules(always loads,fundamental)
 - `.claude/rules/spec-rules.md` — paths: `**/*.spec.md` + `src/design-system/**`
 - `.claude/rules/ui-development.md` — paths: `**/*.tsx` + `**/*.ts`(含 Tailwind / Token / Props 命名 / shadcn)
 - `.claude/rules/story-rules.md` — paths: `**/*.stories.tsx`(三層定位 + Title + 範例最高準則)
