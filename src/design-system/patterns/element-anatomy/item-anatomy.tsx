@@ -583,12 +583,26 @@ export interface ItemInlineActionButtonProps
    * Use case:Tag solid(blue/green/red 等)需 hover bg 跟 host 色相一致(非 neutral)。
    */
   hoverBgClassName?: string
+  /**
+   * 標記本 button 是 **overlay trigger**(DropdownMenu / Popover / Tooltip 透過 `asChild` 包覆)。
+   *
+   * `true` 時:Radix overlay open 期間(`data-state="open"`)button 維持 host hover 樣式
+   * — 視覺鎖,讓 user 追溯 floating panel 來源(對齊 shadcn / Radix Themes / Material)。
+   *
+   * `false` 時(default):無 data-state=open 樣式 — 適用 in-place 互動如 `Collapsible.Trigger`
+   * (展開內容接在 trigger 下方,不需追溯)、drag handle、dismiss X 等。
+   *
+   * Canonical 詳 `inline-action.spec.md`「Overlay trigger canonical」段。
+   *
+   * @default false
+   */
+  overlayTrigger?: boolean
 }
 
 export const ItemInlineActionButton = React.forwardRef<
   HTMLButtonElement,
   ItemInlineActionButtonProps
->(({ icon: Icon, className, iconClassName, style, type = "button", size: sizeProp, hoverBgClassName, ...rest }, ref) => {
+>(({ icon: Icon, className, iconClassName, style, type = "button", size: sizeProp, hoverBgClassName, overlayTrigger = false, ...rest }, ref) => {
   const contextSize = useRowSize()
   const size = sizeProp ?? contextSize
   const iconPx = ICON_SIZE[size]
@@ -600,10 +614,10 @@ export const ItemInlineActionButton = React.forwardRef<
       className={cn(
         "group/action relative grid place-content-center shrink-0 cursor-pointer",
         "text-fg-muted hover:text-foreground active:text-foreground transition-colors",
-        // Overlay trigger active state(Radix 自動 set data-state=open on asChild trigger)
-        // — 維持 host hover 樣式(canonical 2026-05-02 改:對齊 shadcn/Radix/Material 狀態
-        // 極簡派,不另開 selected 4%,跨 host 一致性高)
-        "data-[state=open]:text-foreground",
+        // Overlay trigger active state — 只在 consumer 顯式宣告 overlayTrigger=true 時生效
+        // (canonical 2026-05-05:Collapsible / drag / dismiss 等 in-place 互動 ≠ overlay,
+        // 不應 leak 視覺 lock。詳 inline-action.spec.md「Overlay trigger canonical」)
+        overlayTrigger && "data-[state=open]:text-foreground",
         "focus-visible:outline-2 focus-visible:outline-ring",
         className
       )}
@@ -617,8 +631,8 @@ export const ItemInlineActionButton = React.forwardRef<
           "rounded-md",
           "bg-transparent",
           hoverBgClassName ?? "group-hover/action:bg-neutral-hover group-active/action:bg-neutral-active",
-          // Overlay 開啟 = 維持 host hover bg(對齊上方 text 顏色策略)
-          "group-data-[state=open]/action:bg-neutral-hover",
+          // Overlay 開啟 = 維持 host hover bg(只在 overlayTrigger=true 時生效)
+          overlayTrigger && "group-data-[state=open]/action:bg-neutral-hover",
           "transition-colors"
         )}
         style={{

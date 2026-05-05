@@ -230,6 +230,7 @@ const ZoomInput: React.FC<ZoomInputProps> = ({ value, onChange, onFit, labels })
                 icon={ChevronDown}
                 aria-label={labels.zoomMenu}
                 size="sm"
+                overlayTrigger
               />
             </DropdownMenuTrigger>
           }

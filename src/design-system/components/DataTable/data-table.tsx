@@ -1200,6 +1200,7 @@ function DataTableInner<TData>(
                 icon={ChevronDown}
                 size="md"
                 aria-label={`${typeof header.column.columnDef.header === 'string' ? header.column.columnDef.header : header.column.id} 欄位選單`}
+                overlayTrigger
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
