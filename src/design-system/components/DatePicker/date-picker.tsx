@@ -4,7 +4,7 @@ import * as React from 'react'
 import { X, Calendar as CalendarIcon, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
-import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
+import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY, nakedCellRowModeAlign } from '@/design-system/components/Field/field-wrapper'
 import { ItemInlineAction } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { Popover, PopoverTrigger, PopoverAnchor, PopoverContent } from '@/design-system/components/Popover/popover'
 import { DateGrid } from '@/design-system/components/DateGrid/date-grid'
@@ -679,7 +679,7 @@ const DatePickerRange = React.forwardRef<HTMLDivElement, DatePickerRangeProps>(
       const hasAny = !!(startIso || endIso)
       if (!hasAny) return <span className={cn('text-fg-muted', className)}>{EMPTY_DISPLAY}</span>
       return (
-        <span className={cn('inline-flex items-center min-w-0', className)}>
+        <span className={cn('inline-flex items-center min-w-0', nakedCellRowModeAlign, className)}>
           <span className={cn('truncate', !startIso && 'text-fg-muted')}>
             {startIso ? formatDateOrDateTime(startIso, showTime, showSeconds, { formatOptions, locale }) : resolvedPlaceholder[0]}
           </span>

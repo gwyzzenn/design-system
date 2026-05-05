@@ -115,25 +115,24 @@ const textareaVariants = cva(
       },
       // naked chrome × mode — cell-as-input substrate(對齊 fieldWrapperStyles naked 規則)。
       //   `!h-full !resize-none`:fill cell box(host cell 控高,user 不該手動 resize)。
+      //   **state ring 用 box-shadow inset**(2026-05-05 v3 user canonical)— 不用 border,
+      //     避免 row 變高 + 圓角 corner gap。`!rounded-none` 對齊 cell square edge。
       //   **edit mode 反向接管 cell padding**(`!py-[var(--table-cell-py)] !px-[var(--table-cell-px)]`):
-      //     host cell editing 時 padding=0(讓 Textarea 邊框與 table divider 無縫接軌),
-      //     Textarea 內部加回相同 padding → 內容 Y / X 位置 = display mode(切 mode 文字 0 px shift)。
-      //     A4 canonical「框框跟 cell 一樣大並取代 cell 的框且與 table 隔線無縫接軌」(2026-05-05)。
+      //     host cell editing 時 padding=0,Textarea 內部加回相同 padding → 切 mode 文字 0 px shift。
       //   display / readonly / disabled `!px-0 !py-0`:host cell 仍有 padding,Textarea 不重複加。
-      //   edit mode 自帶 state ring(focus-within → border-primary)— 對齊 user「狀態樣式取決於原輸入框」。
       {
         mode: 'edit',
         variant: 'naked',
         className: [
-          'bg-transparent border border-transparent !h-full !resize-none',
+          'bg-transparent !border-0 !rounded-none !h-full !resize-none',
           '!px-[var(--table-cell-px)] !py-[var(--table-cell-py)]',
-          'hover:border-border',
-          'focus-visible:border-primary focus-visible:hover:border-primary',
+          'hover:shadow-[inset_0_0_0_1px_var(--border)]',
+          'focus-visible:shadow-[inset_0_0_0_2px_var(--primary)] focus-visible:hover:shadow-[inset_0_0_0_2px_var(--primary)]',
         ],
       },
-      { mode: 'display', variant: 'naked', className: 'bg-transparent border border-transparent !h-full !resize-none !px-0 !py-0' },
-      { mode: 'readonly', variant: 'naked', className: 'bg-transparent border border-transparent !h-full !resize-none !px-0 !py-0' },
-      { mode: 'disabled', variant: 'naked', className: 'bg-transparent border border-transparent cursor-not-allowed opacity-disabled text-fg-disabled !h-full !resize-none !px-0 !py-0' },
+      { mode: 'display', variant: 'naked', className: 'bg-transparent !border-0 !rounded-none !h-full !resize-none !px-0 !py-0' },
+      { mode: 'readonly', variant: 'naked', className: 'bg-transparent !border-0 !rounded-none !h-full !resize-none !px-0 !py-0' },
+      { mode: 'disabled', variant: 'naked', className: 'bg-transparent !border-0 !rounded-none cursor-not-allowed opacity-disabled text-fg-disabled !h-full !resize-none !px-0 !py-0' },
     ],
     defaultVariants: {
       mode: 'edit',

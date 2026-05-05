@@ -167,6 +167,21 @@ const SELECT_COL_ID = '__select__'
 const cellPadding: React.CSSProperties = { paddingBlock: 'var(--table-cell-py)', paddingInline: 'var(--table-cell-px)' }
 const HEADER_BG = 'bg-muted'
 
+// Column sizing canonical(2026-05-05 user E rule + Notion / Airtable / AG Grid 共識):
+//   - column.getCanResize() === true  → fixed width = column.getSize()(尊重 user 拖拉設定)
+//   - column.getCanResize() === false → flex-grow:1 + minWidth = configured size(吃剩餘寬,
+//     對齊 Notion / Airtable「最後 column flex fill」canonical;預設最後 column auto !resizable)
+//   - maxSize 一律 forward 為 maxWidth(防止 flex 列無限擴張)
+function columnSizeStyle(col: { getCanResize: () => boolean; getSize: () => number; columnDef: { minSize?: number; maxSize?: number } }): React.CSSProperties {
+  const baseSize = col.getSize()
+  const minSize = col.columnDef.minSize ?? baseSize
+  const maxSize = col.columnDef.maxSize
+  if (col.getCanResize()) {
+    return { width: baseSize, minWidth: col.columnDef.minSize, maxWidth: maxSize }
+  }
+  return { flex: '1 1 0%', minWidth: minSize, maxWidth: maxSize }
+}
+
 // ── TruncateCell ─────────────────────────────────────────────────────────────
 // Shared ResizeObserver(2026-04-22 D3 perf audit):從 per-cell RO 改為全 DS 共用一個 RO
 // dispatch 到 per-element callback。10 col × 100 row = 1 RO(before:1000 RO)。
@@ -484,8 +499,18 @@ function DataTableInner<TData>(
 
   // 注入 checkbox column(L2 selection;L4 row drag handle 不佔 column,absolute 浮在 row 左 border)
   // 順序:[__select__?, ...consumer columns]
+  // **Last-column flex-fill canonical**(2026-05-05 user E rule + Notion/Airtable 對照):
+  //   最後一個 consumer column 預設 `enableResizing: false`(consumer 沒顯式設過時),配合下方
+  //   cell 樣式「!canResize → flex: 1 1 0%」自動撐滿容器右緣(對齊 Notion / Airtable canonical:
+  //   table 永遠撐滿 container,最後 column 吃剩餘寬;user 顯式 resize=true 才 fixed width)。
   const columnsWithSelection = React.useMemo(() => {
-    if (!enabled) return columns
+    const consumerColsAuto = columns.map((c, idx) => {
+      if (idx === columns.length - 1 && c.enableResizing === undefined) {
+        return { ...c, enableResizing: false }
+      }
+      return c
+    })
+    if (!enabled) return consumerColsAuto
     const selectCol: ColumnDef<TData, any> = {
       id: SELECT_COL_ID,
       size: 40,
@@ -495,7 +520,7 @@ function DataTableInner<TData>(
       header: 'Select',  // header cell 由下方自訂 render 取代
       cell: () => null,  // body cell 由下方自訂 render 取代
     }
-    return [selectCol, ...columns]
+    return [selectCol, ...consumerColsAuto]
   }, [columns, enabled])
 
   // pinned-left 自動加 __select__(__select__ 永遠最左)
@@ -600,16 +625,22 @@ function DataTableInner<TData>(
       const ext = defaultRangeExtractor(range)
       const id = activeDragIdRef.current
       if (!id) return ext
-      // B3 fix(2026-05-05 v5):drag 進行中,user scroll past viewport → virtualizer range 重算 →
-      // 新 ext 與舊 ext 差集 rows mount/unmount → useSortable subscription 變動 → 下游 rows
-      // transform 重算 → 視覺閃爍(user reports「下方 table row 不斷閃動」)。
-      // Pragmatic fix:drag 期間 return all indices(禁用 virtualization)。對齊 Notion / Airtable
-      // 共識(drag 期間不 virtualize,user 通常拖幾秒不會 perf 痛點)。Drag 結束 → revert virtualize。
-      // SSOT-vs-DragOverlay:DragOverlay portal 才是 canonical(虛擬化 + drag 解耦),但需要
-      // 跨 3-region(left/center/right)portal-render full row + sticky pin column 跟動 — 大改。
-      // 此 pragmatic fix 0 侵入,先消閃爍;後續若 row count > 10k 才走 DragOverlay。
+      // B3 fix v6(2026-05-05):windowed sticky — pin active drag idx ± WINDOW(=50)+ default ext。
+      // 撤回 v5 pin-all(`Array.from(length: total)`)— 200 row × 3 region useSortable subscription
+      // 同 commit 階段 jank → 視覺空白(user reports 圖二 empty body area)。
+      // 真正 canonical = `<DragOverlay>` portal(decouple drag visual from sortable list),但需要
+      // 改 3-region row render 為 portal-friendly clone shape。本 windowed 方案 0 invasive,perf
+      // ~100 row max mounted(viewport ~20 + window ±50),可接受。後續 row count > 10k 才走
+      // DragOverlay portal canonical。
+      const idx = rowsRef.current.findIndex(r => r.id === id)
+      if (idx < 0 || ext.includes(idx)) return ext
+      const WINDOW = 50
       const total = rowsRef.current.length
-      return Array.from({ length: total }, (_, i) => i)
+      const lo = Math.max(0, idx - WINDOW)
+      const hi = Math.min(total - 1, idx + WINDOW)
+      const pinned: number[] = []
+      for (let i = lo; i <= hi; i++) pinned.push(i)
+      return Array.from(new Set([...ext, ...pinned])).sort((a, b) => a - b)
     },
     []
   )
@@ -837,7 +868,7 @@ function DataTableInner<TData>(
           key={cell.id}
           role="cell"
           className={cn('flex items-center justify-center shrink-0', !isDisabled && 'cursor-pointer')}
-          style={{ width: cell.column.getSize(), ...cellPadding }}
+          style={{ ...columnSizeStyle(cell.column), ...cellPadding }}
           onClick={onCellClick}
         >
           {mode === 'single' ? (
@@ -930,9 +961,7 @@ function DataTableInner<TData>(
           isEditingThisCell && 'z-10',
         )}
         style={{
-          width: cell.column.getSize(),
-          minWidth: cell.column.columnDef.minSize,
-          maxWidth: cell.column.columnDef.maxSize,
+          ...columnSizeStyle(cell.column),
           ...(isEditingThisCell ? {} : cellPadding),
         }}
         onClick={onEditableCellClick}
@@ -961,10 +990,16 @@ function DataTableInner<TData>(
             )}
           </span>
         )}
-        {/* `self-stretch`:span 強制填 cell 全高(覆蓋 cell items-center / items-start 對 span
-            的 cross-axis 約束),Field naked `!h-full` 才有 definite parent height 解析。
-            indicator 是 sibling,跟 cell items-X 走(fixed=center / autoRow=start per spec)。 */}
-        <span className={cn('flex-1 min-w-0 self-stretch flex', align === 'right' && 'justify-end')}>
+        {/* `self-stretch`:span 強制填 cell 全高,Field naked `!h-full` 才有 definite parent height。
+            inner span items-X **mirror cell**(autoRow → start / fixed → center)— 確保非 Field
+            content(Checkbox / inline 內容)在兩 mode 視覺位置正確,Field naked content 也跟著走
+            cell row-mode(透過 group-data SSOT 進一步傳遞到 Field 內部 wrapper,M19 ensure-canonical)。
+            indicator 是 sibling 跟 cell items-X 走(fixed=center / autoRow=start per spec)。 */}
+        <span className={cn(
+          'flex-1 min-w-0 self-stretch flex',
+          autoRowHeight ? 'items-start' : 'items-center',
+          align === 'right' && 'justify-end',
+        )}>
           {renderCellContent(cell)}
         </span>
         {indicator}
@@ -1092,7 +1127,7 @@ function DataTableInner<TData>(
           key={header.id}
           role="columnheader"
           className={cn('flex items-center justify-center shrink-0 select-none', !isHeaderDisabled && 'cursor-pointer')}
-          style={{ width: header.getSize(), ...cellPadding }}
+          style={{ ...columnSizeStyle(header.column), ...cellPadding }}
           onClick={isHeaderDisabled ? undefined : (e) => { e.stopPropagation(); toggleHeaderCheckbox() }}
         >
           {mode === 'multi' && (
@@ -1134,7 +1169,7 @@ function DataTableInner<TData>(
           align === 'right' && 'justify-end',
           align === 'center' && 'justify-center',
         )}
-        style={{ width: header.getSize(), minWidth: header.column.columnDef.minSize, maxWidth: header.column.columnDef.maxSize, ...cellPadding }}
+        style={{ ...columnSizeStyle(header.column), ...cellPadding }}
       >
         {/* 左區:label + sort indicator(整區 click → toggle sort;Shift+click 加 secondary,enableMultiSort 啟用時) */}
         <div

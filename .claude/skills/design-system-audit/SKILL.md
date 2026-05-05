@@ -139,6 +139,7 @@ Grouped by theme. Each runs as an independent subagent; many can parallelize.
 |---|-------|-----------------|
 | 34 | **Disabled state 顯著性 precedence**(M24)| DS-wide grep 所有 Field family + 任何含 `placeholder:text-fg-muted` / `<span className="text-fg-muted">{placeholder ?? ...}</span>` 的 tsx,反向確認:對應 disabled state 是否有 `disabled:placeholder:text-fg-disabled` / `group-data-[field-mode=disabled]/field:` group selector / `resolvedMode === 'disabled' ? 'text-fg-disabled' : ...` JSX 條件。違反 = disabled 元件內 placeholder 仍 muted color → user 看 disabled 內容比 element 對比強(視覺反而 emphasis)。Hook `check_disabled_placeholder_color.sh` write-time 攔,本 dim batch verify 既有元件 |
 | 35 | **Layered chain invariant — overlay scroll**(M25)| DS-wide grep `<PopoverContent\|<HoverCardContent\|<DialogContent\|<SheetContent` consumer,確認所有中間 wrapper 含 `<SurfaceBody>` 時,wrapper className 是否含 `flex flex-col h-full`。Chain 任何一層斷 → SurfaceBody flex-1 失效 → body 不 scroll(Filter / Sort panel 2026-05-04 真實 bug)。Hook `check_overlay_panel_scroll_chain.sh` write-time 攔,本 dim batch verify 既有 panels |
+| 36 | **Naked variant cell-as-input row-mode propagation**(M19,2026-05-05 新增)| DS-wide grep `variant.*naked` consumer 元件,確認**所有內部 wrapper**(`inline-flex items-center` / `flex items-center` 在 inline 容器中)有 import + apply `nakedCellRowModeAlign` SSOT(`field-wrapper.tsx` const)。違反 = autoRow 場景下視覺垂直置中,跟其他純文字 cell baseline 漂移(2026-05-05 PeoplePicker / Combobox / DatePicker range 真實 bug)。Hook `check_naked_row_mode_propagation.sh` write-time 攔,本 dim batch verify 既有 + 未來新增 cell-as-input 元件 |
 
 ---
 

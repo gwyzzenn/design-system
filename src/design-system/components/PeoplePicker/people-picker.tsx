@@ -2,7 +2,7 @@ import * as React from 'react'
 import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
-import { fieldWrapperStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
+import { fieldWrapperStyles, EMPTY_DISPLAY, nakedCellRowModeAlign } from '@/design-system/components/Field/field-wrapper'
 import { useFieldContext } from '@/design-system/components/Field/field-context'
 import { PersonDisplay, MultiPersonDisplay, buildPersonNameCard, resolvePerson, type PersonValue } from './person-display'
 import { SelectMenu, type SelectMenuOption } from '@/design-system/components/SelectMenu/select-menu'
@@ -114,7 +114,7 @@ const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(functio
         data-field-mode={resolvedMode}
         {...props}
       >
-        <span className={cn('flex-1 min-w-0 inline-flex items-center', resolvedMode === 'disabled' && 'text-fg-disabled')}>
+        <span className={cn('flex-1 min-w-0 inline-flex items-center', nakedCellRowModeAlign, resolvedMode === 'disabled' && 'text-fg-disabled')}>
           {isEmpty
             ? <span className="text-fg-muted">{EMPTY_DISPLAY}</span>
             : isMulti
@@ -172,7 +172,7 @@ const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(functio
       data-field-mode="edit"
       {...props}
     >
-      <span className="flex-1 min-w-0 inline-flex items-center">
+      <span className={cn('flex-1 min-w-0 inline-flex items-center', nakedCellRowModeAlign)}>
         {isEmpty
           ? <span className="text-fg-muted">選擇...</span>
           : isMulti

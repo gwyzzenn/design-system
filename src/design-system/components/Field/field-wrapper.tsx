@@ -114,14 +114,16 @@ export const fieldWrapperStyles = cva(
       },
       // naked variant — cell-as-input substrate(Notion / Airtable / Excel canonical)
       //   - `!h-full`: Field 框框 = host cell box(frame 填 cell)
-      //   - **edit mode 自帶 cell padding**(`!py-[var(--table-cell-py)] !px-[var(--table-cell-px)]`):
-      //     host cell 在 editing 時 padding=0(讓 Field 邊框與 table divider 無縫接軌),
-      //     Field 內部反向接管 padding → 內容 Y / X 位置 = display mode(切 mode 文字 0 px shift)。
-      //     對齊 user canonical「框框跟 cell 一樣大並取代 cell 的框且與 table 隔線無縫接軌」。
+      //   - **state ring 用 box-shadow inset**(2026-05-05 v3 user canonical):
+      //     不用 `border` — border 會吃 2px 高度 → row 變高 + 圓角 corner gap。
+      //     box-shadow inset 不佔 layout(M24 invariant: ring not affecting box height),
+      //     `!rounded-none` 配合 sharp corner 對齊 cell square edge,完全蓋過 table divider。
+      //     世界級對照:Notion / Airtable / Excel cell focus = inset shadow / outline,**非 border**。
+      //   - **edit mode 反向接管 cell padding**(`!py-[var(--table-cell-py)] !px-[var(--table-cell-px)]`):
+      //     host cell editing 時 padding=0(讓 ring 與 table divider 同一像素 seamless),
+      //     Field 內部接管 padding → 內容 Y / X 位置 = display mode(切 mode 文字 0 px shift)。
       //   - display / readonly / disabled `!px-0 !py-0`:host cell 仍有 padding,Field 不重複加。
-      //   - **edit mode 自帶 state ring**(user reminder「狀態樣式取決於原輸入框」):
-      //     hover / focus-within / data-[state=open] 各自 fire border 變化(取代 cell border-r divider)
-      //   - **內 alignment 從 host cell 取**(group-data-[row-mode]/cell):
+      //   - **內 alignment 從 host cell 取**(`nakedCellRowModeAlign` SSOT):
       //     autoRowHeight (row-mode=auto) → !items-start(頂對齊 per spec)
       //     fixed       (row-mode=fixed) → 預設 items-center(置中 per spec)
       //     每個 mode 內 display↔edit 自然同位置(同 Field 同 group → 同 items)
@@ -129,19 +131,19 @@ export const fieldWrapperStyles = cva(
         mode: 'edit',
         variant: 'naked',
         className: [
-          'bg-transparent border border-transparent !gap-0 !h-full',
+          'bg-transparent !border-0 !rounded-none !gap-0 !h-full',
           '!px-[var(--table-cell-px)] !py-[var(--table-cell-py)]',
           'group-data-[row-mode=auto]/cell:!items-start',
-          'hover:border-border',
-          'focus-within:border-primary focus-within:hover:border-primary',
-          'data-[state=open]:border-border-hover',
+          'hover:shadow-[inset_0_0_0_1px_var(--border)]',
+          'focus-within:shadow-[inset_0_0_0_2px_var(--primary)] focus-within:hover:shadow-[inset_0_0_0_2px_var(--primary)]',
+          'data-[state=open]:shadow-[inset_0_0_0_1px_var(--border-hover)]',
         ],
       },
       {
         mode: 'display',
         variant: 'naked',
         className: [
-          'bg-transparent border border-transparent !px-0 !py-0 !gap-0 !h-full',
+          'bg-transparent !border-0 !rounded-none !px-0 !py-0 !gap-0 !h-full',
           'group-data-[row-mode=auto]/cell:!items-start',
         ],
       },
@@ -149,7 +151,7 @@ export const fieldWrapperStyles = cva(
         mode: 'readonly',
         variant: 'naked',
         className: [
-          'bg-transparent border border-transparent !px-0 !py-0 !gap-0 !h-full',
+          'bg-transparent !border-0 !rounded-none !px-0 !py-0 !gap-0 !h-full',
           'group-data-[row-mode=auto]/cell:!items-start',
         ],
       },
@@ -157,7 +159,7 @@ export const fieldWrapperStyles = cva(
         mode: 'disabled',
         variant: 'naked',
         className: [
-          'bg-transparent border border-transparent cursor-not-allowed opacity-disabled !px-0 !py-0 !gap-0 !h-full',
+          'bg-transparent !border-0 !rounded-none cursor-not-allowed opacity-disabled !px-0 !py-0 !gap-0 !h-full',
           'group-data-[row-mode=auto]/cell:!items-start',
         ],
       },
@@ -188,6 +190,25 @@ export const bareInputStyles = [
   'group-data-[field-mode=disabled]/field:placeholder:text-fg-disabled',
   'group-data-[field-mode=disabled]/field:text-fg-disabled',
 ].join(' ')
+
+// ── Naked Variant Cell Row-Mode Alignment Propagation ──────────────────────
+// SSOT canonical(M19 / 2026-05-05):cell-as-input naked variant 元件**所有內部
+// wrapper**(`<span>` 包 Avatar+name 等)必 import + apply 此 SSOT,host cell
+// `data-row-mode` 屬性自動 propagate alignment(autoRow → items-start / fixed → items-center)。
+//
+// 不 propagate 的後果:autoRow 場景下 People / Select / Combobox 內部用
+// `inline-flex items-center` hardcode → 視覺垂直置中於 wrapper 自身高度,**沒**頂對齊
+// → 跟其他純文字 cell baseline 視覺漂移。
+//
+// 世界級對照:
+//   - HTML <td> default `vertical-align: baseline`(瀏覽器自動 first-baseline align)
+//   - AG Grid `cellStyle` + `cellRendererSelector`,row context 共享(closed source 部分)
+//   - Material X-Grid `gridClasses.cell` wrapper 不允許 cell content override alignment
+//   - Notion / Airtable cell content 從 host 繼承,不 hardcode self alignment
+//
+// Hook:`check_naked_row_mode_propagation.sh`(write-time BLOCKER)
+// Audit:design-system-audit Group N M27(periodic batch verify)
+export const nakedCellRowModeAlign = 'group-data-[row-mode=auto]/cell:items-start'
 
 // ── Empty Value Display ─────────────────────────────────────────────────────
 

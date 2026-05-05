@@ -390,15 +390,18 @@ function UrlCell({ value, meta, mode, size, isEditable, onRequestEdit, onCommit,
       </span>
     )
   }
-  // edit mode:用 LinkInput edit(URL validation + hostname 顯示一致)
+  // edit mode value pre-fill canonical(2026-05-05):LinkInput edit `value` prop 強制 controlled
+  // (line 113 `useState(value ?? '')`)+ `showLink = !editing && hasValidValue` 預設顯 link 不顯 input
+  // → cell-as-input editing 場景需要 input 直接 focus 編輯。改用 plain `<Input>`(uncontrolled
+  // `defaultValue` 正確 pre-fill,Input.tsx `value={value}` 是 undefined → uncontrolled 走 defaultValue)。
+  // URL 驗證等 deferred 到 commit phase(consumer 可在 onCommit 時 validate)。
   return (
-    <LinkInput
+    <Input
       autoFocus
       variant="naked"
       size={sizeForInput(size)}
       defaultValue={value != null ? String(value) : ''}
-      label={meta?.linkLabel}
-      onBlur={(e) => onCommit?.((e.target as HTMLInputElement).value)}
+      onBlur={(e) => onCommit?.(e.target.value)}
       onKeyDown={makeKeyHandler(onCommit, onCancel)}
     />
   )
