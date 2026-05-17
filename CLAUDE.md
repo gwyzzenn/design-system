@@ -97,7 +97,7 @@ CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap
 
 # Git solo-work canonical(SSOT → `.claude/memory/feedback_solo_dev_workflow.md`)
 
-**1 chat = 1 working branch**;**Netlify preview 是 user gate**;**「push」/「OK」trigger 才 merge main**。
+**1 chat = 1 working branch**;**Netlify preview 是 user gate**;**「push」/「OK」trigger 才 merge main**。**Session-start 必先 grep canonical + 開 working branch,禁直接在 main 上 edit production code**(M28 sub-rule,hook `check_main_branch_workbench.sh` mechanical 攔截)。
 
 | 步驟 | 動作 |
 |------|------|
