@@ -164,17 +164,15 @@ target PR:當前 working branch 的 PR(`mcp__github__list_pull_requests` 找到 
 
 ### Step 4.5:**獨立 verify codex 具體 claim**(不可省 — anti-pass-through)
 
-**Why this exists**:Step 4 只 check 表面 cite / namespace,**不 verify codex 結論本身對不對**。
-歷史:2026-05-07 codex infra audit reply 給「7 anti-bloat 機制重疊」結論,我直接列 A/B/C 給 user 拍板,沒 grep verify → user 發現我退化成 pass-through。**Step 4.5 強制 verify 阻止這個 anti-pattern**。
-
-**強制動作**(逐條 codex 具體 claim 過):
-1. **Grep DS-internal**:codex 指的 file / token / pattern 真存在?用 `grep -rn "${claim}"` 確認
-2. **WebFetch external**(若 codex cite world-class):URL 真有寫 codex 引用的內容?(對 high-stakes claim 必跑)
-3. **Run script**(若 codex 給數字):codex 給「28→16 hooks」這種具體 target,我自己跑分析腳本核對 reachable 數字
-4. **Counter-example scan**:codex 說「X 是 anti-pattern」→ 我 grep 看 DS 是否已用此 pattern 且 work fine(反證)
-5. **記錄 verification result**:每條 claim 標 `✅ verified` / `❌ FALSE` / `⚠️ partial`,理由附旁
-
-**禁止**:跳過 Step 4.5 直接列 A/B/C 給 user 拍板 = pass-through 退化,違反本 SKILL invariant。
+**Why**:Step 4 只 check 表面 cite,不 verify codex 結論。錨 2026-05-07 `775d879` pass-through + 2026-05-19 6+ 條讀前 N 行就斷 truncated(SSOT `memory/codex_collab_backfill_2026-05-19.md`)。
+**強制動作**(逐條 claim):
+0. **Last-verdict gate**(MUST 先跑):`tail -n 240 reply.md` grep `Verdict|tokens used|採納` 必命中;Read `--offset=$((total-240)) --limit=240`。禁讀前 N 行就斷 truncated。
+1. **Grep DS-internal**:codex 指的 file/token/pattern 真存在?`grep -rn` 確認
+2. **WebFetch external**:codex cite world-class URL → fetch 真內容(high-stakes 必跑)
+3. **Run script**:codex 給數字(「28→16」)→ 跑腳本核對
+4. **Counter-example scan**:codex 說「X anti-pattern」→ grep DS 是否已用且 work
+5. **記錄**:每 claim 標 `✅ verified` / `❌ FALSE` / `⚠️ partial`
+**禁止**:跳 Step 4.5 直接列 A/B/C = pass-through;跳 step 0 讀前 N 行斷 truncated。
 
 ### Step 4.6:**Regression / 連動 scan on 我自己 proposed fix**(2026-05-08 user 拍板,絕對禁省)
 
