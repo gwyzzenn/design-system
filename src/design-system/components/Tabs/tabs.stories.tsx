@@ -15,13 +15,15 @@ type Story = StoryObj<typeof Tabs>
 
 export const Default: Story = {
   name: '預設',
+  // 2026-05-18 fix(user 抓 startIcon 違反 #4 全有全無):原 4 triggers 2 有 startIcon 2 無 →
+  // 改成全無 startIcon(badge 是不同 slot 不算 startIcon),展示純文字 tabs 標準型。
   render: () => (
     <Tabs defaultValue="overview" className="w-[600px]">
       <TabsList>
         <TabsTrigger value="overview">總覽</TabsTrigger>
-        <TabsTrigger value="members" startIcon={Users}>成員</TabsTrigger>
+        <TabsTrigger value="members">成員</TabsTrigger>
         <TabsTrigger value="notifications" badge={<Badge count={3} />}>通知</TabsTrigger>
-        <TabsTrigger value="settings" startIcon={Settings}>設定</TabsTrigger>
+        <TabsTrigger value="settings">設定</TabsTrigger>
       </TabsList>
       <TabsContent value="overview" className="p-4">總覽內容</TabsContent>
       <TabsContent value="members" className="p-4">成員內容</TabsContent>
@@ -33,14 +35,74 @@ export const Default: Story = {
 
 export const WithSuffix: Story = {
   name: '帶後綴',
+  // 2026-05-18 fix(user 抓 startIcon 違反 #4 全有全無):原 3 triggers 1 有 startIcon 1 有
+  // endIcon 1 純文字 → 改成全無 startIcon,專注示範 badge / endIcon 後綴 slot 不同型態。
   render: () => (
     <Tabs defaultValue="notifications" className="w-[700px]">
       <TabsList>
-        <TabsTrigger value="all" startIcon={Bell}>全部</TabsTrigger>
+        <TabsTrigger value="all">全部</TabsTrigger>
         <TabsTrigger value="notifications" badge={<Badge count={12} />}>通知</TabsTrigger>
         <TabsTrigger value="more" endIcon={ChevronDown}>更多</TabsTrigger>
       </TabsList>
     </Tabs>
+  ),
+}
+
+export const AllWithStartIcon: Story = {
+  name: '全部含起始圖示',
+  // 2026-05-18 加(配合 #4 startIcon 全有全無 rule):示範另一極端 — 全 trigger 都帶
+  // startIcon,uniform visual。對齊 Material UI 「icon-positioned tabs」共識。
+  render: () => (
+    <Tabs defaultValue="overview" className="w-[600px]">
+      <TabsList>
+        <TabsTrigger value="overview" startIcon={Bell}>總覽</TabsTrigger>
+        <TabsTrigger value="members" startIcon={Users}>成員</TabsTrigger>
+        <TabsTrigger value="settings" startIcon={Settings}>設定</TabsTrigger>
+      </TabsList>
+    </Tabs>
+  ),
+}
+
+export const OverflowScroll: Story = {
+  name: '溢出處理 — 水平捲動',
+  // 2026-05-18 加(user 抓 overflow story 沒秀真實溢出):narrow 320px container + 8 tabs
+  // 強制觸發 overflow → fade mask + scroll arrow 視覺實際可見。
+  render: () => (
+    <div className="w-[320px] border border-divider rounded-md p-2">
+      <Tabs defaultValue="overview">
+        <TabsList overflow="scroll">
+          <TabsTrigger value="overview">總覽</TabsTrigger>
+          <TabsTrigger value="members">成員</TabsTrigger>
+          <TabsTrigger value="projects">專案設定</TabsTrigger>
+          <TabsTrigger value="notifications">通知</TabsTrigger>
+          <TabsTrigger value="integrations">整合</TabsTrigger>
+          <TabsTrigger value="api">API</TabsTrigger>
+          <TabsTrigger value="billing">計費</TabsTrigger>
+          <TabsTrigger value="security">安全性</TabsTrigger>
+        </TabsList>
+      </Tabs>
+    </div>
+  ),
+}
+
+export const OverflowMenu: Story = {
+  name: '溢出處理 — 收進選單',
+  // 2026-05-18 加:narrow 320px container + 8 tabs 強制觸發 → 溢出收進 ⋯ DropdownMenu。
+  render: () => (
+    <div className="w-[320px] border border-divider rounded-md p-2">
+      <Tabs defaultValue="overview">
+        <TabsList overflow="menu">
+          <TabsTrigger value="overview">總覽</TabsTrigger>
+          <TabsTrigger value="members">成員</TabsTrigger>
+          <TabsTrigger value="projects">專案設定</TabsTrigger>
+          <TabsTrigger value="notifications">通知</TabsTrigger>
+          <TabsTrigger value="integrations">整合</TabsTrigger>
+          <TabsTrigger value="api">API</TabsTrigger>
+          <TabsTrigger value="billing">計費</TabsTrigger>
+          <TabsTrigger value="security">安全性</TabsTrigger>
+        </TabsList>
+      </Tabs>
+    </div>
   ),
 }
 

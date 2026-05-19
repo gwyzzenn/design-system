@@ -47,16 +47,30 @@ async function probeDialogWithTabs(page) {
     const row2Rect = row2?.getBoundingClientRect()
     const flushGap = row2Rect && row1Rect ? row2Rect.top - row1Rect.bottom : null
 
-    // Row 2 wrapper border-b color
+    // 2026-05-18 fix(user 抓雙線):W1 line owner = TabsList 自身 border-b(wrapper 撤了)。
+    // Probe 兩個 border 必恰好 1 條 = 1px(避雙線 / 避缺線)。
     const row2Style = row2 ? window.getComputedStyle(row2) : null
+    const tabListStyle = window.getComputedStyle(tabList)
+    const wrapperBorderPx = parseFloat(row2Style?.borderBottomWidth || '0')
+    const tabListBorderPx = parseFloat(tabListStyle.borderBottomWidth || '0')
+    const totalBorderCount = (wrapperBorderPx > 0 ? 1 : 0) + (tabListBorderPx > 0 ? 1 : 0)
+    // TabsList 必 full-width(W2 fix):span 從 wrapper 內邊(left=px-loose)到 wrapper 內邊(right=px-loose)
+    const tabListWidth = tabListRect.width
+    const dialogContentWidth = dialogRect.width
+    const expectedTabListWidth = dialogContentWidth - (titleLeftFromDialog * 2) // 2x px-loose 估算
+    const tabListFullWidth = Math.abs(tabListWidth - expectedTabListWidth) <= 2
 
     return {
       titleLeftFromDialog,
       firstTabLeftFromDialog,
       leftAlignDelta: Math.abs(titleLeftFromDialog - firstTabLeftFromDialog),
       flushGap,
-      row2BorderBottom: row2Style?.borderBottomWidth,
-      row2BorderColor: row2Style?.borderBottomColor,
+      wrapperBorderPx,
+      tabListBorderPx,
+      totalBorderCount,
+      tabListWidth,
+      expectedTabListWidth,
+      tabListFullWidth,
     }
   })
 }
@@ -95,12 +109,21 @@ async function run() {
         failed++
       }
 
-      // W1 — row 2 wrapper has border-b (1px)
-      if (probe.row2BorderBottom === '1px') {
-        console.log(`  ✅ W1: row 2 wrapper border-b = 1px`)
+      // W1 — 恰好 1 條 border-b(2026-05-18 fix:user 抓雙線 = wrapper+TabsList 兩個都畫)
+      if (probe.totalBorderCount === 1) {
+        console.log(`  ✅ W1: 恰好 1 條 border-b(wrapper=${probe.wrapperBorderPx}px / TabsList=${probe.tabListBorderPx}px)`)
         passed++
       } else {
-        console.error(`  ❌ W1: row 2 wrapper border-b = ${probe.row2BorderBottom} (expect 1px)`)
+        console.error(`  ❌ W1: ${probe.totalBorderCount} 條 border-b(wrapper=${probe.wrapperBorderPx}px / TabsList=${probe.tabListBorderPx}px,expect 恰好 1)`)
+        failed++
+      }
+
+      // W2-extra — TabsList full-width(從 px-loose 內邊延展到內邊,不是 content-width)
+      if (probe.tabListFullWidth) {
+        console.log(`  ✅ W2-extra: TabsList full-width = ${probe.tabListWidth}px(expected ~${probe.expectedTabListWidth.toFixed(0)}px)`)
+        passed++
+      } else {
+        console.error(`  ❌ W2-extra: TabsList width = ${probe.tabListWidth}px, expected ~${probe.expectedTabListWidth.toFixed(0)}px(差太多 = content-width 沒 full-width)`)
         failed++
       }
     }

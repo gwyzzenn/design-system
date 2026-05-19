@@ -336,7 +336,9 @@ export const OverflowMatrix: Story = {
       <div>
         <H3>overflow="scroll" — 水平捲動 + fade mask</H3>
         <Desc>Tabs 超出容器寬度時,左右兩端出現 scroll arrow + 漸變遮罩(fade mask)提示可捲動。使用 `useScrollEdges` + `OverflowScrollArrow` 共用 hook。</Desc>
-        <div className="border border-border rounded-lg p-4 max-w-md">
+        {/* 2026-05-18 fix(user 抓 overflow demo 沒秀真實溢出):max-w-md (448px) 太寬
+            8 個短 Chinese tab 加總 < 448 不觸發 overflow。改 280px 強制觸發 + 視覺可見。*/}
+        <div className="border border-border rounded-lg p-4 max-w-[280px]">
           <Tabs defaultValue="a">
             <TabsList overflow="scroll">
               <TabsTrigger value="a">總覽</TabsTrigger>
@@ -355,7 +357,9 @@ export const OverflowMatrix: Story = {
       <div>
         <H3>overflow="menu" — 隱藏溢出 + DropdownMenu trigger</H3>
         <Desc>Tabs 超出容器時,溢出部分收入 DropdownMenu(由 OverflowMenuTriggerButton 觸發),避免 scroll 互動。適合 tab 數量較多但使用者不常切換到後面的場景。</Desc>
-        <div className="border border-border rounded-lg p-4 max-w-md">
+        {/* 2026-05-18 fix(user 抓 overflow demo 沒秀真實溢出):max-w-md (448px) 太寬
+            8 個短 Chinese tab 加總 < 448 不觸發 overflow。改 280px 強制觸發 + 視覺可見。*/}
+        <div className="border border-border rounded-lg p-4 max-w-[280px]">
           <Tabs defaultValue="a">
             <TabsList overflow="menu">
               <TabsTrigger value="a">總覽</TabsTrigger>

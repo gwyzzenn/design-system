@@ -86,8 +86,10 @@ export const ChromeHeader = React.forwardRef<HTMLDivElement, ChromeHeaderProps>(
           >
             {children}
           </div>
-          {/* Row 2:tabsSlot wrapper — W2 padding inheritance + W1 全寬 paint */}
-          <div className="px-[var(--layout-space-loose)] border-b border-divider">
+          {/* Row 2:tabsSlot wrapper — W2 padding inheritance + 強制 TabsList full-width
+              2026-05-18 fix:撤掉 wrapper border-b 避雙線(同 SurfaceHeader),TabsList full-width
+              延展自身 border-b 到 wrapper 內邊 = 1 條 W1「視覺一條線」。*/}
+          <div className="px-[var(--layout-space-loose)] [&>[role=tablist]]:w-full">
             {tabsSlot}
           </div>
         </div>

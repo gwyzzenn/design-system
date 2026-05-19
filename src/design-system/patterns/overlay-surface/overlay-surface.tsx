@@ -109,8 +109,12 @@ export const SurfaceHeader = React.forwardRef<
         >
           {children}
         </div>
-        {/* Row 2:tabsSlot wrapper — 提供 W2 padding inheritance + W1 全寬 paint */}
-        <div className="px-[var(--layout-space-loose)] border-b border-divider">
+        {/* Row 2:tabsSlot wrapper — 提供 W2 padding inheritance + 強制 TabsList full-width
+            2026-05-18 fix(user 抓雙線):原 wrapper 加 `border-b border-divider` 跟 TabsList 自身
+            `border-b border-border` 共存 = 2 條色不同 + 1px box gap 的線。撤掉 wrapper border,
+            用 `[&>[role=tablist]]:w-full` 強制 TabsList 從 content-width 變 full-width → 自身
+            border-b 自然延展到 wrapper px-loose 內邊 = 1 條 W1 「視覺一條線」。 */}
+        <div className="px-[var(--layout-space-loose)] [&>[role=tablist]]:w-full">
           {tabsSlot}
         </div>
       </div>
