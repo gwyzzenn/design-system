@@ -184,9 +184,15 @@ Tabs 是 **navigation anchor**，不是 compact control：
 
 ## Underline 與 TabsList border 的視覺關係
 
-TabsList 底部有 1px gray border（`border-border`），selected trigger 有 2px primary-hover 底線。**這兩條線視覺上必須是同一條**——selected 底線從 TabsList 的 gray border 位置「長出來」，不得出現雙線。
+TabsList 底部有 1px gray border（`border-divider`，neutral-4），selected trigger 有 2px primary-hover 底線。**這兩條線視覺上必須是同一條**——selected 底線從 TabsList 的 gray border 位置「長出來」，不得出現雙線。
 
 **原則**：selected 底線必須覆蓋並延伸 TabsList 的 gray border，避免疊線。實作手法（pseudo-element 定位）見 `.tsx`。
+
+**色 token = `--divider`(neutral-4)而非 `--border`(neutral-5)**(2026-05-18 改 per user verbatim「我認為應該把 tabs 的下底線統一改成是 divider 色吧?」+「做」approval):
+- 跟 Dialog / Sheet / Popover / Sidebar header `border-b border-divider` 同色 — chrome separator 一致
+- withTabs scenario 下 tabs underline = chrome separator,色不同會視覺斷裂
+- Selected trigger 2px primary indicator overlay underlying 1px divider 對比仍清楚(primary 比 neutral-4 強得多)
+- 對齊 `color.spec.md:706-708` outer-vs-divider 判準的「T-junction seamless」直覺(tabs underline 跟 header separator T 字交接)
 
 在 Dialog / Sidebar header 內特別重要——header 的 `border-b` 和 Tabs 的 `border-b` 必須感知為同一條水平線。
 

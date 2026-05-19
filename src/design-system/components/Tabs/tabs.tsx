@@ -101,11 +101,17 @@ const Tabs = React.forwardRef<
 Tabs.displayName = 'Tabs'
 
 // ── List ──
-// TabsList 基礎 class — inline-flex 單列 + gap-loose + 底部 border-border
+// TabsList 基礎 class — inline-flex 單列 + gap-loose + 底部 border-divider
+// 2026-05-18 改 border-border → border-divider(per user verbatim「我認為應該把 tabs 的
+// 下底線統一改成是 divider 色吧?」+「做」approval):
+// - 跟 Dialog / Sheet / Popover / Sidebar header `border-b border-divider`(neutral-4)同色
+// - withTabs scenario 下 tabs underline = chrome separator,跟 dialog 其他 separator 視覺一致
+// - Selected trigger 2px primary 仍 overlay underlying divider(對比 primary >> divider 不弱)
+// - 對齊 `color.spec.md:706-708` outer-vs-divider 判準(Dialog 結構,T-junction 思路適用)
 const TABS_LIST_BASE = [
   'inline-flex items-stretch',
   'gap-[var(--layout-space-loose)]',
-  'border-b border-border',
+  'border-b border-divider',
 ].join(' ')
 
 interface TabsListProps
@@ -187,7 +193,8 @@ const ScrollTabsList = React.forwardRef<
   })
 
   return (
-    <div className="relative border-b border-border">
+    // 2026-05-18:border-border → border-divider 對齊 TABS_LIST_BASE(ScrollTabsList wrapper)
+    <div className="relative border-b border-divider">
       <div
         ref={scrollRef}
         className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -282,7 +289,8 @@ const MenuTabsList = React.forwardRef<
   )
 
   return (
-    <div className="flex items-center border-b border-border">
+    // 2026-05-18:border-border → border-divider 對齊 TABS_LIST_BASE(MenuTabsList wrapper)
+    <div className="flex items-center border-b border-divider">
       <div
         ref={scrollRef}
         className="flex-1 min-w-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
