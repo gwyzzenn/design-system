@@ -44,21 +44,47 @@ Typography 由三個獨立維度組成，分開疊加：
 **h6（14px）vs body（14px）**：同尺寸，靠 font-weight 和 color 區分，使用端需有意識地處理。
 
 
-## line-height 覆蓋
+## line-height 覆蓋（僅 14/16px body 可覆蓋）
 
-大多數情況不需要覆蓋。以下場景例外：
+**Token canonical**：除 `text-body`（14px）/ `text-body-lg`（16px）外，**所有 size 行高皆固定**：
+- `text-h1`–`text-h6`：全部 lh 1.3 固定（標題不需多行閱讀行距）
+- `text-caption`（12px）/ `text-footnote`（10px）：全部 lh 1.3 固定（小字不適合 1.5）
+- `text-body` / `text-body-lg`：**唯二**可覆蓋（預設 lh 1.5 閱讀段落，可 `leading-compact` 覆蓋為 1.3）
+
+唯一合理覆蓋情境：`text-body` / `text-body-lg` 用於**單行固定高度容器**（Button / Tabs trigger / Chip / Notice banner / MenuItem row / SelectMenu / TreeView / DropdownMenu / Combobox input），避免 1lh > chrome height 造成垂直偏移：
 
 ```tsx
-{/* body 文字用於截斷 → 覆蓋為 1.3 */}
+{/* ✅ Button 文字（單行 28/32/36px chrome height）*/}
+<button className="h-field-sm text-body leading-compact">確認</button>
+
+{/* ✅ Notice banner 單行 alert text */}
+<span className="text-body leading-compact">已儲存</span>
+```
+
+可用的 override utility：
+- `leading-compact`：1.3（自訂，只給 `text-body` / `text-body-lg`）
+- `leading-normal`：1.5（Tailwind 內建，**極少用**——僅 stories `<p>` 補 12px footnote 段落呼吸感，正式 DS 元件**不需**主動覆蓋成 1.5，因為 `text-body` / `text-body-lg` 預設就是 1.5）
+
+### 反 pattern（禁用）
+
+```tsx
+{/* ❌ 用 leading-compact + line-clamp 「截斷副標」
+       line-clamp 自己處理截斷，不需要動 line-height；該選對的 token */}
 <p className="text-body leading-compact line-clamp-2">副標說明</p>
 
-{/* h5/h6 用於段落說明而非標題 → 覆蓋為 1.5 */}
+{/* ❌ 用 h5/h6 + leading-normal「當段落」
+       h5/h6 是標題語義，不該當段落；同 size 該換 body-lg / body */}
 <p className="text-h5 leading-normal">較小的說明段落</p>
 ```
 
-可用的 override utilities：
-- `leading-compact`：1.3（自訂）
-- `leading-normal`：1.5（Tailwind 內建）
+### 同尺寸但不同角色的選法（用 token 自然區分，不靠 leading 覆寫）
+
+| 尺寸 | 段落（閱讀） | 標題（掃視 + bold） |
+|---|---|---|
+| 16px | `text-body-lg`（lh 1.5） | `text-h5`（lh 1.3，加 `font-medium`/`font-semibold`） |
+| 14px | `text-body`（lh 1.5） | `text-h6`（lh 1.3，加 `font-medium`/`font-semibold`） |
+
+**結論**：90% 情境用 token 預設就對；唯一覆寫 = body/body-lg 進單行固定高度容器套 `leading-compact`。
 
 
 ## 組合範例
