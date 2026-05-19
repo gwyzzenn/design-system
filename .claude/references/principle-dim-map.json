@@ -38,7 +38,8 @@
     "M30": { "name": "Wrapper schema extends primitive", "dims": [], "note": "hook check_wrapper_primitive_schema_drift;考慮加 dim 49 DS-wide scan" },
     "M31": { "name": "Codex collab 5-step canonical", "dims": [], "note": "codex-collab skill + hook;runtime" },
     "M32": { "name": "Audit script pixel-quantified", "dims": [], "note": "hook check_pixel_quantified_audit;對 audit scripts 自身,不對 component" },
-    "M33": { "name": "Stop hook overfire defer 反 pattern", "dims": [], "note": "stop_self_audit hook;runtime" }
+    "M33": { "name": "Stop hook overfire defer 反 pattern", "dims": [], "note": "stop_self_audit hook;runtime" },
+    "M34": { "name": "Hook detection regex 必對齊 spec wording 廣度", "dims": [], "note": "governance-only;hook check_story_invariants R5 unicode upgrade + future triple-test gate when proposing new hook(spec-vs-regex broad-narrow gap check)" }
   },
   "traits": {
     "isInternal":            { "dims": [44], "note": "Group O Dim 44" },

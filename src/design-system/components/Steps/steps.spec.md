@@ -24,17 +24,17 @@ benchmark:
   - MUI Stepper: github.com/mui/material-ui/tree/master/packages/mui-material/src/Stepper
 ---
 
-<!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
+<!-- @benchmark-cited: D5 retrofit 2026-05-18 — body claims marked per-claim @benchmark-unverified inline; canonical source URLs in frontmatter benchmark list. -->
 
 # Steps 設計原則
 
 **流程進度指示器**:把多步驟任務的「現在走到哪、完成了哪些、還剩哪些」視覺化為一條有序的 indicator + label 序列。
 
-**實作基礎**：組合元件——Icon / number indicator + Text 有序序列，無 external primitive base。Radix / shadcn 無對應 Steps primitive。
+**實作基礎**：組合元件——Icon / number indicator + Text 有序序列，無 external primitive base。Radix / shadcn 無對應 Steps primitive。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 **Layout Family**：CLAUDE.md 4-Family Model **Family 2（List item layout）** 消費者。結構繼承 `patterns/element-anatomy/item-anatomy.spec.md`「List item layout」章節的 reading-mode 規格。Steps 有明文例外：indicator inline 對齊 label 第一行（不走 24px 閾值）。
 
-> 命名選 `Steps`(複數)而非 `Stepper`——`stepper` 在 web 有 HTML `<input type="number">` 計數器的歷史包袱(spinbutton 也叫 stepper),`Steps` 更精確地表達「一組有序步驟」。對齊 Ant Design 的命名慣例。
+> 命名選 `Steps`(複數)而非 `Stepper`——`stepper` 在 web 有 HTML `<input type="number">` 計數器的歷史包袱(spinbutton 也叫 stepper),`Steps` 更精確地表達「一組有序步驟」。對齊 Ant Design 的命名慣例。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 ---
 
@@ -117,7 +117,7 @@ Column rhythm **優先於**「大 prefix 視覺重量平衡文字塊」的需求
 
 ### 業界共識
 
-Material Stepper、Ant Design Steps、GitHub Workflows、Linear、Notion Checklist——**全部**走「indicator anchored to label 第一行」,**沒有任何世界級 stepper 把 indicator 對齊到文字塊中心**。
+Material Stepper、Ant Design Steps、GitHub Workflows、Linear、Notion Checklist——**全部**走「indicator anchored to label 第一行」,**沒有任何世界級 stepper 把 indicator 對齊到文字塊中心**。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 ### 對齊公式
 
@@ -381,7 +381,7 @@ Description 在 error state 下維持 `text-fg-secondary`(跟其他 state 一樣
 1. **Single source of truth**:所有狀態集中在 parent,不可能發生「多個 step 同時是 current」「completedValues 跟 item state 互相矛盾」這類 bug。
 2. **Derived state**:每個 step 的 state 由 parent props 推導,consumer 不手算,不會漂移。
 3. **無 side effect**:Steps 不內部 mutate 狀態,所有變動都走 parent 的 state setter,讓應用層完整掌控推進邏輯(驗證 → 加入 completedValues → 推進 value)。
-4. **對齊業界**:Ant Design Steps(`current` + `status`)、Material Stepper(`activeStep`)、Radix Tabs(`value`)全部用此模式。開發者從這些系統來的直覺可直接套用,學習曲線接近零。
+4. **對齊業界**:Ant Design Steps(`current` + `status`)、Material Stepper(`activeStep`)、Radix Tabs(`value`)全部用此模式。開發者從這些系統來的直覺可直接套用,學習曲線接近零。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 ### Per-item `state` escape hatch
 

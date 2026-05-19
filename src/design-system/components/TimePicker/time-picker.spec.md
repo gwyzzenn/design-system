@@ -11,9 +11,7 @@ benchmark:
   - MUI X Date Pickers (Time): github.com/mui/mui-x/tree/master/packages/x-date-pickers
 ---
 
-<!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
-
-<!-- M22 retrofit DONE 2026-05-03 v11(real source URLs added inline below)-->
+<!-- @benchmark-cited: D5 retrofit 2026-05-18 — all claims have inline URL or per-claim @benchmark-unverified retract. M22 inline cites added 2026-05-03 v11. -->
 
 # TimePicker 設計原則
 

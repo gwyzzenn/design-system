@@ -122,14 +122,14 @@ else
 fi
 teardown_proj
 
-# Test 7: Hook count > 30 (hard) → BLOCKER
-echo "Test 7: hook count 36 → hard BLOCKER (cap raised to 35 2026-05-17)"
+# Test 7: Hook count > hard cap → BLOCKER
+echo "Test 7: hook count 41 → hard BLOCKER (cap raised to 40 2026-05-18)"
 setup_proj
-for i in $(seq 1 36); do
+for i in $(seq 1 41); do
   : > "$TMP_PROJ/.claude/hooks/check_fake_${i}.sh"
 done
 run_hook
-if [ "$EXIT" = "0" ] && echo "$STDOUT_TEXT" | grep -q "BLOCKER" && echo "$STDOUT_TEXT" | grep -qE "hard (30|35)"; then
+if [ "$EXIT" = "0" ] && echo "$STDOUT_TEXT" | grep -q "BLOCKER" && echo "$STDOUT_TEXT" | grep -qE "hard (30|35|40)"; then
   echo "  PASS  Test 7 hook count hard BLOCKER"; PASS=$((PASS+1))
 else
   echo "  FAIL  Test 7 (output: ${STDOUT_TEXT:0:200})"

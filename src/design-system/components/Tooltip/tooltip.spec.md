@@ -12,7 +12,7 @@ benchmark:
   - Polaris Tooltip: github.com/Shopify/polaris/tree/main/polaris-react/src/components/Tooltip
 ---
 
-<!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
+<!-- @benchmark-cited: D5 retrofit 2026-05-18 — body claims marked per-claim @benchmark-unverified inline; canonical source URLs in frontmatter benchmark list. -->
 
 # Tooltip 設計原則
 
@@ -71,19 +71,19 @@ Tooltip 底色是深色，子元素永遠套用 dark theme token（透過 `data-
 
 ## Align 對齊
 
-**Tooltip 走「輕量浮層」例外**(見 `../Popover/popover.spec.md`「SSOT 適用範圍」)—— hover 觸發、純文字展示、寬度極窄(max 280px),Radix 預設 `center` 貼合指標即可。不強制對齊 structured overlay 的 trigger-position canonical。
+**Tooltip 走「輕量浮層」例外**(見 `../Popover/popover.spec.md`「SSOT 適用範圍」)—— hover 觸發、純文字展示、寬度極窄(max 280px),Radix 預設 `center` 貼合指標即可。不強制對齊 structured overlay 的 trigger-position canonical。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 ## Edge collision(避免貼 viewport 邊)
 
 **`collisionPadding` default = 8**(與 HoverCard 一致),Radix `avoidCollisions` 預設 true 會自動翻邊,但 padding 0 會讓 tooltip **貼齊 viewport 邊緣**(視覺上擠)。default 8 讓 tooltip 跟 viewport 邊保留最少 8px 呼吸距離。consumer 需自訂傳 prop 即可覆寫。
 
-世界級對照:Material Tooltip `margin: 14px` default / Polaris Tooltip 8-12px — 本 DS 選 8 對齊 HoverCard。
+世界級對照:Material Tooltip `margin: 14px` default / Polaris Tooltip 8-12px — 本 DS 選 8 對齊 HoverCard。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 ## 最大寬度（元件級常數）
 
 Tooltip 最大寬度 **280px**（見 `.tsx` 的 `max-w-[280px]`）——超過換行。避免單條 tooltip 占據過大空間遮蔽內容，同時保證文字可完整呈現（見「內容完整性」節，tooltip 是資訊終點，不截斷）。
 
-對照世界級：Material tooltip 約 250–300px、Apple HIG tooltip 限制在可讀寬度——**單一元件的 canonical 寬度屬於該元件自己的 design spec，不抽為跨元件 token**。Token 系統只管共享值（如 `--field-height-*`、`--layout-space-*`）；單一元件獨有的結構常數留在 component code + 本 spec。
+對照世界級：Material tooltip 約 250–300px、Apple HIG tooltip 限制在可讀寬度——**單一元件的 canonical 寬度屬於該元件自己的 design spec，不抽為跨元件 token**。Token 系統只管共享值（如 `--field-height-*`、`--layout-space-*`）；單一元件獨有的結構常數留在 component code + 本 spec。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 ## 禁止事項
 

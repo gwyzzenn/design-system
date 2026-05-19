@@ -9,7 +9,7 @@ benchmark:
   - Radix AspectRatio primitive: github.com/radix-ui/primitives/tree/main/packages/react/aspect-ratio
 ---
 
-<!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
+<!-- @benchmark-cited: D5 retrofit 2026-05-18 — body claims marked per-claim @benchmark-unverified inline; canonical source URLs in frontmatter benchmark list. -->
 
 # AspectRatio 設計原則
 
@@ -22,7 +22,7 @@ AspectRatio 是**固定長寬比容器** primitive——確保內部 children(�
 **Layout Family**:非上述 family — self-contained primitive(container 型 layout,無 slot 結構,只暴露 `ratio` 數值 + children)。
 
 **世界級對照**:
-- shadcn `AspectRatio`(本元件主要參考)— 同 Radix 薄包裝
+- shadcn `AspectRatio`(本元件主要參考)— 同 Radix 薄包裝 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 - Ant Design 無獨立元件(用 CSS aspect-ratio 或自訂 padding-bottom)
 - Material 無獨立元件(image/Card 元件內建 props)
 
@@ -52,7 +52,7 @@ AspectRatio 是**固定長寬比容器** primitive——確保內部 children(�
 | **Skeleton** | Skeleton 是 loading placeholder + 預設尺寸;AspectRatio 是 ratio container | 內含 image / chart 等需保 ratio 的 ready content |
 | **Empty(image slot)** | Empty 是 page-state 元件;AspectRatio 是 layout primitive | 結構性 ratio 鎖,跟 content state 無關 |
 
-對齊 Radix AspectRatio / Material `<Box sx={{aspectRatio}}>` / Polaris MediaCard primitive 慣例:純結構 layout 元件。
+對齊 Radix AspectRatio / Material `<Box sx={{aspectRatio}}>` / Polaris MediaCard primitive 慣例:純結構 layout 元件。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 ---
 
@@ -125,7 +125,7 @@ AspectRatio export 為 `const AspectRatio = AspectRatioPrimitive.Root`(**直接 
 - `../Coachmark/coachmark.spec.md` — **本元件 consumer**:media 區預設 `mediaRatio=16/9`
 - `../Carousel/carousel.spec.md` — 未來 consumer(item image 統一 ratio)
 - Radix AspectRatio — `@radix-ui/react-aspect-ratio`
-- shadcn AspectRatio — 參考實作
+- shadcn AspectRatio — 參考實作 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 

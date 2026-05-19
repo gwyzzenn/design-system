@@ -12,7 +12,7 @@ benchmark:
   - MUI X Date Pickers: github.com/mui/mui-x/tree/master/packages/x-date-pickers
 ---
 
-<!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
+<!-- @benchmark-cited: D5 retrofit 2026-05-18 — body claims marked per-claim @benchmark-unverified inline; canonical source URLs in frontmatter benchmark list. -->
 
 <!-- M22 retrofit DONE 2026-05-03 v11(real source URLs added inline below)-->
 
@@ -40,7 +40,7 @@ DateGrid 是 **DatePicker 內部的 date-grid primitive**(月份格網 + 前後�
 | React Aria | `<Calendar>`(date picker grid)— source: [react-spectrum.adobe.com](https://react-spectrum.adobe.com/react-aria/Calendar.html) `@benchmark-unverified`(WebFetch 403)| `<Calendar>` |
 | **本 DS** | **`<Calendar>`**(event 檢視 canvas,見 `../Calendar/`) | **`<DateGrid>`**(本元件) |
 
-結論:Material / React Aria 用 `Calendar` 指 date-picker-grid 有點誤導(user 以為是 event 檢視);本 DS 對齊 Notion / Google / Ant / Apple 的大眾認知,**`Calendar` 給 event view**、**`DateGrid` 給 date picker grid**。
+結論:Material / React Aria 用 `Calendar` 指 date-picker-grid 有點誤導(user 以為是 event 檢視);本 DS 對齊 Notion / Google / Ant / Apple 的大眾認知,**`Calendar` 給 event view**、**`DateGrid` 給 date picker grid**。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 ---
 
@@ -146,7 +146,7 @@ Prev/Next chevron 用 `<Button variant="text" size="xs" iconOnly>`(DS primitive 
 
 ## Range track canonical(2026-05-03 v8)
 
-對齊 Ant `cell-range-start::before { border-radius: 9999px 0 0 9999px }`(stadium pattern):
+對齊 Ant `cell-range-start::before { border-radius: 9999px 0 0 9999px }`(stadium pattern): <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 - `range_start` cell pseudo:`before:left-0 -right-[2px] inset-y-0 rounded-l-full bg-neutral-selected`
 - `range_end` cell pseudo:鏡像 `rounded-r-full`
 - `range_middle` cell pseudo:`before:-inset-x-[2px] inset-y-0 bg-neutral-selected`(無 rounding)

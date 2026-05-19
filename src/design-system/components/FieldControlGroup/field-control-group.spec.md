@@ -12,7 +12,7 @@ benchmark:
   - Chakra UI Group + InputGroup: github.com/chakra-ui/chakra-ui/blob/main/apps/www/content/docs/components/input.mdx
 ---
 
-<!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
+<!-- @benchmark-cited: D5 retrofit 2026-05-18 — Ant Space.Compact + Bootstrap input-group + Chakra Group claims verified via WebFetch + inline URL. -->
 
 # FieldControlGroup spec
 
@@ -22,7 +22,7 @@ benchmark:
 
 **多個 Field controls 視覺接合成一個 input frame**(border-collapse pattern)。對齊 ButtonGroup 同類接合 idiom — `<X>Group` 命名一致(X = button → ButtonGroup;X = field control → FieldControlGroup)。
 
-**自建 + 理由**:無單一 Radix / shadcn 對應 primitive(shadcn 沒提供;Radix 沒對應)。對齊 Ant `Space.Compact`(verified source)mechanism + Bootstrap `.input-group`(verified SCSS)idiom 自建。
+**自建 + 理由**:無單一 Radix / shadcn 對應 primitive(shadcn 沒提供;Radix 沒對應)。對齊 [Ant `Space.Compact`](https://ant.design/components/space#spacecompact)(verified source)mechanism + [Bootstrap `.input-group`](https://getbootstrap.com/docs/5.3/forms/input-group/)(verified SCSS)idiom 自建。
 
 ## 何時用
 
@@ -137,7 +137,7 @@ interface FieldControlGroupProps extends HTMLAttributes<HTMLDivElement> {
 | focus / focus-within(子)| 該 child focus ring | 3 |
 | disabled(子)| 該 child disabled style + **FCG-local override `border-input`**(K12,2026-05-04) | 0 |
 
-**Disabled border integrity canonical(K12,2026-05-04)**:全域 disabled = `border-transparent`(讓 standalone field 視覺輕量),但**FCG context 下,disabled child 強制 `border-input`** — 確保:(a) FCG 整體外圈 border 健在,(b) inner divider 健在(不會因兩相鄰 disabled cells 都 transparent 而消失)。bg-disabled 仍區分狀態,border 維護群組視覺整合性。對齊 Bootstrap input-group / Ant Space.Compact disabled idiom。
+**Disabled border integrity canonical(K12,2026-05-04)**:全域 disabled = `border-transparent`(讓 standalone field 視覺輕量),但**FCG context 下,disabled child 強制 `border-input`** — 確保:(a) FCG 整體外圈 border 健在,(b) inner divider 健在(不會因兩相鄰 disabled cells 都 transparent 而消失)。bg-disabled 仍區分狀態,border 維護群組視覺整合性。對齊 [Bootstrap input-group](https://getbootstrap.com/docs/5.3/forms/input-group/) / [Ant Space.Compact](https://ant.design/components/space#spacecompact) disabled idiom。
 
 實作(v7 — semantic token):
 ```tsx
@@ -147,7 +147,7 @@ interface FieldControlGroupProps extends HTMLAttributes<HTMLDivElement> {
 
 **為什麼用 `--border-opaque` 而非 `--border`**:`--border`(neutral-5 = 15% alpha)會跟 cell bg compositing — 灰底上 composite 略深(物理對比結果)。**`--border-opaque`** semantic token(其 primitive 後盾為 `--color-neutral-5-opaque`,solid #D9D9D9)不分 bg 永遠同色,divider 在 white edit cell 跟 grey disabled cell 上視覺完全一致。
 
-**Token 系統設計**:`--border-opaque` 在 `semantic.css` L289 新增,語意「視覺等同 `--border` 但 alpha-immune」。對齊 Ant Design `colorBorderSecondary` solid idiom — Ant 用此 token 在 table 外框 + row divider(non-white bg 場景),跟 input alpha border 視覺層級分。
+**Token 系統設計**:`--border-opaque` 在 `semantic.css` L289 新增,語意「視覺等同 `--border` 但 alpha-immune」。對齊 [Ant Design `colorBorderSecondary`](https://ant.design/docs/react/customize-theme#seedtoken) solid idiom — Ant 用此 token 在 table 外框 + row divider(non-white bg 場景),跟 input alpha border 視覺層級分。
 
 **為什麼不 override bg**:user 明確要求 disabled cells 有底色(辨識 state)。bg 灰底是 disabled state 的主要視覺載體,FCG context 不應抹除。
 | error(子)| 該 child border-error | 3(error 視覺在最上)|
@@ -164,9 +164,9 @@ interface FieldControlGroupProps extends HTMLAttributes<HTMLDivElement> {
 
 | 框架 | 命名 | 機制 | sizing | 子 scope |
 |--|--|--|--|--|
-| **Ant Space.Compact** | layout primitive | 負 margin 重疊 + z-index 3 | `size: small/middle/large` (group prop)| Button + 各 form control(限定 list)|
-| **Bootstrap input-group** | CSS class | 同(z-index 5)| group-level sizing,個別 children 不能設 | input/select/btn/text addon |
-| **Chakra Group + InputGroup** | 兩 primitives 分工 | 借助 startElement/endElement + Group | per-child | Input + Addon/Element |
+| **[Ant Space.Compact](https://ant.design/components/space#spacecompact)** | layout primitive | 負 margin 重疊 + z-index 3 | `size: small/middle/large` (group prop)| Button + 各 form control(限定 list)|
+| **[Bootstrap input-group](https://getbootstrap.com/docs/5.3/forms/input-group/)** | CSS class | flexbox + first/last border-radius | group-level sizing,個別 children 不能設 | input/select/btn/text addon |
+| **[Chakra Group](https://www.chakra-ui.com/docs/components/group)** | `attached` prop primitive | `attached`+`grow` props | per-child | Input + Addon/Element(InputGroup 已 deprecated v3)|
 | **Mantine** | 無此 idiom | — | — | — |
 
 3/4 共識 → 我們的實作對齊 Ant + Bootstrap 主軸。

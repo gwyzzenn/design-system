@@ -1,4 +1,6 @@
-# Audit Subagent Prompts (22 audits)
+# Audit Subagent Prompts(全 dim per `SKILL.md SSOT`)
+
+> **Count canonical**:本檔 dim 數對齊 `.claude/skills/design-system-audit/SKILL.md` `## The N audit dimensions` 表。歷史標題曾寫「22 audits」,已 deprecated — 真實 dim 數以 SKILL.md 為準,本檔每加 dim 必同步補 prompt section。`scripts/sync-governance-counters.mjs` 自動 cross-verify。
 
 Each prompt is self-contained — designed to paste into an `Agent` call with `run_in_background: true` and `subagent_type: ds-dim-auditor`(registered agent since 2026-04-24;scoped Read/Grep/Glob only;fallback to `general-purpose` if agent not available)。
 
@@ -1191,3 +1193,68 @@ Per component gzip size 上限(eg. Button ≤ 5KB / DataTable ≤ 50KB);CI fail 
 **Type**: Absolute(deep mode only)/ **Canonical**: visual-audit Layer B + baseline snapshot / **Home**: spec.md「邊界案例」段
 
 Deep mode 每 core story 跑 light/dark/high-contrast/density-md/density-lg/RTL 6-cell matrix screenshot diff;baseline drift > 5% pixel-diff → flag。對齊 Polaris visual regression + Carbon dark token matrix + Material 3 dynamic color + Apple HIG Dynamic Type。Chain `/visual-audit --scope=all --matrix=theme-density-rtl`。
+
+## 52. Header canonical cross-family invariants(2026-05-17 新增,W1-W6 per M31 codex 共識)
+
+**Type**: Absolute / **Canonical**: `patterns/chrome-header/*.spec.md` + `patterns/overlay-surface/*.spec.md` + tokens `--tab-height-lg` / `--chrome-header-height` / `--layout-space-loose` / **Home**: spec.md「header tabs invariant」段
+
+對齊 GitHub Primer header + Ant Design Layout.Header + Material v1 AppBar 共識。Per chrome / overlay header tsx 跑 6 invariants:
+
+- **W1**:含 `<Tabs>` child 必有 `withTabs` prop(border 自動 suppress;手寫 `border-b-0` = 違反)
+- **W2**:tabs padding 必 = header padding(`px-[var(--layout-space-loose)]`),不可獨立 padding 值
+- **W3**:`--tab-height-lg` 必 == `--chrome-header-height`(md/lg 對等,token 公式 cross-check)
+- **W4**:header + tabs flush stack 必無 negative margin(`-mt-px` / `-mb-px` = 違反)
+- **W5**:tabs default size 必 = `sm`(已 land);出現 `size="md"` chrome header 場景 = drift
+- **W6**:tabs cva `defaultVariants.size` 必 = `sm`(已從 md 改 sm,grep `defaultVariants: { size: 'md' }` in tabs.tsx = bug)
+
+```
+Your job: audit Header W1-W6 canonical invariants DS-wide.
+
+Coverage requirement(NO-SAMPLE STRICT):全 `src/design-system/components/*/<X>.tsx` + `src/design-system/patterns/chrome-header/**` + overlay surface header usage。
+
+For each header tsx:
+1. **W1** — grep `<Tabs` / `<TabsList` inside header — 若有 → require `withTabs` prop on header element。手寫 `border-b-0` / `border-b-transparent` 同步 flag
+2. **W2** — Tabs padding 必 reference `var(--layout-space-loose)`,不可硬寫 `px-N` 或別的 token
+3. **W3** — open tokens/uiSize / tokens/layoutSpace spec.md verify `--tab-height-lg === --chrome-header-height`(計算公式對等;不等 = token drift)
+4. **W4** — grep `-mt-px` / `-mb-px` / `-mt-N` 在 header + tabs flush stack region = violation
+5. **W5** — grep `<Tabs ... size="md"` in chrome header usage = violation(default sm)
+6. **W6** — grep `defaultVariants:\s*\{\s*size:\s*['"]md['"]` in `tabs.tsx` cva = violation
+
+Cross-reference companion hooks:
+- `check_tab_lg_chrome_header_equal.sh`(W3 mechanical)
+- `check_header_with_tabs_border.sh`(W1 mechanical)
+- `check_chrome_header_handcraft.sh`(Layer 3 ChromeHeader consumption)
+
+Report ONLY violations。Format:
+- `<Component>: W<N> violation — file:line — actual vs canonical`
+
+End: `N header surfaces checked, M violations.` Under 400 words. Don't fix.
+```
+
+## 53. Code-to-spec reverse drift check(2026-05-17 新增,FileViewer h-14 case 啟發)
+
+**Type**: Absolute / **Canonical**: per-component `spec.md`「禁止事項」段 + `<X>.tsx` 真實 className 對比 / **Home**: 該 component spec.md(rationale 段)
+
+對每 component grep `src/design-system/components/<X>/<X>.tsx` 的硬寫 utility(`h-14` / `w-80` / `px-loose` 類 — code 已 migrate to token / DS canonical),反向掃對應 `<X>.spec.md` 是否仍寫「固定 h-NN」「寫死 N px」「H 不消費 token」等 known-drift keyword。**互補既有 forward Dim 15/20(spec → code drift)— 本 dim 抓 spec → code 反向 drift**(code 已對齊 spec 還寫 drift caveat = 漏改)。
+
+```
+Your job: detect spec → code reverse drift(spec writes「known drift / hardcoded / 未消費 token」keyword 但 code has migrated to token / DS canonical).
+
+Coverage requirement(NO-SAMPLE STRICT):全 `src/design-system/components/*/`(60+ 元件)。
+
+For each component:
+1. Grep `<X>.spec.md` 找 keyword:`known drift` / `hardcoded` / `寫死` / `不消費 token` / `h-NN 硬寫` / `w-NN 硬寫` / `未對齊 token` / `TODO migrate` / `interim hardcode`
+2. 若命中 → 開 `<X>.tsx` grep 對應 className(`h-14` / `w-80` / `px-N` 等具體值)
+3. **若 code 已 token-ified(`h-[var(--chrome-header-height)]` / `w-[var(--field-width-md)]` / `px-loose` 等)** → spec.md 仍寫 drift caveat = **reverse drift**(漏改)。Flag
+4. Cross-reference write-time hook `check_spec_class_drift.sh`(本 dim batch verify hook 未覆蓋的既存 drift)
+
+錨例(2026-05-17 Phase 1 漏抓):
+- `file-viewer.spec.md` L103 寫「Known drift:h-14 硬寫不消費 token」
+- 但 `file-viewer.tsx:333` 已 `h-[var(--chrome-header-height)]` migrate 完成
+- → spec.md 那段該刪 / 該改寫 rationale,3+ 次 `--deep` 都沒抓到
+
+Report ONLY violations。Format:
+- `<Component>: spec.md L<N> 寫「<drift keyword>」 vs <X>.tsx L<M> 已 token-ified `<actual className>`(spec 漏改)`
+
+End: `N components checked, M reverse drift gaps.` Under 400 words. Don't fix.
+```

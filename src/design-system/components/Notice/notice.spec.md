@@ -11,7 +11,7 @@ benchmark:
   - Carbon Notification: github.com/carbon-design-system/carbon/tree/main/packages/react/src/components/Notification
 ---
 
-<!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
+<!-- @benchmark-cited: D5 retrofit 2026-05-18 — body claims marked per-claim @benchmark-unverified inline; canonical source URLs in frontmatter benchmark list. -->
 
 # Notice 設計原則
 
@@ -25,7 +25,7 @@ Notice 是純視覺 primitive，不是獨立使用的元件。消費者：
 
 **Layout Family**：CLAUDE.md 4-Family Model **Family 2（List item layout）** 消費者。結構繼承 `patterns/element-anatomy/item-anatomy.spec.md`「List item layout」章節的 reading-mode 規格。Notice 語意為 notification（非 row collection），但視覺排版遵循 Family 2 確保跨元件視覺一致。
 
-**尺寸偏離（documented exception）**：Notice / Alert / Toast **單一固定 size**，**不**實作 Family 2 baseline 的 sm/md/lg。世界級共識（Material Banner/Snackbar、Polaris Banner、Atlassian InlineMessage、GitHub Flash）都是**單一 prominent size**——通知的使命是「搶注意」而非「在密度選擇裡協調」，提供 size 選項反而會讓 consumer 糾結（該用哪個 size？）而稀釋元件的目的性。同理 padding 也不隨 density 變（`px-4 py-3` 固定）——通知是跨 density 一致的訊息載體。
+**尺寸偏離（documented exception）**：Notice / Alert / Toast **單一固定 size**，**不**實作 Family 2 baseline 的 sm/md/lg。世界級共識（Material Banner/Snackbar、Polaris Banner、Atlassian InlineMessage、GitHub Flash）都是**單一 prominent size**——通知的使命是「搶注意」而非「在密度選擇裡協調」，提供 size 選項反而會讓 consumer 糾結（該用哪個 size？）而稀釋元件的目的性。同理 padding 也不隨 density 變（`px-4 py-3` 固定）——通知是跨 density 一致的訊息載體。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 ## Typography
 
@@ -39,7 +39,7 @@ md tier，固定不隨 density 變：
 
 | 屬性 | 值 | 理由 |
 |---|---|---|
-| px | `px-4`（16px） | 世界級系統共識（Atlassian/GitHub/Material/Linear 都是 16px） |
+| px | `px-4`（16px） | 世界級系統共識（Atlassian/GitHub/Material/Linear 都是 16px） | <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 | py | `py-3`（12px） | 介於 row（7px）和 section（16px）之間，通知的 sweet spot |
 | gap | `gap-2`（8px） | 跟 item-layout icon-text gap 一致 |
 

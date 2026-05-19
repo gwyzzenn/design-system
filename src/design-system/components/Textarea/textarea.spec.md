@@ -19,7 +19,7 @@ benchmark:
   - Ant Design Input.TextArea: github.com/ant-design/ant-design/tree/master/components/input
 ---
 
-<!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
+<!-- @benchmark-cited: D5 retrofit 2026-05-18 — body claims marked per-claim @benchmark-unverified inline; canonical source URLs in frontmatter benchmark list. -->
 
 # Textarea 設計原則
 
@@ -89,7 +89,7 @@ sm 與 md 視覺相同（純命名 mapping，對齊 Field family）。
 
 - **現況**:Textarea 高度由 `rows` + `resize-y` 決定,**不綁 `--field-height-*`**;`size` 只控字體(sm/md = text-body 14px / lg = text-body-lg 16px)與 padding 風格,**不控高度**
 - **Rationale**:Textarea 是**多行輸入**,高度由內容 / rows 決定是本質特徵——若硬綁 field-height 只有單行高度,multi-line 場景無法表達。字體 tier 仍對齊 Field family(sm/md 共 text-body、lg 切 text-body-lg),確保並排單行 Input 的視覺 rhythm 一致
-- **世界級對照**:Ant Design `<Input.TextArea>` rows 決定高度、autoSize object 配置 min/max / Material MUI `<TextField multiline>` 用 minRows/maxRows / Polaris `<TextField multiline>` 同流派——全部 textarea 的 container 高度獨立於 field-height,只繼承字體 / padding / border token
+- **世界級對照**:Ant Design `<Input.TextArea>` rows 決定高度、autoSize object 配置 min/max / Material MUI `<TextField multiline>` 用 minRows/maxRows / Polaris `<TextField multiline>` 同流派——全部 textarea 的 container 高度獨立於 field-height,只繼承字體 / padding / border token <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 ---
 

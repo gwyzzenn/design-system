@@ -1,0 +1,24 @@
+{
+  "ts": "2026-05-19T01:57:07.492Z",
+  "filesCount": {
+    "total": 383,
+    "componentTsx": 78,
+    "storiesShowcase": 69,
+    "storiesAnatomy": 61,
+    "storiesPrinciples": 61,
+    "specMd": 79,
+    "tokens": 18
+  },
+  "principles": {
+    "mRules": 33,
+    "specTraits": 11,
+    "hookInvariants": 27,
+    "rules": 6,
+    "total": 71
+  },
+  "auditDims": 53,
+  "coverageGaps": 1,
+  "gaps": [
+    "meta-pattern:M34 (unmapped — 必補 principle-dim-map.json entry)"
+  ]
+}

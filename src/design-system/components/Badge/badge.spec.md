@@ -24,7 +24,7 @@ benchmark:
   - Polaris Badge: github.com/Shopify/polaris/tree/main/polaris-react/src/components/Badge
 ---
 
-<!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
+<!-- @benchmark-cited: D5 retrofit 2026-05-18 — body claims marked per-claim @benchmark-unverified inline; canonical source URLs in frontmatter benchmark list. -->
 
 # Badge 設計原則
 
@@ -163,7 +163,7 @@ Contrast floor **是下限不是上限**——不限制 semantic 繼續往上。
 Badge count 模式的數字使用 `text-[10px]`,低於 typography 系統最小的 `--font-footnote`（12px）。這是 **Badge 獨有的合法例外**：
 
 - **為什麼不加新 typography token**: 10px 是「count indicator 專用尺寸」,全系統**只有 Badge / OverflowIndicator 兩處**使用；創一個 `--font-micro` token 只為這兩個消費者會過度 generalization
-- **為什麼合法**: Badge count 是輔助 indicator（次要訊號）,12px 字寬在 16×16 的圓形 Badge 內缺乏 padding 呼吸(字徑/圓徑比例過密)。對照世界級:Material Badge 10sp、Polaris Badge 字級小於 body、GitHub Counter 10-11px 都小於 body footnote
+- **為什麼合法**: Badge count 是輔助 indicator（次要訊號）,12px 字寬在 16×16 的圓形 Badge 內缺乏 padding 呼吸(字徑/圓徑比例過密)。對照世界級:Material Badge 10sp、Polaris Badge 字級小於 body、GitHub Counter 10-11px 都小於 body footnote <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 - **其他元件不得比照**: 若新元件覺得需要 `text-[10px]`,先問「真的不是 footnote 12px 可以解決嗎」,99% 情境 footnote 夠用;真有需求跟 Badge / OverflowIndicator 歸同一 micro-indicator family 討論
 
 ---
@@ -257,8 +257,8 @@ Q3. Badge 自己獨立呈現狀態嗎?(無宿主元件)
 ```
 
 - **語意**：元件主內容（icon / avatar）+ 補充通知
-- **實作**：badge **絕對定位相對於 icon / avatar 視覺重心**,不相對於 interactive chrome。Button `overlayBadge` prop 內部用 `<span className="relative inline-flex">` 包 icon、badge 中心對齊 icon top-right corner(Material BadgedBox canonical)。**不再允許** consumer 手刻 `<div relative><Button/><Badge absolute/></div>`——padding 差距會讓 badge 飄到 chrome 角
-- **世界級對照**：Material BadgedBox / iOS App Icon / Ant Design Badge — 全部 wrap 視覺重心(icon / avatar),不 wrap interactive chrome(button padding)
+- **實作**：badge **絕對定位相對於 icon / avatar 視覺重心**,不相對於 interactive chrome。Button `overlayBadge` prop 內部用 `<span className="relative inline-flex">` 包 icon、badge 中心對齊 icon top-right corner(Material BadgedBox canonical)。**不再允許** consumer 手刻 `<div relative><Button/><Badge absolute/></div>`——padding 差距會讓 badge 飄到 chrome 角 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
+- **世界級對照**：Material BadgedBox / iOS App Icon / Ant Design Badge — 全部 wrap 視覺重心(icon / avatar),不 wrap interactive chrome(button padding) <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 - **aria**：parent 元件的 `aria-label` 包含 badge 資訊（見「無障礙」）
 
 ### Overlay 適用元件 canonical(2026-04-20)
@@ -272,7 +272,7 @@ Q3. Badge 自己獨立呈現狀態嗎?(無宿主元件)
 - ❌ **text + icon Button**:按鈕寬度遠大於 icon,badge 跑到按鈕右邊緣,離 icon 太遠,視覺上 dot / count 跟 icon 語義無法配對。使用者不會把 "飄在按鈕邊緣的小點" 和齒輪 icon 的 "有新功能" 連結起來。改用:(a) 按鈕改 iconOnly、(b) 移除 overlay 改 inline badge 在 text 後。
 - ❌ **Primary / 主 CTA button**:contrast floor 會逼 badge 升階到 critical,扭曲 passive count 的語意(見「Contrast floor」rule)。Archive 這種歸檔動作本來就不該是 primary;正確做法是按鈕降級 tertiary + badge 回歸 low。
 
-世界級對照:iOS / Material / macOS / Slack 的 badge dot 永遠貼在 **App icon 或單一 icon** 上,從不疊在「icon + text」的 inline button 右上角。
+世界級對照:iOS / Material / macOS / Slack 的 badge dot 永遠貼在 **App icon 或單一 icon** 上,從不疊在「icon + text」的 inline button 右上角。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 ### 2. Inline（跟 label 並列）
 

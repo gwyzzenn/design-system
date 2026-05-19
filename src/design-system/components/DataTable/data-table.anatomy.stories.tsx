@@ -58,12 +58,12 @@ export const Overview: Story = {
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
-      col.accessor('name', { header: 'Product', size: 200, meta: { type: 'string' } }),
-      col.accessor('category', { header: 'Category', size: 140, meta: { type: 'select', options: CATEGORY_OPTIONS } }),
-      col.accessor('stock', { header: 'Stock', size: 140, meta: { type: 'select', options: STATUS_OPTIONS } }),
-      col.accessor('price', { header: 'Price', size: 120, meta: { type: 'currency', prefix: '$' } }),
-      col.accessor('available', { header: 'Available', size: 100, meta: { type: 'boolean' } }),
-      col.accessor('launchDate', { header: 'Launch', size: 140, meta: { type: 'date' } }),
+      col.accessor('name', { header: 'Product', meta: { type: 'string', width: 200 } }),
+      col.accessor('category', { header: 'Category', meta: { type: 'select', options: CATEGORY_OPTIONS, width: 140 } }),
+      col.accessor('stock', { header: 'Stock', meta: { type: 'select', options: STATUS_OPTIONS, width: 140 } }),
+      col.accessor('price', { header: 'Price', meta: { type: 'currency', prefix: '$', width: 120 } }),
+      col.accessor('available', { header: 'Available', meta: { type: 'boolean', width: 100 } }),
+      col.accessor('launchDate', { header: 'Launch', meta: { type: 'date', width: 140 } }),
     ]
 
     return (
@@ -142,12 +142,12 @@ export const Inspector: Story = {
     const { size, bordered, pinnedLeft, pinnedRight, inlineEdit, height } = args as InspectorArgs
     const col = createColumnHelper<Product>()
     const columns = [
-      col.accessor('name', { header: 'Product', size: 200, meta: { type: 'string' } }),
-      col.accessor('category', { header: 'Category', size: 140, meta: { type: 'select', options: CATEGORY_OPTIONS } }),
-      col.accessor('stock', { header: 'Stock', size: 140, meta: { type: 'select', options: STATUS_OPTIONS } }),
-      col.accessor('price', { header: 'Price', size: 120, meta: { type: 'currency', prefix: '$' } }),
-      col.accessor('available', { header: 'Available', size: 100, meta: { type: 'boolean' } }),
-      col.accessor('launchDate', { header: 'Launch', size: 140, meta: { type: 'date' } }),
+      col.accessor('name', { header: 'Product', meta: { type: 'string', width: 200 } }),
+      col.accessor('category', { header: 'Category', meta: { type: 'select', options: CATEGORY_OPTIONS, width: 140 } }),
+      col.accessor('stock', { header: 'Stock', meta: { type: 'select', options: STATUS_OPTIONS, width: 140 } }),
+      col.accessor('price', { header: 'Price', meta: { type: 'currency', prefix: '$', width: 120 } }),
+      col.accessor('available', { header: 'Available', meta: { type: 'boolean', width: 100 } }),
+      col.accessor('launchDate', { header: 'Launch', meta: { type: 'date', width: 140 } }),
     ]
     return (
       <DataTable
@@ -169,11 +169,11 @@ export const ColumnTypes: Story = {
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
-      col.accessor('name', { header: 'text', size: 200, meta: { type: 'string' } }),
-      col.accessor('price', { header: 'currency', size: 120, meta: { type: 'currency', prefix: '$' } }),
-      col.accessor('stock', { header: 'select(Tag)', size: 140, meta: { type: 'select', options: STATUS_OPTIONS } }),
-      col.accessor('available', { header: 'boolean(✓/—)', size: 100, meta: { type: 'boolean' } }),
-      col.accessor('launchDate', { header: 'date', size: 140, meta: { type: 'date' } }),
+      col.accessor('name', { header: 'text', meta: { type: 'string', width: 200 } }),
+      col.accessor('price', { header: 'currency', meta: { type: 'currency', prefix: '$', width: 120 } }),
+      col.accessor('stock', { header: 'select(Tag)', meta: { type: 'select', options: STATUS_OPTIONS, width: 140 } }),
+      col.accessor('available', { header: 'boolean(✓/—)', meta: { type: 'boolean', width: 100 } }),
+      col.accessor('launchDate', { header: 'date', meta: { type: 'date', width: 140 } }),
     ]
 
     return (
@@ -214,9 +214,9 @@ export const RowHeightMatrix: Story = {
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
-      col.accessor('name', { header: 'Product', size: 200, meta: { type: 'string' } }),
-      col.accessor('category', { header: 'Category', size: 140, meta: { type: 'select', options: CATEGORY_OPTIONS } }),
-      col.accessor('price', { header: 'Price', size: 120, meta: { type: 'currency', prefix: '$' } }),
+      col.accessor('name', { header: 'Product', meta: { type: 'string', width: 200 } }),
+      col.accessor('category', { header: 'Category', meta: { type: 'select', options: CATEGORY_OPTIONS, width: 140 } }),
+      col.accessor('price', { header: 'Price', meta: { type: 'currency', prefix: '$', width: 120 } }),
     ]
     return (
       <div className="flex flex-col gap-8">
@@ -252,10 +252,10 @@ export const AlignmentRule: Story = {
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
-      col.accessor('name', { header: 'Product(text)', size: 200, meta: { type: 'string' } }),
-      col.accessor('price', { header: 'Price(currency)', size: 120, meta: { type: 'currency', prefix: '$' } }),
-      col.accessor('stock', { header: 'Stock(select)', size: 120, meta: { type: 'select', options: STATUS_OPTIONS } }),
-      col.accessor('available', { header: 'Available(boolean)', size: 100, meta: { type: 'boolean' } }),
+      col.accessor('name', { header: 'Product(text)', meta: { type: 'string', width: 200 } }),
+      col.accessor('price', { header: 'Price(currency)', meta: { type: 'currency', prefix: '$', width: 120 } }),
+      col.accessor('stock', { header: 'Stock(select)', meta: { type: 'select', options: STATUS_OPTIONS, width: 120 } }),
+      col.accessor('available', { header: 'Available(boolean)', meta: { type: 'boolean', width: 100 } }),
     ]
     return (
       <div className="flex flex-col gap-8">
@@ -290,9 +290,9 @@ export const Features: Story = {
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
-      col.accessor('name', { header: 'Product', size: 200, meta: { type: 'string' }, enableSorting: true }),
-      col.accessor('category', { header: 'Category', size: 140, meta: { type: 'select', options: CATEGORY_OPTIONS } }),
-      col.accessor('price', { header: 'Price', size: 120, meta: { type: 'currency', prefix: '$' }, enableSorting: true }),
+      col.accessor('name', { header: 'Product', meta: { type: 'string', width: 200 }, enableSorting: true }),
+      col.accessor('category', { header: 'Category', meta: { type: 'select', options: CATEGORY_OPTIONS, width: 140 } }),
+      col.accessor('price', { header: 'Price', meta: { type: 'currency', prefix: '$', width: 120 }, enableSorting: true }),
     ]
     const virtualData = Array.from({ length: 500 }, (_, i) => ({
       name: `Product ${String(i + 1).padStart(4, '0')}`,
@@ -463,9 +463,9 @@ export const EmptyState: Story = {
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
-      col.accessor('name', { header: 'Product', size: 200, meta: { type: 'string' } }),
-      col.accessor('category', { header: 'Category', size: 140, meta: { type: 'select', options: CATEGORY_OPTIONS } }),
-      col.accessor('price', { header: 'Price', size: 120, meta: { type: 'currency', prefix: '$' } }),
+      col.accessor('name', { header: 'Product', meta: { type: 'string', width: 200 } }),
+      col.accessor('category', { header: 'Category', meta: { type: 'select', options: CATEGORY_OPTIONS, width: 140 } }),
+      col.accessor('price', { header: 'Price', meta: { type: 'currency', prefix: '$', width: 120 } }),
     ]
     return (
       <div>
@@ -482,9 +482,9 @@ export const BorderedProp: Story = {
   render: () => {
     const col = createColumnHelper<Product>()
     const columns = [
-      col.accessor('name', { header: 'Product', size: 200, meta: { type: 'string' } }),
-      col.accessor('category', { header: 'Category', size: 140, meta: { type: 'select', options: CATEGORY_OPTIONS } }),
-      col.accessor('price', { header: 'Price', size: 120, meta: { type: 'currency', prefix: '$' } }),
+      col.accessor('name', { header: 'Product', meta: { type: 'string', width: 200 } }),
+      col.accessor('category', { header: 'Category', meta: { type: 'select', options: CATEGORY_OPTIONS, width: 140 } }),
+      col.accessor('price', { header: 'Price', meta: { type: 'currency', prefix: '$', width: 120 } }),
     ]
     return (
       <div className="flex flex-col gap-8">

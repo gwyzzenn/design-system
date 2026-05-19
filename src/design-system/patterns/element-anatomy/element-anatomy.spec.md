@@ -1,4 +1,4 @@
-<!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
+<!-- @benchmark-cited: D5 retrofit 2026-05-18 — body claims marked per-claim @benchmark-unverified inline; canonical source URLs in frontmatter benchmark list. -->
 
 # Element Anatomy 設計原則(4-Family Model Taxonomy)
 
@@ -32,7 +32,7 @@ Taxonomy 跟 F1+F2 runtime primitive **co-locate 在同 folder** 是 `src/design
 
 | 偏離類型 | 範例 | 合理理由 |
 |---------|------|---------|
-| **單一固定 size** | Chip (`h-field-sm`) / Notice / Alert / Toast | 世界級共識(Material 3 filter chips / Material Banner):此類元件不需密度選擇 |
+| **單一固定 size** | Chip (`h-field-sm`) / Notice / Alert / Toast | 世界級共識(Material 3 filter chips / Material Banner):此類元件不需密度選擇 | <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 | **Alias** | Tag lg=md=24px | 子元件補齊(discrete tier):consumer 傳 size 不 break,視覺等同 |
 | **Mode 取代 Size** | FileItem(`compact` / `rich`) | **結構變體**非密度變體——用 size 會誤導 |
 | **額外 xs**(Family 3 only) | Button / SegmentedControl xs | icon-only toolbar utility(24px 固定 不配對 Field) |

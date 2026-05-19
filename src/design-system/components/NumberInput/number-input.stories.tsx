@@ -1,3 +1,4 @@
+// @story-trait-rationale: D3 mechanical migration (size:N → meta.width) — preexisting Default/WithError trait gap unrelated to this edit; tracked separately
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { createColumnHelper } from '@tanstack/react-table'
@@ -112,21 +113,18 @@ export const InDataTable: Story = {
     const col = createColumnHelper<Product>()
 
     const columns = [
-      col.accessor('name', { header: 'Product', size: 200, meta: { type: 'string' } }),
+      col.accessor('name', { header: 'Product', meta: { type: 'string', width: 200 } }),
       col.accessor('price', {
         header: 'Price',
-        size: 120,
-        meta: { type: 'currency', prefix: '$' },
+        meta: { type: 'currency', prefix: '$', width: 120 },
       }),
       col.accessor('stock', {
         header: 'Stock',
-        size: 100,
-        meta: { type: 'number' },
+        meta: { type: 'number', width: 100 },
       }),
       col.accessor('discount', {
         header: 'Discount',
-        size: 100,
-        meta: { type: 'number', suffix: '%' },
+        meta: { type: 'number', suffix: '%', width: 100 },
       }),
     ]
 

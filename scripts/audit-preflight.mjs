@@ -39,9 +39,16 @@ const fileBuckets = {
 
 // ── 2. 設計原則 enumeration ─────────────────────────────────────────
 // 2.1 M-rules from meta-patterns.md
+// 2026-05-18 fix(per codex Phase B audit P0-2):支援兩種 M-rule 表達式 —
+//   (a) table-row: `| **M<N>** | ...`(原 pattern,大宗 M1-M33)
+//   (b) heading:   `## M<N> ...`(M34 升 heading 型 codify per user gap finding)
+// 任一 match 都 abstract 成 `M<N>`,避免 abstract drift hide audit gap。
 const metaPatternsPath = path.join(ROOT, '.claude/rules/meta-patterns.md')
 const metaContent = fs.existsSync(metaPatternsPath) ? fs.readFileSync(metaPatternsPath, 'utf-8') : ''
-const mRules = [...metaContent.matchAll(/\|\s*\*\*M(\d+)\*\*\s*\|/g)].map(m => `M${m[1]}`)
+const mRulesSet = new Set()
+for (const m of metaContent.matchAll(/\|\s*\*\*M(\d+)\*\*\s*\|/g)) mRulesSet.add(`M${m[1]}`)
+for (const m of metaContent.matchAll(/^##\s+M(\d+)\b/gm)) mRulesSet.add(`M${m[1]}`)
+const mRules = [...mRulesSet].sort((a, b) => parseInt(a.slice(1)) - parseInt(b.slice(1)))
 
 // 2.2 Spec.md traits enumeration
 const traitsSet = new Set()

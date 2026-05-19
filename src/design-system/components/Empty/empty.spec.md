@@ -10,7 +10,7 @@ benchmark:
   - Polaris EmptyState: github.com/Shopify/polaris/tree/main/polaris-react/src/components/EmptyState
 ---
 
-<!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
+<!-- @benchmark-cited: D5 retrofit 2026-05-18 — body claims marked per-claim @benchmark-unverified inline; canonical source URLs in frontmatter benchmark list. -->
 
 # Empty 設計原則
 
@@ -104,8 +104,8 @@ Empty 是 **non-interactive layout primitive**——本身無 ARIA role(讓 cons
 
 | 場景 | Consumer 容器應加 | 為什麼 |
 |------|----------------|------|
-| Table / List 空狀態 | `<table aria-describedby={emptyId}>` 或在容器加 `aria-live="polite"` | screen reader 在資料載入完成時主動通知「無資料」(對齊 Polaris EmptyState pattern) |
-| Search / Filter 無結果 | container `aria-live="polite"` + 文案明確指向搜尋詞(「找不到符合『XXX』的結果」)| 對齊 Material `<NoOptions>` + Atlassian Empty Search idiom — 變動結果需 live region |
+| Table / List 空狀態 | `<table aria-describedby={emptyId}>` 或在容器加 `aria-live="polite"` | screen reader 在資料載入完成時主動通知「無資料」(對齊 Polaris EmptyState pattern) | <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
+| Search / Filter 無結果 | container `aria-live="polite"` + 文案明確指向搜尋詞(「找不到符合『XXX』的結果」)| 對齊 Material `<NoOptions>` + Atlassian Empty Search idiom — 變動結果需 live region | <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 | Page section 暫無內容 | `<section aria-labelledby={titleId}>` + `<h2>` 包 title slot | 對齊 WCAG 2.1 SC 2.4.6 標題明確語意 |
 | 初次引導(有 CTA) | Action Button 自帶 a11y;無需 Empty 層額外 ARIA | CTA 是真實互動 element,自己的 a11y 足夠 |
 
@@ -120,7 +120,7 @@ Empty 是 **non-interactive layout primitive**——本身無 ARIA role(讓 cons
 - **Material** `<NoOptions>`(Autocomplete 內):容器自帶 `role="listbox"` + `aria-live="polite"` 通知無結果
 - **Carbon** `<EmptyState>`:無自帶 ARIA,文檔指引 consumer 在父容器設 `aria-describedby`
 
-本 DS 對齊 Carbon「primitive 不自帶 ARIA,consumer 控制」哲學——避免 Empty 強加 role 跟 consumer 容器衝突。
+本 DS 對齊 Carbon「primitive 不自帶 ARIA,consumer 控制」哲學——避免 Empty 強加 role 跟 consumer 容器衝突。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 ---
 
@@ -167,7 +167,7 @@ Empty 是 **non-interactive layout primitive**——本身無 ARIA role(讓 cons
 
 - ❌ 把 Empty 拿來顯示 loading state(無 description 又無 spinner)— Empty 是「確定沒有」語意,loading 用 `<Skeleton>` / `<CircularProgress>` 或 `<Empty icon={<CircularProgress />}/>` compose
 - ❌ 把 Empty 拿來顯示 error state(只有 description)— error 需明確 action(重試 / 報告 / 聯絡支援),用 `<Alert>` + 重試 button
-- ❌ Empty title / description 文案太抽象(「Nothing here」「No data」)— 應描述「缺什麼資料」+「為什麼空」+「下一步動作」(對齊 Polaris EmptyState / Carbon Empty State copy guideline)
+- ❌ Empty title / description 文案太抽象(「Nothing here」「No data」)— 應描述「缺什麼資料」+「為什麼空」+「下一步動作」(對齊 Polaris EmptyState / Carbon Empty State copy guideline) <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 - ❌ Action button 用 destructive variant — Empty 是引導 onboarding 心境,destructive 視覺敵意衝突
 - ❌ 整頁 Empty 但無 action — user 困惑「我該做什麼」;若該頁本質無 action(等待後台 invite),改用 Alert/Notice 解釋
 

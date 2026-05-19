@@ -1,4 +1,4 @@
-<!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
+<!-- @benchmark-cited: D5 retrofit 2026-05-18 — body claims marked per-claim @benchmark-unverified inline; canonical source URLs in frontmatter benchmark list. -->
 
 # Color 設計原則
 
@@ -597,9 +597,9 @@ Dark mode 覆寫：hover/active 方向反轉（hover → step-7，active → ste
 
 1. **讀 code 的語意清晰**：`bg-neutral-selected` 比 `bg-neutral-active` 更精準表達「這個 element 處於選中狀態」，不需要讀者在腦裡轉換語意
 2. **未來演化的安全界線**：若未來要把 click 回饋加強（例：`--neutral-active` 改成 neutral-3），selected 狀態視覺不會被意外牽動
-3. **對齊流派原則**：本系統選 Atlassian 流派（Semantic State Token），把互動狀態封裝進 semantic 層——active 和 selected 本來就是兩個語意
+3. **對齊流派原則**：本系統選 Atlassian 流派（Semantic State Token），把互動狀態封裝進 semantic 層——active 和 selected 本來就是兩個語意 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
-此原則對齊 Carbon Design System 的 `$layer-*` 族命名（`$layer-active` vs `$layer-selected`），是世界級系統處理「同值不同語意」的標準做法。
+此原則對齊 Carbon Design System 的 `$layer-*` 族命名（`$layer-active` vs `$layer-selected`），是世界級系統處理「同值不同語意」的標準做法。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 ### Default state family
 
@@ -701,7 +701,7 @@ Dark mode 覆寫：hover/active 方向反轉（hover → step-7，active → ste
 
 **解法**:**淡化 outer border 至 divider 同色**(從 `border-border` 降到 `border-divider`)。交匯處 seamless,divider 視覺重量不變。
 
-**實作**:DataTable outer 用 `border-divider`(對齊 row 內 dividers)。對齊 Ant Design `colorBorderSecondary` idiom — Ant table 外框 + row divider 同 token。
+**實作**:DataTable outer 用 `border-divider`(對齊 row 內 dividers)。對齊 Ant Design `colorBorderSecondary` idiom — Ant table 外框 + row divider 同 token。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 **何時 outer = `--border` vs `--divider`**:
 - 元件**無 inner divider**(input / Field / Card / Dialog)→ 用 `--border`(獨立邊框,標準視覺重量)

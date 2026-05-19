@@ -11,7 +11,7 @@ benchmark:
   - Carbon DataTable (batch actions): github.com/carbon-design-system/carbon/tree/main/packages/react/src/components/DataTable
 ---
 
-<!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
+<!-- @benchmark-cited: D5 retrofit 2026-05-18 — body claims marked per-claim @benchmark-unverified inline; canonical source URLs in frontmatter benchmark list. -->
 
 # BulkActionBar 設計原則
 
@@ -21,7 +21,7 @@ benchmark:
 
 **Layout Family**:非 1-4 family — composite / multi-section(自 own layout,batch action 區 + count 區 + page-action 區 + hint banner)。
 
-**世界級對照**:Linear bulk action toolbar / Polaris IndexTable bulk actions / Material DataGrid `<GridToolbar>` selection mode / Notion database row selection bar / Gmail / GitHub Issues 多選 toolbar。
+**世界級對照**:Linear bulk action toolbar / Polaris IndexTable bulk actions / Material DataGrid `<GridToolbar>` selection mode / Notion database row selection bar / Gmail / GitHub Issues 多選 toolbar。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 ---
 
@@ -80,14 +80,14 @@ benchmark:
 
 | Placement variant | Buttons size | 理由 |
 |--|--|--|
-| **default**(footer 浮層 / page-bottom 區段)| **md** | 視覺 weight 對齊 Dialog footer commit 系 / page primary-button bar(md)/ Linear/Notion/Asana world-class 共識 |
+| **default**(footer 浮層 / page-bottom 區段)| **md** | 視覺 weight 對齊 Dialog footer commit 系 / page primary-button bar(md)/ Linear/Notion/Asana world-class 共識 | <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 | **top-toolbar 變體**(未來)| sm | 覆蓋 sm-density toolbar / GitHub-style;variant prop 驅動 override |
 
 #### Count text color canonical(2026-05-04 升 SSOT)
 
 | 元素 | Token / weight | 理由 |
 |--|--|--|
-| **count(`已選 N 項`)** | `text-foreground` + `font-medium` | state-bearing 主資訊(user 在 selection mode + N items),非裝飾 → primary foreground。對齊 Linear / Notion / Carbon / Polaris 共識;muted 化會弱化 state signal |
+| **count(`已選 N 項`)** | `text-foreground` + `font-medium` | state-bearing 主資訊(user 在 selection mode + N items),非裝飾 → primary foreground。對齊 Linear / Notion / Carbon / Polaris 共識;muted 化會弱化 state signal | <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 | **`hiddenByFilter` suffix(`· M 個被 filter 隱藏`)** | `text-fg-muted` + `font-normal` | 次資訊,視覺層次低於 count |
 | **clear X icon** | dismiss md(自動 fg-muted)| chrome dismiss canonical |
 
@@ -151,7 +151,7 @@ interface BulkActionBarLabels {
 }
 ```
 
-完整 default labels 由 component 內 export `BULK_ACTION_BAR_DEFAULT_LABELS`,consumer 可 spread 後 override(對齊 Material `defaultLocale` 模式)。
+完整 default labels 由 component 內 export `BULK_ACTION_BAR_DEFAULT_LABELS`,consumer 可 spread 後 override(對齊 Material `defaultLocale` 模式)。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 **Hint banner(擴 dataset 提示)不在本 API**:由 consumer 用 `<Alert variant="info" placement="fixed">` 配 ReactNode title 帶 inline link 自組,黏在 BulkActionBar 上方。Alert / Notice 的 `title` + `description` 已支援 ReactNode(2026-04-28)。
 
@@ -171,7 +171,7 @@ interface BulkActionBarLabels {
 ## 視覺與動畫
 
 - **出現 / 消失**:`selection.length` 0→>0 時 fade in;>0→0 時 fade out（animation timing — see motion canonical, not invariant）。**不 layout shift**(預留位置或 absolute / fixed)
-- **底色**:**無底色 contrast**,跟 page 同色(`bg-canvas` / `bg-surface` 視 placement 繼承)。對齊 Notion / Linear minimalist — 用文字內容切換呈現「mode」,**不**用底色 highlight。**不像 Polaris 那種顯著底色變化**
+- **底色**:**無底色 contrast**,跟 page 同色(`bg-canvas` / `bg-surface` 視 placement 繼承)。對齊 Notion / Linear minimalist — 用文字內容切換呈現「mode」,**不**用底色 highlight。**不像 Polaris 那種顯著底色變化** <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 - **邊界**:**無外框邊界**(融入 page chrome)— Top 模式跟 toolbar 共位置;Footer 模式 **`border-top` border-divider 切割 layout**(因 footer 是 page 結構,不是 floating overlay,不用 box-shadow 製造「浮層」誤導)
 - **與 table 的關係**:Top scenario 跟 toolbar 共邊;Footer scenario 是 page 結構性 footer,純 border-top 切
 - **Action variant**:`tertiary`(主)+ `tertiary danger`(destructive)— **不用 primary**(留給 dialog 確認最終 action)

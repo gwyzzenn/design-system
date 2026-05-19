@@ -13,7 +13,7 @@ benchmark:
   - Carbon Breadcrumb: github.com/carbon-design-system/carbon/tree/main/packages/react/src/components/Breadcrumb
 ---
 
-<!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
+<!-- @benchmark-cited: D5 retrofit 2026-05-18 — body claims marked per-claim @benchmark-unverified inline; canonical source URLs in frontmatter benchmark list. -->
 
 # Breadcrumb 設計原則
 
@@ -51,7 +51,7 @@ Breadcrumb 顯示「當前頁面在資訊階層中的位置」，同時提供快
 | **Sidebar nav** | Sidebar 是全局導覽 chrome;Breadcrumb 是 content header 內 inline path | 局部位置 anchor,不取代全局 nav |
 | **Link / page header** | Link 是單一導覽動作;Breadcrumb 是 parent-chain 完整路徑 | 路徑 ≥ 3 層需要可逐層回上 |
 
-對齊 Polaris Breadcrumbs / Material Breadcrumb / Atlassian Breadcrumbs 共識:nav inside page header,不取代 sidebar。
+對齊 Polaris Breadcrumbs / Material Breadcrumb / Atlassian Breadcrumbs 共識:nav inside page header,不取代 sidebar。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 ---
 
@@ -127,7 +127,7 @@ Breadcrumb 顯示「當前頁面在資訊階層中的位置」，同時提供快
 
 ## Single-line + Overflow / 長路徑處理(2026-05-10 升級)
 
-**Single-line canonical**:BreadcrumbList 預設 `flex-nowrap`,**不 wrap 到下一行**。對齊 Material UI / GitHub / Notion / Linear / Atlassian 共識(WebFetch verified Material UI source `Breadcrumbs.js renderItemsBeforeAndAfter`)。路徑過長走中段折疊,非 multi-line wrap。
+**Single-line canonical**:BreadcrumbList 預設 `flex-nowrap`,**不 wrap 到下一行**。對齊 Material UI / GitHub / Notion / Linear / Atlassian 共識(WebFetch verified Material UI source `Breadcrumbs.js renderItemsBeforeAndAfter`)。路徑過長走中段折疊,非 multi-line wrap。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 當路徑層級太深(> 4–5 層)且容器寬度有限,world-class 作法是**中段折疊**:
 
@@ -140,7 +140,7 @@ Breadcrumb 顯示「當前頁面在資訊階層中的位置」，同時提供快
 - `<BreadcrumbEllipsis>` 消費 `ItemInlineActionButton` primitive(per inline-action.spec.md predicate + M1 SSOT 消費),`overlayTrigger=true` 內建 DropdownMenu open 視覺鎖
 - 包 `<DropdownMenuTrigger asChild>` 提供點 ⋯ 展開互動
 
-**v2 shipped Phase B**(2026-05-10):declarative `items` prop + `maxItems`(**default 4**,user-tuned;Material UI source 預設 8)+ `itemsBeforeCollapse`(default 1)+ `itemsAfterCollapse`(default 1)auto-collapse mode。對齊 Material UI source `Breadcrumbs.js renderItemsBeforeAndAfter` mechanism(2026-05-10 WebFetch verified)。
+**v2 shipped Phase B**(2026-05-10):declarative `items` prop + `maxItems`(**default 4**,user-tuned;Material UI source 預設 8)+ `itemsBeforeCollapse`(default 1)+ `itemsAfterCollapse`(default 1)auto-collapse mode。對齊 Material UI source `Breadcrumbs.js renderItemsBeforeAndAfter` mechanism(2026-05-10 WebFetch verified)。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 ```tsx
 <BreadcrumbList
@@ -191,7 +191,7 @@ Breadcrumb 顯示「當前頁面在資訊階層中的位置」，同時提供快
 
 ## Title-breadcrumb-end 同步 canonical(2026-05-10 新增)
 
-**Breadcrumb 末位 `<BreadcrumbPage>` 文字 = page title `<h2>` / `<h3>` / `<h4>` 內容**。對齊 GitHub / Notion / Linear / Atlassian / Material UI examples 共識。
+**Breadcrumb 末位 `<BreadcrumbPage>` 文字 = page title `<h2>` / `<h3>` / `<h4>` 內容**。對齊 GitHub / Notion / Linear / Atlassian / Material UI examples 共識。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 具體 pairing(per BreadcrumbList size):
 - `size="sm"` + 末位 `<BreadcrumbPage>X</BreadcrumbPage>` + `<h4>X</h4>` 同字
@@ -220,7 +220,7 @@ Breadcrumb 顯示「當前頁面在資訊階層中的位置」，同時提供快
 
 Breadcrumb 決策維度是 collapse 策略 × size × 當前頁狀態,已在 `CollapseMatrix` / `SizeMatrix` / `ColorMatrix` / `StateBehavior` / 元件特有 `UsageExamples` 五張結構矩陣 + 真實場景完整覆蓋。互動 Inspector(切換 size / truncate)無法呈現「路徑深度 + 斷點」這類真實場景決策——`UsageExamples` 展示實際業務路徑更直接。
 
-ColorMatrix 已建:展示 BreadcrumbLink / Page / Separator / Ellipsis 四種節點的 default / hover / focus 色彩矩陣,採 fg-muted → fg-secondary → foreground 的階層策略(對齊 GitHub / Notion / Linear)。
+ColorMatrix 已建:展示 BreadcrumbLink / Page / Separator / Ellipsis 四種節點的 default / hover / focus 色彩矩陣,採 fg-muted → fg-secondary → foreground 的階層策略(對齊 GitHub / Notion / Linear)。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 ---
 

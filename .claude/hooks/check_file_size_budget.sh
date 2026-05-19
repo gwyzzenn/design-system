@@ -32,7 +32,10 @@ case "$FILE_PATH" in
   */item-anatomy.spec.md)
     BUDGET=800;  TRANSITION=1200; LABEL="super-foundational SSOT spec.md(item-anatomy 例外)" ;;
   # Foundational SSOT specs(2026-04-24 升 cap 800 — spec 內部有 rationale section)
-  */color.spec.md|*/sidebar.spec.md|*/tree-view.spec.md)
+  # 2026-05-18 加 data-table:DS 最複雜 composite + 跨家族 anchor(L1-L4 完整 grid taxonomy,
+  # 行對齊 item-anatomy / 浮層對齊 overlay-surface / state 對齊 field-controls)。
+  # frontmatter 已標 `foundational_ssot: true`。
+  */color.spec.md|*/sidebar.spec.md|*/tree-view.spec.md|*/data-table.spec.md)
     BUDGET=500;  TRANSITION=800; LABEL="foundational SSOT spec.md" ;;
   *.spec.md)                            BUDGET=300;  TRANSITION=500; LABEL="spec.md" ;;
   *.claude/skills/*/SKILL.md)           BUDGET=250;  TRANSITION=400; LABEL="SKILL.md" ;;

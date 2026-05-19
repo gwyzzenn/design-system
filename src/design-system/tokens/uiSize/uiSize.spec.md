@@ -1,4 +1,4 @@
-<!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
+<!-- @benchmark-cited: D5 retrofit 2026-05-18 — body claims marked per-claim @benchmark-unverified inline; canonical source URLs in frontmatter benchmark list. -->
 
 # UiSize 設計原則
 
@@ -300,7 +300,7 @@ Overlay family 套 v5 `data-unbounded` slot trick(Button unbounded → SurfaceHe
 6. ☐ Dismiss button:overlay 用 `<Button dismiss size="sm" data-dismiss />`(native sm,trick 自動套);notification banner 用 `<Button dismiss size="xs" />`(family 特化)
 
 **SSOT 入口**(本節即入口):`tokens/uiSize/uiSize.spec.md`「Chrome header 選型 canonical」
-- Density lg 模式下 56px 對齊 Material 桌面 app bar 的舒適呼吸
+- Density lg 模式下 56px 對齊 Material 桌面 app bar 的舒適呼吸 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 ---
 
@@ -346,7 +346,7 @@ className={cn(
 - `aspect-square` 從 `h-field-X` 計算 width,無 magic number
 - `p-0` + flex-center → SVG 自動置中,無公式
 - Border 厚度由 `border-box` 自然吸收(width 不被影響)
-- 對齊 **Polaris / Atlassian** 的 iconOnly idiom(2/4 家世界級派,另 2 家 Material/Ant 用 padding-based 屬不同設計取捨)
+- 對齊 **Polaris / Atlassian** 的 iconOnly idiom(2/4 家世界級派,另 2 家 Material/Ant 用 padding-based 屬不同設計取捨) <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 ### 各 size 的 icon-size
 

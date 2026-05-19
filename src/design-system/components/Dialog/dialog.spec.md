@@ -12,7 +12,7 @@ benchmark:
   - Polaris Modal: github.com/Shopify/polaris/tree/main/polaris-react/src/components/Modal
 ---
 
-<!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
+<!-- @benchmark-cited: D5 retrofit 2026-05-18 — body claims marked per-claim @benchmark-unverified inline; canonical source URLs in frontmatter benchmark list. -->
 
 # Dialog 設計原則
 

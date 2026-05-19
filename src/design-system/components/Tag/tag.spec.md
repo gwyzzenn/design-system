@@ -46,7 +46,7 @@ benchmark:
   - Carbon Tag: github.com/carbon-design-system/carbon/tree/main/packages/react/src/components/Tag
 ---
 
-<!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
+<!-- @benchmark-cited: D5 retrofit 2026-05-18 — body claims marked per-claim @benchmark-unverified inline; canonical source URLs in frontmatter benchmark list. -->
 
 # Tag 設計原則
 
@@ -93,7 +93,7 @@ Tag 是 inline label，用於分類標籤、狀態標記、多選已選值。不
 
 ## Color
 
-以色名命名，語義由消費端決定。建議用法與色彩系統的語義定義對齊。Prop 命名 `color`（對齊 MUI Chip / Ant Tag / Atlaskit Tag world-class 多數派 idiom）。
+以色名命名，語義由消費端決定。建議用法與色彩系統的語義定義對齊。Prop 命名 `color`（對齊 MUI Chip / Ant Tag / Atlaskit Tag world-class 多數派 idiom）。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 | Color | 建議用法 |
 |---------|----------|

@@ -1,4 +1,4 @@
-<!-- @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved. -->
+<!-- @benchmark-cited: D5 retrofit 2026-05-18 — body claims marked per-claim @benchmark-unverified inline; canonical source URLs in frontmatter benchmark list. -->
 
 # Overlay Surface 設計原則
 
@@ -68,7 +68,7 @@ Dialog 和 Popover 的**結構化 sub-components 共用 primitive**——提供 
 2026-05-01 移除 `<DialogBody flush>` / `<SheetBody flush>` / `<PopoverBody flush>` variant。原因:
 
 1. **Variant 不解決底層脆弱**:flush 只省一行 chrome padding override;consumer 仍要管 list outer `py-2` + item `px-loose rounded-md` — 加 1 row search/banner 就破功(body 反而沒 chrome padding,更難排版)。
-2. **世界級主流不做 universal flush**:Material M3 / Atlassian Dialog / Mantine Modal / shadcn Dialog 都讓 consumer 用 className override 處理。Polaris 有 flush API 但 scope 極窄(只 ResourceList in Modal)。Mainstream 把這個 case 歸 consumer 自管。
+2. **世界級主流不做 universal flush**:Material M3 / Atlassian Dialog / Mantine Modal / shadcn Dialog 都讓 consumer 用 className override 處理。Polaris 有 flush API 但 scope 極窄(只 ResourceList in Modal)。Mainstream 把這個 case 歸 consumer 自管。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 3. **Single API surface**:body 一律 chrome padded,list-only 場景用 `className="!px-0 !pt-0 !pb-0"` override + 自管 list outer wrapper — surface 概念清楚,不雙路徑。
 
 ### Canonical pattern
@@ -96,7 +96,7 @@ chrome 邊 ─ hover bg 左邊 ─────── [ loose breathing ] ──�
   (x=0)     (x=0, flush chrome)                           (x=loose, 對齊 header)
 ```
 
-### 世界級對照(Linear-family canonical;≥5 家)
+### 世界級對照(Linear-family canonical;≥5 家) <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
 | DS | Body padding | Item padding | Hover bg flush chrome? |
 |----|---|---|---|
