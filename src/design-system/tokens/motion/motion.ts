@@ -7,11 +7,11 @@
  * SSOT: `motion.css` + `motion.spec.md`。
  */
 
-/** 純文字提示(Tooltip)— passive hint */
-export const HOVER_DELAY_PLAIN_MS = 200
+/** 純文字提示(Tooltip)— passive hint。2026-05-20 200→500ms 對齊 Material 3 / Apple HIG / shadcn-Radix 主流 */
+export const HOVER_DELAY_PLAIN_MS = 500
 
-/** 內容預覽(HoverCard / NameCard)— rich preview */
-export const HOVER_DELAY_RICH_MS = 300
+/** 內容預覽(HoverCard / NameCard)— rich preview。2026-05-20 300→700ms 避免列表掃視誤觸發 fetch */
+export const HOVER_DELAY_RICH_MS = 700
 
 /** 通用關閉延遲(所有 hover overlay)— accidental-hover 容錯 */
 export const HOVER_DELAY_CLOSE_MS = 200

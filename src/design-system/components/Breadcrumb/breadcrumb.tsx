@@ -2,7 +2,7 @@
 // code-quality-allow: file-size — Breadcrumb 含 BreadcrumbList(主)+ BreadcrumbItem + BreadcrumbEllipsis + items-collapse logic,split 會破壞 collapse/overflow Tooltip subtree
 import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import { ChevronRight, MoreHorizontal } from 'lucide-react'
+import { ChevronRight, MoreHorizontal, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ItemInlineActionButton } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/design-system/components/Tooltip/tooltip'
@@ -159,6 +159,13 @@ export interface BreadcrumbItemSpec {
   label: React.ReactNode
   href?: string
   asChild?: boolean
+  /**
+   * 起始 icon(per `ui-development.md`「icon prop 命名 4 條」:slot 只接 icon → `startIcon`)。
+   * 業界慣例:Breadcrumb 首項用 Home icon 強化視覺錨點(Material / Atlassian)。
+   * 內部消費 `BREADCRUMB_ICON_SIZE[size]` SSOT(sm/md=16, lg=20,對齊 uiSize.spec.md Icon Size Tier)。
+   * Consumer **不傳** size,DS 統一管。
+   */
+  startIcon?: LucideIcon
 }
 
 interface BreadcrumbListProps extends Omit<React.ComponentPropsWithoutRef<'ol'>, 'children'> {
@@ -201,10 +208,10 @@ const BreadcrumbList = React.forwardRef<HTMLOListElement, BreadcrumbListProps>(
       const renderItem = (spec: BreadcrumbItemSpec, role: 'root' | 'middle' | 'current') => (
         <BreadcrumbItem key={`${role}-${typeof spec.label === 'string' ? spec.label : Math.random()}`} role={role}>
           {role === 'current'
-            ? <BreadcrumbPage>
+            ? <BreadcrumbPage startIcon={spec.startIcon}>
                 <TruncatedLabel fullText={typeof spec.label === 'string' ? spec.label : undefined}>{spec.label}</TruncatedLabel>
               </BreadcrumbPage>
-            : <BreadcrumbLink href={spec.href} asChild={spec.asChild}>
+            : <BreadcrumbLink href={spec.href} asChild={spec.asChild} startIcon={spec.startIcon}>
                 <TruncatedLabel fullText={typeof spec.label === 'string' ? spec.label : undefined}>{spec.label}</TruncatedLabel>
               </BreadcrumbLink>
           }
@@ -390,20 +397,20 @@ interface BreadcrumbItemProps extends React.ComponentPropsWithoutRef<'li'> {
 
 const BreadcrumbItem = React.forwardRef<HTMLLIElement, BreadcrumbItemProps>(
   ({ className, role, style, ...props }, ref) => {
-    // 2026-05-10 fix v2(user 抓「Long Organization Name 只顯示 L」)— v1 retract minWidth
-    // 完全 後,root 縮到 ~12px 只夠顯一個字元,**ellipsis 視覺消失**(text-overflow:ellipsis
-    // 需要 ~12-15px 才能 render「…」)。但 v1 前的 large minWidth(2.5-4rem)又 force 寬度
-    // 違反 hug content。
+    // 2026-05-20 fix v3(user 抓「專案 後方多 4px 間距 / 我的新專案 沒有」chevron 不對稱):
+    //   v2 `minWidth: '2rem'`(32px)在寬容器強制 li ≥ 32px → 短 label「專案」(natural ~28px)
+    //   被撐 4px,長 label「我的新專案」(natural ~70px)hug content → chevron 兩側不對稱。
     //
-    // 修正 v2:**小 min-width floor `2rem`(32px)** — 足以 render「X…」(1 char + ellipsis)
-    // 但對短中文 label「角色」(natural ~30px)只多 ~2px,視覺幾乎無感。Trade-off accepted:
-    //   - 短英文「OK / ID」(natural ~20px)→ min-width 32px = 多 12px bloat(minor 可接受)
-    //   - 短中文「角色 / 專案」(natural ~30px)→ min-width 32px = 多 2px(近 invisible)
-    //   - 長 label squeezed → 至少 32px 寬,「X…」永遠 visible(不丟失「有內容」訊號)
-    //   - Tooltip on truncate 提供完整文字
-    const shrinkStyle: React.CSSProperties = role === 'root' ? { flexShrink: 3, minWidth: '2rem' }
-      : role === 'middle' ? { flexShrink: 2, minWidth: '2rem' }
-      : role === 'current' ? { flexShrink: 1, minWidth: '2rem' }
+    // v3 解法:minWidth `2rem` → `1.5rem`(24px)
+    //   數學:中文「X…」最小寬度 = 1 char(~14-16px)+ ellipsis(~6-8px)≈ 22-24px → 24px 剛 cover
+    //   結果:
+    //     - 寬容器:所有自然 label ≥ 24px → li hug content,chevron 緊貼,對稱(本 fix 主目的)
+    //     - 窄容器 truncate:shrink 不過 24px → 「X…」仍可見 ellipsis 保險
+    //     - 短英文「OK / ID」(natural ~20px)→ 多 ~4px(原 12px → 縮到 4px,顯著改善)
+    //   對齊 user verbatim「minWidth 再調小一點」+ ellipsis 數學最小值。
+    const shrinkStyle: React.CSSProperties = role === 'root' ? { flexShrink: 3, minWidth: '1.5rem' }
+      : role === 'middle' ? { flexShrink: 2, minWidth: '1.5rem' }
+      : role === 'current' ? { flexShrink: 1, minWidth: '1.5rem' }
       : role === 'ellipsis' ? { flexShrink: 0 }
       : {}
     return (
@@ -424,11 +431,18 @@ BreadcrumbItem.displayName = 'BreadcrumbItem'
 interface BreadcrumbLinkProps extends React.ComponentPropsWithoutRef<'a'> {
   /** 將樣式套用至子元件(e.g. React Router Link) */
   asChild?: boolean
+  /**
+   * 起始 icon(per `ui-development.md`「icon prop 命名 4 條」:slot 只接 icon → `startIcon`)。
+   * 內部消費 `BREADCRUMB_ICON_SIZE[size]` SSOT,DS 統一尺寸不允許 consumer override。
+   * 對齊 uiSize.spec.md Icon Size Tier(2026-05-18 撤回 14 例外,統一 16/16/20)。
+   */
+  startIcon?: LucideIcon
 }
 
 const BreadcrumbLink = React.forwardRef<HTMLAnchorElement, BreadcrumbLinkProps>(
-  ({ asChild, className, children, ...props }, ref) => {
+  ({ asChild, className, children, startIcon: StartIcon, ...props }, ref) => {
     const Comp = asChild ? Slot : 'a'
+    const { size } = React.useContext(BreadcrumbContext)
     // 2026-05-12 fix(user 抓 image 2 Deep story 麵包屑沒符合 single-line + truncate canonical):
     // 純文字 children → auto-wrap TruncatedLabel(canonical「single-line + ellipsis + tooltip
     // on truncate」per spec.md / Polaris breadcrumb)。Non-string children(consumer 自訂 icon+text
@@ -451,6 +465,7 @@ const BreadcrumbLink = React.forwardRef<HTMLAnchorElement, BreadcrumbLinkProps>(
         )}
         {...props}
       >
+        {StartIcon && <StartIcon size={BREADCRUMB_ICON_SIZE[size]} aria-hidden className="shrink-0" />}
         {wrappedChildren}
       </Comp>
     )
@@ -460,27 +475,33 @@ BreadcrumbLink.displayName = 'BreadcrumbLink'
 
 // ── BreadcrumbPage (current, non-clickable) ──────────────────────────────────
 
-const BreadcrumbPage = React.forwardRef<
-  HTMLSpanElement,
-  React.ComponentPropsWithoutRef<'span'>
->(({ className, children, ...props }, ref) => {
-  // 2026-05-12 fix(同 BreadcrumbLink):純文字 children → auto-wrap TruncatedLabel。
-  const wrappedChildren = typeof children === 'string'
-    ? <TruncatedLabel fullText={children}>{children}</TruncatedLabel>
-    : children
-  return (
-    <span
-      ref={ref}
-      role="link"
-      aria-disabled="true"
-      aria-current="page"
-      className={cn('inline-flex items-center gap-2 min-w-0 max-w-full text-foreground', className)}
-      {...props}
-    >
-      {wrappedChildren}
-    </span>
-  )
-})
+interface BreadcrumbPageProps extends React.ComponentPropsWithoutRef<'span'> {
+  /** 起始 icon。內部消費 `BREADCRUMB_ICON_SIZE[size]` SSOT。對齊 BreadcrumbLink. */
+  startIcon?: LucideIcon
+}
+
+const BreadcrumbPage = React.forwardRef<HTMLSpanElement, BreadcrumbPageProps>(
+  ({ className, children, startIcon: StartIcon, ...props }, ref) => {
+    const { size } = React.useContext(BreadcrumbContext)
+    // 2026-05-12 fix(同 BreadcrumbLink):純文字 children → auto-wrap TruncatedLabel。
+    const wrappedChildren = typeof children === 'string'
+      ? <TruncatedLabel fullText={children}>{children}</TruncatedLabel>
+      : children
+    return (
+      <span
+        ref={ref}
+        role="link"
+        aria-disabled="true"
+        aria-current="page"
+        className={cn('inline-flex items-center gap-2 min-w-0 max-w-full text-foreground', className)}
+        {...props}
+      >
+        {StartIcon && <StartIcon size={BREADCRUMB_ICON_SIZE[size]} aria-hidden className="shrink-0" />}
+        {wrappedChildren}
+      </span>
+    )
+  }
+)
 BreadcrumbPage.displayName = 'BreadcrumbPage'
 
 // ── BreadcrumbSeparator ──────────────────────────────────────────────────────
