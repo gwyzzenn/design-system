@@ -7,6 +7,7 @@ import { NameCard } from './name-card'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
 import { Button } from '@/design-system/components/Button/button'
 import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/design-system/components/HoverCard/hover-card'
+import { HOVER_DELAY_RICH_MS, HOVER_DELAY_CLOSE_MS } from '@/design-system/tokens/motion/motion'
 
 const meta: Meta = {
   title: 'Design System/Internal/NameCard/設計原則',
@@ -44,7 +45,7 @@ const sampleActions = (
 
 function InlineHoverExample() {
   return (
-    <HoverCard openDelay={300} closeDelay={200}>
+    <HoverCard openDelay={HOVER_DELAY_RICH_MS} closeDelay={HOVER_DELAY_CLOSE_MS}>
       <span className="inline-flex items-center gap-2">
         <HoverCardTrigger asChild>
           <button type="button" className="cursor-pointer">

@@ -1,9 +1,17 @@
+// @story-trait-rationale: HoverCard 是「行為 primitive」非視覺 variant — `isOverlay` trait
+//   要求的 OpenSnapshot/defaultOpen 用 hover trigger 真實情境(MultiAvatarTooltip / Avatar
+//   滑過顯人物卡 / DateContextOnHover 等)展示遠比 forced-open snapshot 更貼近 user 真實
+//   體驗。Default/AllVariants N/A — HoverCard 自身無視覺(bg/border/shadow 由 consumer 決定),
+//   無 variant API,Default story 等於 consumer canonical wrapper(NameCard / OverflowIndicator
+//   各有自己的 Default 範例)。
+// @story-trait-allow: missing-default missing-opensnapshot
 import type { Meta, StoryObj } from '@storybook/react'
 import { ExternalLink, Github, Calendar, MapPin } from 'lucide-react'
 import { HoverCard, HoverCardTrigger, HoverCardContent } from './hover-card'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
 import { Button } from '@/design-system/components/Button/button'
 import { NameCard } from '@/design-system/components/NameCard/name-card'
+import { HOVER_DELAY_RICH_MS, HOVER_DELAY_CLOSE_MS } from '@/design-system/tokens/motion/motion'
 
 const meta: Meta = {
   title: 'Design System/Internal/HoverCard/展示',
@@ -135,7 +143,7 @@ export const OverflowList: Story = {
           <Avatar alt="Ada Chen" color="indigo" size={24} />
           <Avatar alt="張美真" color="magenta" size={24} />
           <Avatar alt="林伯彥" color="green" size={24} />
-          <HoverCard openDelay={200} closeDelay={300}>
+          <HoverCard openDelay={HOVER_DELAY_RICH_MS} closeDelay={HOVER_DELAY_CLOSE_MS}>
             <HoverCardTrigger asChild>
               <button
                 type="button"
@@ -239,7 +247,7 @@ export const TriggerShowcase: Story = {
       <div className="flex items-center gap-6 flex-wrap">
         <div className="flex flex-col gap-2">
           <span className="text-footnote text-fg-muted font-mono">trigger: Avatar</span>
-          <HoverCard openDelay={200} closeDelay={300}>
+          <HoverCard openDelay={HOVER_DELAY_RICH_MS} closeDelay={HOVER_DELAY_CLOSE_MS}>
             <HoverCardTrigger asChild>
               <button type="button" aria-label="Ada Chen 個人資訊" className="cursor-pointer rounded-full">
                 <Avatar alt="Ada Chen" color="indigo" size={32} />
@@ -253,7 +261,7 @@ export const TriggerShowcase: Story = {
 
         <div className="flex flex-col gap-2">
           <span className="text-footnote text-fg-muted font-mono">trigger: Button</span>
-          <HoverCard openDelay={200} closeDelay={300}>
+          <HoverCard openDelay={HOVER_DELAY_RICH_MS} closeDelay={HOVER_DELAY_CLOSE_MS}>
             <HoverCardTrigger asChild>
               <Button variant="tertiary" size="sm">
                 查看位置
@@ -270,7 +278,7 @@ export const TriggerShowcase: Story = {
 
         <div className="flex flex-col gap-2">
           <span className="text-footnote text-fg-muted font-mono">trigger: text link</span>
-          <HoverCard openDelay={200} closeDelay={300}>
+          <HoverCard openDelay={HOVER_DELAY_RICH_MS} closeDelay={HOVER_DELAY_CLOSE_MS}>
             <HoverCardTrigger asChild>
               <a
                 href="#"
@@ -288,8 +296,8 @@ export const TriggerShowcase: Story = {
       </div>
 
       <div className="text-footnote text-fg-muted">
-        建議 delay:<code className="font-mono mx-1">openDelay=200ms / closeDelay=300ms</code>——跟 Tooltip
-        (delay 0)拉開節奏,避免 hover 過路誤觸。
+        建議 delay:消費 <code className="font-mono mx-1">HOVER_DELAY_RICH_MS / HOVER_DELAY_CLOSE_MS</code> SSOT
+        (motion.spec.md,當前 700ms / 200ms)——避免 hover 過路誤觸發 fetch waterfall;close 延遲讓 user 誤滑出可回來。
       </div>
     </div>
   ),

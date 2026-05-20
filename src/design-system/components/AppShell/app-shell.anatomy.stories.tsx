@@ -6,6 +6,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import * as React from 'react'
 import { AppShell, AppShellAside } from './app-shell'
 import { AcmeSidebar, PageHeader } from './_demo-helpers'
+import { ChromeHeader } from '@/design-system/patterns/header-canonical/chrome-header'
 import { SidebarProvider, SidebarTrigger } from '@/design-system/components/Sidebar/sidebar'
 import { Button } from '@/design-system/components/Button/button'
 
@@ -102,13 +103,13 @@ export const StateBehavior: Story = {
           layout="primary-sidebar"
           sidebar={<AcmeSidebar />}
           header={
-            <header className="flex h-[var(--chrome-header-height)] shrink-0 items-center gap-2 border-b border-divider bg-surface px-[var(--layout-space-loose)]">
+            <ChromeHeader className="bg-surface">
               <SidebarTrigger />
               <h1 className="text-body-lg font-medium flex-1 truncate">Toggle Aside demo</h1>
               <Button size="sm" variant="primary" onClick={() => setOpen(!open)}>
                 {open ? 'Close' : 'Open'} Aside (cmd+.)
               </Button>
-            </header>
+            </ChromeHeader>
           }
           aside={
             <AppShellAside title="Detail panel" width={320}>
