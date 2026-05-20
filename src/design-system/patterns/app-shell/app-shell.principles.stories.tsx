@@ -11,7 +11,7 @@ type Story = StoryObj
 export const UsageGuidance: Story = {
   name: '使用準則',
   render: () => (
-    <div className="prose max-w-2xl space-y-6 px-[var(--layout-space-loose)] py-[var(--layout-space-loose)]">
+    <div className="prose max-w-2xl space-y-6 px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]">
       <section>
         <h2 className="text-h4 mb-2">何時用 AppShell</h2>
         <ul className="text-body space-y-1">

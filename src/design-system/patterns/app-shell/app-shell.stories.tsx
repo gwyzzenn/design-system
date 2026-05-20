@@ -105,13 +105,14 @@ function IssuesView({ onSelectIssue: _onSelectIssue }: { onSelectIssue: (issue: 
 function IssueDetail({ issue }: { issue: Issue | null }) {
   if (!issue) {
     return (
-      <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-loose)] text-fg-muted">
+      <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-tight)] text-fg-muted">
         選一個 issue 看詳情
       </div>
     )
   }
+  // Per layoutSpace.spec.md 規則 2(element-first → tight)+ 規則 4 line 1(內容 → action button → bottom 48)
   return (
-    <div className="flex flex-col gap-[var(--layout-space-loose)] px-[var(--layout-space-loose)] py-[var(--layout-space-loose)]">
+    <div className="flex flex-col gap-[var(--layout-space-loose)] px-[var(--layout-space-loose)] pt-[var(--layout-space-tight)] pb-[var(--layout-space-bottom)]">
       <p className="text-caption text-fg-muted">
         {issue.id} • {issue.status} • {issue.priority}
       </p>

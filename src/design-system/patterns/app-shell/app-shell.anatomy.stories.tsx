@@ -31,7 +31,7 @@ export const Overview: Story = {
           header={<PageHeader title="Dashboard" onToggleAside={() => setAsideOpen(!asideOpen)} asideOpen={asideOpen} />}
           aside={
             <AppShellAside title="Detail panel" width={320}>
-              <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-loose)]">
+              <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]">
                 <p className="text-body">Aside 內容(consumer 自管 padding,遵循 layoutSpace.spec.md 規則 1B 父層管)</p>
               </div>
             </AppShellAside>
@@ -39,7 +39,7 @@ export const Overview: Story = {
           asideOpen={asideOpen}
           onAsideOpenChange={setAsideOpen}
         >
-          <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-loose)]">
+          <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]">
             <h2 className="text-h4 mb-3">Main &lt;main&gt; landmark + padding=0</h2>
             <p className="text-body text-fg-secondary">
               內容自管 padding,遵循 layoutSpace.spec.md 6 條規則。本 slot 自身不發明 padding —
@@ -57,7 +57,7 @@ export const Overview: Story = {
 export const LayoutModeDiagram: Story = {
   name: 'LayoutModeDiagram — 兩 mode 對照(diagram)',
   render: () => (
-    <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-loose)] space-y-6 text-body">
+    <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-tight)] space-y-6 text-body">
       <h2 className="text-h4">兩 mode 對照</h2>
       <section className="space-y-2">
         <h3 className="text-h5">primary-sidebar(Linear / Notion / Figma 派)</h3>
@@ -112,7 +112,7 @@ export const StateBehavior: Story = {
           }
           aside={
             <AppShellAside title="Detail panel" width={320}>
-              <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-loose)]">
+              <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]">
                 <p className="text-body">Aside 內容</p>
               </div>
             </AppShellAside>
@@ -120,7 +120,7 @@ export const StateBehavior: Story = {
           asideOpen={open}
           onAsideOpenChange={setOpen}
         >
-          <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-loose)] text-body">
+          <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-tight)] text-body">
             <p>Aside open:{String(open)}</p>
             <p>Desktop ≥ 768px → inline standard mode(右側 panel,不蓋 mask)</p>
             <p>Mobile &lt; 768px → modal mode(Sheet from right,蓋 mask)</p>
@@ -135,7 +135,7 @@ export const StateBehavior: Story = {
 export const Accessibility: Story = {
   name: 'Accessibility — landmark + skip-link + keyboard',
   render: () => (
-    <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-loose)]">
+    <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]">
       <h2 className="text-h4 mb-3">A11y 機制</h2>
       <ul className="text-body space-y-2 list-disc pl-5">
         <li>
@@ -156,7 +156,7 @@ export const Accessibility: Story = {
 export const SizeMatrix: Story = {
   name: 'SizeMatrix — Aside width clamp(240-640)',
   render: () => (
-    <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-loose)] space-y-3 text-body">
+    <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-tight)] space-y-3 text-body">
       <h2 className="text-h4">Aside width clamp</h2>
       <ul className="space-y-2 list-disc pl-5">
         <li>不傳 width → 320px(default)</li>
