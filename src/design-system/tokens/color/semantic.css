@@ -243,8 +243,20 @@
      ───────────────────────────────────────────────────────────────── */
   --blue-hover:           var(--color-blue-5);
   --blue-active:          var(--color-blue-7);
-  --red-hover:            var(--color-deep-orange-5);
-  --red-active:           var(--color-deep-orange-7);
+  /* 2026-05-20 fix(codex Layer B D1 Bug 1):red 之前誤映射 deep-orange,red 跟 deep-orange 是
+     primitive 12 hue 內兩個 distinct 色相(hue 25 vs 38;lightness 0.46 vs 0.58)。red/error
+     不該共名空間 — `--error-*` semantic 自己直接指 primitive deep-orange,`--red-*` hue
+     interaction 必指 primitive red。 */
+  --red-hover:            var(--color-red-5);
+  --red-active:           var(--color-red-7);
+  --deep-orange-hover:    var(--color-deep-orange-5);
+  --deep-orange-active:   var(--color-deep-orange-7);
+  --orange-hover:         var(--color-orange-5);
+  --orange-active:        var(--color-orange-7);
+  --amber-hover:          var(--color-amber-5);
+  --amber-active:         var(--color-amber-7);
+  --lime-hover:           var(--color-lime-5);
+  --lime-active:          var(--color-lime-7);
   --green-hover:          var(--color-green-5);
   --green-active:         var(--color-green-7);
   --yellow-hover:         var(--color-yellow-5);
@@ -377,11 +389,21 @@
   --warning-hover:        var(--color-yellow-7);
   --warning-active:       var(--color-yellow-5);
 
-  /* Hue interaction tokens — 同樣的方向反轉（hover 永遠較亮、active 永遠較暗） */
+  /* Hue interaction tokens — 同樣的方向反轉(hover 永遠較亮、active 永遠較暗)
+     2026-05-20 fix(codex Layer B D1):red 改指 primitive red(非 deep-orange)+ 補 deep-orange /
+     orange / amber / lime 4 個 missing hue interaction(per primitive 12 hue full coverage)*/
   --blue-hover:           var(--color-blue-7);
   --blue-active:          var(--color-blue-5);
-  --red-hover:            var(--color-deep-orange-7);
-  --red-active:           var(--color-deep-orange-5);
+  --red-hover:            var(--color-red-7);
+  --red-active:           var(--color-red-5);
+  --deep-orange-hover:    var(--color-deep-orange-7);
+  --deep-orange-active:   var(--color-deep-orange-5);
+  --orange-hover:         var(--color-orange-7);
+  --orange-active:        var(--color-orange-5);
+  --amber-hover:          var(--color-amber-7);
+  --amber-active:         var(--color-amber-5);
+  --lime-hover:           var(--color-lime-7);
+  --lime-active:          var(--color-lime-5);
   --green-hover:          var(--color-green-7);
   --green-active:         var(--color-green-5);
   --yellow-hover:         var(--color-yellow-7);
