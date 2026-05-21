@@ -288,10 +288,18 @@ export function extractSourceVars(el: Element): Map<string, SourceVar> {
         continue
       }
       if (!matches) continue
-      const decl = rule.style
-      for (let i = 0; i < decl.length; i++) {
-        const prop = decl.item(i)
-        captureDecl(prop, decl.getPropertyValue(prop))
+      // 2026-05-21 v2 fix(per codex M31 Layer C M10 proactive scan): 同 extractAllAuthorDecls
+      // 邏輯 — CSSOM `decl.item(i)` 對 logical shorthand(padding-inline / margin-inline 等)
+      // 展開為 longhand names,`getPropertyValue(longhand)` 返回空字串。改用 cssText parse 直接。
+      const cssText = rule.style.cssText
+      const declarations = cssText.split(';').map(s => s.trim()).filter(Boolean)
+      for (const declStr of declarations) {
+        const colonIdx = declStr.indexOf(':')
+        if (colonIdx < 0) continue
+        const prop = declStr.slice(0, colonIdx).trim()
+        let value = declStr.slice(colonIdx + 1).trim()
+        value = value.replace(/\s*!important\s*$/, '')
+        captureDecl(prop, value)
       }
     }
   }
