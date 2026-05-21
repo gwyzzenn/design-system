@@ -214,7 +214,9 @@ ChromeHeader / SurfaceHeader 新增 `tabsSlot?: ReactNode` prop。提供時自�
 ```tsx
 <ChromeHeader
   withTabs?: boolean              // false (default) | true → auto-suppress border + delegate to TabsList
+  tabsSlot?: ReactNode            // Tabs row(column mode + W1-W6 lockstep,2026-05-18 ship)
   lockDensity?: 'inherit' | 'lg'  // 'inherit' (default) | 'lg' → 強制 chrome-header-height lg=56(viewer 等 fullscreen chrome)
+  leadingRail?: ReactNode         // 2026-05-21 ship per AppShell primary-header globalHeader:固定 width=sidebar-width-icon 的左 rail,內 justify-center 排列(toggle/logo 跟 sidebar 收合 icon center x 對齊)。對齊 GitHub global nav 左 logo 區 / Slack thin workspace rail 慣例。
 >
   {children}
 </ChromeHeader>

@@ -58,11 +58,28 @@ export interface ChromeHeaderProps
    * 對應 patterns/header-canonical/header-canonical.spec.md Layer 3 API
    */
   lockDensity?: 'inherit' | 'lg'
+  /**
+   * Leading rail slot(2026-05-21 ship per AppShell primary-header globalHeader 用例,
+   * codex M31 Layer C 建議 codify into ChromeHeader API):
+   * 固定寬度 = `var(--sidebar-width-icon)` 的左邊容器,內 `justify-center` 排列。
+   *
+   * 用途:primary-header globalHeader 左側 SidebarTrigger,跟 sidebar 收合 icon 完美水平對齊
+   * (sidebar 收合 width = sidebar-width-icon,toggle container 同寬 = toggle center x = sidebar
+   * collapsed icon center x = perfect alignment)。
+   *
+   * 對齊 GitHub global nav 左側固定寬度 logo 區 / Slack thin workspace rail 慣例。
+   * 提供時自動結構:
+   *   row1: [leadingRail (width=sidebar-width-icon)] [children (px-loose flex-1)]
+   * 不提供時 fallback 預設 single-row(全 px-loose)。
+   *
+   * 與 tabsSlot 互斥(tabsSlot 啟動 column mode,本 prop 不生效)。
+   */
+  leadingRail?: React.ReactNode
 }
 
 export const ChromeHeader = React.forwardRef<HTMLElement, ChromeHeaderProps>(
   (
-    { className, withTabs, tabsSlot, lockDensity = 'inherit', children, ...props },
+    { className, withTabs, tabsSlot, lockDensity = 'inherit', leadingRail, children, ...props },
     ref,
   ) => {
     const hasTabs = tabsSlot != null || withTabs === true
@@ -95,6 +112,36 @@ export const ChromeHeader = React.forwardRef<HTMLElement, ChromeHeaderProps>(
               提供,讓 TabsList border-b 延展全 dialog 寬。對齊 `tabs.spec.md:199` 既有 canonical。*/}
           <div className="[&>[role=tablist]]:w-full [&>[role=tablist]]:px-[var(--layout-space-loose)]">
             {tabsSlot}
+          </div>
+        </header>
+      )
+    }
+
+    // Leading rail mode(2026-05-21 ship per AppShell primary-header globalHeader):
+    // [leadingRail (width=sidebar-width-icon, justify-center)] [children (flex-1 px-loose)]
+    // 整 header 仍 fixed-height chrome-header-height + border-b。Rail 容器無 padding(內元素
+    // 透過 sidebar-width-icon 幾何自然居中,跟 sidebar 收合 icon center x 對齊)。
+    if (leadingRail != null) {
+      return (
+        <header
+          ref={ref}
+          data-density={lockDensity === 'lg' ? 'lg' : undefined}
+          className={cn(
+            'flex items-center shrink-0',
+            'h-[var(--chrome-header-height)]',
+            !hasTabs && 'border-b border-divider',
+            className,
+          )}
+          {...props}
+        >
+          {/* Rail:固定寬度 = sidebar-width-icon,內容 justify-center 居中(toggle center x
+              = rail 寬度的中點 = sidebar 收合 icon center x = 完美 vertical 對齊)*/}
+          <div className="flex w-[var(--sidebar-width-icon)] shrink-0 items-center justify-center">
+            {leadingRail}
+          </div>
+          {/* Main:flex-1 + px-loose(沿用 header 既有左右 padding canonical)+ gap-2 */}
+          <div className="flex flex-1 items-center gap-2 min-w-0 px-[var(--layout-space-loose)]">
+            {children}
           </div>
         </header>
       )

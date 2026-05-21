@@ -136,9 +136,12 @@ export function AcmeSidebar({
 // top-level chrome → 自畫 bg-surface)。
 
 export function GlobalHeader({ rightSlot }: { rightSlot?: React.ReactNode } = {}) {
+  // 2026-05-21 v2 ship Option B(per user「primary header toggle 為了與 sidebar menu item
+  // startIcon 水平對齊...container 寬度 = sidebar-width-icon」+ Issue 2 geometry formula 落地):
+  // 用 ChromeHeader `leadingRail` slot(width = `--sidebar-width-icon` = 2*loose + icon-size)。
+  // Toggle center x = rail 寬度中點 = sidebar collapsed icon center x = 完美 vertical 對齊。
   return (
-    <ChromeHeader className="bg-surface">
-      <SidebarTrigger />
+    <ChromeHeader className="bg-surface" leadingRail={<SidebarTrigger />}>
       <WorkspaceBrand />
       <div className="flex-1" />
       {rightSlot}
