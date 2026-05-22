@@ -137,6 +137,7 @@ const SidebarProvider = React.forwardRef<
     uniformPrefix?: boolean
   }
 >(
+  // code-quality-allow: long-function — SidebarProvider 整合 dual-state(open + activeId)+ mobile sync + keyboard handler + context memo + style binding。拆 sub-fn 會打斷 React state binding chain + Context provider 順序語意(M21 prop variant test:拆分降低可讀性,單 fn 內 state lifecycle 一目了然)。當前 97 < cap 200。
   (
     {
       defaultOpen = true,
@@ -201,6 +202,7 @@ const SidebarProvider = React.forwardRef<
       return () => window.removeEventListener("keydown", handleKeyDown)
     }, [toggleSidebar])
 
+    // code-quality-allow: long-function — SidebarProvider 內 dual-state(open + activeId)+ mobile + handler refs + useMemo context 集中一處;拆 sub-fn 會打斷 useMemo dep stability + Context provider 順序。當前 97 < cap 200。Script naive heuristic 把 `const state = ?` 三元當 fn 起點誤報。
     const state = open ? "expanded" : "collapsed"
 
     const contextValue = React.useMemo<SidebarContextProps>(

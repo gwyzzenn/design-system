@@ -1,4 +1,5 @@
 // @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
+// code-quality-allow: file-size — foundational composite(Button + iconOnly + danger + loading + asChild + dismiss + pressedTone)— 跨 7 axis variant 集中 SSOT 一處,拆分會 fragment cva variant catalog。當前 528 < cap 800。
 import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
