@@ -2,10 +2,20 @@
 
 2026-05-23 ship per team-distribution-roadmap Phase 5+6 — pre-built scaffold 給 user 不用等 Claude 在 new repo 內生 boilerplate。
 
+## 安全 / 部署模式(per 2026-05-23 user directive)
+
+**Repo**:**Private**(team member-only collaborators,non-member 看不到 source)
+**App / Storybook host**:**Netlify**(non-GitHub Pages — public host 不適合 private workspace)
+**權限控管**:Netlify Identity(免費,invite-only)OR Site Password(Pro)OR RBAC(Enterprise)— per `deploy.yml` / `storybook-deploy.yml` 註解
+
+不適用 host(本 template 已 ban):
+- ❌ **GitHub Pages**:public host,private workspace 不該 expose
+- ❌ **Vercel free tier**:可,但本 template 統一 Netlify(reduce host fragmentation)
+
 ## 怎麼用
 
 ```bash
-# 1. Create new GitHub repo
+# 1. Create new GitHub repo(必 --private,per security posture)
 gh repo create your-org/product-workspace --private --confirm
 
 # 2. Clone empty
