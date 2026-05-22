@@ -31,8 +31,13 @@ esac
 head -3 "$FILE_PATH" | grep -qE '//[[:space:]]*@pixel-quantified-allow:' && exit 0
 
 # Count getAttribute calls vs getBoundingClientRect / offsetTop / offsetHeight calls
-ATTR_HITS=$(grep -cE 'getAttribute\(|\.hasAttribute\(' "$FILE_PATH" 2>/dev/null || echo 0)
-PIXEL_HITS=$(grep -cE 'getBoundingClientRect\(|\.offsetTop\b|\.offsetHeight\b|\.offsetLeft\b|\.offsetWidth\b' "$FILE_PATH" 2>/dev/null || echo 0)
+# 2026-05-23 bug fix:`grep -c ... 2>/dev/null || echo 0` 當 zero match 時 grep exit 1 + fallback echo,
+# 產生 multi-line "0\n0" string,下游 [ "$X" -eq 0 ] arithmetic 報「integer expression expected」silent skip。
+# 修法:grep 不用 fallback,直接保證輸出 numeric(strip 非數字)+ default 0。
+ATTR_HITS=$(grep -cE 'getAttribute\(|\.hasAttribute\(' "$FILE_PATH" 2>/dev/null)
+ATTR_HITS="${ATTR_HITS//[^0-9]/}"; ATTR_HITS=${ATTR_HITS:-0}
+PIXEL_HITS=$(grep -cE 'getBoundingClientRect\(|\.offsetTop\b|\.offsetHeight\b|\.offsetLeft\b|\.offsetWidth\b' "$FILE_PATH" 2>/dev/null)
+PIXEL_HITS="${PIXEL_HITS//[^0-9]/}"; PIXEL_HITS=${PIXEL_HITS:-0}
 
 if [ "$ATTR_HITS" -gt 0 ] && [ "$PIXEL_HITS" -eq 0 ]; then
   CTX="⚠️ M32(a) pixel-quantified verify gap:
