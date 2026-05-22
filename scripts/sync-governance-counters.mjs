@@ -57,7 +57,7 @@ const dimMin = dimNums.length ? Math.min(...dimNums) : 0
 const dimMax = dimNums.length ? Math.max(...dimNums) : 0
 
 // 4) Spec traits(frontmatter traits enumeration)
-const specFiles = globSync('src/design-system/**/*.spec.md', { cwd: ROOT })
+const specFiles = globSync('packages/design-system/src/**/*.spec.md', { cwd: ROOT })
 const traitSet = new Set()
 for (const f of specFiles) {
   const c = fs.readFileSync(path.join(ROOT, f), 'utf-8')

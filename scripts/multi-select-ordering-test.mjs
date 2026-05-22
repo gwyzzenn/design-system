@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
-// Inline the SSOT(verbatim copy from src/design-system/lib/multi-select-ordering.ts)to
+// Inline the SSOT(verbatim copy from packages/design-system/src/lib/multi-select-ordering.ts)to
 // avoid TypeScript transpile in node-only test。Any drift between this copy + source = test FAIL
 // via direct string compare assertion below。
 function applySelectAll(existing, all) {

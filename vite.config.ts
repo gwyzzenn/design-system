@@ -9,8 +9,11 @@ export default defineConfig({
     tailwindcss(),
   ],
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
+    alias: [
+      // 2026-05-22 Phase 1 team-distribution-roadmap:
+      // 特定 prefix 必先(Vite alias array 順序生效,specific first general after)
+      { find: /^@\/design-system\/(.*)$/, replacement: path.resolve(__dirname, './packages/design-system/src/$1') },
+      { find: '@', replacement: path.resolve(__dirname, './src') },
+    ],
   },
 })

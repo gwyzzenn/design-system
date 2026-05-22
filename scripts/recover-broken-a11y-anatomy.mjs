@@ -15,7 +15,7 @@ import { execSync } from 'node:child_process'
 const ROOT = process.cwd()
 
 function findAllAnatomyStories() {
-  return execSync(`find src/design-system -name "*.anatomy.stories.tsx" -type f`, { encoding: 'utf-8' })
+  return execSync(`find packages/design-system/src -name "*.anatomy.stories.tsx" -type f`, { encoding: 'utf-8' })
     .trim().split('\n').filter(Boolean)
 }
 
@@ -36,7 +36,7 @@ function extractSpecA11y(specPath) {
 }
 
 function findSpecPath(compName) {
-  const dir = `src/design-system/components/${compName}`
+  const dir = `packages/design-system/src/components/${compName}`
   const kebab = compName.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
   const main = `${dir}/${kebab}.spec.md`
   if (execSync(`test -f ${main} && echo yes || echo no`, { encoding: 'utf-8' }).trim() === 'yes') return main

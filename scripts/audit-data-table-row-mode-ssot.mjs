@@ -20,7 +20,7 @@ import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const FILE = join(__dirname, '..', 'src/design-system/components/DataTable/data-table.tsx')
+const FILE = join(__dirname, '..', 'packages/design-system/src/components/DataTable/data-table.tsx')
 
 const src = readFileSync(FILE, 'utf8')
 const lines = src.split('\n')

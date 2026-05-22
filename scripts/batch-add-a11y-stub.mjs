@@ -23,7 +23,7 @@ const NON_INTERACTIVE = new Set([
 // Find all anatomy.stories.tsx missing Accessibility export
 function findMissing() {
   const files = execSync(
-    'find src/design-system/components -name "*.anatomy.stories.tsx" -type f',
+    'find packages/design-system/src/components -name "*.anatomy.stories.tsx" -type f',
     { encoding: 'utf8' }
   ).trim().split('\n')
 
@@ -34,7 +34,7 @@ function findMissing() {
 }
 
 function getComponentName(filePath) {
-  // src/design-system/components/Foo/foo.anatomy.stories.tsx → Foo
+  // packages/design-system/src/components/Foo/foo.anatomy.stories.tsx → Foo
   const m = filePath.match(/components\/([^/]+)\//)
   return m ? m[1] : null
 }

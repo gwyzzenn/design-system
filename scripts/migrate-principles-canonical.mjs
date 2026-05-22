@@ -8,7 +8,7 @@
 import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, basename } from 'node:path';
 
-const COMPONENTS_DIR = 'src/design-system/components';
+const COMPONENTS_DIR = 'packages/design-system/src/components';
 
 // Rename map for deprecated → WhenNotToUse
 const RENAME_PATTERNS = [

@@ -17,7 +17,7 @@
 import { readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs';
 import { join, basename } from 'node:path';
 
-const COMPONENTS_DIR = 'src/design-system/components';
+const COMPONENTS_DIR = 'packages/design-system/src/components';
 const fix = process.argv.includes('--fix');
 
 function* walk(dir) {

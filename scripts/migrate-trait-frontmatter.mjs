@@ -17,7 +17,7 @@
 import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { join, basename } from 'node:path';
 
-const COMPONENTS_DIR = 'src/design-system/components';
+const COMPONENTS_DIR = 'packages/design-system/src/components';
 
 const inputLike = new Set(['Input', 'Textarea', 'Combobox', 'Select', 'NumberInput', 'PeoplePicker', 'LinkInput', 'DatePicker', 'TimePicker', 'SelectMenu']);
 const selectionMulti = new Set(['Checkbox', 'RadioGroup']);

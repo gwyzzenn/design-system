@@ -11,7 +11,7 @@
   },
   "components": {
     "Sidebar": {
-      "baseline": "src/design-system/components/Sidebar/sidebar.stories.tsx#IconCollapse",
+      "baseline": "packages/design-system/src/components/Sidebar/sidebar.stories.tsx#IconCollapse",
       "requiredHelpers": ["WorkspaceBrand", "MAIN_NAV", "SidebarHeader", "SidebarFooter"],
       "antiPatterns": [
         {
@@ -29,7 +29,7 @@
       ]
     },
     "DataTable": {
-      "baseline": "src/design-system/components/DataTable/data-table.stories.tsx#WithBulkActions",
+      "baseline": "packages/design-system/src/components/DataTable/data-table.stories.tsx#WithBulkActions",
       "toolbar": {
         "requiredHelpers": ["Popover", "PopoverTrigger", "PopoverContent", "Input"],
         "filterPanel": "DataTableFilterPanel",
@@ -64,7 +64,7 @@
       ]
     },
     "ChromeHeader": {
-      "baseline": "src/design-system/components/Sidebar/sidebar.stories.tsx#IconCollapse (PageContent helper)",
+      "baseline": "packages/design-system/src/components/Sidebar/sidebar.stories.tsx#IconCollapse (PageContent helper)",
       "requiredStructure": "SidebarTrigger + h1.text-body-lg.font-medium 緊鄰 gap-2",
       "antiPatterns": [
         {

@@ -99,14 +99,29 @@ your-org GitHub:
 - `tsup` or `vite build --lib` for bundle generation
 
 **Acceptance**(數值動態以 `node scripts/sync-governance-counters.mjs` 跑出為準,以下為 2026-05-22 snapshot):
-- `npm run build` 0 errors
-- `npm run build-storybook` 仍跑(workspace local link)
-- 既有 **63 components**(63 spec.md / 100% coverage)全 pass
-- `npm pack --dry-run` 看 publish 內容正確(不含 stories / spec 等 internal files)
+- `npm run build` 0 errors ✅ landed 2026-05-22
+- `npm run build-storybook` 仍跑(workspace local link)— 待 verify(需 user 手動跑或 CI)
+- 既有 **63 components**(63 spec.md / 100% coverage)全 pass ✅
+- `npm pack --dry-run` 看 publish 內容正確(不含 stories / spec 等 internal files)✅ 397→117 files / 5.7MB→1.5MB / 0 spec.md / 0 stories.tsx
 
 **World-class ref**: Material UI monorepo structure / Radix UI packages
 
-**Status**: Not started
+**Status**: **DONE 2026-05-22**(commit pending push)— infrastructure landed:
+- `packages/design-system/` created with `package.json` + `tsconfig.json`
+- 396 files moved via `git mv src/design-system packages/design-system/src`(history preserved)
+- Root `package.json` `workspaces: ["packages/*"]` 加
+- `tsconfig.app.json` paths:`@/design-system/*` → `packages/design-system/src/*`,`@/*` → `src/*` 保留
+- `vite.config.ts` alias 同樣 specific-first(regex-based)
+- `src/globals.css` imports 更新 relative path `../packages/design-system/src/tokens/...`
+- 26 script files mass-updated path refs(audit-* / sync-* / migrate-* 等)
+- Tooling 決策已落地:**vite build --lib(decision A2)** + **npm workspaces(decision B1)** per user 2026-05-22 verbatim「照你建議做」+「我要世界級的」
+- Bundle generation refinement:**deferred to Phase 4**(release pipeline)— 目前 root `npm run build` 已生 `dist/`,packages/design-system/dist/ 獨立 build 等 Phase 4 changesets / release script 階段一起配
+- npm pack 內容 verified:`files` allowlist 排 stories/spec/test/anatomy/principles → 397 files → 117 files / 1.5MB
+
+**Deferred to Phase 2-4**:
+- Lib build 獨立 `packages/design-system/vite.config.ts`(esm + cjs + d.ts)
+- Storybook config 抽出 → Phase 2 scope
+- changesets / release pipeline → Phase 4 scope
 
 ---
 

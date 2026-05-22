@@ -7,7 +7,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-const COMPONENTS_DIR = 'src/design-system/components'
+const COMPONENTS_DIR = 'packages/design-system/src/components'
 
 // Layout Family assignments per CLAUDE.md 4-Family Model + spec inspection
 const FAMILY = {

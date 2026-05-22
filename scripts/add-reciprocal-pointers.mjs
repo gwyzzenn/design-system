@@ -20,7 +20,7 @@ import path from 'node:path'
 import { globSync } from 'node:fs'
 
 const root = process.cwd()
-const SPECS = globSync('src/design-system/**/*.spec.md', { cwd: root }).map((p) => path.join(root, p))
+const SPECS = globSync('packages/design-system/src/**/*.spec.md', { cwd: root }).map((p) => path.join(root, p))
 
 // Build pointer map
 const pointers = [] // { from: abspath, fromBase, to: basename, line, context }

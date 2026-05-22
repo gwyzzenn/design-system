@@ -18,7 +18,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import yaml from 'js-yaml'
 
-const COMPONENTS_DIR = 'src/design-system/components'
+const COMPONENTS_DIR = 'packages/design-system/src/components'
 
 function toKebab(name) {
   return name.replace(/[A-Z]/g, (c, i) => (i === 0 ? c.toLowerCase() : `-${c.toLowerCase()}`))

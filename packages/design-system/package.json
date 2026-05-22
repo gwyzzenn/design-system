@@ -1,0 +1,53 @@
+{
+  "name": "@your-org/design-system",
+  "version": "0.0.0",
+  "private": false,
+  "description": "World-class design system — components, patterns, tokens, hooks (single source of truth for team distribution).",
+  "type": "module",
+  "license": "UNLICENSED",
+  "files": [
+    "dist",
+    "src/**/*.{tsx,ts,css}",
+    "!src/**/*.stories.tsx",
+    "!src/**/*.anatomy.stories.tsx",
+    "!src/**/*.principles.stories.tsx",
+    "!src/**/*.spec.md",
+    "!src/**/*.spec.ts",
+    "!src/**/*.test.ts",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./components/*": {
+      "types": "./dist/components/*/index.d.ts",
+      "import": "./dist/components/*/index.js"
+    },
+    "./patterns/*": {
+      "types": "./dist/patterns/*/index.d.ts",
+      "import": "./dist/patterns/*/index.js"
+    },
+    "./tokens/*": "./dist/tokens/*",
+    "./hooks/*": {
+      "types": "./dist/hooks/*.d.ts",
+      "import": "./dist/hooks/*.js"
+    },
+    "./styles/globals.css": "./dist/globals.css"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  }
+}

@@ -24,7 +24,7 @@ const renames = [];
 const adds = [];
 
 for (const comp of TARGETS) {
-  const dir = `src/design-system/components/${comp}`;
+  const dir = `packages/design-system/src/components/${comp}`;
   const files = readdirSync(dir).filter(f => f.endsWith('.principles.stories.tsx'));
   if (files.length === 0) continue;
   const file = join(dir, files[0]);

@@ -455,7 +455,7 @@ async function auditScenario(browser, scenario, opts = {}) {
 // 依 --scope / --urls 過濾 ASSERTIONS.scenarios 或產生 ad-hoc scenarios
 
 function getChangedComponents() {
-  // 讀 git diff 找動到的 src/design-system/components/<Name>/ 目錄
+  // 讀 git diff 找動到的 packages/design-system/src/components/<Name>/ 目錄
   try {
     // 相比 main:用 `git diff main...HEAD --name-only` + working tree
     const committedFiles = execSync('git diff main...HEAD --name-only 2>/dev/null || echo ""', {

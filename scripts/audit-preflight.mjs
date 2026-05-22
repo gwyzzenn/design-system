@@ -27,7 +27,7 @@ const VERBOSE = process.argv.includes('--verbose')
 const CHECK_ONLY = process.argv.includes('--check')
 
 // ── 1. 檔案 enumeration ─────────────────────────────────────────────
-const dsFiles = globSync('src/design-system/**/*.{tsx,ts,css,md}', { cwd: ROOT })
+const dsFiles = globSync('packages/design-system/src/**/*.{tsx,ts,css,md}', { cwd: ROOT })
 const fileBuckets = {
   tsx: dsFiles.filter(f => f.endsWith('.tsx') && !f.includes('.stories.') && !f.includes('.anatomy.') && !f.includes('.principles.')),
   storiesShowcase: dsFiles.filter(f => /\.stories\.tsx$/.test(f) && !/(anatomy|principles)\.stories\.tsx$/.test(f)),

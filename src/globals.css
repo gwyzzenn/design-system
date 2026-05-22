@@ -1,14 +1,14 @@
 @import "tailwindcss";
-@import "./design-system/tokens/color/primitives.css";
-@import "./design-system/tokens/color/semantic.css";
-@import "./design-system/tokens/typography/typography.css";
-@import "./design-system/tokens/uiSize/uiSize.css";
-@import "./design-system/tokens/layoutSpace/layoutSpace.css";
-@import "./design-system/tokens/radius/radius.css";
-@import "./design-system/tokens/opacity/opacity.css";
-@import "./design-system/tokens/motion/motion.css";
-@import "./design-system/components/DataTable/data-table.css";
-@import "./design-system/patterns/header-canonical/header-canonical.css";
+@import "../packages/design-system/src/tokens/color/primitives.css";
+@import "../packages/design-system/src/tokens/color/semantic.css";
+@import "../packages/design-system/src/tokens/typography/typography.css";
+@import "../packages/design-system/src/tokens/uiSize/uiSize.css";
+@import "../packages/design-system/src/tokens/layoutSpace/layoutSpace.css";
+@import "../packages/design-system/src/tokens/radius/radius.css";
+@import "../packages/design-system/src/tokens/opacity/opacity.css";
+@import "../packages/design-system/src/tokens/motion/motion.css";
+@import "../packages/design-system/src/components/DataTable/data-table.css";
+@import "../packages/design-system/src/patterns/header-canonical/header-canonical.css";
 
 /* ── Icon stroke width（全域 lucide 預設）── */
 .lucide { stroke-width: 1.75; }

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Code quality audit — scans src/design-system/ (and optionally src/) for code
+ * Code quality audit — scans packages/design-system/src/ (and optionally src/) for code
  * hygiene violations that are orthogonal to design canonical audits.
  *
  * Checks:
@@ -32,7 +32,7 @@ const CHECK = args.includes('--check')
 const scopeArg = args.find((a) => a.startsWith('--scope='))
 const scope = scopeArg?.split('=')[1] ?? 'all'
 
-const DS_ROOT = 'src/design-system'
+const DS_ROOT = 'packages/design-system/src'
 const FILE_SIZE_BUDGET_TSX = 500
 const FILE_SIZE_TRANSITION_CAP = 800
 const FUNCTION_LENGTH_BUDGET = 80
@@ -46,7 +46,7 @@ function resolveTargets() {
       return diff
         .split('\n')
         .filter((l) => l.endsWith('.tsx') || l.endsWith('.ts'))
-        .filter((l) => l.startsWith('src/'))
+        .filter((l) => l.startsWith('src/') || l.startsWith('packages/'))
         .filter((l) => fs.existsSync(l))
     } catch {
       return []
@@ -186,8 +186,8 @@ function checkDeadExports() {
     exportMap.set(f, names)
   }
 
-  // Build import search corpus (all src/ files)
-  const allSrc = globSync('src/**/*.{ts,tsx,mjs,js}')
+  // Build import search corpus (all src/ + packages/ files; 2026-05-22 Phase 1 path migration)
+  const allSrc = [...globSync('src/**/*.{ts,tsx,mjs,js}'), ...globSync('packages/**/*.{ts,tsx,mjs,js}')]
   const corpus = allSrc.map((f) => ({ f, content: fs.readFileSync(f, 'utf-8') }))
 
   for (const [f, names] of exportMap.entries()) {

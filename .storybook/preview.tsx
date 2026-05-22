@@ -1,7 +1,7 @@
 import type { Preview } from "@storybook/react";
 import React, { useEffect } from "react";
 import "../src/globals.css";
-import { TooltipProvider } from "../src/design-system/components/Tooltip/tooltip";
+import { TooltipProvider } from "../packages/design-system/src/components/Tooltip/tooltip";
 
 const preview: Preview = {
   globalTypes: {

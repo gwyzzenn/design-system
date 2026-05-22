@@ -27,7 +27,7 @@ const COMPONENTS = [
 ]
 
 function findSpecPath(compName) {
-  const dir = `src/design-system/components/${compName}`
+  const dir = `packages/design-system/src/components/${compName}`
   if (!existsSync(`${ROOT}/${dir}`)) return null
   const files = execSync(`ls ${dir}/*.spec.md 2>/dev/null || true`, { encoding: 'utf-8' })
     .trim().split('\n').filter(Boolean)
@@ -39,7 +39,7 @@ function findSpecPath(compName) {
 }
 
 function findTsxPath(compName) {
-  const dir = `src/design-system/components/${compName}`
+  const dir = `packages/design-system/src/components/${compName}`
   const kebab = compName.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
   const main = `${dir}/${kebab}.tsx`
   return existsSync(`${ROOT}/${main}`) ? main : null

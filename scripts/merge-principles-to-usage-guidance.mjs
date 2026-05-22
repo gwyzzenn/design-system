@@ -12,7 +12,7 @@
 import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
-const COMPONENTS_DIR = 'src/design-system/components';
+const COMPONENTS_DIR = 'packages/design-system/src/components';
 
 const DECISION_PATTERNS = {
   when: /^(WhenToUse|WhatItIs|UsageScenarioRule)$/,

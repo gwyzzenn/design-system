@@ -28,7 +28,7 @@ const NAME_WHITELIST = new Set([
 // 抽象代號
 const PLACEHOLDER_RE = /\b(Option [ABCD]|Foo|Bar|Baz|Lorem|Hello World|Test [12345]|按鈕[一二三])\b/i
 
-const stories = execSync(`find src/design-system -name "*.stories.tsx" -type f`, { encoding: 'utf-8' })
+const stories = execSync(`find packages/design-system/src -name "*.stories.tsx" -type f`, { encoding: 'utf-8' })
   .trim().split('\n').filter(Boolean)
 
 const violations = { v1a: [], v1c: [], v1d: [] }

@@ -30,7 +30,7 @@ import path from 'path'
 import { glob } from 'glob'
 
 const ROOT = path.resolve(process.cwd())
-const tokenFiles = (await glob('src/design-system/tokens/**/*.css', { cwd: ROOT })).sort()
+const tokenFiles = (await glob('packages/design-system/src/tokens/**/*.css', { cwd: ROOT })).sort()
 
 // 1. Declare scan
 const declared = new Map()
@@ -45,8 +45,11 @@ for (const f of tokenFiles) {
 // 2. Consumer scan(comprehensive)
 const consumed = new Set()
 
-// 2.1 var() consumption across src
-const allFiles = await glob('src/**/*.{tsx,ts,css}', { cwd: ROOT })
+// 2.1 var() consumption across src + packages(2026-05-22 Phase 1 team-distribution-roadmap migration)
+const allFiles = [
+  ...(await glob('src/**/*.{tsx,ts,css}', { cwd: ROOT })),
+  ...(await glob('packages/**/*.{tsx,ts,css}', { cwd: ROOT })),
+]
 for (const f of allFiles) {
   const abs = path.join(ROOT, f)
   if (tokenFiles.map(t => path.join(ROOT, t)).includes(abs)) continue
@@ -64,8 +67,11 @@ for (const block of allTokenCss.matchAll(/@utility[^{]+\{[^}]+\}/gs)) {
   for (const m of block[0].matchAll(/var\((--[a-zA-Z0-9-]+)/g)) consumed.add(m[1])
 }
 
-// 2.4 Tailwind class-name match
-const tsxFiles = await glob('src/**/*.{tsx,ts}', { cwd: ROOT })
+// 2.4 Tailwind class-name match(2026-05-22 同上 + packages)
+const tsxFiles = [
+  ...(await glob('src/**/*.{tsx,ts}', { cwd: ROOT })),
+  ...(await glob('packages/**/*.{tsx,ts}', { cwd: ROOT })),
+]
 let allClassText = ''
 for (const f of tsxFiles) allClassText += fs.readFileSync(path.join(ROOT, f), 'utf8')
 const bridges = {

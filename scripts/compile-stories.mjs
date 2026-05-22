@@ -34,7 +34,7 @@ if (!isAll && componentArgs.length === 0) {
   process.exit(1)
 }
 
-const COMPONENTS_DIR = 'src/design-system/components'
+const COMPONENTS_DIR = 'packages/design-system/src/components'
 
 function toKebab(name) {
   return name.replace(/[A-Z]/g, (c, i) => (i === 0 ? c.toLowerCase() : `-${c.toLowerCase()}`))

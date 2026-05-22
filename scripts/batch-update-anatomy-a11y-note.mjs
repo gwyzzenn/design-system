@@ -8,7 +8,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { execSync } from 'node:child_process'
 
-const files = execSync('grep -l "TODO.*A11y\\|尚無「## A11y 預設」段" $(find src/design-system/components -name "*.anatomy.stories.tsx")', { encoding: 'utf-8' }).trim().split('\n').filter(Boolean)
+const files = execSync('grep -l "TODO.*A11y\\|尚無「## A11y 預設」段" $(find packages/design-system/src/components -name "*.anatomy.stories.tsx")', { encoding: 'utf-8' }).trim().split('\n').filter(Boolean)
 
 function extractComponentName(filePath) {
   const m = filePath.match(/components\/([^/]+)\//)
@@ -34,7 +34,7 @@ for (const file of files) {
 
   const tsxKebab = compName.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
   // Find spec.md(prefer kebab-named main spec)
-  const candidatePaths = execSync(`ls src/design-system/components/${compName}/*.spec.md 2>/dev/null || true`, { encoding: 'utf-8' }).trim().split('\n').filter(Boolean)
+  const candidatePaths = execSync(`ls packages/design-system/src/components/${compName}/*.spec.md 2>/dev/null || true`, { encoding: 'utf-8' }).trim().split('\n').filter(Boolean)
   const specPath = candidatePaths.find(p => p.endsWith(`/${tsxKebab}.spec.md`)) || candidatePaths[0]
   if (!specPath) { skipped++; continue }
 
