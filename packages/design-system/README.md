@@ -10,14 +10,23 @@ Tailwind v4 + React 18+ project required. License: UNLICENSED (internal use).
 
 ---
 
-## Quick start(consumer side,完整 4 步驟)
+## Quick start(consumer side)
 
-新 consumer 跑通 Button + tokens 需要這 4 件,缺一不可:
-
-### 1. CSS entry — 載 tokens(必要)
+### 推薦:1-line preset(beta.9+,零偏移即取即用)
 
 ```css
 /* globals.css (or main.css / src/index.css) */
+@import '@qijenchen/design-system/styles/preset';
+```
+
+這 1 行展開等於:`tailwindcss` + DS tokens + `@source` directive(自動 scan DS source 產出 utility class)。Consumer 0 config,**Button 立即正確 render with 所有設計準則樣式**。
+
+> 為何要 preset:Tailwind v4 預設只掃 `src/**` 不掃 `node_modules`。沒 preset 的 `@source`,DS 元件內用的 `h-field-md` / `bg-primary-hover` 等 class 不會被產出 → 元件純文字無樣式。preset 把 setup 收成 1 行。
+
+### 替代:4 步驟手動 setup(beta.8 或想自己管 Tailwind scan source)
+
+```css
+/* globals.css */
 @import 'tailwindcss';
 @import '@qijenchen/design-system/styles/tokens';
 
@@ -25,7 +34,7 @@ Tailwind v4 + React 18+ project required. License: UNLICENSED (internal use).
 @source '../node_modules/@qijenchen/design-system/src/**/*.{js,ts,jsx,tsx}';
 ```
 
-> ⚠️ **`@source` 不能省**。Tailwind v4 預設只掃 `src/**`,不掃 `node_modules`。沒這行,DS 元件內部用的 `h-field-md` / `bg-primary-hover` 等 class 不會被產出 → 元件看起來像沒套樣式(P0.2 of common-mistakes)。
+> ⚠️ 漏 `@source` → 元件看起來像沒套樣式。
 
 ### 2. App-level Provider(必要)
 
