@@ -25,8 +25,9 @@ case "$FILE_PATH" in *.tsx) ;; *) exit 0 ;; esac
 case "$FILE_PATH" in *.stories.tsx|*.test.tsx) exit 0 ;; esac
 
 # Heuristic:multiple <FileItem> / <MenuItem variant="rich"> / standalone card pattern + parent 無 gap-N
+# 2026-05-26 fix:grep -c 計行數不計次,用 -o count 真實 occurrence
 STANDALONE_RE='<(FileItem|MenuItem[^>]+variant=["'\'']rich["'\''])'
-COUNT=$(echo "$NEW" | grep -cE "$STANDALONE_RE" 2>/dev/null)
+COUNT=$(echo "$NEW" | grep -oE "$STANDALONE_RE" 2>/dev/null | wc -l | tr -d ' ')
 COUNT=${COUNT:-0}
 
 [ "$COUNT" -lt 2 ] && exit 0

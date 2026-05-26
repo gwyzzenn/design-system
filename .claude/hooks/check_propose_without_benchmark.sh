@@ -23,8 +23,8 @@ PROMPT=$(echo "$INPUT" | jq -r '.prompt // ""' 2>/dev/null)
 [ "$EVENT" != "UserPromptSubmit" ] && exit 0
 [ -z "$TRANSCRIPT_PATH" ] || [ ! -f "$TRANSCRIPT_PATH" ] && exit 0
 
-# Heuristic:user prompt 含 visual / behavior decision trigger keyword
-PROPOSE_TRIGGER_RE='(propose|建議|方案|看法|要不要|該不該|應該|是否|怎麼設計|哪個比較|對齊哪家|改成|改為|世界級|比稿|design|visual|behavior|互動)'
+# Heuristic:user prompt 含 specific visual / behavior decision trigger keyword(2026-05-26 tighten — 拿掉「應該/是否/改成/design/behavior/互動」太籠統的 false-positive triggers)
+PROPOSE_TRIGGER_RE='(propose me|give me options|列.{0,5}option|建議.{0,5}方案|建議.{0,5}做法|哪個比較|對齊哪家|比稿|要怎麼設計|該用哪個|design tradeoff|recommend|world-class.{0,10}(對照|比較))'
 if ! echo "$PROMPT" | grep -qE "$PROPOSE_TRIGGER_RE"; then
   exit 0
 fi
