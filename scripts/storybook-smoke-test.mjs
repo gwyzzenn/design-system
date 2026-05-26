@@ -53,11 +53,35 @@ try {
   // Mode selection:
   //   `node storybook-smoke-test.mjs`              → SAMPLE(~100 stories,daily CI fast lane)
   //   `node storybook-smoke-test.mjs --full`       → FULL 947 stories(weekly / release pre-publish)
+  //   `node storybook-smoke-test.mjs --full --shard=N/M`  → shard N of M(full sweep parallel via CI matrix)
+  //
+  // 2026-05-26 sharding 升級(user 永久 directive「不要抽樣要全盤驗證」):
+  //   release.yml GitHub matrix N=4 parallel jobs,each handles ~237 stories,wall time ~3-5 min
+  //   全 947 stories cover(不 sample)+ 20-min job budget 不再 timeout
+  //   對齊 Jest --shard / Playwright --shard / Vitest --shard canonical
   const FULL_MODE = process.argv.includes('--full')
+  const SHARD_ARG = process.argv.find(a => a.startsWith('--shard='))
+  let shardIndex = 0
+  let shardTotal = 1
+  if (SHARD_ARG) {
+    const [n, m] = SHARD_ARG.replace('--shard=', '').split('/').map(Number)
+    if (!Number.isInteger(n) || !Number.isInteger(m) || n < 1 || m < 1 || n > m) {
+      console.error(`  ✗ Invalid --shard format(got "${SHARD_ARG}",expect "N/M" with 1<=N<=M)`)
+      process.exit(1)
+    }
+    shardIndex = n - 1  // 0-indexed
+    shardTotal = m
+  }
   let storyIds
   if (FULL_MODE) {
-    storyIds = allStoryIds
-    console.log(`  FULL mode: ${storyIds.length} stories(weekly / pre-publish gate)`)
+    // Deterministic shard split:sort then slice by(index % shardTotal === shardIndex)
+    const sortedIds = [...allStoryIds].sort()
+    storyIds = sortedIds.filter((_, i) => i % shardTotal === shardIndex)
+    if (shardTotal > 1) {
+      console.log(`  FULL mode shard ${shardIndex + 1}/${shardTotal}: ${storyIds.length}/${allStoryIds.length} stories`)
+    } else {
+      console.log(`  FULL mode: ${storyIds.length} stories(weekly / pre-publish gate)`)
+    }
   } else {
     // Sample = 1 story per component family(by title prefix)+ guarantee critical components
     // Critical = those with runtime trap history(Breadcrumb / DataTable / Dialog / Popover etc.)
