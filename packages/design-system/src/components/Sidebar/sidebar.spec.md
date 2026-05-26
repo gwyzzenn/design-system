@@ -610,12 +610,12 @@ Sheet 開啟狀態**不持久化**。
 
 | Token | 預設值 | 用途 |
 |-------|--------|------|
-| `--sidebar-width` | `17rem` | 展開寬度 |
+| `--sidebar-width` | `15rem` (240px) | 展開寬度(2026-05-21 v11 user 拍板 240px;對齊 Linear/Notion/Figma/Polaris/Material Drawer 主流 240–256,5/8 家 = 240。也是 `--sidebar-width-min` AppShell Aside floor 共識值)|
 | `--sidebar-width-icon` | `calc(2 * var(--layout-space-loose) + var(--sidebar-menu-icon-size))` | icon 模式寬度(2026-05-21 v3 撤回 `3rem` hardcode,改 geometry formula 保證 icon center x = loose + icon/2 在展開/收合一致;md=48 / lg=64,跟 chrome-header-height 解耦)|
 | `--sidebar-menu-icon-size` | `1rem` (16px) | sidebar menu icon 大小(per ICON_SIZE.sm/md=16);size=lg 罕見 case override `1.25rem` |
 | `--sidebar-width-mobile` | `18rem` | Mobile sheet 寬度 |
 
-**用 rem**：跟隨 root font-size，支援 accessibility 等比例縮放。**不用 layoutSpace / uiSize 推導**：sidebar width 是容器維度，不是間距或元件內高度，語意不同；耦合會讓寬度跟間距連動。**16rem / 3rem / 18rem** 是 shadcn + 多數 SaaS 的事實標準，不要為獨特而改。
+**用 rem**：跟隨 root font-size，支援 accessibility 等比例縮放。**不用 layoutSpace / uiSize 推導**：sidebar width 是容器維度，不是間距或元件內高度，語意不同；耦合會讓寬度跟間距連動。**15rem / 18rem** 對齊 Linear/Notion/Figma/Polaris/Material Drawer 240–288 主流寬度,`--sidebar-width-icon` 用 geometry formula(2026-05-21 v3)`calc(2*loose + icon-size)` 保證 collapse/expand icon center x 一致。
 
 ---
 

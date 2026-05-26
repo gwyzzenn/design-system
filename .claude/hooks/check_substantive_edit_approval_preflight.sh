@@ -31,15 +31,20 @@ EVENT=$(echo "$INPUT" | jq -r '.hook_event_name // ""' 2>/dev/null)
 [ "$EVENT" != "PreToolUse" ] && exit 0
 case "$TOOL" in Edit|Write|MultiEdit) ;; *) exit 0 ;; esac
 
-# Substantive scope:packages/design-system/src/**.{tsx,ts,css} only
+# Substantive scope(2026-05-26 extended per user verbatim「未來其他人 fork 也會偏移 / 該程式化的都沒程式化」):
+# - DS internal: packages/design-system/src/**.{tsx,ts,css}
+# - Consumer fork-user app code: apps/**.{tsx,ts,css} (product-workspace 或任何 fork 的 monorepo apps/)
+# - DS source in node_modules(consumer 改 DS 直接 forbidden — 必走 fork 流程):node_modules/@qijenchen/design-system/**
 case "$FILE_PATH" in
   */packages/design-system/src/*.tsx|*/packages/design-system/src/*.ts|*/packages/design-system/src/*.css) ;;
+  */apps/*.tsx|*/apps/*.ts|*/apps/*.css) ;;
+  */node_modules/@qijenchen/design-system/*) ;;
   *) exit 0 ;;
 esac
 
 # Allowlist:storybook config / scripts / tests 等非 production code
 case "$FILE_PATH" in
-  *.stories.tsx|*.test.ts|*.spec.ts) exit 0 ;;
+  *.stories.tsx|*.test.ts|*.spec.ts|*/scripts/*) exit 0 ;;
 esac
 
 [ -z "$TRANSCRIPT_PATH" ] || [ ! -f "$TRANSCRIPT_PATH" ] && exit 0
