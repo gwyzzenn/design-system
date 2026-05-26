@@ -32,8 +32,33 @@ on:
           - clear-latest
 
 jobs:
+  smoke-shard:
+    name: Storybook FULL smoke shard ${{ matrix.shard }}/4
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.action == 'release')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false  # 一 shard fail 不擋其他 shard,看完整 fail picture
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+      - name: Install
+        run: npm ci
+      - name: Install Playwright chromium
+        run: npx playwright install --with-deps chromium
+      - name: Build Storybook
+        run: npm run build-storybook 2>&1 | tail -5
+      - name: Run smoke shard ${{ matrix.shard }}/4(FULL 947 stories sharded)
+        run: node scripts/storybook-smoke-test.mjs --full --shard=${{ matrix.shard }}/4
+
   release:
     name: Release packages
+    needs: smoke-shard  # 4 shards 全綠才 release(per user「全盤驗證」directive)
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.action == 'release')
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -96,23 +121,11 @@ jobs:
         # Fail = block publish(per user verbatim「不要再耍白痴,確保自己驗證到成功」)。
         run: node scripts/dogfood-prepublish-verify.mjs
 
-      - name: Storybook story SAMPLE smoke test(release pre-publish gate)
-        # 2026-05-25 Phase 5.3 fix:beta.14 release 卡 FULL 947-story timeout(20 min job cap)。
-        # Beta releases already covered by:
-        #   (a) `Dogfood pre-publish verify` step(fresh consumer install + vite build)
-        #   (b) ci.yml SAMPLE 365 critical stories on every push
-        # FULL 947-story probe moved to separate weekly cron workflow(防 runtime bug shipping)。
-        # Stable release(no -beta/-next/-rc tag)仍跑 FULL — codify「beta=fast / stable=full」gate hygiene。
-        run: |
-          npm run build-storybook 2>&1 | tail -5
-          TAG_NAME="${GITHUB_REF#refs/tags/v}"
-          if [[ "$TAG_NAME" == *"-beta"* ]] || [[ "$TAG_NAME" == *"-next"* ]] || [[ "$TAG_NAME" == *"-rc"* ]]; then
-            echo "📦 Pre-release tag($TAG_NAME)→ SAMPLE mode(365 critical stories)"
-            node scripts/storybook-smoke-test.mjs
-          else
-            echo "📦 Stable tag($TAG_NAME)→ FULL mode(947 stories)"
-            node scripts/storybook-smoke-test.mjs --full
-          fi
+      # Storybook FULL smoke moved to parallel `smoke-shard` matrix job(2026-05-26)。
+      # Per user 永久 directive「不要抽樣要全盤驗證」— 947-story full sweep 走 4-shard
+      # GitHub matrix parallel(每 shard ~237 stories × ~3-5 min ≈ wall time 5-7 min),
+      # `release` job gate on `needs: [smoke-shard]` block publish unless all 4 shards 全綠。
+      # 對齊 Jest / Playwright / Vitest `--shard=N/M` canonical(industry standard)。
 
       - name: Publish to npm
         if: startsWith(github.ref, 'refs/tags/v')
