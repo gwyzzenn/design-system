@@ -1,0 +1,65 @@
+name: SSOT sync dispatch(non-version main push)
+
+# Per user 2026-05-27 verbatim「當 ds repo 有任何增刪改被 push main 之後一律務必自主自動讓
+# PW REPO 同步更新到最新」directive.
+#
+# Existing chain(release.yml + tag push):DS bump version + tag → npm publish → dispatch PW sync.
+# Gap caught:DS main push without tag(spec.md edits / hook ship / governance counter
+# changes / plugin marketplace.json update)不 trigger PW sync,因為 release.yml dispatch
+# 條件 `startsWith(github.ref, 'refs/tags/v')`.
+#
+# This workflow fills gap:on push main 偵測 SSOT-affecting paths changed → dispatch
+# PW `design-system-ssot-changed` event。PW sync workflow 接收 event → npm update +
+# plugin marketplace check + commit + push → Netlify rebuild auto chain.
+#
+# Path filter prevents noise:不 fire on log artifacts / governance counter auto-update.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      # SSOT-affecting paths(per CLAUDE.md `# Step 5.5 SSOT propagation gate`)
+      - 'packages/design-system/src/**'
+      - 'packages/storybook-config/src/**'
+      - '.claude/rules/**'
+      - '.claude/hooks/**'
+      - '.claude/skills/**'
+      - '.claude/commands/**'
+      - '.claude/references/**'
+      - '.claude-plugin/**'
+      - 'hooks/hooks.json'
+      - 'CLAUDE.md'
+      # exclude noise
+      - '!**/governance-counters.json'
+      - '!**/hook-fires.jsonl'
+      - '!**/audit-coverage-matrix.json'
+
+jobs:
+  dispatch-pw-sync:
+    name: Dispatch PW sync(non-version SSOT change)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # for diff
+      - name: Identify SSOT diff scope
+        id: scope
+        run: |
+          DIFF=$(git diff --name-only HEAD~1 HEAD || echo "")
+          echo "diff_files<<EOF" >> $GITHUB_OUTPUT
+          echo "$DIFF" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "Changed files since last push:"
+          echo "$DIFF"
+      - name: Dispatch ds-ssot-changed event to product-workspace
+        env:
+          GH_TOKEN: ${{ secrets.PRODUCT_WORKSPACE_DISPATCH_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          gh api repos/ajenchen/product-workspace/dispatches \
+            -f "event_type=ds-ssot-changed" \
+            -f "client_payload[commit]=${{ github.sha }}" \
+            -f "client_payload[message]=${{ github.event.head_commit.message }}" \
+            || echo "⚠️ dispatch failed(secrets.PRODUCT_WORKSPACE_DISPATCH_TOKEN missing?fallback: Dependabot daily)"

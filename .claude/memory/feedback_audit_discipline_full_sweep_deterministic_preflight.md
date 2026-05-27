@@ -1,0 +1,76 @@
+---
+name: Audit discipline — full-sweep + deterministic script + preflight (3-in-1 consolidated 2026-05-27)
+description: 稽核三 invariant — NO-SAMPLE 全盤 / 必 chain deterministic script not sub-agent / Preflight scan all files + principles + coverage matrix。違 = hook BLOCKER
+type: feedback
+originSessionId: a689a78e-f264-4c1f-b881-0859a7a12135
+---
+
+# Audit Discipline — 3 sub-rules consolidated
+
+User 2026-05-15 + 2026-05-23 系列 directives codified per Rule-of-3 absorb principle. 原 3 file (`feedback_audit_full_sweep_not_sample.md` / `feedback_audit_deterministic_script_not_subagent.md` / `feedback_audit_preflight_全盤查.md`) 合併本檔。
+
+## Sub-rule 1 — NO-SAMPLE 全盤掃(原 full_sweep_not_sample)
+
+**Rule**:`/design-system-audit --deep` sub-agent 必掃 DS-wide 全元件(non-Internal + Internal ~60+),禁 sample subset。
+
+❌ 絕禁 sub-agent prompt 寫「sample top N」「Sampled top X」「subset」「pick top」「too many to scan all」
+✅ 必:DS-wide grep + per-component dim verify ALL;context budget 不夠 → 拆 N stages(每 10-15 元件),不 sample
+
+**User 原話 SSOT 2026-05-15**:「稽核**並非既往不咎**,稽核要**全盤稽核,不能只抽樣,要全盤**」
+
+**Anchor**:2026-05-15 Dim 12+24+25 sub-agent「Sample top 5-10」→ 只覆蓋 22/190 stories ≈ 12%,168 stories 漏掃,user 抓「還是有很多 story 和範例都沒有被整理過」。
+
+## Sub-rule 2 — Deterministic script not sub-agent judgment(原 deterministic_script)
+
+**Rule**:Dim 40/41/42(title canonical / name jargon / placeholder)**禁** sub-agent AI judgment 替代 deterministic script。**必 chain** `node scripts/audit-story-quality.mjs --check` 全 196 stories / 350 names 全掃。
+
+Sub-agent dispatch prompt 必含:
+> 「先跑 `node scripts/audit-story-quality.mjs --check`,stderr 完整貼進 report;0 violations = CLEAN,有 violations 列具體 file:line。禁 sub-agent 自寫 grep / 自評 sample」
+
+**User 原話 2026-05-23**:「我他媽你確定 deep audit cross codex 跑完了?我不信現在所有的範例都有講具體言簡意賅的中文 ... 如果又被發現你他媽又再偷懶又再抽樣他媽該怎麼幹死你避免你下次再犯?」
+
+**Anchor**:2026-05-23 Batch 3 sub-agent「sample-based AI judgment, sampled Button only」→ inline 跑 deterministic script 0 violations,但 reactive 非 mechanical prevention。
+
+## Sub-rule 3 — Preflight 全面盤查(原 audit_preflight)
+
+**Rule**:`/design-system-audit --deep` Phase 1 前必跑 Phase 0.5 Preflight,輸出 3 件:
+1. **檔案 enumeration**:全 DS files list(`src/design-system/**/*.{tsx,ts,css,md}` 含 stories + anatomy + principles + spec)+ count
+2. **設計原則 enumeration**:全 M-rule + spec.md `traits:` + `.claude/rules/*.md` + hook invariant + SKILL discipline
+3. **Coverage matrix**:每原則 → audit dim 對應 / 「NO COVER (gap)」標記
+
+存 `.claude/logs/audit-preflight-{date}.json` 供 Phase 1 引用。`scripts/audit-preflight.mjs` SSOT。
+
+**User 原話 2026-05-15**:「你完整稽核之前應該會先全面盤查全部檔案和所有設計原則對吧?我記得之前我有命令你要在 infra 定義這件事」+「上面的都完成之後,就去確保所有 infra 要求的任何設計準則在設計系統進階稽核都會全面涵蓋,並要確保現在和未來都會自動涵蓋」
+
+## How to apply(統一)
+
+Sub-agent dispatch prompt 必含 3 directives(verbatim,不可弱化):
+```
+**Coverage requirement (NO-SAMPLE)**:DS-wide ALL components,context 不夠 → 拆 stage,禁「sample top N」
+**Deterministic script chain (Dim 40/41/42 等可機械化 dims)**:先跑 audit-story-quality.mjs --check,stderr 完整貼進 report
+**Preflight prerequisite**:Phase 0.5 audit-preflight.json 必存在,否則 BLOCKER
+```
+
+## Mechanical enforcement
+
+- `stop_self_audit.sh` 偵測 sub-agent prompt 含「sample / subset / top N / pick top / too many」+ `--deep` mode → BLOCKER
+- `check_audit_sample_escape.sh` pre + post Agent dispatch 雙向攔 sample escape keyword(2026-05-23)
+- `scripts/audit-preflight.mjs` 必先跑;`stop_self_audit.sh` 偵測 audit 但 24h 內無 preflight log → BLOCKER
+- `scripts/audit-story-quality.mjs --check` deterministic 全掃 + ci.yml `npm run story-quality:check` step
+- design-system-audit SKILL Phase 0.5 mandatory directive
+- `references/audit-prompts.md` template 必含 NO-SAMPLE / deterministic script / preflight directives
+
+## Anti-pattern(永久 ban)
+
+- ❌ Sub-agent prompt sample top N / subset / pick top / too many
+- ❌ Dim 40/41/42 sub-agent self-grep / self-judgment 替代 audit-story-quality.mjs
+- ❌ Audit 跳 Phase 0.5 直接 Phase 1
+- ❌「Coverage 12% sampled looks clean」= audit incomplete
+- ❌ Claim「D40 CLEAN」無 cite script output
+
+## 對齊原則
+
+- CLAUDE.md `# 稽核 canonical` audit-vs-execute 分權
+- M20 self-improvement(audit incomplete → score regress → next session inject directive)
+- mindset #1 不取巧
+- Linux kernel `scripts/checkpatch.pl` deterministic pre-submit / Google CL presubmit / Toyota TPS Jidoka
