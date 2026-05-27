@@ -51,10 +51,10 @@ const MAIN_NAV = [
  *
  * Chrome typography:`text-body-lg font-medium`(16px)——跟 page title 同級。
  */
+// @canonical-pattern: chrome-header-brand
+// Consumer 抄此 pattern 用於 SidebarHeader 內 brand。raw <Avatar size={24}>(chrome header 非 row context)。
+// Per header-canonical.spec.md:57-72 + sidebar.spec.md:241-247。
 const WorkspaceBrand = () => (
-  // Chrome header avatar canonical(header-canonical.spec.md:57-72 + sidebar.spec.md:241-247):
-  // chrome header 不是 row context → raw <Avatar size={24}>,禁 <ItemAvatar>(會誤啟動 row anatomy lookup)。
-  // 對應 CSS local token --chrome-header-avatar-size: 1.5rem(header-canonical.css)
   <div className="flex items-center gap-2 min-w-0 group-data-[collapsible=icon]:justify-center">
     <Avatar size={24} shape="square" color="blue" solid alt="Acme Inc" />
     <span className="text-body-lg font-medium truncate group-data-[collapsible=icon]:hidden">Acme Inc</span>
@@ -77,6 +77,10 @@ const WorkspaceBrand = () => (
 // Avatar hoverCard 本身已是 keyboard accessible 入口(Tab 直接到 Avatar → 開 NameCard
 // 取得 profile actions)。世界級 Slack / Linear user footer 亦 row 非 button,靠
 // inner avatar / menu-button 明確 disclosure。
+// @canonical-pattern: sidebar-menu-button-with-avatar
+// Consumer 抄此 pattern 用於 SidebarMenuButton 含 Avatar prefix 時必走 asChild + <div role="group"> wrap
+// + data-sidebar="menu-label" min-w-0 flex-1 truncate。不走會被 SidebarMenuButton 隱式 wrap 進
+// ItemLabel 致 Avatar+text 垂直 stack(2026-05-27 user 抓的 bug)。
 const UserFooter = () => (
   <SidebarMenu>
     <SidebarMenuItem>

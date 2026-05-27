@@ -1,11 +1,11 @@
 {
-  "ts": "2026-05-27T00:50:23.400Z",
+  "ts": "2026-05-27T01:34:34.854Z",
   "counts": {
-    "hooks": 44,
+    "hooks": 45,
     "mRules": 31,
-    "auditDims": 66,
+    "auditDims": 68,
     "auditDimMin": 1,
-    "auditDimMax": 66,
+    "auditDimMax": 68,
     "specTraits": 11
   },
   "mRulesList": [
@@ -71,6 +71,7 @@
     ".claude/hooks/check_propose_pre_grep_verify.sh",
     ".claude/hooks/check_propose_without_benchmark.sh",
     ".claude/hooks/check_select_all_canonical.sh",
+    ".claude/hooks/check_sidebar_menu_button_implicit_wrap.sh",
     ".claude/hooks/check_solo_workflow.sh",
     ".claude/hooks/check_spec_class_drift.sh",
     ".claude/hooks/check_story_invariants.sh",
