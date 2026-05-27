@@ -32,8 +32,11 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const REPO_ROOT = join(__dirname, '..')
-const TOKENS_DIR = join(REPO_ROOT, 'packages/design-system/src/tokens')
-const OUTPUT_DIR = join(REPO_ROOT, 'packages/design-system/src/styles')
+const DS_SRC = join(REPO_ROOT, 'packages/design-system/src')
+const TOKENS_DIR = join(DS_SRC, 'tokens')
+const PATTERNS_DIR = join(DS_SRC, 'patterns')
+const COMPONENTS_DIR = join(DS_SRC, 'components')
+const OUTPUT_DIR = join(DS_SRC, 'styles')
 const OUTPUT_FILE = join(OUTPUT_DIR, 'tokens.css')
 
 const CHECK_MODE = process.argv.includes('--check')
@@ -85,6 +88,28 @@ function sortCanonical(files) {
   })
 }
 
+/** Scan patterns/ + components/ for CSS files containing :root or @theme — these declare
+ *  consumer-needed tokens / styles outside tokens/ home. Per 2026-05-27 root-cause:
+ *  src/globals.css 已 import them for DS internal,但 tokens.css consumer aggregator
+ *  漏掉導致 consumer 拿不到。Auto-scan 防再犯。 */
+function findExtraCssFiles(dir) {
+  if (!existsSync(dir)) return []
+  const out = []
+  for (const entry of readdirSync(dir)) {
+    const full = join(dir, entry)
+    const s = statSync(full)
+    if (s.isDirectory()) {
+      out.push(...findExtraCssFiles(full))
+    } else if (s.isFile() && entry.endsWith('.css')) {
+      const content = readFileSync(full, 'utf8')
+      if (content.includes(':root') || content.includes('@theme')) {
+        out.push(full)
+      }
+    }
+  }
+  return out
+}
+
 function generate() {
   const files = sortCanonical(findTokenCssFiles(TOKENS_DIR))
 
@@ -100,6 +125,12 @@ function generate() {
     })
     ordered.push(...catFiles)
   }
+
+  // Scan patterns/ + components/ for CSS containing :root / @theme tokens
+  const extras = [
+    ...findExtraCssFiles(PATTERNS_DIR),
+    ...findExtraCssFiles(COMPONENTS_DIR),
+  ].sort((a, b) => relative(DS_SRC, a).localeCompare(relative(DS_SRC, b)))
 
   const header = `/* ═══════════════════════════════════════════════════════════════════════
    @qijenchen/design-system — Consolidated Token Stylesheet
@@ -133,7 +164,16 @@ function generate() {
     .map((f) => `@import './../tokens/${relative(TOKENS_DIR, f)}';`)
     .join('\n')
 
-  return header + imports + '\n'
+  // Non-token CSS containing :root / @theme — auto-detected per 2026-05-27 root-cause sweep
+  let extrasBlock = ''
+  if (extras.length > 0) {
+    extrasBlock = '\n\n/* Non-token CSS (patterns/ + components/) containing :root token declarations\n   or component-internal styles — auto-detected by generator scan. Per 2026-05-27\n   root-cause fix: src/globals.css 已 import for DS internal, 但 consumer-facing\n   tokens.css aggregator 必須也包含, 不然 consumer 拿不到 → 跑版。 */\n'
+    extrasBlock += extras
+      .map((f) => `@import './../${relative(DS_SRC, f)}';`)
+      .join('\n')
+  }
+
+  return header + imports + extrasBlock + '\n'
 }
 
 function ensureDir(dir) {
