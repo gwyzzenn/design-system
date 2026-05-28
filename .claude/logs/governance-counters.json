@@ -1,11 +1,11 @@
 {
-  "ts": "2026-05-27T14:31:25.930Z",
+  "ts": "2026-05-28T02:11:01.844Z",
   "counts": {
-    "hooks": 55,
+    "hooks": 57,
     "mRules": 31,
-    "auditDims": 78,
+    "auditDims": 80,
     "auditDimMin": 1,
-    "auditDimMax": 78,
+    "auditDimMax": 80,
     "specTraits": 11
   },
   "mRulesList": [
@@ -44,6 +44,7 @@
   "hookFiles": [
     ".claude/hooks/auto_regen_ds_barrel.sh",
     ".claude/hooks/block_prototype_imports.py",
+    ".claude/hooks/check_addon_subdir_ship.sh",
     ".claude/hooks/check_audit_post_report_validator.sh",
     ".claude/hooks/check_audit_sample_escape.sh",
     ".claude/hooks/check_benchmark_citation.sh",
@@ -86,6 +87,7 @@
     ".claude/hooks/check_spec_class_drift.sh",
     ".claude/hooks/check_story_invariants.sh",
     ".claude/hooks/check_substantive_edit_approval_preflight.sh",
+    ".claude/hooks/check_tailwind_wildcard_in_docs.sh",
     ".claude/hooks/check_wrapper_primitive_schema_drift.sh",
     ".claude/hooks/chrome_header_dispatcher.sh",
     ".claude/hooks/enforce_home_charter.sh",
