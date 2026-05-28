@@ -20,7 +20,7 @@
       "skills/ symlink → .claude/skills/(22 skills accessible)",
       "commands/ symlink → .claude/commands/(commands accessible)",
       "hooks/hooks.json generated from .claude/settings.json hooks section + ${CLAUDE_PLUGIN_ROOT} path rewrite",
-      "hooks/scripts/ symlink → .claude/hooks/(59 hook scripts accessible per snapshot 2026-05-28;count via sync-governance-counters.mjs)",
+      "hooks/scripts/ symlink → .claude/hooks/(59 .sh hook scripts + 4 aux command entries in hooks.json = 63 PreToolUse command slots per snapshot 2026-05-29;sync via sync-governance-counters.mjs;真值以 script 輸出為準避 drift)",
       ".claude-plugin/plugin.json + marketplace.json real schema(2026-05-23 fix)"
     ],
     "intentional_omissions": [

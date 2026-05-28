@@ -1,49 +1,72 @@
-# 02 — Create new product
+# Create New Product App
 
-從零生新 product app。
+從 template 生新 product app — 1 command, 自動 setup。
 
-## 一鍵 generator
-
-```bash
-npm run create-app order-dashboard
-```
-
-從 `apps/_template/` 複製 → `apps/order-dashboard/`,替換 `__APP_NAME__` / `__APP_PASCAL__` 佔位符。
-
-## 預設結構
+## Generator command
 
 ```
-apps/order-dashboard/
-├── package.json         (name: @qijenchen/order-dashboard,deps DS + react)
-├── tsconfig.json
-├── vite.config.ts
-├── index.html
-└── src/
-    └── main.tsx         (entry,demo imports DS Button + Avatar)
+npm run create-app <kebab-case-name>
+# Example: npm run create-app order-dashboard
 ```
 
-## 開發
+行為(`scripts/create-app.mjs`,2026-05-28 全盤 sweep):
+1. **Validate name**:kebab-case lowercase / 不可為 `template`(reserved) / 不可 duplicate
+2. **Copy** `apps/template/` → `apps/<name>/`(filter callback 排除 `node_modules / dist / storybook-static / .turbo / .next / .cache / tsconfig.tsbuildinfo`)
+3. **Patch `package.json`** name → `@product/<name>`
+4. **Patch `index.html`** `<title>` → `<name>`
+5. **Patch story titles** `*.stories.{tsx,ts,mdx}` 內 `title: 'Apps/template/...'` → `Apps/<name>/...`(防 Storybook duplicate id 與 template 衝突)
+6. **REQUIRED file invariant check**:5 critical files(`package.json` / `tsconfig.json` / `vite.config.ts` / `index.html` / `src`)缺一 → error
+7. **Safety-net rmSync**:filter 漏抓 dist / tsbuildinfo / storybook-static → 兜底清
+8. **Print** Storybook + dev guidance(含 sidebar path `apps-<name>-...`)
 
-```bash
-cd apps/order-dashboard
-npm run dev               # http://localhost:5173
+## After generation
+
+```
+cd apps/<name>
+npm run dev        # http://localhost:5173
+npm run build      # production build to dist/
+npm run typecheck  # tsc no-emit
 ```
 
-Claude session(workspace root)看到 apps/order-dashboard/ 後跟你共事。問 `Claude:幫我建一個列表頁` → 走 `/new-component` skill 流程,從 DS 找近親 → 寫元件 → 加 stories。
+## 第一個 component
 
-## 用 DS 元件
+`apps/<name>/src/App.tsx` 用 DS:
 
 ```tsx
-import { Button, Avatar, DataTable } from '@qijenchen/design-system'
-import '@qijenchen/design-system/styles/globals.css'  // 全 token
+import { Button, Avatar, TooltipProvider } from '@qijenchen/design-system'
 
-// 用即可,DS 自動處理 theme / density / a11y
+export default function App() {
+  return (
+    <main className="bg-canvas text-foreground p-8">
+      <h1 className="text-h2 mb-4">My Product</h1>
+      <Button variant="primary">Save</Button>
+      <Avatar name="Wendy" />
+    </main>
+  )
+}
 ```
 
-## 用 Storybook(可選 per-app)
+注意:
+- **Top barrel import only**(`from '@qijenchen/design-system'`)
+- 禁 import `/src/...`、`/dist/...` 內部路徑(`npm run lint:imports` CI gate 攔)
+- 樣式 token(`bg-canvas` / `text-foreground` / `text-h2`)由 globals.css 引入的 DS tokens 提供
 
-每 app 可有自己 stories,放 `apps/<name>/src/**/*.stories.tsx`。workspace root `.storybook/main.ts` 已 cover 全 apps glob。
+## Deploy(自動,無需 secret)
 
-## 部署
+新 app 自動進 Storybook(`netlify.toml:14` `build.command = "npm run build-storybook"`)+ git push main → Netlify auto-rebuild → 可見於 `https://<your-netlify-site>/?path=/story/apps-<name>-...`。
 
-push 後 `.github/workflows/deploy.yml` 自動 detect `apps/*` 並 per-app Vercel deploy(matrix)。
+**Fork user 第一次 setup**:
+- `npm run setup:netlify`(1 OAuth click)auto-creates site `${ghUser}-${repoName}.netlify.app` + 印 dashboard URL 教 user 30 秒設 Basic Password(per 2026-05-29 canonical;Identity 已 deprecated)
+- 之後每 push main → 自動 build + deploy + URL 進 Claude reply(`.claude/hooks/inject_deploy_url_after_push.sh`)
+
+**Per-app standalone deploy**(`apps/<name>/dist` 獨立 site)若需要,自建 `.github/workflows/<app>-deploy.yml` + Netlify secrets。但通常不用 — template Storybook 已統一展示所有 apps,沒必要 fragment deploy。
+
+## 找 DS component 用法
+
+- Storybook: https://ajenchen-design-system.netlify.app/
+- 元件總覽 / 設計規格 / 設計原則 3 層 stories
+- Claude session 跑 `/component-quality-gate` audit 你產品 UI 對 DS canonical 對齊度
+
+## Next
+
+→ `docs/03-co-edit-workflow.md` 多人共編 workflow
