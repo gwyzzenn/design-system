@@ -6,10 +6,10 @@
   "author": {
     "name": "Your-Org DS Owner"
   },
-  "homepage": "https://github.com/qijenchen/design-system",
+  "homepage": "https://github.com/ajenchen/design-system",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/qijenchen/design-system.git"
+    "url": "git+ssh://git@github.com/ajenchen/design-system.git"
   },
   "license": "UNLICENSED",
   "_metadata": {
