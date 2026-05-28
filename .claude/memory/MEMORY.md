@@ -11,14 +11,13 @@
 - [feedback_solo_dev_workflow.md](feedback_solo_dev_workflow.md) — 1 chat = 1 working branch;Netlify preview = user gate;user 拍板才 push main(M28)
 - [feedback_ship_then_revert_anti_pattern.md](feedback_ship_then_revert_anti_pattern.md) — SSOT-UI/UX edit 必先 propose verbatim approval,違 = hook BLOCKER(2026-05-15)
 - [feedback_propose_discipline.md](feedback_propose_discipline.md) — Propose discipline 2-in-1:中文人話(禁 jargon)+ file:line cite(claim「規定/必配」沒 cite = 撤回)(2026-05-15 + 2026-05-27,合 2 file)
-- [feedback_codex_local_transport_node_modules.md](feedback_codex_local_transport_node_modules.md) — 地端 codex 走 `node_modules/.bin/codex`(npm dep),3-test discovery 順序固定(2026-05-17)
+- [feedback_codex_exec_transport_canonical.md](feedback_codex_exec_transport_canonical.md) — 地端 transport `node_modules/.bin/codex` 3-test + visual audit `--dangerously-bypass-approvals-and-sandbox`(user authorize)+ 大 brief 死局 → 拆 N focused brief + low reasoning(2026-05-29 合 2 file)
 - [feedback_push_always_call.md](feedback_push_always_call.md) — 每 substantive turn 結尾必 call PushNotification,不自我 suppress(2026-05-17)
-- [feedback_codex_visual_audit_dangerously_bypass.md](feedback_codex_visual_audit_dangerously_bypass.md) — Codex exec MCP visual audit 唯一可行 path = `--dangerously-bypass-approvals-and-sandbox`(2026-05-27)
 - [feedback_ds_css_aggregator_full_sweep_2026_05_27.md](feedback_ds_css_aggregator_full_sweep_2026_05_27.md) — DS src/**/*.css 必在 tokens.css aggregator 或被 tsx import — 否則 consumer 拿不到(2026-05-27,hook `check_orphan_ds_css.sh`)
 - [feedback_ssot_mechanical_p0_not_p1_warn_2026_05_27.md](feedback_ssot_mechanical_p0_not_p1_warn_2026_05_27.md) — SSOT canonical = 必 P0 BLOCKER 機械強制 with per-line escape comment;禁 P1 WARN soft signal(2026-05-27)
 - [feedback_ai_ground_truth_unreliable_mechanical_primary.md](feedback_ai_ground_truth_unreliable_mechanical_primary.md) — AI self-audit unreliable;mechanical(pixel/DOM/tsc/playwright)= primary defense / AI judgement = supplementary only / new audit layer ALWAYS expand never replace(2026-05-27 + composition fidelity application,合 2 file)
 - [feedback_deploy_url_auto_detect_2026_05_27.md](feedback_deploy_url_auto_detect_2026_05_27.md) — Deploy URL auto-detection 3-strategy + per-user override + curl content sniff(2026-05-27 hook v4 ship)
-- [feedback_netlify_basic_password_canonical_2026_05_29.md](feedback_netlify_basic_password_canonical_2026_05_29.md) — Netlify Identity deprecated;fork-template default = Basic Password;Codespaces 是合法 cloud-dev path(2026-05-29 user screenshot 抓出 free-tier 現實)
+- [feedback_netlify_basic_password_canonical_2026_05_29.md](feedback_netlify_basic_password_canonical_2026_05_29.md) — Netlify Basic Password canonical + Claude Code 直連 sandbox 是雲端主路徑(不是 Codespaces)+ Codex 大 brief 死局(2026-05-29)
 
 ## Feedback (DS canonical / 視覺判斷)
 - [feedback_story_baseline_reference.md](feedback_story_baseline_reference.md) — 寫 stories wrap primitive 必 reference 既有完整佈局 baseline(2026-05-20 AppShell-vs-Sidebar drift anchor)
@@ -36,4 +35,8 @@
   - Cluster B:`feedback_ai_self_audit_unreliable_mechanical_primary_2026_05_27` + `feedback_composition_fidelity_pixel_vs_structural_2026_05_27` → 合 `feedback_ai_ground_truth_unreliable_mechanical_primary.md`(AI ground-truth canonical + composition fidelity specific application)
   - Archive: `.claude/memory/retired/2026-05-28-consolidate/`
   - Net delta:20 → 18 entries(-2,軟 cap 18 達標)
+- **2026-05-29 D3 consolidate 2 → 1 entry**(per M33 anti-defer):
+  - Cluster:`feedback_codex_local_transport_node_modules` + `feedback_codex_visual_audit_dangerously_bypass` → 合 `feedback_codex_exec_transport_canonical.md`(transport + bypass + 大 brief 死局 3 rules under one Codex exec canonical)
+  - Archive: `.claude/memory/retired/2026-05-29-codex-transport-consolidate/`
+  - Net delta:20 → 19 entries(-1,hard cap 20 達標)
 - [Storybook addon preset MUST be .cjs](feedback_storybook_addon_preset_must_be_cjs.md) — beta.27-.31 5 連敗 root cause: 強制 CJS evaluation,bypass Node ESM/esbuild-register CJS-interop 衝突(2026-05-28)
