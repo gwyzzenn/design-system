@@ -37,9 +37,12 @@ npm install   # postinstall 紅色 warning 提示 /plugin install
 
 ```bash
 npm run create-app order-dashboard   # 在 apps/order-dashboard/ 開新 app
+npm install                          # ← 必跑:重新 link workspace symlinks 讓新 app 拿 DS deps
 cd apps/order-dashboard
-npm run dev   # localhost vite 啟動
+npm run dev                          # localhost vite 啟動
 ```
+
+**為何 `npm run create-app` 後要再跑 `npm install`?** npm workspaces 在新增 workspace dir 後需重新 `npm install` 才能把 `@qijenchen/design-system` symlink 到 `apps/order-dashboard/node_modules/`。漏跑 → vite 起來抓不到 DS package。
 
 Storybook root config `.storybook/main.ts` 自動 glob `apps/**/*.stories.tsx`,**每加新 app stories 自動現身 storybook**,不用手動 register。
 

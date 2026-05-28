@@ -68,19 +68,26 @@ if (ghOut.includes('Logged in')) {
 }
 console.log('')
 
-// Step 1: Netlify CLI
+// Step 1: Netlify CLI(robust: global → npx fallback for locked-down env like Codespaces / sandbox / non-sudo Mac)
+let netlifyCmd = 'netlify'
 if (!shOut('which netlify')) {
   console.log('▶ Installing Netlify CLI globally...')
-  sh('npm install -g netlify-cli')
+  try {
+    sh('npm install -g netlify-cli')
+  } catch (e) {
+    console.log('  ⚠️ Global install failed(無 sudo / 鎖權限環境 — Codespaces 非 root user / 本地 macOS root-owned /usr/local 等)')
+    console.log('  Fall back to `npx -y netlify-cli`(首次稍慢,後續 cache)')
+    netlifyCmd = 'npx -y netlify-cli'
+  }
 }
-console.log('✓ Netlify CLI available')
+console.log(`✓ Netlify CLI available(via "${netlifyCmd}")`)
 console.log('')
 
 // Step 2: Login
-const whoami = shOut('netlify status --json')
+const whoami = shOut(`${netlifyCmd} status --json`)
 if (!whoami.includes('"User"') && !whoami.includes('"name"')) {
-  console.log('▶ Login to Netlify(browser 自動開啟,點「Continue with GitHub」→ Authorize)...')
-  sh('netlify login')
+  console.log('▶ Login to Netlify(browser 自動開啟,Codespaces 內走 VS Code port forward;點「Continue with GitHub」→ Authorize)...')
+  sh(`${netlifyCmd} login`)
 }
 console.log('✓ Netlify logged in')
 console.log('')
@@ -92,11 +99,11 @@ if (!existsSync('.netlify/state.json')) {
   const autoSiteName = `${ghUser}-${repoName}`.toLowerCase().replace(/[^a-z0-9-]/g, '-')
   console.log(`▶ Auto-create Netlify site "${autoSiteName}" + link this repo...`)
   try {
-    sh(`netlify sites:create --name="${autoSiteName}" --account-slug=$(netlify api listAccountsForUser --json 2>/dev/null | jq -r '.[0].slug // "personal"' 2>/dev/null || echo personal)`)
-    sh('netlify link --name=' + autoSiteName)
+    sh(`${netlifyCmd} sites:create --name="${autoSiteName}" --account-slug=$(${netlifyCmd} api listAccountsForUser --json 2>/dev/null | jq -r '.[0].slug // "personal"' 2>/dev/null || echo personal)`)
+    sh(`${netlifyCmd} link --name=${autoSiteName}`)
   } catch {
     console.log('⚠️ Auto-create failed(site name 可能已存在)。Fall back to interactive netlify init...')
-    sh('netlify init')
+    sh(`${netlifyCmd} init`)
   }
 }
 const state = JSON.parse(readFileSync('.netlify/state.json', 'utf8'))
