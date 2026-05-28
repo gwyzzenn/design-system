@@ -6,7 +6,7 @@
 
 **Repo**:**Private**(team member-only collaborators,non-member 看不到 source)
 **App / Storybook host**:**Netlify**(non-GitHub Pages — public host 不適合 private workspace)
-**權限控管**:Netlify Identity(免費,invite-only)OR Site Password(Pro)OR RBAC(Enterprise)— per `deploy.yml` / `storybook-deploy.yml` 註解
+**權限控管**:**Netlify Basic Password**(free-tier 唯一可用,共用 password)OR Pro Team protection($19/mo,per-account login)OR Cloudflare Access(免費 50 user,自架 SSO)— 2026-05-29 改 from Identity(已 deprecated)
 
 不適用 host(本 template 已 ban):
 - ❌ **GitHub Pages**:public host,private workspace 不該 expose

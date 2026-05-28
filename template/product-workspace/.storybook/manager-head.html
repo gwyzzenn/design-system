@@ -1,0 +1,13 @@
+<!-- 2026-05-29 — Netlify Identity widget removed(原 invite-only widget)。
+
+     現 access control 走 Basic Password Protection(Netlify edge 層擋,client 不需 widget):
+       1. `npm run setup:netlify` 完成自動部分(CLI + site + 連 repo)
+       2. Script 印 dashboard URL → user 點 2 radio button + 輸 password + Save
+       3. Netlify edge 收到 request 自動跳 password 提示頁(內建 UI,無需 client widget)
+
+     為何 Identity 移除:
+       - Netlify 2024 公告 Identity service deprecated;新帳號可能看不到 menu
+       - Free-tier 唯一真擋陌生人方法 = Basic Password
+       - Edge-layer password 比 client widget 更安全(client widget 可被繞過)
+
+     詳 CLAUDE.md `# 🔒 Access control — Basic Password` 段。 -->
