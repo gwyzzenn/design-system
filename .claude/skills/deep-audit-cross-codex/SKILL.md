@@ -32,24 +32,24 @@ arguments: scope?=full|changed focus?=「ssot|visual|behavior|all」
 
 ---
 
-## Phase 0 — Cwd context detection(3-mode branching,2026-05-29 加)
+## Phase 0 — Cwd context detection(2-mode branching,2026-05-29 加)
 
-Skill 必能跑在 **DS repo / template SSOT / fork user repo** 三處(per user 2026-05-29「fork user 在自己獨立環境下 infra 仍正確運行」directive)。Phase 0 自動偵測 cwd 切 scope:
+Skill 必能跑在 **DS repo + fork user repo** 兩處(per user 2026-05-29「fork user 在自己獨立環境下 infra 仍正確運行」directive)。Phase 0 自動偵測 cwd 切 scope:
 
 ```bash
 detect_mode() {
   if [ -d "packages/design-system/src" ]; then echo "ds-repo"
-  elif [ -d "template/product-workspace" ]; then echo "ds-template-ssot"
   elif grep -q '"@qijenchen/design-system"' package.json 2>/dev/null; then echo "fork-user-repo"
   else echo "non-ds"; exit 0; fi
 }
 ```
 
+**為何 2-mode 不是 3-mode**(per user「避免原則無限膨脹」):「template SSOT」實際上是 ds-repo 內 `template/product-workspace/` 子目錄;DS owner 編 template scaffold 仍在 ds-repo cwd 跑,**無 semantic 區隔**。Published `ds-product-template` GitHub repo 跟 fork user new repo 在 file structure 上一致(都消費 DS via npm + plugin),統一 fork-user-repo mode 處理。3-mode 設計 dead code:`ds-template-ssot` 永不 trigger 因 `packages/design-system/src` 條件先 win。
+
 | Mode | A.0 全盤閱讀 scope | A.1 audit dim scope | Phase B codex scope |
 |---|---|---|---|
-| **ds-repo** | full DS canonical + spec + token + pattern + memory(per 下方 A.0)| 全 dim per `/design-system-audit --deep` SSOT | 全 dim parallel verify |
-| **ds-template-ssot** | CLAUDE.md + template scaffold + plugin manifest + `template/README.md`「命名 SSOT」段 | dim 62-64 + 66 + 83 cross-3-repo subset | mirror diff + fork E2E paper test |
-| **fork-user-repo** | `node_modules/@qijenchen/design-system/CLAUDE.md` + `ds-canonical/rules/meta-patterns.md` + `apps/**`+ 本 repo `CLAUDE.md` | dim 83 fork-side runtime checks(hook fire / cross-load / setup-netlify smoke / deploy URL hook live)| 同 dim,fork-side verify;**禁** propose DS source change |
+| **ds-repo**(DS owner workflow,含 template SSOT 編輯)| full DS canonical + spec + token + pattern + memory + `template/product-workspace/` scaffold | 全 dim per `/design-system-audit --deep` SSOT(含 dim 83 cross-3-repo runtime audit)| 全 dim parallel verify |
+| **fork-user-repo**(published template repo / fork user product repo)| `node_modules/@qijenchen/design-system/CLAUDE.md` + `ds-canonical/rules/meta-patterns.md` + `apps/**` + 本 repo `CLAUDE.md` | dim 83 fork-side runtime checks(hook fire / cross-load / setup-netlify smoke / deploy URL hook live) + dim 62-67 consumer subset | 同 dim,fork-side verify;**禁** propose DS source change |
 
 ### Fork-mode safety invariants(2026-05-29 加)
 
@@ -138,8 +138,8 @@ detect_mode() {
 3-test 順序固定(local 優先):`node_modules/.bin/codex` → `which codex` → `~/.codex/auth.json`。**禁 Explore agent 替身**(M31)。
 
 **Auto-fallback policy(2026-05-29 加,fork-user 友善)**:
-- 全 ❌ **且** cwd = `fork-user-repo` → **auto-fallback Phase A only**(不 interactive ASK),印中文:`「Codex 未裝(@openai/codex 不在你的 fork repo deps),skip Phase B 比稿。Phase A solo audit 已完整跑完。若要 dual-track 比稿請 npm i --save-dev @openai/codex 後重跑」`
-- 全 ❌ **且** cwd = `ds-repo` / `ds-template-ssot` → 報 user(DS owner config issue,需 fix)
+- 全 ❌ **且** cwd = `fork-user-repo` → **auto-fallback Phase A only**(不 interactive ASK),印中文:`「Codex 未裝(@openai/codex 不在你的 fork repo deps),skip Phase B 比稿。Phase A solo audit 已完整跑完。若要 dual-track 比稿請 npm i --save-dev @openai/codex 後重跑」`(2026-05-29 verified:`/tmp/ds-product-template/node_modules/.bin/codex` 不存在 = fork user 預設無 codex,此 fallback 為正常路徑)
+- 全 ❌ **且** cwd = `ds-repo` → 報 user(DS owner config issue,需 fix)
 - **禁** Explore 替身 / 嘗試 `sudo npm i -g` / 繞 M28 開 PR(per `memory/feedback_codex_exec_transport_canonical.md` Anti-pattern)
 - **大型 brief 死局 fix**:r1-r4 anchor — 用 `--dangerously-bypass-approvals-and-sandbox` + `-c model_reasoning_effort=low` + 拆 N 個 single-axis focused brief 並行(每 brief 25k tokens 真完成)
 
@@ -241,7 +241,7 @@ Send via `codex exec`(local CLI per M31 Step 0.4)或 cloud `@codex` 後序。
 
 | Checkpoint | 在哪 | What |
 |---|---|---|
-| **CP-P0** | Phase 0 結束 | Print detected mode(ds-repo / ds-template-ssot / fork-user-repo),mode = non-ds 直接 exit;確認 user 跑對 repo |
+| **CP-P0** | Phase 0 結束 | Print detected mode(ds-repo / fork-user-repo),mode = non-ds 直接 exit;確認 user 跑對 repo |
 | **CP-A0** | A.0 結束 | 全盤閱讀清單給 user 看(列 N file read,per detected mode 切 scope),禁未讀就進 A.1 |
 | **CP-A2** | A.2 SSOT-UI/UX propose | 中文人話 + 4-Q gate;**STOP** 等 user A/B 才動 code(fork-user-repo mode:propose scope 限 `apps/**`,禁 DS source)|
 | **CP-B0** | B.0 codex transport | 3-test 全 ❌ + cwd=fork → **auto-fallback Phase A only 印中文**,不 interactive ASK;cwd=ds-repo → 報 user;禁 Explore 替身 |
