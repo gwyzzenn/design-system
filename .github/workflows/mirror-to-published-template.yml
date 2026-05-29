@@ -1,0 +1,75 @@
+name: Mirror to published ds-product-template repo
+
+# Per 2026-05-29 monorepo 2-scenario architecture(codex r5 synthesize verdict):
+#   DS repo = SSOT,published `ajenchen/ds-product-template` = subset mirror(build artifact).
+#
+# Trigger: on push to main(template-affecting paths only)
+# Action:
+#   1. Build mirror via scripts/build-published-template-mirror.mjs(allowlist + integrity scans)
+#   2. Push to ajenchen/ds-product-template main using CROSS_REPO_TOKEN PAT
+#
+# Setup required(user-side,one-time):
+#   1. Create GitHub Personal Access Token(PAT) with `Contents: write` permission for `ajenchen/ds-product-template` repo
+#   2. Add PAT to DS repo secrets as `CROSS_REPO_TOKEN`
+#   3. Push DS main → workflow auto fires → published repo auto syncs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      # Template-affecting paths(per architecture)
+      - 'apps/template/**'
+      - 'scripts/create-app.mjs'
+      - 'scripts/setup-netlify-access.mjs'
+      - 'scripts/check-plugin-installed.mjs'
+      - 'scripts/build-published-template-mirror.mjs'
+      - '.devcontainer/**'
+      - 'template/ds-product-template/**'
+      - 'package.json'
+      # exclude noise
+      - '!**/governance-counters.json'
+      - '!**/hook-fires.jsonl'
+
+  workflow_dispatch:  # allow manual trigger
+
+jobs:
+  mirror:
+    name: Build mirror + push to published template repo
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build mirror(allowlist + integrity scans)
+        run: node scripts/build-published-template-mirror.mjs --out=/tmp/mirror-build
+
+      - name: Push mirror to ajenchen/ds-product-template main
+        env:
+          CROSS_REPO_TOKEN: ${{ secrets.CROSS_REPO_TOKEN }}
+        run: |
+          if [ -z "$CROSS_REPO_TOKEN" ]; then
+            echo "❌ CROSS_REPO_TOKEN secret 未設"
+            echo ""
+            echo "需 user 一次性 setup:"
+            echo "  1. GitHub Settings → Developer settings → Personal access tokens → Generate new token"
+            echo "  2. Permission: Contents: write for repo ajenchen/ds-product-template"
+            echo "  3. DS repo Settings → Secrets → Actions → New secret: CROSS_REPO_TOKEN = <PAT>"
+            echo ""
+            echo "本次 mirror build 已完成 in /tmp/mirror-build,但不會 push"
+            exit 1
+          fi
+          cd /tmp/mirror-build
+          git init -b main
+          git config user.name "DS Mirror Bot"
+          git config user.email "bot@noreply.github.com"
+          git add -A
+          git commit -m "sync: mirror from DS repo ${GITHUB_SHA::8}"
+          git push --force "https://x-access-token:${CROSS_REPO_TOKEN}@github.com/ajenchen/ds-product-template.git" main
+          echo "✅ Mirror pushed to ajenchen/ds-product-template main"
