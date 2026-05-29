@@ -113,3 +113,4 @@ tmp/
 /tooltip.png
 /treeview.png
 /smoke.png
+*.tsbuildinfo
