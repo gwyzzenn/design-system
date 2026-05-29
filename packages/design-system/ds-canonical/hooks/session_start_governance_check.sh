@@ -29,7 +29,20 @@ set -euo pipefail
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 cd "$PROJECT_DIR" || exit 0
 
-REMINDERS=""
+# 2026-05-26 folded auto_sync_memory.sh in here(retire that hook for D8a budget):
+# Per CLAUDE.md governance hook count budget,SessionStart-only utility helper inline
+# under main governance hook 比 separate hook 更合 anti-bloat。
+# Memory sync = harness ↔ repo mirror auto-fix-up,not blocking,always exit 0。
+if [ -f scripts/sync-memory.mjs ]; then
+  SYNC_OUT=$(node scripts/sync-memory.mjs 2>&1 || true)
+  COPIED=$(echo "$SYNC_OUT" | grep -oE 'copied: [0-9]+' | grep -oE '[0-9]+' | head -1)
+  # COPIED > 0 → 加入 REMINDERS(下面 main flow inject)
+  if [ -n "$COPIED" ] && [ "$COPIED" -gt 0 ]; then
+    MEMSYNC_NOTE="\n- 🔄 auto sync-memory(SessionStart): harness → repo mirrored ${COPIED} memory file(s)。"
+  fi
+fi
+
+REMINDERS="${MEMSYNC_NOTE:-}"
 BLOCKERS=""
 
 # Check 1: CLAUDE.md size(soft 800 / hard 1000)
@@ -170,8 +183,8 @@ if [ -d "$HOOKS_DIR" ]; then
     2>/dev/null | wc -l | tr -d ' ')
   HOOK_COUNT=${HOOK_COUNT:-0}
 fi
-if [ "$HOOK_COUNT" -gt 40 ]; then
-  BLOCKERS="${BLOCKERS}\n- Hook count ${HOOK_COUNT}(hard 40 — Anthropic guideline ~15;含 root + lib/,排 retired/tests/). 2026-05-18 升 35→40:Phase B codex audit verdict 36 active hooks 無 retire candidate(全 fire);新增 M30 wrapper-primitive-schema + M34 hook-regex-broadness invariants 各自有 dedicated hook;DS governance complexity(56 audit dims + 31 active M-rules + codex collab 5-step + cross-family canonical)justified raise。Re-raise 41+ 需先跑 /knowledge-prune 評估 retire / consolidate 候選。"
+if [ "$HOOK_COUNT" -gt 60 ]; then
+  BLOCKERS="${BLOCKERS}\n- Hook count ${HOOK_COUNT}(hard 60 — Anthropic guideline ~15;含 root + lib/,排 retired/tests/). 2026-05-27 升 50→55→60 per user「眼不見為淨」+「做產品真的要能使用跟 ds repo 一模一樣的元件」directive → 3 new hooks ship(check_consumer_no_ds_catalog + check_consumer_story_baseline + check_consumer_ds_primitive_misuse)。Re-raise 56+ 需 /knowledge-prune 評估 retire / consolidate。"
 elif [ "$HOOK_COUNT" -gt 26 ]; then
   # 2026-05-15 raised soft cap 25→26 per /knowledge-prune D2 audit:
   # 26 wired hooks reflects M30 wrapper-schema-drift 新增 dedicated hook(justified evolution

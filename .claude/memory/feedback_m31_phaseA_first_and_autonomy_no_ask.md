@@ -20,7 +20,7 @@ originSessionId: 41fa83c2-f951-431e-911e-ed3ceb185903
 
 **Anchor 2026-05-29**:user 要「所有 repo deep audit cross codex」,我 run `test:scenarios` + tsc + validate(幾個 script)就直接 launch codex,**跳過自己的 Phase A 深度 audit**。user 抓「並不是全部都仰賴 codex 喔,codex 只是 second opinion...你確定你有先跑一遍?」。補做 Explore agent Claude-solo audit → 抓 3 P0(codex 另抓 3 P0 互補)→ 證實 dual-track 價值。**若我一開始就跳過 Claude Phase A,會漏掉那 3 個只有 Claude 抓到的 P0**。
 
-**Mechanical backstop**:`stop_self_audit.sh` 偵測「本 turn / session 有 codex exec cmd trace 但無 prior Claude-solo audit trace(Explore agent dispatch OR 多 file Read/Grep sweep before codex)」→ warn / BLOCKER。
+**Mechanical backstop(soft warn,非 BLOCKER)**:`stop_self_audit.sh` 偵測「本 turn 有 codex reply read 但無 prior Claude-solo audit trace(Agent/Explore dispatch OR ≥5 Grep/Read)」→ **soft warn**(next-turn inject 提醒)。設計為 warn 非 block:Phase-A-first 判斷需 context(有時 codex 是 follow-up 而非 primary),hard block 會 false-positive;warn + memory anchor 提醒已足夠 self-correct。Anchor 2026-05-29 codex 自己也指出此 warn vs memory「backstop」用詞需一致 → 本句精確化為「soft warn backstop」。
 
 ## Rule 2 — Auto mode 只為 SSOT-UI/UX substantive ASK,其他自己 pick best execute
 
