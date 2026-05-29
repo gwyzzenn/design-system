@@ -188,6 +188,18 @@ Proceed with P0+P1 as atomic commit? Then discuss P2?
 - 每 P2 item 一個獨立 commit(animation trail 可回溯)
 - 新 meta-pattern 加進 CLAUDE.md `# Meta-Pattern 預警` → 同時**必檢討哪些下游條目冗餘**(上游加 = 下游減)
 
+### Phase Z reference — Cross-repo SSOT propagation(2026-05-26 retract skill-specific Phase Z,移到 CLAUDE.md canonical)
+
+**Per user 2026-05-26 correction**:「不是只要一 knowledge audit deep 之後就要,是等我 push main 後才要」。
+
+Cross-repo SSOT sync trigger 不是「skill 跑完」而是「push main 後 SSOT-affecting diff」— canonical 統一在:
+- `CLAUDE.md` `# Git solo-work canonical` Step 5.5
+- Hook `check_post_main_ssot_propagate.sh`(PostToolUse Bash 偵測 `git push origin main` + diff)
+
+→ /knowledge-prune skill 本身**不負責 trigger sync**;Phase 3-4 commit + Phase 6 user 拍板 push main 後,canonical hook 自動偵測 SSOT diff + 提議 npm bump。**整鏈 1 trigger 同時 cover /deep-audit-cross-codex / 一般 dev / 任何 SSOT-affecting 來源**(DRY,不複製到每個 skill)。
+
+---
+
 ### Phase 5 — Final report + **quantified retire rate** + baseline update
 
 **Retire rate 計算公式**(從 aspirational 轉 quantified,2026-04-24):
