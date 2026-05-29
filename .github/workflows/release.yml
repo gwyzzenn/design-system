@@ -151,6 +151,19 @@ jobs:
           cd ../storybook-config
           npm publish --access public --tag $DIST_TAG
 
+      # 2026-05-29 RC3 fix(codex dual-track 共識):pre-1.0 beta-only 套件,`latest` 必自動跟最新 beta。
+      # 否則 latest 停在舊版 → consumer sync-design-system `npm update`(target latest)+ 裸 `npm i` 拿舊版
+      # → 修正(如 beta.34 React #31 fix)送不到 fork repo → 部署仍壞。Anchor:beta.34 latest 卡 beta.33。
+      - name: Repoint latest → this beta(防 latest/beta 分岔)
+        if: startsWith(github.ref, 'refs/tags/v') && contains(github.ref, '-beta')
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          npm dist-tag add @qijenchen/design-system@"$VERSION" latest
+          npm dist-tag add @qijenchen/storybook-config@"$VERSION" latest
+          echo "✅ latest dist-tag → $VERSION(consumer npm update / 裸 npm i 即拿最新 beta)"
+
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
