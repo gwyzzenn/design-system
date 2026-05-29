@@ -123,14 +123,18 @@ fi
 teardown_proj
 
 # Test 7: Hook count > hard cap → BLOCKER
-echo "Test 7: hook count 46 → hard BLOCKER (cap raised to 45 2026-05-26 per infra backfill)"
+# Cap 從 SSOT(session_start_governance_check.sh `HOOK_COUNT" -gt N`)動態讀,避免 cap 升級後測試 re-drift。
+# Anchor:2026-05-29 cap 已升 45→60 但本測試寫死 46/「hard 45」→ CI hook-test 失敗 → 連帶 storybook
+# build + GitHub Pages deploy 全卡(deploy-storybook job gated 在 Verify pass)。改動態讀後永不 drift。
+HARD_CAP=$(grep -oE 'HOOK_COUNT" -gt [0-9]+' "$HOOK" | grep -oE '[0-9]+' | head -1)
+echo "Test 7: hook count > hard cap ${HARD_CAP} → BLOCKER (cap 從 SSOT 讀)"
 setup_proj
-for i in $(seq 1 46); do
+for i in $(seq 1 $((HARD_CAP + 5))); do
   : > "$TMP_PROJ/.claude/hooks/check_fake_${i}.sh"
 done
 run_hook
-if [ "$EXIT" = "0" ] && echo "$STDOUT_TEXT" | grep -q "BLOCKER" && echo "$STDOUT_TEXT" | grep -qE "hard (30|35|40|45)"; then
-  echo "  PASS  Test 7 hook count hard BLOCKER"; PASS=$((PASS+1))
+if [ "$EXIT" = "0" ] && echo "$STDOUT_TEXT" | grep -q "BLOCKER" && echo "$STDOUT_TEXT" | grep -qE "hard ${HARD_CAP}"; then
+  echo "  PASS  Test 7 hook count hard BLOCKER (cap ${HARD_CAP})"; PASS=$((PASS+1))
 else
   echo "  FAIL  Test 7 (output: ${STDOUT_TEXT:0:200})"
   FAIL=$((FAIL+1)); FAILED="${FAILED}\n  - Test 7"
