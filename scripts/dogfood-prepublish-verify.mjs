@@ -35,6 +35,15 @@ function runCapture(cmd, opts = {}) {
   return execSync(cmd, { encoding: 'utf8', ...opts }).trim()
 }
 
+// Step 0: ds-canonical mirror drift gate (block publish if npm-shipped governance is stale vs .claude SSOT)
+console.log('=== Step 0: ds-canonical mirror drift check ===')
+try {
+  run('node scripts/sync-ds-canonical.mjs --check', { cwd: REPO_ROOT, stdio: 'inherit' })
+} catch {
+  console.error('❌ ds-canonical mirror drift — run `npm run sync:ds-canonical` then re-commit before publish')
+  process.exit(1)
+}
+
 // Step 1: pack
 console.log('=== Step 1: pack DS + storybook-config ===')
 const packDir = mkdtempSync(join(tmpdir(), 'ds-dogfood-pack-'))

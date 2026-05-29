@@ -1,0 +1,60 @@
+#!/usr/bin/env node
+// Sync .claude governance SSOT → packages/design-system/ds-canonical mirror (npm-shipped to fork users).
+//
+// Why: ds-canonical/ + packages/design-system/CLAUDE.md are hand-maintained npm-shipped mirrors of the
+// `.claude/` SSOT + root CLAUDE.md. With no auto-sync they chronically drift (2026-05-29 deep-audit found
+// rules/ + references/ + shipped CLAUDE.md stale after a partial hooks-only rsync). This script makes the
+// `.claude → ds-canonical` direction (the canonical SSOT direction) one command, and `--check` gates publish.
+//
+// Usage:
+//   node scripts/sync-ds-canonical.mjs           # write: exact-mirror .claude → ds-canonical (rsync --delete)
+//   node scripts/sync-ds-canonical.mjs --check    # dry-run: exit 1 if any drift, print drifting paths
+
+import { execSync } from 'node:child_process'
+import { readFileSync, copyFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+import { dirname, join } from 'node:path'
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
+const CHECK = process.argv.includes('--check')
+
+// Content dirs mirrored from .claude/ → ds-canonical/ + root CLAUDE.md → packages CLAUDE.md.
+// NOTE: ds-canonical/templates is ds-canonical-native (fork-user scaffold, no .claude source) → NOT mirrored.
+const DIR_PAIRS = ['commands', 'hooks', 'references', 'rules', 'skills'].map((d) => ({
+  src: `.claude/${d}/`,
+  dest: `packages/design-system/ds-canonical/${d}/`,
+}))
+const FILE_PAIRS = [{ src: 'CLAUDE.md', dest: 'packages/design-system/CLAUDE.md' }]
+
+// -rtc = recurse + preserve mtime + checksum compare (content, not mtime). -t avoids mtime-only false drift.
+// -i itemizes changed paths in both modes so the report/exit reflects real content drift only.
+const flags = CHECK ? '-rtci --delete --dry-run' : '-rtci --delete'
+let drift = []
+
+for (const { src, dest } of DIR_PAIRS) {
+  const out = execSync(`rsync ${flags} '${join(ROOT, src)}' '${join(ROOT, dest)}'`, {
+    encoding: 'utf8',
+  }).trim()
+  if (out) drift.push(`[${src}]\n${out}`)
+}
+// Single files: deterministic content compare (rsync -c on a single file dest mis-reports in dry-run).
+for (const { src, dest } of FILE_PAIRS) {
+  const same = readFileSync(join(ROOT, src), 'utf8') === readFileSync(join(ROOT, dest), 'utf8')
+  if (same) continue
+  if (CHECK) drift.push(`[${src} → ${dest}]\n>f content differs`)
+  else {
+    copyFileSync(join(ROOT, src), join(ROOT, dest))
+    drift.push(`[${src} → ${dest}] copied`)
+  }
+}
+
+if (CHECK) {
+  if (drift.length) {
+    console.error('❌ ds-canonical mirror DRIFT (run `node scripts/sync-ds-canonical.mjs` to fix):\n')
+    console.error(drift.join('\n\n'))
+    process.exit(1)
+  }
+  console.log('✓ ds-canonical mirror in sync with .claude SSOT (0 drift)')
+} else {
+  console.log(drift.length ? `✓ synced .claude → ds-canonical (${drift.length} group(s) updated)` : '✓ already in sync (0 changes)')
+}

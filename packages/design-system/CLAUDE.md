@@ -32,7 +32,7 @@
 
 ## 行數預算(Anthropic 對齊)
 
-CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap 800。SKILL ≤ 250 / spec ≤ 300(foundational SSOT 例外 ≤ 800-1200)/ memory **per-file ≤ 100 lines** + **MEMORY.md index ≤ 20 entries**(soft 18 / hard 20,session-start hook 攔)。Hooks **26 soft / 40 hard**(SSOT = `session_start_governance_check.sh:173`)。動態值見 `scripts/sync-governance-counters.mjs` 跑出為準(2026-05-23:**31 M-rules / 56 audit dims / 37 hooks** — 不寫死避 drift,per 2026-05-22 prune codify)。
+CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap 800。SKILL ≤ 250 / spec ≤ 300(foundational SSOT 例外 ≤ 800-1200)/ memory **per-file ≤ 100 lines** + **MEMORY.md index ≤ 20 entries**(soft 18 / hard 20,session-start hook 攔)。Hooks **26 soft / 60 hard**(SSOT = `session_start_governance_check.sh:186`,2026-05-27 升 50→55→60 per codex M31 P0 hooks + baseline + primitive-misuse 3 new hooks)。動態值見 `scripts/sync-governance-counters.mjs` 跑出為準(snapshot 2026-05-28:**31 M-rules / 82 audit dims / 59 hooks** — 數字僅供 sanity check,真值以 script 輸出為準避 drift)。
 
 ## Anti-bloat L1-L3
 
@@ -85,6 +85,7 @@ CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap
 | **寫 story / 視覺 code** | `/story-writing` + `# SSOT 消費 canonical` |
 | **命名新檔 / 變數 / prop** | `# 命名與語言一致性` + `.claude/rules/ui-development.md`「元件 Props 命名」 |
 | **新元件 layout** | `# 4-Family Layout Model` |
+| **建產品 / 開新 product app** | `npm run create-app <name>` → `apps/<name>/`;**2-scenario architecture SSOT** → `.claude/references/scenario-definition.md`(Scenario A / Scenario B 定義 + 20 test case + mirror chain + verify checkpoints,**之後增刪改 reference 此 SSOT**)|
 | **新 skill / hook / command** | `.claude/{home}/README.md` charter |
 | **無前例設計決策** | `# 遇不確定時的協議` |
 | **Tailwind 出怪事** | `.claude/rules/ui-development.md`「Tailwind 5 條核心」+ `# 失敗記憶索引` |
@@ -106,6 +107,7 @@ CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap
 | 3 告訴 user 主要 change(or preview URL)| 讓 user 知道看什麼 |
 | 4 等 user trigger | **「push / OK / 好 / 合 main」** → step 5;**「改 X / 不對 / 等等」** → 繼續 step 1 |
 | 5 Squash merge to main | 不開 PR(可 GitHub API squash-merge OR fast-forward)|
+| 5.5 **SSOT propagation gate**(2026-05-26 加 per user verbatim「push main 後所有 repo 都能獲得更新」)| Hook `check_post_main_ssot_propagate.sh` 偵測 `git push origin main` + diff HEAD~..HEAD 含 SSOT-affecting paths(`packages/{design-system,storybook-config}/src` / `.claude/{rules,hooks,skills,commands,references}` / `.claude-plugin/*.json` / `hooks/hooks.json` / `CLAUDE.md`)→ inject context 提議 bump npm `0.1.0-beta.<N+1>` + tag。AI 跑 bump + push tag → Release workflow auto-fire → npm publish → ds-product-template + fork repos Dependabot daily auto-PR(整鏈 1 trigger 涵蓋 /knowledge-prune / /deep-audit-cross-codex / 一般 dev / 任何 SSOT-affecting 來源,不需 skill-specific Phase Z)|
 | 6 砍 remote branch | `git push origin --delete <branch>` ;sandbox HTTP 403 → 提醒 user GitHub UI 手動 |
 | 7 Local 對齊 | `git checkout main && git fetch && git reset --hard origin/main && git branch -d <branch>` |
 
@@ -192,10 +194,6 @@ Vite + React + TypeScript + Tailwind v4 + shadcn/ui + Storybook + 自訂 Design 
 - `.claude/rules/ui-development.md` — paths: `**/*.tsx` + `**/*.ts`(含 Tailwind / Token / Props 命名 / shadcn)
 - `.claude/rules/story-rules.md` — paths: `**/*.stories.tsx`(三層定位 + Title + 範例最高準則)
 
-# 元件完成 checklist
+# 元件完成 + Exploration
 
-merge 前 invoke `/component-quality-gate`(45 項 + visual + clean-code 三層)。
-
-# Exploration & Prototype
-
-正式 `packages/design-system/src/`(Phase 1 後 npm workspace 內化)vs 比稿 `src/explorations/`(hook `block_prototype_imports.py` 強制隔離)。比稿 `*.v1.stories.tsx` + `notes.md`,定案升級 patterns/ 或 components/。Skills:`/prototype` / `/component-quality-gate` / `/delivery-handoff`。
+merge 前 invoke `/component-quality-gate`(45 項 + visual + clean-code 三層)。正式 `packages/design-system/src/`(Phase 1 後 npm workspace 內化)vs 比稿 `src/explorations/`(hook `block_prototype_imports.py` 強制隔離);比稿 `*.v1.stories.tsx` + `notes.md`,定案升級 patterns/ 或 components/。Skills:`/prototype` / `/component-quality-gate` / `/delivery-handoff`。

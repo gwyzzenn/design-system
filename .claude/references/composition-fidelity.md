@@ -28,7 +28,7 @@ Per user 2026-05-27 verbatim directive 對應 root cause:**DS source 提供 prim
 npm run composition-fidelity -- \
   --ds-url=http://localhost:9001 \
   --consumer-url=http://localhost:9002 \
-  --consumer-app-files=/path/to/ds-product-template/apps/template/src/App.tsx \
+  --consumer-root=/path/to/ds-product-template \
   --out=.claude/snapshots/composition-fidelity \
   --threshold-pct=2
 
@@ -36,7 +36,7 @@ npm run composition-fidelity -- \
 npm run composition-fidelity -- \
   --ds-static=storybook-static \
   --consumer-static=/path/to/ds-product-template/storybook-static \
-  --consumer-app-files=/path/to/ds-product-template/apps/template/src/App.tsx \
+  --consumer-root=/path/to/ds-product-template \
   --threshold-pct=0.5
 ```
 
@@ -52,35 +52,41 @@ npm run composition-fidelity -- \
 
 **Initial ds-product-template baseline 1.41%**(measured 2026-05-27):brand text + NAV labels content-level diff。Structural composition byte-equal。
 
-## CI workflow(待 next-phase ship)
+## CI workflow(shipped)
 
-對應 codex feature `exec_permission_approvals` graduate 後可 land 在 ds-product-template repo:
+Actual gate is centralized in DS repo at `.github/workflows/composition-fidelity.yml`:checkout DS + `ajenchen/ds-product-template`,build both Storybooks,and run the local DS script against the two `storybook-static` directories.
 
 ```yaml
-# .github/workflows/composition-fidelity.yml(ds-product-template)
+# .github/workflows/composition-fidelity.yml(design-system)
 on: [push, pull_request]
 jobs:
   composition-fidelity:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-      - run: npm ci
+        with: { path: design-system }
+      - uses: actions/checkout@v4
+        with: { repository: ajenchen/ds-product-template, path: ds-product-template }
+      - run: npm ci --legacy-peer-deps
+        working-directory: design-system
+      - run: npm ci --legacy-peer-deps
+        working-directory: ds-product-template
       - run: npm run build-storybook
-      # Fetch DS storybook from Pages (or download artifact)
-      - run: curl -L https://ajenchen.github.io/design-system/storybook-static.tar.gz | tar xz -C ds-baseline
-      - run: npm install @qijenchen/design-system --include=dev
+        working-directory: design-system
+      - run: npm run build-storybook
+        working-directory: ds-product-template
       - run: |
-          node node_modules/@qijenchen/design-system/scripts/composition-fidelity-visual-diff.mjs \
-            --ds-static=ds-baseline/storybook-static \
-            --consumer-static=storybook-static \
-            --consumer-app-files=apps/template/src/App.tsx \
-            --threshold-pct=2
+          node scripts/composition-fidelity-visual-diff.mjs \
+            --ds-static=storybook-static \
+            --consumer-static=../ds-product-template/storybook-static \
+            --consumer-root=../ds-product-template \
+            --threshold-pct=0.5
+        working-directory: design-system
 ```
 
 ## 不該做的事
 
-- ❌ 把 baseline screenshots commit 進 ds-product-template repo(stale 風險)— 改 fetch from DS Pages live
+- ❌ 把 baseline screenshots commit 進 product-workspace repo(stale 風險)— 改 fetch from DS Pages live
 - ❌ Threshold 設 0%(content-level diff 必然有，brand text / NAV labels)
 - ❌ 跑 raw DOM diff(M32 educated:pixel-quantified verify ≠ attribute existence)
 - ❌ 抽樣 5 stories(M-rule 不抽樣 / 不少於 user 明示「所有元件」scope)
@@ -88,7 +94,7 @@ jobs:
 ## 反 pattern 錨例
 
 **2026-05-27**:user 抓 AppShell Avatar+Label drift。Triple-verify 發現:
-1. Source byte-equivalent(DS sidebar.stories.tsx WorkspaceBrand 跟 ds-product-template App.tsx 同 pattern)
+1. Source byte-equivalent(DS sidebar.stories.tsx WorkspaceBrand 跟 product-workspace App.tsx 同 pattern)
 2. Stale build artifact:DS storybook-static built BEFORE commit 4e3256c1 fix → DS render 用 ItemAvatar wrapper / consumer 用 raw Avatar
 3. User screenshot 從 stale deploy 看到「DS-rendered」vs「consumer-rendered」structural diff
 

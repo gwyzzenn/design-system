@@ -1,6 +1,6 @@
 # Composition Fidelity Visual Diff(SSOT,2026-05-27 codify)
 
-**Mechanical 機制讓「DS components 在 consumer (product-workspace) 渲染必跟 DS canonical 一致」可被驗證**(byte-identity 不夠,需 visual diff)。
+**Mechanical 機制讓「DS components 在 consumer (ds-product-template) 渲染必跟 DS canonical 一致」可被驗證**(byte-identity 不夠,需 visual diff)。
 
 Per user 2026-05-27 verbatim directive 對應 root cause:**DS source 提供 primitive,consumer 自由 compose;npm byte-identity 不約束 compose 方式**。Consumer 可寫 `<Avatar size={32}>` 即使 DS canonical demo 用 `<Avatar size={24}>` — bytes 同但 visual drift。
 
@@ -28,15 +28,15 @@ Per user 2026-05-27 verbatim directive 對應 root cause:**DS source 提供 prim
 npm run composition-fidelity -- \
   --ds-url=http://localhost:9001 \
   --consumer-url=http://localhost:9002 \
-  --consumer-root=/path/to/product-workspace \
+  --consumer-root=/path/to/ds-product-template \
   --out=.claude/snapshots/composition-fidelity \
   --threshold-pct=2
 
 # CI — against built storybook-static dirs:
 npm run composition-fidelity -- \
   --ds-static=storybook-static \
-  --consumer-static=/path/to/product-workspace/storybook-static \
-  --consumer-root=/path/to/product-workspace \
+  --consumer-static=/path/to/ds-product-template/storybook-static \
+  --consumer-root=/path/to/ds-product-template \
   --threshold-pct=0.5
 ```
 
@@ -50,7 +50,7 @@ npm run composition-fidelity -- \
 - `2%` — typical(allows brand text difference like "Acme Inc" vs "Acme Product")
 - `5%` — initial bootstrap(consumer 多元化內容差異)
 
-**Initial product-workspace baseline 1.41%**(measured 2026-05-27):brand text + NAV labels content-level diff。Structural composition byte-equal。
+**Initial ds-product-template baseline 1.41%**(measured 2026-05-27):brand text + NAV labels content-level diff。Structural composition byte-equal。
 
 ## CI workflow(shipped)
 
