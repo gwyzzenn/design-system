@@ -31,7 +31,7 @@ Dialog 和 Popover 的**結構化 sub-components 共用 primitive**——提供 
 
 ### SurfaceBody
 - `px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]`
-- **無額外 flex 屬性**——consumer 依浮層類型決定:
+- **永遠套 `flex-1 min-h-0 overflow-y-auto`**(viewport-aware scroll:視窗太小時 body 內捲動;非 flex-col parent 內 flex-1/min-h-0 為 no-op,backward compat)。2026-05-31 infra-audit 修:原寫「無額外 flex 屬性」與 code(overlay-surface.tsx:168 恆套)矛盾。consumer 依浮層類型:
   - **Popover**:多數 bare consume,padding 即是總 padding
   - **Dialog / Sheet**:consumer **不直接 wrap SurfaceBody**——走 ScrollArea canonical(下節),padding 搬到 ScrollArea viewport 內層 div
 
@@ -341,7 +341,7 @@ const CHROME_UNBOUNDED_SLOT =
 
 **禁止**:`w-[640px]` 單獨用(❌ 斷鏈)/ `flex flex-col h-full` 無 `min-h-0`(❌ flex item 不 shrink,scroll 失效)。
 
-**DS-wide consumer 必檢點**:`grep '<PopoverContent\|<HoverCardContent\|<DialogContent\|<SheetContent'` 內第一層 wrapper 是否含 `flex flex-col h-full`(若該 panel 用 SurfaceBody)。Hook `check_overlay_panel_scroll_chain.sh` 機械化攔截。
+**DS-wide consumer 必檢點**:`grep '<PopoverContent\|<HoverCardContent\|<DialogContent\|<SheetContent'` 內第一層 wrapper 是否含 `flex flex-col h-full`(若該 panel 用 SurfaceBody)。Hook `check_pattern_invariants.sh` C.1(原 `check_overlay_panel_scroll_chain.sh` 已 folded;2026-05-31 infra-audit 修 dangling ref)機械化攔截。
 
 **共通 rationale**(全 overlay + banner 家族):corner close X 屬 **action group region**,必用 `<Button>` primitive(不自刻 `<button><X /></button>` 繞 DS token / a11y,不用 `ItemInlineActionButton`)。
 
@@ -372,7 +372,7 @@ const CHROME_UNBOUNDED_SLOT =
 
 **Why**:primitive 自帶 padding token + PopoverHeader auto close X(line 72)+ PopoverTitle typography + `data-popover-body` autofocus 標記;自刻 = padding/border/close X/title 大小 4 向 drift 起點(對齊 mindset #2)。
 
-**Hook**:`.claude/hooks/check_overlay_handcraft.sh` 攔此 pattern;escape hatch `// overlay-handcraft-allow: <reason>` 同/前行。
+**Hook**:`.claude/hooks/post_edit_dispatcher.sh`(原 `check_overlay_handcraft.sh` 已 folded;2026-05-31 infra-audit 修 dangling ref)攔此 pattern;escape hatch `// overlay-handcraft-allow: <reason>` 同/前行。
 
 ---
 
@@ -418,3 +418,12 @@ overlay-surface 是 **layout pattern**(`SurfaceHeader` / `SurfaceBody` / `Surfac
 - `app-shell.spec.md`
 - `header-canonical.spec.md`
 - `motion.spec.md`
+
+## 被引用(auto-maintained,Dim 3 reciprocal audit)
+
+> 本節由 `scripts/add-reciprocal-pointers.mjs` 自動維護,列出在 SSOT 語境下指向本 spec 的其他 spec。若要手動補充,寫在本節之前。
+
+- `coachmark.spec.md`
+- `element-anatomy.spec.md`
+- `notice.spec.md`
+- `sheet.spec.md`
