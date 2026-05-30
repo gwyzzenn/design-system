@@ -21,7 +21,7 @@ export const Overview: Story = {
     <div className="flex flex-col gap-10">
       <div>
         <H3>Anatomy</H3>
-        <Desc>Alert 消費 Notice primitive(跟 Toast 共用 layout + icon + theme 策略)。結構:Icon + Title + Description + 可選 actions。</Desc>
+        <Desc>Alert 跟 Toast 共用同一套排版、圖示與主題策略。結構:圖示 + 標題 + 說明文字 + 右側操作區(endContent)+ 右上角關閉鈕。</Desc>
         <Alert
           variant="warning"
           title="方案即將到期"
@@ -41,7 +41,9 @@ export const Overview: Story = {
                 ['placement', "'inline' | 'fixed'", "'inline'", 'inline 嵌內容 vs fixed 頂部全域警告'],
                 ['title', 'ReactNode', '必填', '主要訊息'],
                 ['description', 'ReactNode', '—', '補充說明'],
-                ['actions', 'ReactNode', '—', 'CTA buttons'],
+                ['endContent', 'ReactNode', '—', '右側操作區（CTA 按鈕等）'],
+                ['dismissible', 'boolean', 'true', '是否顯示右上角關閉按鈕'],
+                ['onDismiss', '() => void', '—', '按下關閉按鈕時觸發'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
               ))}
@@ -204,7 +206,7 @@ export const StateBehavior: Story = {
           <table className="text-caption border-collapse">
             <thead><tr><Th>State</Th><Th>視覺</Th><Th>Token</Th></tr></thead>
             <tbody>
-              <tr><Td>default</Td><Td>Button sm iconOnly(28×28),X icon 16,fg-muted</Td><Td mono>text-fg-muted(`dismiss` override)</Td></tr>
+              <tr><Td>default</Td><Td>Button xs iconOnly(24×24),X icon 16,fg-muted</Td><Td mono>text-fg-muted(`dismiss` override)</Td></tr>
               <tr><Td>hover</Td><Td>Button bg 套 neutral-hover,icon 升 foreground</Td><Td mono>bg-neutral-hover / text-foreground</Td></tr>
               <tr><Td>focus</Td><Td>2px ring(鍵盤導航)</Td><Td mono>ring-ring ring-offset-1</Td></tr>
               <tr><Td>solid appearance</Td><Td>icon 用白字(繼承 data-theme foreground)</Td><Td mono>text-foreground(inverse)</Td></tr>
@@ -230,7 +232,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `alert.spec.md` 「A11y 預設」段。摘要:\n\n-   預設  ： role=\"alert\"  +  aria-live=\"polite\" ——screen reader 在空閒時讀出 Alert 內容，不中斷使用者目前動作\n-   error variant 可升級  ： aria-live=\"assertive\"  中斷 screen reader 目前朗讀，立即讀出 Alert（僅用於真正 critical 的錯誤，避免濫用干擾）\n-   Close X 按鈕  ：必須有  aria-label (如「關閉通知」),實作見下方「Chrome corner close X canonical」\n-   CTA 按鈕  ：放在 Alert body action row 時 size 固定為  xs  tertiary,文字描述動作(「前往設定」「立即更新」)"}</p>
+      <p className="whitespace-pre-line">{"無障礙朗讀行為依 variant 自動切換：\n\n-   一般提示（neutral / info / success）  ： role=\"status\"  +  aria-live=\"polite\" ——螢幕報讀器在使用者空閒時才讀出內容，不打斷目前動作\n-   緊急提示（warning / error）  ： role=\"alert\"  +  aria-live=\"assertive\" ——立即中斷目前朗讀讀出內容，因為使用者必須馬上知道\n-   關閉按鈕  ：必須有  aria-label （如「關閉通知」）\n-   行動按鈕  ：放在 Alert 內的操作按鈕用最小尺寸、低調樣式，文字直接描述動作（「前往設定」「立即更新」）"}</p>
     </div>
   ),
 }

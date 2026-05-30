@@ -73,7 +73,7 @@ export const UsageGuidance: Story = {
           <LinkTo kind="Design System/Components/DropdownMenu/展示" name="單選"><span className="text-primary hover:underline font-medium cursor-pointer">單選</span></LinkTo>
         </li>
       </ul>
-      <p className="text-fg-muted mt-3">判斷不確定時:對照 spec.md「何時用 / 何時不用」段;若仍不符,改用近親元件(見 <code>Vs*Rule</code> stories)。</p>
+      <p className="text-fg-muted mt-3">判斷不確定時:先看「選完之後畫面是否需要保留選中狀態」——需要就改用 Select / SelectMenu。下方的「DropdownMenu vs 選值元件」與「群組 vs 分隔線」範例提供更完整的對照。</p>
     </div>
 
       {/* vs 近親 — VsSelectMenuRule — 原 VsSelectMenuRule */}
@@ -118,7 +118,7 @@ export const UsageGuidance: Story = {
         title="判斷法：「選完之後畫面需要保留選中狀態嗎？」"
         note="需要 → Select / SelectMenu；不需要（點完即執行動作）→ DropdownMenu"
       >
-        <Label>完整判斷詳見 dropdown-menu.spec.md「與 SelectMenu 的區別」</Label>
+        <Label>一句話判斷:點完後使用者還需要看到「目前選了什麼」就用 Select / SelectMenu;只是觸發一個動作、選完即關閉就用 DropdownMenu。</Label>
       </Rule>
     </div>
 
@@ -245,7 +245,7 @@ export const ItemTypeRule: Story = {
 
         <Rule
           title="RadioItem — 從互斥選項選一（選中後關閉）"
-          note="排序方式、檢視模式等只能選一個的設定。與 Item 的差異：視覺有 radio 指示器表達「已選中」"
+          note="排序方式、檢視模式等只能選一個的設定。選中的那一項以選取底色（neutral-selected 背景）標示，不另畫圓點指示器"
         >
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -260,7 +260,7 @@ export const ItemTypeRule: Story = {
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Label>↑ 互斥選一——視覺上一個 dot 指示當前選項</Label>
+          <Label>↑ 互斥選一——目前選中的項目以選取底色標示</Label>
         </Rule>
       </div>
     )

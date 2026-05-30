@@ -854,7 +854,7 @@ const StateBehaviorInner = () => {
       <div className="flex flex-col gap-3">
         <span className="text-caption font-medium text-fg-secondary">行為 2:Submenu 展開(hover/focus 延遲 + sideways slide)</span>
         <Desc>
-          SubTrigger hover 300ms 自動展開 submenu 向右側滑入(RTL 向左)。Submenu 是獨立 floating layer——與 parent 共存,parent 不 close。鍵盤用 ArrowRight 展開 / ArrowLeft 收起。
+          SubTrigger hover 約 100ms 自動展開 submenu 向右側滑入(RTL 向左)。Submenu 是獨立 floating layer——與 parent 共存,parent 不 close。鍵盤用 ArrowRight 展開 / ArrowLeft 收起。
         </Desc>
         <div className="flex gap-6 items-start">
           <div className="flex items-center justify-center px-6 py-8 rounded-lg bg-canvas border border-divider min-w-[280px]">
@@ -962,7 +962,8 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `dropdown-menu.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :繼承 Radix  dropdown-menu  primitive a11y 預設(role / aria-  / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/dropdown-menu#accessibility)。\n\n  Keyboard 行為  :\n\n- Tab — focus trigger\n- Enter / Space / ↓ — 開啟\n- ↑/↓ — 導覽 items\n- Enter — 選擇\n- Esc — 關閉\n\n  Focus  :Radix primitive 自管 focus trap / restoration / visible ring( outline: 2px solid var(--ring)  per design-system focus-visible 設計準則)。\n\n  驗證  :Storybook a11y addon panel 應 0 critical vio"}</p>
+      <p className="whitespace-pre-line">{"無障礙能力沿用 Radix 選單元件的內建支援,涵蓋語意角色、選單導覽與焦點管理,設計師與工程師不需額外設定。\n\n鍵盤操作:\n\n- Tab — 將焦點移到觸發按鈕\n- Enter / Space / 向下鍵 — 開啟選單\n- 向上鍵 / 向下鍵 — 在選項之間移動\n- Enter — 選擇目前的選項\n- Esc — 關閉選單(子選單會先關內層)\n\n焦點管理:選單開啟時焦點會進入選單,關閉後自動回到原本的觸發按鈕;聚焦的選項會顯示清楚的外框,鍵盤使用者隨時看得到自己在哪一項。\n\n驗證:鍵盤可完整操作(不需滑鼠),文字對比達 WCAG AA;在 Storybook 無障礙檢查面板上應為零項嚴重問題。"}</p>
+      <p className="mt-4 text-fg-muted">完整 ARIA 細節參考 <a className="text-primary hover:underline" href="https://www.radix-ui.com/primitives/docs/components/dropdown-menu#accessibility" target="_blank" rel="noreferrer">Radix Accessibility 文件</a>。</p>
     </div>
   ),
 }

@@ -79,16 +79,16 @@ export interface CircularProgressProps extends React.HTMLAttributes<HTMLSpanElem
   value?: number
   /** 直徑 px,預設 24,≤ 64 建議 */
   size?: number
-  /** 狀態色(與 ProgressBar 一致) */
-  status?: 'inProgress' | 'success' | 'error'
   /** 視覺 label(inline,font-size inherit,color text-fg-muted) */
   label?: string
   /** Determinate 模式的 affix(indeterminate 忽略) */
-  affix?: 'value' | 'status-icon' | React.ReactNode
+  affix?: 'value' | React.ReactNode
   /** A11y label(指定後 shouldAnnounce=true) */
   'aria-label'?: string
 }
 ```
+
+**無 `status` prop**:本元件不提供 `status`(success / error 等)狀態色——完成 / 失敗由 consumer 端 swap 整個元件(見下方「不設 `status` prop」)。`affix` 也不提供 `'status-icon'` 選項。
 
 ### 尺寸策略:自由 `number`,跟 Avatar 同一套
 
@@ -223,8 +223,8 @@ Track 色鎖 `var(--secondary)`(= neutral-3,與 ProgressBar track 一致)。
 
 CircularProgress 是**最薄的 circular progress primitive**,刻意避免多維度變體:
 
-- **無 Inspector**:variant 只有 value 有無 + status 三狀態(lifecycle),互動切換式 Inspector 可展的決策點少。`UsageInButton` / `UsageInline` 已覆蓋真實 consumer context
-- **ColorMatrix N/A(只繼承 Progress color token)**:本元件 color 完全來自 `text-current`(繼承 host)+ Progress token(track / fill),無 own variant × state 色彩組合可 matrix 對照。status(running/success/error)已在 `UsageInButton` / `UsageInline` 真實 context 演示,獨立 ColorMatrix story 會是冗餘
+- **無 Inspector**:variant 只有 value 有無(indeterminate / determinate 兩態),互動切換式 Inspector 可展的決策點少。`UsageInButton` / `UsageInline` 已覆蓋真實 consumer context
+- **ColorMatrix N/A(只繼承 Progress color token)**:本元件 color 完全來自 `text-current`(繼承 host)+ Progress token(track / fill),無 own variant × state 色彩組合可 matrix 對照。色彩不隨狀態變色(完成 / 失敗由 consumer swap 整個元件),`UsageInButton` / `UsageInline` 真實 context 已示範,獨立 ColorMatrix story 會是冗餘
 - **SizeMatrix 透過 Inspector 即可展示 — 無 separate SizeMatrix story**:size 是自由 number(非 sm/md/lg tier),Inspector 的 size slider 即可展示 16 / 24 / 32 / 48 等常用值的行為差異,比靜態 matrix 更貼近消費情境
 - **無 StateBehavior**:無 hover / focus / active,唯一「狀態」是 value 變化(已在 Determinate story 動態演示)
 
@@ -234,9 +234,9 @@ CircularProgress 是**最薄的 circular progress primitive**,刻意避免多維
 
 ## 邊界案例
 
-- **Disabled(consumer host)**:CircularProgress 本身**不擁有 disabled state**(色彩繼承 host 的 `text-current`)。當消費 host 為 Button loading + disabled 組合時,spinner 顏色自動跟 Button text color 弱化為 `text-fg-disabled`;不需 CircularProgress 端 prop。
+- **Disabled(consumer host)**:CircularProgress 本身**不擁有 disabled state**,也不含任何弱化色邏輯。arc 固定用 `currentColor`,顏色完全跟著 host 的文字色走;若 consumer 傳 `className="text-current"`(如 Button loading),host 把文字色設成什麼,spinner 就是什麼色——由 host CSS 決定,非 CircularProgress 端 prop 或內建保證。
 - **Loading(本即元件本質)**:本元件本質是 loading indicator;無需另外的 loading prop。indeterminate(無 `value`)= 旋轉動畫,determinate(有 `value`)= 弧長對應 0–100%。
-- **Empty / 0 progress**:`value=0` 在 determinate mode 渲空 track,符合「尚未開始」語意;若 0 + lifecycle status `success`,自動切 success token(`UsageInline` story 演示)。
+- **Empty / 0 progress**:`value=0` 在 determinate mode 渲空 track(arc 長度 0),符合「尚未開始」語意。本元件沒有 success / error 等狀態色切換——arc 永遠是 `currentColor`(預設 `text-primary`),不會因進度值自動變色。
 - **Dark mode**:走 Progress token + `text-current` 繼承,自動 adapt。
 - **Size 極端值**:size 為自由 number(非 sm/md/lg tier);size < 12 不建議(stroke width / icon overlap 失調),size > 96 建議改 ProgressBar(linear 在大尺寸更易讀)。
 

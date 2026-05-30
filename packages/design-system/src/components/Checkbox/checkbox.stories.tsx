@@ -27,11 +27,11 @@ export const Modes: Story = {
       </div>
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">readonly</h3>
-        <Checkbox mode="readonly" checked aria-label="同意條款(readonly mode demo)" />
+        <Checkbox readOnly checked aria-label="同意條款(readonly mode demo)" />
       </div>
       <div>
         <h3 className="text-body font-bold text-foreground mb-2">disabled</h3>
-        <Checkbox mode="disabled" checked aria-label="同意條款(disabled mode demo)" />
+        <Checkbox disabled checked aria-label="同意條款(disabled mode demo)" />
       </div>
     </div>
   ),

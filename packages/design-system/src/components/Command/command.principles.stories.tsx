@@ -73,15 +73,15 @@ export const CompositionRules: Story = {
         <p>需要「全域 keyboard 觸發 + 跨頁搜尋 / 動作」→ 自行組合 <code>Popover + Command</code>(對齊 Linear ⌘K / Raycast / VS Code Quick Pick):</p>
         <pre className="text-xs"><code>{`<Popover open={cmdkOpen}>
   <Command>
-    <Command.Input placeholder="輸入指令..." />
-    <Command.List>
-      <Command.Group heading="動作">
-        <Command.Item>新建文件</Command.Item>
-      </Command.Group>
-    </Command.List>
+    <CommandInput placeholder="輸入指令..." />
+    <CommandList>
+      <CommandGroup heading="動作">
+        <CommandItem>新建文件</CommandItem>
+      </CommandGroup>
+    </CommandList>
   </Command>
 </Popover>`}</code></pre>
-        <p className="text-fg-muted">禁止:在 app code 自刻 search input + filter list — 必消費 Command primitive(對齊 主檔消費準則 M1)。</p>
+        <p className="text-fg-muted">禁止:在產品端自己刻搜尋框 + 過濾清單 — 一律重用 Command,不要重造一份。</p>
       </div>
     </div>
   ),

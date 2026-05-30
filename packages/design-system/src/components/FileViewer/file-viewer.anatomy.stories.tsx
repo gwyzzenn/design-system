@@ -98,7 +98,7 @@ export const Overview: Story = {
           <div className="bg-canvas text-foreground" style={{ height: 420 }}>
             <div className="h-full w-full flex flex-col">
               {/* Toolbar */}
-              <div className="h-14 shrink-0 flex items-center justify-between bg-surface border-b border-divider px-6">
+              <div className="h-14 shrink-0 flex items-center justify-between bg-surface-raised border-b border-divider px-6">
                 <span className="text-body-lg text-foreground">① Toolbar — 檔名 + zoom/info/download/close</span>
                 <span className="text-caption text-fg-muted">h-14 固定</span>
               </div>
@@ -109,12 +109,12 @@ export const Overview: Story = {
                   <span className="absolute left-6 top-1/2 -translate-y-1/2 text-caption text-fg-muted">← prev</span>
                   <span className="absolute right-6 top-1/2 -translate-y-1/2 text-caption text-fg-muted">next →</span>
                 </div>
-                <aside className="w-80 shrink-0 bg-surface border-l border-divider flex items-center justify-center">
+                <aside className="w-80 shrink-0 bg-surface-raised border-l border-divider flex items-center justify-center">
                   <span className="text-body text-fg-secondary">③ InfoPanel — w-80(320px)</span>
                 </aside>
               </div>
               {/* Filmstrip */}
-              <div className="h-24 shrink-0 bg-surface border-t border-divider flex items-center px-6 gap-1">
+              <div className="h-24 shrink-0 bg-surface-raised border-t border-divider flex items-center px-6 gap-1">
                 <span className="text-caption text-fg-muted mr-3">④ Filmstrip</span>
                 {[0, 1, 2, 3, 4].map((i) => (
                   <div
@@ -144,8 +144,8 @@ export const Overview: Story = {
               <tr>
                 <Td mono>Toolbar</Td>
                 <Td>永遠顯示</Td>
-                <Td mono>h-14, bg-surface, border-b</Td>
-                <Td>檔名 + 按鈕列(zoom → info → download → close,影響力遞增)</Td>
+                <Td mono>h-14, bg-surface-raised, border-b</Td>
+                <Td>檔名 + 按鈕列(zoom → info → download → close,影響力遞增)；bg-surface-raised 確保 overlay 上的 chrome 不透明</Td>
               </tr>
               <tr>
                 <Td mono>Viewport</Td>
