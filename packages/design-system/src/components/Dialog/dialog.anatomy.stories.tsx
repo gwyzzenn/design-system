@@ -1,4 +1,5 @@
 // @benchmark-unverified-blanket: file-level retraction per M22 (d) — claims herein not individually URL-cited; treat as unverified visual/usage rumor unless retrofit per-claim. Hook escape preserved.
+// @anatomy-exempt: spec-reference tables(Props 速查 / Layout token / 視覺 token / 開關方式對照 / Focus management)為靜態文件對照表,非互動資料網格 — DataTable 為 row-data 互動元件,過度包裝靜態 spec 對照。對齊 Sheet / Popover anatomy 同 pattern。
 import type { Meta, StoryObj } from '@storybook/react'
 import { Trash2 } from 'lucide-react'
 import {
@@ -394,14 +395,14 @@ export const StateBehavior: Story = {
       </div>
 
       <div>
-        <H3>Focus management(Radix 預設)</H3>
+        <H3>Focus management</H3>
         <div className="overflow-x-auto">
           <table className="text-caption border-collapse">
             <thead><tr><Th>階段</Th><Th>行為</Th></tr></thead>
             <tbody>
-              <tr><Td>Open</Td><Td>focus 自動落到 Dialog 內第一個 focusable element(通常 Cancel button)</Td></tr>
-              <tr><Td>Tab cycle</Td><Td>focus trap——Tab 在 Dialog 內循環,不跳到背景頁</Td></tr>
-              <tr><Td>Close</Td><Td>focus 自動回到觸發 Dialog 的原 trigger element</Td></tr>
+              <tr><Td>Open</Td><Td>DialogContent 攔截 Radix 預設(`onOpenAutoFocus`):focus 落在 body 第一個有意義互動元素(input / textarea / select / button,排除右上關閉 X);無則退到 footer 第一顆按鈕,再退到 container。避免 Radix 預設 focus close X 觸發 tooltip</Td></tr>
+              <tr><Td>Tab cycle</Td><Td>focus trap(Radix)——Tab 在 Dialog 內循環,不跳到背景頁</Td></tr>
+              <tr><Td>Close</Td><Td>focus 自動回到觸發 Dialog 的原 trigger element(Radix)</Td></tr>
             </tbody>
           </table>
         </div>

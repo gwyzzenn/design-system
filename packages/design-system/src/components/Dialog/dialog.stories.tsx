@@ -126,11 +126,11 @@ export const WithForm = {
           <div className="flex flex-col gap-[var(--layout-space-loose)]">
             <Field>
               <FieldLabel>專案名稱</FieldLabel>
-              <Input placeholder="輸入專案名稱" />
+              <Input placeholder="例:Q3 設計改版" />
             </Field>
             <Field>
               <FieldLabel>描述</FieldLabel>
-              <Input placeholder="輸入描述" />
+              <Input placeholder="一句話介紹專案目標..." />
               <FieldDescription>選填，簡述專案用途</FieldDescription>
             </Field>
           </div>
@@ -376,8 +376,6 @@ export const ListBody = {
           user Image 9 指出 modal 內 list item 通常可直接被設定 — 對齊 Gmail 通知設定 /
           macOS System Preferences / Notion preferences 的 in-modal pattern */}
       <NotificationSettings />
-
-      {/* 小 item:純文字 label(對齊 Linear Cmd+K 密集) */}
 
       {/* 小 item:純文字 label(對齊 Linear Cmd+K 密集) */}
       <Dialog>
