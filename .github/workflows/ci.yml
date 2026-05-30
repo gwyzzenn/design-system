@@ -179,6 +179,9 @@ jobs:
           for f in scripts/*.mjs; do node --check "$f" || { echo "❌ $f node --check failed (TS-in-mjs?)"; exit 1; }; done
           echo "✅ all scripts/*.mjs parse via node --check"
 
+      - name: BLOCKER hook test coverage(每個含 exit2/deny 的 hook 必有 test_<name>.sh — 2026-05-30 per laziness-hunt)
+        run: node scripts/audit-hook-test-coverage.mjs --check 2>&1 | tail -20
+
       - name: Figma Make artifacts(SSOT propagation check)
         run: node scripts/gen-figma-make-artifacts.mjs --check
 

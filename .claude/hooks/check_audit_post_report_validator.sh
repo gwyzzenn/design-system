@@ -56,7 +56,9 @@ if [ -f "$AUDIT_PROMPTS" ]; then
   # 2026-05-30 M3 fix:原 regex `^### Dim N` 對不上實際格式 `## N. Title`（grep 0 → 永遠誤觸 prune）;
   # 寫死 46 也錯。改成數真實 `## N.` heading + 動態判「PURE-JUDGMENT dim 數」（只有 judgment dim 需 prompt
   # 才能派 agent;deterministic/hook dim 不需）。prompts < judgment dim = 有 judgment dim 派不出 agent。
-  PROMPT_DIM_COUNT=$(grep -cE '^##[[:space:]]+[0-9]+\.' "$AUDIT_PROMPTS" 2>/dev/null || echo 0)
+  # 2026-05-30 fix(hook-test surfaced):`grep -c ... || echo 0` 在 0-match 時 grep 已印 "0" + exit 1,
+  # `|| echo 0` 再 append → "0\n0" → 下方 `[ -lt ]` integer error → trigger 失效。改 `|| true` + 取首行。
+  PROMPT_DIM_COUNT=$(grep -cE '^##[[:space:]]+[0-9]+\.' "$AUDIT_PROMPTS" 2>/dev/null | head -1 || true)
   PROMPT_DIM_COUNT=${PROMPT_DIM_COUNT:-0}
   JUDGMENT_DIMS=$(node -e "try{const m=JSON.parse(require('fs').readFileSync('$PROJECT_DIR/.claude/logs/audit-coverage-matrix.json','utf8'));console.log(Object.values(m.coverage_by_dim).filter(v=>v.tier==='PURE-JUDGMENT').length)}catch{console.log(24)}" 2>/dev/null || echo 24)
   if [ "$PROMPT_DIM_COUNT" -lt "$JUDGMENT_DIMS" ]; then

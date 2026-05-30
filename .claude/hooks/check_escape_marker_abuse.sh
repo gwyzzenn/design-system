@@ -54,7 +54,10 @@ if [ "${CLAUDE_BYPASS_ESCAPE_MARKER_AUDIT:-0}" = "1" ]; then exit 0; fi
 # Count distinct markers + total occurrences
 MARKER_RE='@(ds-misuse-allow|story-baseline-allow|consumer-catalog-allow|overlay-open-skip|template-customized|layout-space-magic-ok|story-trait-allow|story-trait-rationale|story-split-rationale|story-name-canonical-allow|propose-cite-skip|anatomy-exempt|anatomy-exempt-next|benchmark-unverified|benchmark-citation-allow|benchmark-unverified-blanket)'
 MARKERS_FOUND=$(echo "$CONTENT" | grep -oE "$MARKER_RE" | sort -u)
-DISTINCT_COUNT=$(echo "$MARKERS_FOUND" | grep -c . || echo 0)
+# 2026-05-30 fix(test-surfaced):空 MARKERS_FOUND 時 grep -c 印 "0" 已 exit 1,原 `|| echo 0`
+# 會再 append 一個 "0" → "0\n0" → 下方 `[ -ge 3 ]` integer-expression error。改 `|| true` 不重複。
+DISTINCT_COUNT=$(echo "$MARKERS_FOUND" | grep -c . || true)
+[ -z "$DISTINCT_COUNT" ] && DISTINCT_COUNT=0
 TOTAL_COUNT=$(echo "$CONTENT" | grep -oE "$MARKER_RE" | wc -l | tr -d ' ')
 
 # Threshold: ≥3 distinct types OR ≥5 total
