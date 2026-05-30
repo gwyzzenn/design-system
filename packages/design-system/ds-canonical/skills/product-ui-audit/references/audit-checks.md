@@ -1,4 +1,4 @@
-# Audit Checks — 6 維度 grep pattern + rule
+# Audit Checks — 7 維度 grep pattern + rule
 
 每個維度的具體 check。AI Phase 1 parallel 執行時依此 grep + rule 判斷。
 

@@ -14,7 +14,7 @@ arguments: scope?=full|changed focus?=「ssot|visual|behavior|all」
 
 **生態位**:`/design-system-audit --deep` 是 Claude solo 全 dim 稽核 SSOT;本 skill 是**雙 model 完整 sweep**(Claude solo → codex parallel → 比稿辯論共識 → 落地),chain 既有 audit dim 不 fork。
 
-**上游 canonical 全繼承(2026-05-29 加明示,per user「避免膨脹但別漏」directive)**:本 skill 繼承 CLAUDE.md 6 mindset 全(對標世界級 / 優先消費 / 改一處看三處 / 範例真實 / 猶豫就問 / 大原則吸收瑣碎) + meta-patterns 31 active M-rules 全(M1-M32,M27/M33/M34/M35 retired)+ 治理 8-home canonical + 自主執行 7 軸 canonical + 命名 SSOT 3-test。**Skill 不重述上游內容(避 R19 膨脹),全靠 chain reference**。
+**上游 canonical 全繼承**(per user「避免膨脹但別漏」):本 skill chain CLAUDE.md 全 mindset + meta-patterns 全 active M-rules + 治理 8-home / 自主執行 / 命名 SSOT canonical,**不重述、不 hardcode count(避 R19 膨脹),全靠 reference**。
 
 對齊 mindset #1「不取巧省工」+ M31 dual-track + 用戶 2026-05-18 directive(verbatim):
 

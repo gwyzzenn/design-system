@@ -50,7 +50,7 @@ Purpose: design-system-audit audits the **DS itself**(spec / cva / SSOT 三方�
 ### Dim 1 — Token 紀律(token hygiene)
 
 - 硬寫 hex / rgb / rgba / hsl 色值
-- shadcn compat alias(bg-popover / text-muted-foreground / bg-accent / bg-destructive / bg-background / bg-card / border-input / text-primary-foreground / text-accent-foreground / text-card-foreground / text-popover-foreground)
+- shadcn compat alias(bg-popover / text-muted-foreground / bg-accent / bg-destructive / bg-background / bg-card / border-input / text-primary-foreground / text-accent-foreground / text-card-foreground / text-popover-foreground)**(完整 deny-list SSOT:`packages/design-system/src/tokens/utility-registry.json`;此處 inline 為 grep 便利,新增 alias 改 registry)**
 - Tailwind default shadow(shadow-sm / md / lg / xl / 2xl / inner)— 應走 elevation token
 - Tailwind v4 `[--foo]` shorthand 靜默失效
 - 硬寫 px 值當該用 token(`w-[48px]` 應改 token)

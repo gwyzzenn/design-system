@@ -3,7 +3,9 @@ name: design-system-audit
 description: Systematic audit of this design system for world-class quality. Runs the full audit dimension list(per `## The N audit dimensions` section) covering spec hygiene / code correctness / a11y / naming / tokens / patterns / CLAUDE.md consistency / Layout Family compliance / prop value collisions / shadcn alias leakage / home-name-vs-scope fit / spec hardcoded-values, and surfaces actionable fix lists. Has explicit checkpoints where the skill MUST stop and ask user. Invoke via /design-system-audit when asked to audit, re-audit, check quality, or verify design system health.
 ---
 
-# Design System Audit (Groups A–P + Future-proof preflight; dim count canonical per `check_dim_count_drift.sh` / `dispatch-audit-dims.mjs` SSOT — 禁 hardcode)
+# Design System Audit (Groups A–Q + Future-proof preflight; dim count canonical per `check_dim_count_drift.sh` / `dispatch-audit-dims.mjs` SSOT — 禁 hardcode)
+
+> **Budget note**:本檔 = 88-dim **registry SSOT**(foundational;dispatch-audit-dims.mjs / deep-audit / check_dim_count_drift 全 parse 此檔),per CLAUDE.md `# 治理 canonical`「foundational SSOT 例外 ≤ 800-1200」,**不受 250 SKILL cap**(dim table 本質就是 registry,拆出會 break dispatch parser SSOT)。
 
 Purpose: catch every bug class this project has shipped historically PLUS structural gaps relative to Polaris / Material / Atlassian / Ant / Carbon / Apple HIG. Each audit has a clear rubric tied to CLAUDE.md rules. The skill reports findings and **explicitly stops at checkpoints** for user decisions before large-scope fixes.
 
@@ -81,7 +83,7 @@ Grouped by theme. Each runs as an independent subagent; many can parallelize.
 |---|-------|-----------------|
 | 16 | **Layout Family 宣告** | 每個 component spec 第一段必須宣告「Layout Family: 1/2/3/4」或明示「非 family（self-contained / composite）」; 缺漏代表元件遊離於系統 |
 | 17 | **Prop value 跨元件認知衝突** | 同字 literal 在不同元件作 prop value 但語義衝突(`text` 是 Button `variant="text"` 文字樣式,若 FileItem `mode="text"` 變成「文字為主呈現」= 雙語義,consumer 混淆)——命名三 test 第 3 條強制檢查 |
-| 18 | **shadcn compat alias 回流檢查** | grep `bg-popover / text-popover-foreground / text-muted-foreground / bg-accent / text-accent-foreground / bg-destructive / bg-background` 等在我們的元件 code——這些是 shadcn copy-paste 安全網,我們元件應用 direct token。每次 audit 重新 grep 防 `npx shadcn add X` 新生成的 code 留下 alias |
+| 18 | **shadcn compat alias 回流檢查** | grep `bg-popover / text-popover-foreground / text-muted-foreground / bg-accent / text-accent-foreground / bg-destructive / bg-background` 等在我們的元件 code——這些是 shadcn copy-paste 安全網,我們元件應用 direct token。每次 audit 重新 grep 防 `npx shadcn add X` 新生成的 code 留下 alias。完整 deny-list SSOT:`tokens/utility-registry.json`(新增 alias 改 registry;此 grep pattern + product-ui Dim 1 對齊同 SSOT)|
 
 ### Group G — Home governance + spec hygiene (P1 priority)
 
