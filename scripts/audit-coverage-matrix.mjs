@@ -7,7 +7,10 @@
  *
  * 每 audit dim 分 3 tier:
  *   - DETERMINISTIC:有 deterministic script,sub-agent 必 chain,output 含「N files scanned, 0 violations」cite
- *   - HOOK-ENFORCED:有 write-time PostToolUse hook(`check_*_invariants.sh`),audit-time 信賴 hook accumulated state
+ *   - HOOK-ENFORCED:有 write-time PostToolUse hook 偵測該違規。**2026-05-31 誠實化(infra-audit)**:hook 分
+ *     BLOCK(exit 2 真擋)vs WARN(exit 0 印 stderr 不擋)兩種;WARN-only hook **不 prevent 違規 landing**,
+ *     audit-time 必 DS-wide grep 確認 residue(不可純信賴 hook state)。各 dim mechanism 須註明 block 或 warn。
+ *     [TODO queued #9:逐個 audit 全 HOOK-ENFORCED dim 的 hook 是 block 或 warn,mechanism 標註齊]
  *   - PURE-JUDGMENT:genuinely 需 LLM reasoning(content quality 主觀),dispatch contract 強制「DS-wide all files 不 sample」
  *
  * Output:
@@ -31,7 +34,7 @@ const COVERAGE = {
   1: { tier: 'HOOK-ENFORCED', mechanism: 'cva 三方漂移 — story-auto-compile-migrate + compile-stories.mjs --check chain' },
   2: { tier: 'DETERMINISTIC', mechanism: 'scripts/audit-spec-deadlinks.mjs --check(掃 83 spec.md cross-ref pointer,assert target 存在;2026-05-30 從誤分 PURE-JUDGMENT 修正)' },
   3: { tier: 'DETERMINISTIC', mechanism: 'scripts/add-reciprocal-pointers.mjs --check(2026-05-31 加 --check verify gate;原本只 mutator 無 gate=紙上 DETERMINISTIC,infra-audit 修)' },
-  4: { tier: 'HOOK-ENFORCED', mechanism: 'check_opacity_token_usage.sh + utility-registry.json — write-time block' },
+  4: { tier: 'HOOK-ENFORCED', mechanism: 'check_opacity_token_usage.sh(write-time WARN — 印 9 類 violation 到 stderr 但 exit 0 不 block;2026-05-31 infra-audit 修:原寫「write-time block」是假 guarantee)+ utility-registry.json SSOT + audit-time DS-wide grep 確認 residue' },
   5: { tier: 'DETERMINISTIC', mechanism: 'scripts/audit-orphan-tokens.mjs --check(0 真孤兒 verdict)' },
   // Group B — Spec hygiene
   6: { tier: 'PURE-JUDGMENT', mechanism: 'Spec 文字品質 AI judgment;dispatch 必 DS-wide 全 spec.md(82 files),禁 sample;含 file:line per finding' },
