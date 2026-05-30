@@ -15,12 +15,20 @@ const meta: Meta = {
 export default meta
 type Story = StoryObj
 
-// Sample filler content for previews
-const FillerList = ({ count = 20 }: { count?: number }) => (
+// 真實 Notion sidebar 頁面清單 — 垂直捲動 preview 內容(對齊展示頁 NOTION_NAV)
+const NOTION_PAGES = [
+  'Getting Started', 'Daily journal', 'Reading list', 'Recipes', 'Weekend projects',
+  'Japan 2026 trip', 'Engineering wiki', 'Design system spec', 'Meeting notes',
+  'Roadmap Q2', 'Incident retrospectives', 'Onboarding docs', 'Product handbook',
+  'Brand guidelines', 'Customer interviews', 'Competitive analysis', 'Press & media kit',
+  'Hiring pipeline',
+]
+
+const PreviewList = ({ count = 20 }: { count?: number }) => (
   <div className="p-2">
     {Array.from({ length: count }).map((_, i) => (
       <div key={i} className="px-3 py-2 text-caption border-b border-divider last:border-b-0">
-        Row {i + 1} — Linear issue / Notion page / Stripe product record
+        {NOTION_PAGES[i % NOTION_PAGES.length]}
       </div>
     ))}
   </div>
@@ -87,7 +95,7 @@ export const Overview: Story = {
           <div className="flex flex-col gap-2">
             <span className="text-footnote text-fg-muted">vertical(預設)</span>
             <ScrollArea className="h-[180px] border border-border rounded-md">
-              <FillerList count={12} />
+              <PreviewList count={12} />
             </ScrollArea>
           </div>
           <div className="flex flex-col gap-2">
@@ -165,7 +173,7 @@ export const Inspector: Story = {
         <div className="flex flex-col gap-5 min-w-[340px]">
           <div className="px-6 py-6 rounded-lg bg-canvas border border-divider">
             <ScrollArea className="h-[200px] border border-border rounded-md bg-surface">
-              <FillerList count={16} />
+              <PreviewList count={16} />
             </ScrollArea>
           </div>
 
@@ -278,7 +286,7 @@ export const ColorMatrix: Story = {
         <H3>實際渲染 — hover 感受差異</H3>
         <Desc>將游標移入下方容器,scrollbar 會淡入(type=&quot;hover&quot;);hover 到 thumb 上,色彩由 --border(neutral-5)加深至 --border-hover(neutral-6)。世界級 SaaS 的 scrollbar thumb 都是這種 subtle 視覺,不搶主視覺。</Desc>
         <ScrollArea className="h-[200px] w-[320px] border border-border rounded-md bg-surface">
-          <FillerList count={18} />
+          <PreviewList count={18} />
         </ScrollArea>
       </div>
     </div>
@@ -320,7 +328,7 @@ export const SizeMatrix: Story = {
           <div className="flex flex-col gap-2">
             <span className="text-footnote text-fg-muted">vertical — 10px wide</span>
             <ScrollArea className="h-[160px] border border-border rounded-md bg-surface">
-              <FillerList count={12} />
+              <PreviewList count={12} />
             </ScrollArea>
           </div>
           <div className="flex flex-col gap-2">
@@ -417,7 +425,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `scrollarea.spec.md` 「A11y 預設」段。摘要:\n\nRadix ScrollArea 自動處理:\n\n-   鍵盤捲動  :Viewport 原生可 focus,支援  ArrowUp/Down/Left/Right  /  PageUp/Down  /  Home/End \n-   Focus 可見  :focused viewport 保留原生 focus ring\n-   Scrollbar 非 tab stop  :scrollbar thumb 不搶焦點,使用鍵盤的使用者透過 viewport 捲動\n-   Pointer 支援  :thumb 可拖曳,track 可 click-to-jump(Radix 內建)\n\nConsumer 無需額外處理 a11y。"}</p>
+      <p className="whitespace-pre-line">{"詳 `scrollarea.spec.md` 「A11y 預設」段。摘要(Radix primitive + 本 DS 橋接):\n\n-   鍵盤捲動  :本 DS 在 Viewport 加  tabIndex={0}  使其可被鍵盤聚焦(Radix 不自動標 focusable,Safari 尤其需要),聚焦後支援  ArrowUp/Down/Left/Right  /  PageUp/Down  /  Home/End \n-   Focus 可見  :聚焦的 Viewport 顯示 DS focus ring(focus-visible:outline-primary,inset 2px)\n-   Scrollbar 非 tab stop  :scrollbar thumb 不搶焦點,使用鍵盤的使用者透過 viewport 捲動(Radix 內建)\n-   Pointer 支援  :thumb 可拖曳,track 可 click-to-jump(Radix 內建)\n\nConsumer 無需額外處理 a11y——本元件已內建 tabIndex 與 focus ring。"}</p>
     </div>
   ),
 }

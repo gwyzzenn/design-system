@@ -287,13 +287,13 @@ export const OutOfScopeRule: Story = {
       >
         <div className="w-[320px] flex flex-col gap-3">
           <div className="border border-success/40 rounded-md px-3 py-2 bg-surface">
-            <div className="text-body truncate">✅ Stripe Atlas 新創設立方案 — 一次搞定公司設立、銀行帳戶、稅務與股權</div>
+            <div className="text-body truncate">Stripe Atlas 新創設立方案 — 一次搞定公司設立、銀行帳戶、稅務與股權</div>
           </div>
           <Label>✅ 用 truncate,一行顯示,超出省略號</Label>
           <div className="border border-error/40 rounded-md bg-surface">
             <ScrollArea className="w-full">
               <div className="whitespace-nowrap text-body px-3 py-2">
-                ❌ Stripe Atlas 新創設立方案 — 一次搞定公司設立、銀行帳戶、稅務與股權
+                Stripe Atlas 新創設立方案 — 一次搞定公司設立、銀行帳戶、稅務與股權
               </div>
               <ScrollBar orientation="horizontal" />
             </ScrollArea>

@@ -160,18 +160,18 @@ export const ColorMatrix: Story = {
               <tbody>
                 <tr>
                   <Td>一般 event(timed)</Td>
-                  <Td mono>bg-{`{color}`}-subtle · text-{`{color}`}-text · rounded-md · px-1.5 py-0.5 · text-caption · truncate</Td>
-                  <Td>單行 tile,color 依事件類別</Td>
+                  <Td mono>bg-[var(--color-{`{color}`}-1)] · text-[var(--color-{`{color}`}-7)] · rounded-md · px-1.5 py-0.5 · text-caption · truncate</Td>
+                  <Td>單行 tile,color 依事件類別。對齊 Tag / Badge primitive 色階(step-1 subtle 底 / step-7 文字)</Td>
                 </tr>
                 <tr>
                   <Td>All-day event</Td>
                   <Td mono>同上 + grid-column span(橫跨多 cell)</Td>
-                  <Td>實作用 absolute 或 grid span</Td>
+                  <Td>實作用 absolute 或 grid span(MVP 暫以日精度 filter 顯示於各 cell)</Td>
                 </tr>
                 <tr>
                   <Td>Hover tile</Td>
-                  <Td mono>hover:bg-{`{color}`}-hover</Td>
-                  <Td>微暗化表示可點擊</Td>
+                  <Td mono>hover:bg-[var(--color-{`{color}`}-2)]</Td>
+                  <Td>同色深一階表示可點擊</Td>
                 </tr>
                 <tr>
                   <Td>超出 tile 限制</Td>
@@ -194,9 +194,9 @@ export const StateBehavior: Story = {
     <div className="h-screen p-4 bg-canvas">
       <div className="mb-2 text-body text-fg-muted space-y-1">
         <div>• <b>today</b> cell:date 數字加 `bg-primary text-on-emphasis rounded-full` 圓</div>
-        <div>• <b>outside month</b>:前後月日期走 `text-fg-muted`</div>
-        <div>• <b>多事件 cell</b>:超出顯示的 event 顯示「+N more」(hover 展開)</div>
-        <div>• <b>event hover</b>:tile 輕微 `hover:brightness-95` + `cursor-pointer`</div>
+        <div>• <b>outside month</b>:前後月日期數字走 `text-fg-disabled`,cell 底色 `bg-muted`</div>
+        <div>• <b>多事件 cell</b>:超出 3 則的 event 顯示「+N more」</div>
+        <div>• <b>event hover</b>:tile 切同色深一階 `hover:bg-{`{color}`}-2`(如 blue → `--color-blue-2`)+ `cursor-pointer`</div>
         <div>• <b>empty cell</b>:無事件保持純底色,點擊觸發 onDateClick</div>
       </div>
       <Calendar events={sampleEvents} />
@@ -211,7 +211,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `calendar.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :對齊 [W3C ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/patterns/) 對應 pattern。\n\n  Keyboard 行為  :\n\n- Tab — focus calendar\n- ↑/↓/←/→ — 切 day\n- PageUp/Down — 切月\n- Shift+PageUp/Down — 切年\n- Enter — 選 date\n- Esc — 取消 / 關閉\n\n  Focus  :focus-visible ring 對齊 DS 設計準則( outline: 2px solid var(--ring) );focus management 由元件 own。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"詳 `calendar.spec.md` 「A11y 預設」段。摘要:\n\n  Grid role  :月格容器 `role=\"grid\"` + `aria-label`(月份),每列 `role=\"row\"`(`display:contents` 保 CSS grid 佈局),每格 `role=\"gridcell\"` + `aria-label`(日期 + 事件數)。事件 tile `role=\"button\"` + `aria-label`(事件標題)。\n\n  Keyboard 行為(MVP 實作現況)  :\n\n- Tab — 逐一 focus 每個日期格與其中的事件 tile(每個 cell 為 native `<button>`)\n- Enter / Space — 啟用目前 focus 的事件 tile,觸發 `onEventClick`\n- Toolbar 的 ◀ / 今天 / ▶ / 檢視切換為標準可聚焦控件,Tab 可達\n\n  Keyboard tech debt(尚未實作,見 spec.md「MVP vs 後續增量」)  :\n\n- ↑/↓/←/→ 在日期格間 roving 移動、PageUp/Down 切月、Shift+PageUp/Down 切年、Esc 關閉 — 隨週 / 日 view 增量一併補上 roving tabindex\n\n  Focus  :focus-visible ring 對齊 DS 設計準則( outline: 2px solid var(--ring) );日期格與事件 tile 皆有 ring。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
     </div>
   ),
 }

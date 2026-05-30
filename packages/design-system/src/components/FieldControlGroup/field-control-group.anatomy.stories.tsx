@@ -44,7 +44,7 @@ export const Overview: Story = {
         <FieldControlGroup block>
           <Select className="w-[120px]" options={FIELDS} value="name" onChange={() => {}} />
           <Select className="w-[100px]" options={OPS} value="contains" onChange={() => {}} />
-          <Input className="flex-1" defaultValue="phone" />
+          <Input className="flex-1" defaultValue="無線滑鼠" />
         </FieldControlGroup>
       </section>
     </div>
@@ -78,21 +78,21 @@ export const StateBehavior: Story = {
         <p className="text-caption text-fg-muted mb-2">default</p>
         <FieldControlGroup block>
           <Select className="w-[120px]" options={FIELDS} value="name" onChange={() => {}} />
-          <Input className="flex-1" defaultValue="abc" />
+          <Input className="flex-1" defaultValue="無線滑鼠" />
         </FieldControlGroup>
       </div>
       <div>
         <p className="text-caption text-fg-muted mb-2">disabled(整 group children 各自 disabled)</p>
         <FieldControlGroup block>
           <Select className="w-[120px]" options={FIELDS} value="name" onChange={() => {}} disabled />
-          <Input className="flex-1" defaultValue="abc" disabled />
+          <Input className="flex-1" defaultValue="無線滑鼠" disabled />
         </FieldControlGroup>
       </div>
       <div>
         <p className="text-caption text-fg-muted mb-2">cell error(其中一 child invalid → border-error + z-3)</p>
         <FieldControlGroup block>
           <Select className="w-[120px]" options={FIELDS} value="name" onChange={() => {}} />
-          <Input className="flex-1" defaultValue="abc" error />
+          <Input className="flex-1" defaultValue="無線滑鼠" error />
         </FieldControlGroup>
       </div>
     </div>
@@ -110,7 +110,7 @@ export const Accessibility: Story = {
       <FieldControlGroup block>
         <Select className="w-[120px]" options={FIELDS} value="name" onChange={() => {}} aria-label="篩選欄位" />
         <Select className="w-[100px]" options={OPS} value="contains" onChange={() => {}} aria-label="篩選運算子" />
-        <Input className="flex-1" defaultValue="phone" aria-label="篩選值" />
+        <Input className="flex-1" defaultValue="無線滑鼠" aria-label="篩選值" />
       </FieldControlGroup>
     </div>
   ),

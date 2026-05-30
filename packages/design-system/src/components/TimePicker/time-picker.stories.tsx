@@ -109,9 +109,9 @@ export const ShopBusinessHours: Story = {
       <Field>
         <FieldLabel>營業時段</FieldLabel>
         <div className="flex items-center gap-2">
-          <TimePicker value={open} onChange={setOpen} placeholder="Open" />
+          <TimePicker value={open} onChange={setOpen} placeholder="開店時間" />
           <span className="text-fg-muted">→</span>
-          <TimePicker value={close} onChange={setClose} placeholder="Close" />
+          <TimePicker value={close} onChange={setClose} placeholder="打烊時間" />
         </div>
       </Field>
     )
@@ -128,7 +128,7 @@ export const EventTimestamp: Story = {
     const [time, setTime] = React.useState<string>('14:35:22')
     return (
       <Field>
-        <FieldLabel>Event timestamp</FieldLabel>
+        <FieldLabel>事件發生時間</FieldLabel>
         <TimePicker value={time} onChange={setTime} showSeconds clearable />
       </Field>
     )

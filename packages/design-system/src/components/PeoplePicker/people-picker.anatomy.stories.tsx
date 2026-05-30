@@ -113,7 +113,7 @@ export const Inspector: Story = {
 }
 
 export const ModeMatrix: Story = {
-  name: 'Mode 對照',
+  name: '模式對照',
   render: () => (
     <div className="flex flex-col gap-4 max-w-md">
       <div>

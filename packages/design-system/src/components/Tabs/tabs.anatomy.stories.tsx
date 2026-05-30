@@ -310,14 +310,14 @@ export const StateBehavior: Story = {
     <div className="flex flex-col gap-10">
       <div>
         <H3>互動狀態對照</H3>
-        <Desc>hover:移 hover 到未選 tab;selected:當前 value 對應 tab,有 primary-hover 底部下線;disabled:停用 tab。</Desc>
+        <Desc>「總覽」為 selected（當前 value，有 primary-hover 底部下線）;「成員」「通知」為 unselected(移 hover 上去文字色轉 foreground);「設定」為 disabled(停用)。</Desc>
         <div className="border border-border rounded-lg p-4">
-          <Tabs defaultValue="selected">
+          <Tabs defaultValue="overview">
             <TabsList>
-              <TabsTrigger value="selected">Selected(當前)</TabsTrigger>
-              <TabsTrigger value="unselected">Unselected</TabsTrigger>
-              <TabsTrigger value="hover">懸停 ↓</TabsTrigger>
-              <TabsTrigger value="disabled" disabled>Disabled</TabsTrigger>
+              <TabsTrigger value="overview">總覽</TabsTrigger>
+              <TabsTrigger value="members">成員</TabsTrigger>
+              <TabsTrigger value="notifications">通知</TabsTrigger>
+              <TabsTrigger value="settings" disabled>設定</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>

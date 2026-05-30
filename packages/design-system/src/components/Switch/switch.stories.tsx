@@ -1,3 +1,4 @@
+// @story-trait-rationale: hasSizes 由 anatomy.stories.tsx SizeMatrix / 狀態(States)story 的 md/lg 對照 owns size showcase;Default scenario 由 四模式(Modes) / 狀態(States) / 搭配標籤(WithLabel)等真實業務情境 story 覆蓋,不另開抽象 Default/AllSizes。
 import type { Meta, StoryObj } from '@storybook/react'
 import { Switch } from './switch'
 import { SelectionItem } from '@/design-system/components/SelectionControl/selection-item'
@@ -10,7 +11,6 @@ const meta: Meta<typeof Switch> = {
 export default meta
 type Story = StoryObj<typeof Switch>
 
-// @story-trait-rationale: pre-existing trait gaps tracked separately; this PR scope = add Modes story with display card.
 /* ── 四模式 ── */
 export const Modes: Story = {
   name: '四模式',
@@ -71,7 +71,7 @@ export const States: Story = {
 
 /* ── 搭配 SelectionItem ── */
 export const WithLabel: Story = {
-  name: '搭配 Label',
+  name: '搭配標籤',
   render: () => (
     <div className="flex flex-col gap-4 max-w-sm">
       {(['sm', 'md', 'lg'] as const).map(size => (

@@ -58,7 +58,7 @@ export const Overview: Story = {
               </>
             }
             fields={[
-              { label: 'Email', value: 'user@example.com' },
+              { label: 'Email', value: 'ada.chen@example.com' },
               { label: '團隊', value: 'Engineering' },
               { label: '時區', value: 'UTC+8' },
               { label: '員工編號', value: '#E-2048' },
@@ -148,7 +148,7 @@ export const Inspector: InspectorStory = {
     },
   },
   args: {
-    name: 'Ada Chen（範例人名）',
+    name: 'Ada Chen',
     subtitle: 'Design Engineer · Engineering',
     status: 'online',
     withStatusMessage: true,
@@ -252,7 +252,7 @@ export const SectionMatrix: Story = {
             subtitle="Design Engineer"
             status="online"
             fields={[
-              { label: 'Email', value: 'user@example.com' },
+              { label: 'Email', value: 'ada.chen@example.com' },
               { label: '團隊', value: 'Engineering' },
               { label: '時區', value: 'UTC+8' },
               { label: '員工編號', value: '#E-2048' },

@@ -780,7 +780,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `number-input.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :native  <input>  element 預設 a11y;Field wrapper 補  aria-labelledby  /  aria-invalid  /  aria-describedby 。\n\n  Keyboard 行為  :\n\n- Tab — focus\n- ↑/↓ — 加 / 減 step\n- 字母鍵 — 輸入數字\n\n  Focus  :native input focus ring;DS focus-visible ring( focus-visible:!border-primary )由 Field wrapper 提供。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"詳 `number-input.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :native  <input type=\"text\" inputMode=\"decimal\">  ;Field wrapper 補  aria-labelledby  /  aria-invalid  /  aria-describedby 。 inputMode=\"decimal\"  讓行動裝置彈出數字鍵盤。\n\n  Keyboard 行為  :\n\n- Tab — focus\n- 數字鍵 — 輸入數值\n\n  Focus  :native input focus ring;DS focus-visible ring( focus-visible:!border-primary )由 Field wrapper 提供。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
     </div>
   ),
 }

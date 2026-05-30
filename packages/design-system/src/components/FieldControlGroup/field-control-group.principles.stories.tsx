@@ -109,7 +109,7 @@ export const UsageGuidance: Story = {
         <FieldControlGroup block>
           <Select className="w-[140px]" options={FIELDS} value="name" onChange={() => {}} />
           <Select className="w-[120px]" options={OPS} value="contains" onChange={() => {}} />
-          <Input className="flex-1" defaultValue="phone" />
+          <Input className="flex-1" defaultValue="無線滑鼠" />
         </FieldControlGroup>
       </section>
     </div>

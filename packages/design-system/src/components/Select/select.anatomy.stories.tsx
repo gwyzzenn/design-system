@@ -811,7 +811,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `select.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :native  <input>  element 預設 a11y;Field wrapper 補  aria-labelledby  /  aria-invalid  /  aria-describedby 。\n\n  Keyboard 行為  :\n\n- Tab — focus\n- 字母鍵 — 輸入\n- Esc — 清空(若 clearable + 有值)\n\n  Focus  :native input focus ring;DS focus-visible ring( focus-visible:!border-primary )由 Field wrapper 提供。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"詳 `select.spec.md` 「A11y 預設」段。摘要:\n\n  ARIA / Pattern  :預設走原生  <select>  element 取得完整 a11y;searchable 模式走  role=\"combobox\"  容器 +  aria-expanded  /  aria-haspopup=\"listbox\"  + 隱藏的原生  <input> 。Field wrapper 補  aria-labelledby  /  aria-invalid  /  aria-describedby 。\n\n  Keyboard 行為(原生  <select>  路徑)  :\n\n- Tab — focus\n- ↑ / ↓ — 在選項間移動\n- 字母鍵 — type-to-jump 跳到符合首字的選項(searchable 模式則為打字篩選)\n- Enter / Space — 展開選單\n- Esc — 關閉選單(清除值走右側 clear 按鈕,非 Esc)\n\n  Focus  :native  <select>  focus ring;DS focus-visible ring( focus-visible:!border-primary )由 Field wrapper 提供。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
     </div>
   ),
 }

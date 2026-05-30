@@ -573,9 +573,16 @@ export const SizeMatrix = {
 export const Accessibility = {
   name: '無障礙',
   render: () => (
-    <div className="max-w-3xl text-body text-fg-secondary">
-      <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"本元件為純視覺呈現,無 keyboard / ARIA role / focus state 需求。Consumer 包 Badge 進互動容器(Button / Card / Link)時 a11y 由容器決定。"}</p>
+    <div className="max-w-3xl text-body text-fg-secondary flex flex-col gap-3">
+      <h3 className="text-h5 text-foreground mb-1">無障礙設計</h3>
+      <p>Badge 不可聚焦、無鍵盤互動（非互動元件），但**不是**完全無語意：元件預設帶 <code className="font-mono text-fg-secondary">role="status"</code>（live region，計數變化可被 screen reader 播報），consumer 可傳 <code className="font-mono text-fg-secondary">role</code> override。</p>
+      <ul className="list-disc pl-5 space-y-1 text-caption text-fg-muted">
+        <li><span className="font-mono text-fg-secondary">role="status"</span>：cva 預設，計數更新時自動播報，不需 consumer 設定。</li>
+        <li>Count 模式：數字會被讀出，但需 parent 容器的 <span className="font-mono text-fg-secondary">aria-label</span> 補 context（「通知 (3 則未讀)」）。</li>
+        <li>Dot 模式：無文字 → screen reader 看不到 → <span className="font-mono text-fg-secondary">aria-label</span> 為必填。</li>
+        <li>色彩不獨立承載語意（color-blind）：level 不能只靠紅 / 藍 / 灰，需搭配 count 數字或 aria-label。</li>
+      </ul>
+      <p className="text-caption text-fg-muted">完整 aria-label 整合 / dot 必填 / color-blind 反例 demo 見「設計原則」頁的「無障礙必備」story；keyboard / focus 由宿主互動容器（Button / Card / Link）負責。</p>
     </div>
   ),
 }

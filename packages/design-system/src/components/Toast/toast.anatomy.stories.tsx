@@ -186,11 +186,17 @@ export const ColorMatrix: Story = {
       </div>
 
       <div>
-        <H3>觸發各 variant 測試</H3>
+        <H3>觸發各 variant 比較</H3>
         <div className="flex flex-wrap gap-2">
-          {(['neutral', 'info', 'success', 'warning', 'error'] as const).map(v => (
-            <Button key={v} variant="tertiary" size="sm" onClick={() => toast({ variant: v, title: `${v} toast`, description: '範例訊息' })}>
-              {v}
+          {([
+            { variant: 'neutral', label: 'neutral', title: '已複製到剪貼簿', description: '連結已加入剪貼簿' },
+            { variant: 'info', label: 'info', title: '有新版本可用', description: '重新整理即可套用更新' },
+            { variant: 'success', label: 'success', title: '訂單已寄送', description: '預計 3 個工作天送達' },
+            { variant: 'warning', label: 'warning', title: '連線不穩', description: '部分變更可能尚未同步' },
+            { variant: 'error', label: 'error', title: '匯入失敗', description: '檔案格式不符,請改用 CSV' },
+          ] as const).map(({ variant, label, title, description }) => (
+            <Button key={variant} variant="tertiary" size="sm" onClick={() => toast({ variant, title, description })}>
+              {label}
             </Button>
           ))}
         </div>
@@ -231,10 +237,10 @@ export const StateBehavior: Story = {
           <Button
             variant="tertiary"
             onClick={() => {
-              toast({ variant: 'info', title: '第 1 個 toast', description: '剛剛觸發' })
-              setTimeout(() => toast({ variant: 'success', title: '第 2 個 toast', description: '1 秒後' }), 1000)
-              setTimeout(() => toast({ variant: 'warning', title: '第 3 個 toast', description: '2 秒後' }), 2000)
-              setTimeout(() => toast({ variant: 'error', title: '第 4 個 toast', description: '3 秒後' }), 3000)
+              toast({ variant: 'info', title: '開始同步工作區', description: '剛剛觸發,最上層' })
+              setTimeout(() => toast({ variant: 'success', title: '設計稿已上傳', description: '1 秒後,推下前一則' }), 1000)
+              setTimeout(() => toast({ variant: 'warning', title: '網路速度偏慢', description: '2 秒後,繼續往下堆疊' }), 2000)
+              setTimeout(() => toast({ variant: 'error', title: '部分檔案上傳逾時', description: '3 秒後,最底層' }), 3000)
             }}
           >
             連續觸發 4 個 toast(觀察堆疊)

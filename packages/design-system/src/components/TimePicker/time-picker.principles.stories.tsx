@@ -75,14 +75,20 @@ export const RuleMinuteStepForMeetings: Story = {
   name: '會議時段用 15 分鐘間隔',
   render: () => (
     <div className="flex gap-8">
-      <Field>
-        <FieldLabel>✅ 正確(minuteStep=15)</FieldLabel>
-        <TimePicker value="09:15" onChange={() => {}} minuteStep={15} />
-      </Field>
-      <Field>
-        <FieldLabel>❌ 錯誤(預設 minuteStep=1,會議排程無意義)</FieldLabel>
-        <TimePicker value="09:07" onChange={() => {}} />
-      </Field>
+      <div className="flex flex-col gap-1.5">
+        <h3 className="text-caption font-medium text-foreground">✅ minuteStep=15</h3>
+        <Field>
+          <FieldLabel>專案週會時間</FieldLabel>
+          <TimePicker value="09:15" onChange={() => {}} minuteStep={15} />
+        </Field>
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <h3 className="text-caption font-medium text-fg-muted">❌ 預設 minuteStep=1(會議排程無意義)</h3>
+        <Field>
+          <FieldLabel>專案週會時間</FieldLabel>
+          <TimePicker value="09:07" onChange={() => {}} />
+        </Field>
+      </div>
     </div>
   ),
 }
@@ -121,10 +127,13 @@ export const RuleClearNoLabelButton: Story = {
   render: () => {
     const [t, setT] = React.useState<string>('14:30')
     return (
-      <Field>
-        <FieldLabel>✅ clearable=true(自動 X Inline Action)</FieldLabel>
-        <TimePicker value={t} onChange={setT} clearable />
-      </Field>
+      <div className="flex flex-col gap-1.5">
+        <h3 className="text-caption font-medium text-foreground">✅ clearable=true(自動渲染 X 行內動作)</h3>
+        <Field>
+          <FieldLabel>提醒時間</FieldLabel>
+          <TimePicker value={t} onChange={setT} clearable />
+        </Field>
+      </div>
     )
   },
 }
