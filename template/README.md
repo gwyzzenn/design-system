@@ -45,35 +45,29 @@ git push origin main
 ```
 template/ds-product-template/
 ├── README.md                            ← consumer-facing quick start
+├── CLAUDE.md                            ← fork-and-go onboarding + consumer canonical
 ├── package.json                          ← workspaces + DS deps + scripts
-├── tsconfig.json                         ← (TODO consumer 自添)
-├── vite.config.ts                        ← (TODO consumer 自添)
+├── tsconfig.json                         ← workspace base tsconfig
+├── netlify.toml                          ← Storybook build + access headers (Netlify Git integration)
 ├── .gitignore
-├── renovate.json                         ← auto DS bump PR
+├── .npmrc
+├── .env.example
 ├── .claude/
 │   └── settings.json                     ← enable design-system@qijenchen plugin
+├── .devcontainer/
+│   ├── devcontainer.json                 ← Codespaces cloud-dev path
+│   └── onboard-banner.sh
 ├── .storybook/
 │   ├── main.ts                           ← import from @qijenchen/storybook-config
-│   └── preview.tsx                       ← import shared preview
+│   ├── preview.tsx                       ← import shared preview
+│   ├── manager-head.html
+│   └── storybook.css
 ├── .github/
 │   ├── CODEOWNERS                        ← team review
+│   ├── dependabot.yml                    ← daily DS version bump PR
 │   └── workflows/
-│       ├── audit.yml                     ← per-PR tsc + content + code + build + storybook
-│       └── deploy.yml                    ← per-app Vercel matrix deploy
-├── apps/
-│   └── _template/                        ← npm run create-app <name> source
-│       ├── package.json
-│       ├── tsconfig.json
-│       ├── vite.config.ts
-│       ├── index.html
-│       └── src/
-│           └── main.tsx                  ← demo with DS Button + Avatar
-├── packages/
-│   └── shared-utils/                     ← (TODO consumer fill 跨 product utility)
-├── scripts/
-│   └── create-app.mjs                    ← npm run create-app <name> generator
-├── codemods/
-│   └── README.md                         ← DS major bump migration scripts hub
+│       ├── audit.yml                     ← per-PR tsc + lint:imports + build + a11y CI
+│       └── sync-design-system.yml        ← DS publish event → auto npm update + commit
 └── docs/
     ├── 01-first-time-setup.md            ← Day 0 上工
     ├── 02-create-new-product.md          ← 生新 app

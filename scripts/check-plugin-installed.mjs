@@ -59,7 +59,7 @@ ${BOLD}修法(用 Claude Code 開本 repo 後第一件事):${RESET}
 ${BOLD}Plugin install 後拿到:${RESET}
   ✓ 59 個 DS governance hooks(自動 fire,dynamic — 跟 DS repo 同步)
   ✓ 22 個 skills(/prototype / /component-quality-gate / /design-system-audit 等)
-  ✓ DS canonical(31 M-rules + 82 audit dims + ssot-index)cross-load
+  ✓ DS canonical(31 M-rules + 88 audit dims + ssot-index)cross-load
   ✓ App.tsx 憑記憶寫 mock 會被 mechanical BLOCKER 攔
 
 ${YELLOW}注意:本 script 不 exit 1(避免擋 npm install / CI / Netlify build)。

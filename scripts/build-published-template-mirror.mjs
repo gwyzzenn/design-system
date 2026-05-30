@@ -66,8 +66,10 @@ const ALLOWLIST = [
   'scripts/lint-ds-internal-imports.mjs',
   'scripts/sync-all.mjs',
   'scripts/verify-consumer-css-entry.mjs',
-  // Cloud-dev path
-  '.devcontainer',
+  // Cloud-dev path — 2026-05-30 codex Phase B P-bug fix:source 從 template 的 Scenario-B 版,
+  // 非 DS-root 的 Scenario-A 版。否則 fork user 拿到「不需 /plugin install」的錯 banner + 錯 npm 命令
+  // (`npm ci` vs consumer 該用的 `npm install --legacy-peer-deps`)。FLATTEN 後 dest = mirror root .devcontainer。
+  'template/ds-product-template/.devcontainer',
   // Consumer-facing scaffold(template/ds-product-template/ 內)
   'template/ds-product-template/.storybook',
   'template/ds-product-template/.github',
