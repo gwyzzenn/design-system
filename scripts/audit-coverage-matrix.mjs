@@ -50,7 +50,7 @@ const COVERAGE = {
   // Group F — Architecture
   16: { tier: 'DETERMINISTIC', mechanism: 'scripts/audit-layout-family-frontmatter.mjs --check(primary spec 必有 family: frontmatter;2026-05-30 從誤分 PURE-JUDGMENT 修正)' },
   17: { tier: 'PURE-JUDGMENT', mechanism: 'Prop value cross-component semantic conflict — dispatch 必 grep prop literal DS-wide' },
-  18: { tier: 'HOOK-ENFORCED', mechanism: 'check_shadcn_alias.sh write-time block + DS-wide grep audit-time(zero hit)' },
+  18: { tier: 'HOOK-ENFORCED', mechanism: 'check_token_hygiene.sh(folded lib/_token_hygiene.sh — shadcn compat alias ban write-time)+ DS-wide grep audit-time;2026-05-30 M4 修 stale ref check_shadcn_alias' },
   // Group G — Home governance
   19: { tier: 'PURE-JUDGMENT', mechanism: 'Home-name-vs-scope AI judgment;dispatch 必 DS-wide enumerate folder vs actual scope' },
   20: { tier: 'PURE-JUDGMENT', mechanism: 'Spec 硬寫機械化值 — dispatch 必 grep DS-wide spec.md 找 px / hex / Tailwind class lists' },
@@ -89,7 +89,7 @@ const COVERAGE = {
   45: { tier: 'DETERMINISTIC', mechanism: 'scripts/compile-stories.mjs --all + grep generated rows full coverage' },
   46: { tier: 'PURE-JUDGMENT', mechanism: 'Manual vs Mechanical boundary — dispatch 必 grep DS-wide stories trait-derived hand-written exports' },
   // Group P — World-class tier
-  47: { tier: 'HOOK-ENFORCED', mechanism: 'check_tailwind_token_registry.sh + utility-registry.json SSOT' },
+  47: { tier: 'HOOK-ENFORCED', mechanism: 'check_token_hygiene.sh(folded lib/_token_hygiene.sh)+ utility-registry.json SSOT;2026-05-30 M4 修 stale ref check_tailwind_token_registry' },
   48: { tier: 'DETERMINISTIC', mechanism: 'scripts/audit-orphan-tokens.mjs --check(0 真孤兒 structural-keep classifier)' },
   49: { tier: 'DETERMINISTIC', mechanism: 'scripts/audit-a11y.mjs(axe-core WCAG 2A+AA all stories deterministic;separate workflow .github/workflows/a11y-and-size.yml)' },
   50: { tier: 'DETERMINISTIC', mechanism: 'size-limit npx + package.json per-component manifest(deterministic CI gate)' },
@@ -159,6 +159,29 @@ for (let i = 1; i <= expected; i++) {
   }
 }
 
+// M4 vaporware lint(2026-05-30 per laziness-hunt P1):cited script/hook 必存在 disk。堵「(planned) 未實作 hook」
+// + folded-drift(SKILL/matrix 引用 standalone hook 已 fold 進 lib 卻沒更新)。標 DETERMINISTIC/HOOK 卻指向不
+// 存在的東西 = 紙上保證(綠燈 ≠ 真有兜底)。
+const stripCheck = (n) => n.replace(/^check_/, '').replace(/\.sh$/, '')
+let allHookSrc = ''
+try { allHookSrc = fs.globSync('.claude/hooks/**/*.sh', { cwd: ROOT }).map((f) => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n') } catch {}
+const hookExists = (h) => {
+  const base = stripCheck(h)
+  const cands = [`.claude/hooks/${h}`, `.claude/hooks/lib/${h}`, `.claude/hooks/lib/_${base}.sh`, `.claude/hooks/_${base}.sh`, `.claude/hooks/retired/${h}`]
+  if (cands.some((c) => fs.existsSync(path.join(ROOT, c)))) return true
+  return new RegExp(`原[^\\n]{0,40}${base}|\\b${base}\\b`).test(allHookSrc) // folded provenance / lib-consolidation
+}
+const vaporware = []
+for (const [dim, entry] of Object.entries(COVERAGE)) {
+  if (/\(planned\)|（planned）/i.test(entry.mechanism)) { vaporware.push({ dim, reason: `「(planned)」未實作: ${entry.mechanism.slice(0, 48)}` }); continue }
+  for (const m of entry.mechanism.matchAll(/scripts\/([\w-]+\.mjs)/g)) {
+    if (!fs.existsSync(path.join(ROOT, 'scripts', m[1]))) vaporware.push({ dim, reason: `cited script 不存在: scripts/${m[1]}` })
+  }
+  for (const m of entry.mechanism.matchAll(/\b(check_[\w]+\.sh)\b/g)) {
+    if (!hookExists(m[1])) vaporware.push({ dim, reason: `cited hook 不存在(非 folded): ${m[1]}` })
+  }
+}
+
 const report = {
   ts: new Date().toISOString(),
   expected_dims: expected,
@@ -183,7 +206,11 @@ console.log('══════════════════════�
 if (gaps.length) {
   console.error('\n⚠️  Coverage gaps:')
   for (const g of gaps) console.error(`   Dim ${g.dim}: ${g.reason}`)
-  if (CHECK) process.exit(1)
 }
-console.log(`\n✅ All ${expected} dims classified with anti-sample mechanism`)
+if (vaporware.length) {
+  console.error('\n🚨 VAPORWARE(cited script/hook 不存在 — 紙上保證,綠燈≠真兜底):')
+  for (const v of vaporware) console.error(`   Dim ${v.dim}: ${v.reason}`)
+}
+if (CHECK && (gaps.length || vaporware.length)) process.exit(1)
+console.log(`\n✅ All ${expected} dims classified + cited mechanisms resolve on disk`)
 process.exit(0)

@@ -1,5 +1,5 @@
 {
-  "ts": "2026-05-30T06:44:56.961Z",
+  "ts": "2026-05-30T06:51:38.305Z",
   "expected_dims": 88,
   "classified": 88,
   "tier_counts": {
@@ -80,7 +80,7 @@
     },
     "18": {
       "tier": "HOOK-ENFORCED",
-      "mechanism": "check_shadcn_alias.sh write-time block + DS-wide grep audit-time(zero hit)"
+      "mechanism": "check_token_hygiene.sh(folded lib/_token_hygiene.sh — shadcn compat alias ban write-time)+ DS-wide grep audit-time;2026-05-30 M4 修 stale ref check_shadcn_alias"
     },
     "19": {
       "tier": "PURE-JUDGMENT",
@@ -196,7 +196,7 @@
     },
     "47": {
       "tier": "HOOK-ENFORCED",
-      "mechanism": "check_tailwind_token_registry.sh + utility-registry.json SSOT"
+      "mechanism": "check_token_hygiene.sh(folded lib/_token_hygiene.sh)+ utility-registry.json SSOT;2026-05-30 M4 修 stale ref check_tailwind_token_registry"
     },
     "48": {
       "tier": "DETERMINISTIC",

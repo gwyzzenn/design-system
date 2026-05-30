@@ -168,6 +168,11 @@ jobs:
       - name: Layout Family frontmatter(Dim 16 deterministic backstop — 2026-05-30 從誤分 PURE-JUDGMENT 修正)
         run: node scripts/audit-layout-family-frontmatter.mjs --check 2>&1 | tail -20
 
+      - name: .mjs syntax gate(M6 — 抓 TS-in-mjs dead script 假綠,2026-05-30 per laziness-hunt)
+        run: |
+          for f in scripts/*.mjs; do node --check "$f" || { echo "❌ $f node --check failed (TS-in-mjs?)"; exit 1; }; done
+          echo "✅ all scripts/*.mjs parse via node --check"
+
       - name: Figma Make artifacts(SSOT propagation check)
         run: node scripts/gen-figma-make-artifacts.mjs --check
 
