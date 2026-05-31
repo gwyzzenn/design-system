@@ -229,7 +229,7 @@ Main 內塞什麼(table / field / card / page header / list)的 layout + spacing
 
 - 所有 modal overlay(Dialog / Sheet / Popover / HoverCard)消費既有 `overlay-surface.spec.md` SSOT
 - Mask 蓋整個 AppShell(包含 sidebar + header + aside + main)
-- Z-index:AppShell base = 100(對齊 Mantine default);overlay 走既有 **`z-50` Tailwind utility**(`Sheet.tsx:53/69` SSOT canonical,**不發明 `--z-overlay` token** — repo 內無此 token,Sheet 直接 `z-50`)
+- Z-index:AppShell shell root **不設 z-index**(`app-shell.tsx` root `<div>` 走正常 flow / stacking context,唯一 z-* 是 SkipToMain `focus:z-50`);overlay 走既有 **`z-50` Tailwind utility**(`Sheet.tsx:53/69` SSOT canonical,**不發明 `--z-overlay` token** — repo 內無此 token,Sheet 直接 `z-50`)
 - AppShell **不** export `modalOpen` prop,overlay 自管 open / close state
 
 ---
@@ -250,19 +250,17 @@ Main 內塞什麼(table / field / card / page header / list)的 layout + spacing
 
 | Slot | HTML landmark | Auto ARIA |
 |---|---|---|
-| `header`(`primary-header` mode) | `<header>` 直接 viewport child → **`role="banner"`** implicit(global banner) | site-wide |
-| `header`(`primary-sidebar` mode) | `<header>` 在 `<main>` descendant → **不是 banner**,是 local toolbar | per W3C ARIA in HTML spec:`<header>` 只有不在 `main/nav/section` descendant 才是 banner |
+| `header`(`primary-header` mode) | `<header>` 只被 `<div>` 包覆(body-scoped)→ **`role="banner"`** implicit(global banner) | site-wide |
+| `header`(`primary-sidebar` mode) | `<header>` 只被 `<div>` 包覆、與 `<main>` 是 sibling(非 main descendant)→ 同樣 body-scoped → **`role="banner"`** implicit | per W3C HTML-AAM:只有 `main/article/aside/nav/section` descendant 的 `<header>` 才 scope out banner;`<div>` ancestor 不會 |
 | `sidebar` | `<nav aria-label="Primary navigation">` | Sidebar own |
 | `aside` | `<aside aria-label={title}>` | title required(modal mode `aria-labelledby` 強制) |
 | `children`(main) | `<main>` | `role="main"`(implicit)+ skip-to-main 跳轉 anchor |
 
 **W3C ARIA in HTML banner rule(精準 quote)**:`<header>` element 在 `<body>` direct context = `role="banner"` implicit;若 `<header>` 是 `<main>` / `<nav>` / `<article>` / `<section>` / `<aside>` descendant,則 **NOT** banner role(W3C HTML AAM spec)。
 
-**本 AppShell 對應落實**:
-- `primary-header` mode:`<header>` 直接 `<body>` descendant(AppShell root flex-col 第一個 child)→ implicit banner role ✓
-- `primary-sidebar` mode:header 包在 `<div>`(main column 內,跟 `<main>` 是 sibling 非 descendant)→ ChromeHeader 本身是 `<div>` 元件,因此**沒有 banner role 觸發**。屬 local toolbar 語意。
-
-不發明新 ARIA,消費 HTML5 semantic + WAI-ARIA Landmark 標準 + W3C ARIA in HTML banner rule。
+**本 AppShell 對應落實**(ChromeHeader render `<header>`,per `chrome-header.tsx:96/129/157`):
+- `primary-header` mode:`<header>` 被 `flex-shrink-0 <div>` 包覆(AppShell root flex-col 第一個 child,body-scoped)→ implicit banner role ✓
+- `primary-sidebar` mode:`<header>` 被 `flex-shrink-0 <div>` 包覆、與 `<main>` 是 sibling(非 main descendant,body-scoped)→ **同樣得到 implicit banner role**。`<div>` wrapper 依 W3C HTML-AAM **不** scope out banner(只有 `main/article/aside/nav/section` 能)。
 
 不發明新 ARIA,消費 HTML5 semantic + WAI-ARIA Landmark 標準 + W3C ARIA in HTML banner rule。
 
@@ -291,7 +289,7 @@ Main 內塞什麼(table / field / card / page header / list)的 layout + spacing
 | Header height | `--chrome-header-height`(`tokens/uiSize/uiSize.spec.md`)|
 | Aside width | consumer 自傳 prop(無 token)|
 | Layout spacing | `layoutSpace` 全 family(`--layout-space-{tight,loose,bottom}`)|
-| Z-index | `--z-overlay`(既有)/ AppShell base z=100 |
+| Z-index | shell root 不設 z-index;overlay 走 Sheet `z-50` Tailwind utility(`sheet.tsx:53/69`,無 `--z-overlay` token)|
 | Sheet fallback | `sheet.spec.md` SSOT |
 | Overlay | `overlay-surface.spec.md` SSOT |
 

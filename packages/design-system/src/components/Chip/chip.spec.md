@@ -106,7 +106,7 @@ Chip **只有一個 size**，對應 `h-field-sm`（md density 28px / lg density 
 
 | State | 樣式 |
 |---|---|
-| **Default** | `bg-surface border-border text-foreground` |
+| **Default** | `bg-surface border-border text-fg-secondary`（未選文字用 neutral-8，對齊 SegmentedControl / Tabs 未選狀態；hover 才轉 `text-foreground`）|
 | **Hover**（未選）| `hover:border-border-hover`（對齊 Input / SegmentedControl hover 的 border 加深一階）|
 | **Selected** | `border-primary-hover text-primary-hover`，底色維持 `bg-surface` 不變（primary-hover 同時染 border + text，不染底色，跟 SegmentedControl 一致）|
 | **Disabled** | `cursor-not-allowed text-fg-disabled`，border 維持 `border-border` 不變色 |
@@ -170,16 +170,17 @@ Chip 的 overflow 處理有三種模式：
 
 **為什麼要 scroll arrow buttons**（與 Tabs scroll 同規則）：鍵盤用方向鍵、trackpad 用兩指滑、滑鼠滾輪使用者只能靠 arrows（`Shift+wheel` 太隱晦）。Material 3 / Ant Design / Carbon 都這麼做。
 
-### menu — 收進 DropdownMenu
+### menu — 水平捲動 + show-all navigator dropdown
 
-- 所有 Chip 渲染在 DOM 中（保留 Radix ToggleGroup 的 a11y）
-- 用 `useOverflowIndices()` 偵測哪些 chip 溢出
-- 溢出的 chip 套 `invisible`（`visibility: hidden`，不佔 hit test 但保持 layout）
-- 右側渲染 `<Button variant="text" iconOnly startIcon={MoreVertical} />`(overflow menu canonical icon,見 CLAUDE.md「常用 icon canonical」;對齊決策 10)
-- 點擊開 DropdownMenu，內容是 `DropdownMenuCheckboxItem` 陣列，checked 狀態跟 ChipGroup 當前 value 同步
-- 點 menu item 時呼叫 ChipGroup 的 `onValueChange`，更新的值同時反映到可見 chips 和 menu checked state
+採 **show-all navigator** pattern（對齊 Chrome tab dropdown / VS Code editor tabs）——menu 不做動態 overflow 計算，永遠把全部 chip 列在 dropdown 裡：
 
-**a11y 保留機制**：因為溢出的 chips 只是視覺隱藏、仍在 DOM，Radix ToggleGroup 的 roving tabindex 依然可以 focus 它們。鍵盤使用者可以透過 Tab 進入 ChipGroup，用方向鍵在所有 chips 之間導覽（含視覺隱藏的），或用 Tab 到 `⋯` 按鈕用 dropdown 介面。兩條互動路徑同時可用。
+- 所有 Chip 永遠渲染在水平 `overflow-x-auto` 容器（保留 Radix ToggleGroup 的 a11y），靠 scroll 顯示而非 hide/show；邊緣用 fade mask 軟化硬邊
+- 不偵測哪些 chip 溢出、不套 `invisible` / `visibility:hidden`——所有 chip 都正常可見可點
+- 容器可捲動時（`canScroll`），右側渲染 canonical `<OverflowMenuTriggerButton />`（= `<Button variant="text" size="sm" iconOnly startIcon={ChevronDown} />`，跟 Tabs menu trigger 共用同一 primitive，見 `horizontal-overflow.spec.md`）
+- 點擊開 DropdownMenu，內容是**全部 chip** 的 `DropdownMenuCheckboxItem` 陣列，checked 狀態跟 ChipGroup 當前 value 同步
+- 點 menu item 時呼叫 ChipGroup 的 `onValueChange` toggle 選取，並把該 chip `scrollIntoView`（捲到容器中央）；更新的值同時反映到可見 chips 和 menu checked state
+
+**a11y 保留機制**：所有 chip 都在 DOM 且視覺可見，Radix ToggleGroup 的 roving tabindex 可以 focus 全部 chip。鍵盤使用者可以透過 Tab 進入 ChipGroup，用方向鍵在所有 chips 之間導覽（焦點移動時 chip 隨 scroll 進入視圖），或用 Tab 到 dropdown 觸發按鈕用 menu 介面。兩條互動路徑同時可用。
 
 **menu 模式需要 controlled ChipGroup**：菜單 items 透過 `onValueChange` 觸發選擇變化，因此 ChipGroup 必須傳 `value` + `onValueChange`（controlled）。uncontrolled mode（`defaultValue`）的 menu 模式無法讓 menu items 與 chips 同步狀態。
 

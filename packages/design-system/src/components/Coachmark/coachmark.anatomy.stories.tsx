@@ -22,7 +22,7 @@ export const Overview: Story = {
       <div>
         <H3>Anatomy</H3>
         <Desc>
-          Coachmark 是 Popover 的 composition pattern——消費 Popover 的浮層外殼 + overlay-surface Body/Footer padding,自己擁有的差異僅三點:(1) 無 Header,(2) 有 Media 區,(3) Footer 為 justify-between。改 Popover 視覺 Coachmark 自動跟進。
+          Coachmark 是 Popover 的 composition pattern——消費 Popover 的浮層外殼 + overlay-surface Body/Footer padding,自己擁有的差異僅三點:(1) Header 可選(kind="tips"/"new-features"/ReactNode;single-step 常無、multi-step tour 建議帶),(2) 有 Media 區,(3) Footer 為 justify-between。改 Popover 視覺 Coachmark 自動跟進。
         </Desc>
         <div className="flex items-start gap-8">
           <Coachmark
@@ -40,7 +40,7 @@ export const Overview: Story = {
           </Coachmark>
           <div className="text-caption text-fg-secondary max-w-[280px] leading-relaxed">
             <ul className="list-disc pl-4 space-y-1.5">
-              <li><b>Media</b> — 可選,預設 16:9 比例,邊緣對齊 rounded-t-lg</li>
+              <li><b>Media</b> — 可選,預設 16:9 比例,邊緣切齊靠外殼 p-0 overflow-hidden 裁切</li>
               <li><b>Body</b> — Title(text-body-lg font-medium) + Description(text-body text-fg-secondary)</li>
               <li><b>Footer</b> — justify-between;左 step 計數 / 右 actions(有 Previous 時為 Previous + Next;第一步無 Previous 時為 Skip + Next)</li>
             </ul>
@@ -332,7 +332,7 @@ export const StateBehavior: Story = {
         <div>
           <H3>Focus / Esc / Click-outside(繼承 Popover)</H3>
           <Desc>
-            Coachmark 行為完全繼承 Popover(Radix):開啟時焦點移進 content,關閉 return to trigger;Esc 關閉(= Skip 語意);預設 non-modal,使用者可忽略繼續主流程。
+            Coachmark 大部分行為繼承 Popover(Radix),但刻意抑制開啟時的自動 focus(onOpenAutoFocus preventDefault)——焦點停在 trigger,避免使用者還在讀 body 時 CTA 被 auto-focus 偷觸發;關閉時 return to trigger;Esc 關閉(= Skip 語意);預設 non-modal,使用者可忽略繼續主流程。
           </Desc>
         </div>
       </div>
@@ -347,7 +347,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `coachmark.spec.md` 「A11y 預設」段。摘要:\n\n-   焦點管理  :由 Popover(Radix)處理——開啟移焦點進 content,關閉 return to trigger\n-   Esc 關閉  :預設啟用(= Skip 行為)——user 按 Esc 等同 skip,尊重退出意願\n-   ARIA  :trigger 自動  aria-expanded  /  aria-controls ,content  role=\"dialog\" (Radix 預設)\n-   Step 計數 tabular-nums  :螢幕閱讀器讀「2 of 3」語意清楚"}</p>
+      <p className="whitespace-pre-line">{"詳 `coachmark.spec.md` 「A11y 預設」段。摘要:\n\n-   焦點管理  :刻意抑制開啟時的自動 focus(onOpenAutoFocus preventDefault),焦點停在 trigger——避免 user 還在讀 body 時 CTA 被偷觸發;關閉時 return to trigger\n-   Esc 關閉  :預設啟用(= Skip 行為)——user 按 Esc 等同 skip,尊重退出意願\n-   ARIA  :trigger 自動  aria-expanded  /  aria-controls ,content  role=\"dialog\" (Radix 預設)\n-   Step 計數 tabular-nums  :螢幕閱讀器讀「2 of 3」語意清楚"}</p>
     </div>
   ),
 }

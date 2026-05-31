@@ -67,7 +67,7 @@ export const Overview: Story = {
             <thead><tr><Th>區塊</Th><Th>CSS</Th><Th>用途</Th></tr></thead>
             <tbody>
               <tr><Td mono>DialogHeader</Td><Td mono>border-b, px-loose py-tight</Td><Td>Title + Close button(fixed top-right)</Td></tr>
-              <tr><Td mono>DialogBody</Td><Td mono>flex-1, overflow-y-auto, px-loose pt-tight pb-bottom</Td><Td>主要內容(可捲動,底部留較大空間)</Td></tr>
+              <tr><Td mono>DialogBody</Td><Td mono>ScrollArea(flex-1 min-h-0)+ inner div(px-loose pt-tight pb-bottom)</Td><Td>主要內容(ScrollArea 捲動,底部留較大空間)</Td></tr>
               <tr><Td mono>DialogFooter</Td><Td mono>border-t, px-loose py-tight</Td><Td>Action buttons(justify-end, gap-2)</Td></tr>
             </tbody>
           </table>
@@ -426,7 +426,7 @@ export const ColorMatrix: Story = {
           <table className="text-caption border-collapse">
             <thead><tr><Th>Area</Th><Th>Token</Th><Th>數值</Th></tr></thead>
             <tbody>
-              <tr><Td>水平 padding(Header / Body / Footer 統一)</Td><Td mono>--layout-space-loose</Td><Td>24/32 px</Td></tr>
+              <tr><Td>水平 padding(Header / Body / Footer 統一)</Td><Td mono>--layout-space-loose</Td><Td>16/24 px</Td></tr>
               <tr><Td>Header / Footer 垂直 padding</Td><Td mono>--layout-space-tight</Td><Td>12/16 px</Td></tr>
               <tr><Td>Body 垂直 padding(top)</Td><Td mono>--layout-space-tight</Td><Td>12/16 px</Td></tr>
               <tr><Td>Body 垂直 padding(bottom)</Td><Td mono>--layout-space-bottom</Td><Td>48 px(固定)</Td></tr>
@@ -478,7 +478,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"詳 `dialog.spec.md` 「A11y 預設」段。摘要:\n\nRadix Dialog 自動處理：\n\n-   Modal 語意  ： role=\"dialog\"  +  aria-modal=\"true\" \n-   標題綁定  ： <DialogTitle>  自動成為  aria-labelledby  指向對象，screen reader 開啟時讀出標題\n-   Focus trap  ：焦點鎖在 Dialog 內，Tab 循環不逃出\n-   Esc 關閉  ：按 Esc 自動關閉\n-   Focus return  ：關閉時焦點返回 trigger 元素\n-   Overlay click  ：點擊 overlay 關閉（可透過  onPointerDownOutside  阻止）\n\nConsumer 必須保留  <DialogTitle> ——即使視覺不顯示，也要用  VisuallyHidden  包裹提供給 screen reader。"}</p>
+      <p className="whitespace-pre-line">{"詳 `dialog.spec.md` 「A11y 預設」段。摘要:\n\nRadix Dialog 自動處理：\n\n-   Modal 語意  ： role=\"dialog\" （Radix 刻意不設  aria-modal ，改用 aria-hidden  hideOthers()  把背景兄弟節點設  aria-hidden  +  FocusScope  trap 達成隔離）\n-   標題綁定  ： <DialogTitle>  自動成為  aria-labelledby  指向對象，screen reader 開啟時讀出標題\n-   Focus trap  ：焦點鎖在 Dialog 內，Tab 循環不逃出\n-   Esc 關閉  ：按 Esc 自動關閉\n-   Focus return  ：關閉時焦點返回 trigger 元素\n-   Overlay click  ：點擊 overlay 關閉（可透過  onPointerDownOutside  阻止）\n\nConsumer 必須保留  <DialogTitle> ——即使視覺不顯示，也要用  VisuallyHidden  包裹提供給 screen reader。"}</p>
     </div>
   ),
 }

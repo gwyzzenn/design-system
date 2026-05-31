@@ -25,17 +25,14 @@ export default meta
 
 const noop = () => {}
 
-// FileItem row dedicated action(2026-04-22 canonical):
-// **Row action 絕對值 cap = ≤ 24px,不隨 row tier 放大**。依 row 高度分兩種實作:
-//   - Rich(row 56)→ Button size="xs" iconOnly(24 固定,≤ cap)
-//   - Compact(row 24)→ ItemInlineActionButton(因 Button xs 24 會填滿 compact row,
-//     失去呼吸;Inline Action icon 16 + hover-bg 22 剛好)
+// FileItem row dedicated action(2026-04-23 統一 canonical):
+// **Row action 絕對值 cap = ≤ 24px,不隨 row tier 放大**。rich + compact 統一用
+// Button size="xs" iconOnly variant="text"(24 固定,≤ cap):
+// compact row 透過 FileItem 內部 suffix wrapper `[&>[data-unbounded]]:my-[calc((1lh-var(--field-height-xs))/2)]`
+// trick 讓 Button(24)layout footprint 收斂到 1lh(~18px)不撐高 row,觸控範圍仍 24。
 // Trash/Delete 非 dismiss 語意(dismiss 嚴格 = X close overlay),不套 `dismiss` prop——
-// Button variant="text" / Inline Action 本來就 fg-muted,視覺已弱化。
+// Button variant="text" 本來就 fg-muted,視覺已弱化(兩 mode 同)。
 // 詳 item-anatomy.spec.md「Predicate」+「Row action 絕對值 cap」
-// rich + compact 統一 Button xs variant="text"(2026-04-23 canonical):
-// compact row 透過 FileItem 內部 `[&_[data-unbounded]]:my-[calc((1lh-xs)/2)]` trick
-// 讓 Button(24)layout 收斂到 1lh(~18px)不影響 row 高度,觸控範圍仍 24。
 const deleteBtn = <Button size="xs" iconOnly variant="text" startIcon={Trash2} aria-label="刪除" onClick={noop} />
 const deleteBtnXs = deleteBtn
 
@@ -93,7 +90,7 @@ export const HoverSwap = {
       </div>
       <div>
         <div className="text-caption text-fg-muted mb-2">
-          同樣 pattern 在 compact mode:status slot 幾何與 Inline Action(16×16 icon)一致,center 自動對齊
+          同樣 pattern 在 compact mode:status slot 幾何與 delete action 一致(兩 mode 統一 Button xs 24),center 自動對齊
         </div>
         {/* Compact list 統一 gap-1(canonical 簡化) */}
         <div className="flex flex-col gap-1">

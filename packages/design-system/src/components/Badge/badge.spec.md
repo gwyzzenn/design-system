@@ -257,7 +257,7 @@ Q3. Badge 自己獨立呈現狀態嗎?(無宿主元件)
 ```
 
 - **語意**：元件主內容（icon / avatar）+ 補充通知
-- **實作**：badge **絕對定位相對於 icon / avatar 視覺重心**,不相對於 interactive chrome。Button `overlayBadge` prop 內部用 `<span className="relative inline-flex">` 包 icon、badge 中心對齊 icon top-right corner(Material BadgedBox canonical)。**不再允許** consumer 手刻 `<div relative><Button/><Badge absolute/></div>`——padding 差距會讓 badge 飄到 chrome 角 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
+- **實作**：badge **絕對定位相對於 icon / avatar 視覺重心**,不相對於 interactive chrome。Button `overlayBadge` prop 內部用 `<span className="relative inline-block">`(明確鎖 width/height = iconSize)包 icon、badge 中心對齊 icon top-right corner(Material BadgedBox canonical)。**不再允許** consumer 手刻 `<div relative><Button/><Badge absolute/></div>`——padding 差距會讓 badge 飄到 chrome 角 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 - **世界級對照**：Material BadgedBox / iOS App Icon / Ant Design Badge — 全部 wrap 視覺重心(icon / avatar),不 wrap interactive chrome(button padding) <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 - **aria**：parent 元件的 `aria-label` 包含 badge 資訊（見「無障礙」）
 

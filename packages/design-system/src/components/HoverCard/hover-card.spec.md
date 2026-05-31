@@ -130,7 +130,7 @@ HoverCard 是**純行為 primitive**(只提供 hover 觸發邏輯 + 定位 + 動
 
 ## A11y 預設
 
-**ARIA / Pattern**:繼承 Radix `hover-card` primitive a11y 預設(role / aria-* / 鍵盤導覽)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/hover-card#accessibility)。
+**ARIA / Pattern**:Radix `hover-card` 刻意**不**設 `role` / `aria-*`,定位為 sighted-mouse-user 增強,content 不暴露給輔助技術(grep Radix source 0 命中 role/aria-*)。Radix 只提供:hover / focus 開、Esc 關 + `data-state`。Trigger 的可聚焦性需 consumer 自補(如 Avatar `hoverCard` 在 `avatar.tsx` 手動加 `tabIndex=0` + `role="button"` + `aria-haspopup="dialog"`)。詳 [Radix Accessibility docs](https://www.radix-ui.com/primitives/docs/components/hover-card#accessibility)。
 
 **Keyboard 行為**:
 
@@ -140,7 +140,7 @@ HoverCard 是**純行為 primitive**(只提供 hover 觸發邏輯 + 定位 + 動
 
 **Focus**:non-modal hover/focus surface — focus 開啟 surface,**不 trap**,focus 仍在 trigger,Esc 關閉。Visible ring(`outline: 2px solid var(--ring)` per design-system focus-visible canonical)。(2026-05-27 修正 codex M31 finding:HoverCard 非 modal,不該有 focus trap)
 
-**驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
+**驗證**:Storybook a11y addon panel 應 0 critical violation;WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。**注意鍵盤限制**:Radix HoverCard 會把 content 內所有 tabbable node 強制設 `tabindex="-1"`,故卡片**內部**的按鈕 / 連結鍵盤 Tab 到不了 — 鍵盤使用者僅能 focus trigger 開卡 + Esc 關卡,無法進入卡片操作互動內容。關鍵互動勿放 HoverCard 內(見「禁止事項」),需鍵盤可達的互動浮層用 Popover(click 觸發)。
 
 ## 被引用(auto-maintained,Dim 3 reciprocal audit)
 

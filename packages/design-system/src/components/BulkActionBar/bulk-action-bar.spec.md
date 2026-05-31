@@ -159,9 +159,9 @@ interface BulkActionBarLabels {
 
 ## a11y 預設
 
-- BulkActionBar 整體用 `role="toolbar"` + `aria-label`(default `"Bulk actions"`,可 override)
+- BulkActionBar 整體用 `role="toolbar"` + `aria-label`(default `"批次操作"`,可 override)
 - count 文字用 `aria-live="polite"` 通知 selection 變更(SR 讀「3 selected」)
-- Clear button:`aria-label="Clear selection"`
+- Clear button:`aria-label="清除選取"`
 - Hint banner 用 `role="status"` + `aria-live="polite"`(state 切換時通知)
 - 鍵盤:Esc → `onClear()`(consumer 應監聽 page-level keydown 觸發);Tab 序按 actions → count → clear
 - Disabled action(無權限等)用 Button `disabled` + tooltip 解釋,**不藏 action**(避免 user 困惑)

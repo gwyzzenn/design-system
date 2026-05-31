@@ -215,23 +215,23 @@ export const Inspector = {
               </div>
 
               <div className="inline-flex flex-col gap-0 rounded-md overflow-hidden" style={{ padding: 12, background: Z.pad.bg, border: `2px solid rgba(0,0,0,0.1)` }}>
-                <div className="flex items-center justify-center font-mono text-[11px] font-bold" style={{ height: 36, background: Z.head.bg, color: Z.head.text, border: `1.5px dashed ${Z.head.border}` }}>
-                  月份 caption · h-9
+                <div className="flex items-center justify-center font-mono text-[11px] font-bold" style={{ height: 24, background: Z.head.bg, color: Z.head.text, border: `1.5px dashed ${Z.head.border}` }}>
+                  月份 caption · h-field-xs（24px）
                 </div>
                 <div className="grid grid-cols-7 gap-0 mt-2">
                   {['M','T','W','T','F','S','S'].map((d, i) => (
-                    <div key={i} className="flex items-center justify-center font-mono text-[10px]" style={{ width: 36, height: 32, background: Z.cell.bg, color: Z.cell.text, border: `1px dashed ${Z.cell.border}` }}>
+                    <div key={i} className="flex items-center justify-center font-mono text-[10px]" style={{ width: 28, height: 28, background: Z.cell.bg, color: Z.cell.text, border: `1px dashed ${Z.cell.border}` }}>
                       {d}
                     </div>
                   ))}
                   {Array.from({ length: 14 }).map((_, i) => (
-                    <div key={i} className="flex items-center justify-center font-mono text-[10px]" style={{ width: 36, height: 36, background: Z.grid.bg, color: Z.grid.text, border: `1px dashed ${Z.grid.border}` }}>
+                    <div key={i} className="flex items-center justify-center font-mono text-[10px]" style={{ width: 28, height: 28, background: Z.grid.bg, color: Z.grid.text, border: `1px dashed ${Z.grid.border}` }}>
                       {i + 1}
                     </div>
                   ))}
                 </div>
               </div>
-              <p className="text-[10px] text-fg-muted">日格固定 36x36(h-9 w-9),不隨 density 變化。</p>
+              <p className="text-[10px] text-fg-muted">日格 h-field-sm(28×28 md / 32×32 lg),隨 density 縮放。</p>
             </div>
           </div>
 
@@ -246,11 +246,11 @@ export const Inspector = {
                 <span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider">Layout</span>
               </div>
               <PropRow label="外層 padding">p-3 · 12px</PropRow>
-              <PropRow label="月份 gap">gap-3 · 12px</PropRow>
-              <PropRow label="日格尺寸">h-9 w-9 · 36×36</PropRow>
-              <PropRow label="星期標頭">w-9 h-8 · 36×32</PropRow>
-              <PropRow label="Nav 按鈕">h-7 w-7 · 28×28</PropRow>
-              <PropRow label="週間距">mt-1 · 4px</PropRow>
+              <PropRow label="月份並排 gap">gap-4 · 16px</PropRow>
+              <PropRow label="日格尺寸">h-field-sm · 28×28 (md) / 32×32 (lg)</PropRow>
+              <PropRow label="星期標頭">h-7 · 28px(寬度 table-native 自動)</PropRow>
+              <PropRow label="Nav 按鈕">size=xs iconOnly · 24×24</PropRow>
+              <PropRow label="Cell gap">border-spacing-1 · 4px(H+V)</PropRow>
             </div>
 
             <div className="px-4 py-1">
@@ -258,7 +258,7 @@ export const Inspector = {
                 <span className="text-[10px] font-semibold text-fg-muted uppercase tracking-wider">Typography</span>
               </div>
               <PropRow label="月份標題">text-body · font-medium</PropRow>
-              <PropRow label="星期標頭">text-caption · font-normal</PropRow>
+              <PropRow label="星期標頭">text-body · font-medium</PropRow>
               <PropRow label="日格">text-body · font-normal</PropRow>
             </div>
 
@@ -268,9 +268,9 @@ export const Inspector = {
               </div>
               <PropRow label="Selected bg"><TokenCell token="--primary" /></PropRow>
               <PropRow label="Selected fg">white</PropRow>
-              <PropRow label="Today ring"><TokenCell token="--primary" /></PropRow>
-              <PropRow label="Hover bg"><TokenCell token="--neutral-hover" /></PropRow>
-              <PropRow label="Outside fg"><TokenCell token="--fg-disabled" /></PropRow>
+              <PropRow label="Today bar"><TokenCell token="--primary" /></PropRow>
+              <PropRow label="Hover ring"><TokenCell token="--primary" /></PropRow>
+              <PropRow label="Outside fg"><TokenCell token="--fg-muted" /></PropRow>
             </div>
 
             <div className="px-4 py-1 pb-3">
@@ -559,10 +559,10 @@ export const Accessibility = {
         <H3>ARIA roles(react-day-picker v9 內建,本 DS 不重寫)</H3>
         <ul className="list-disc list-inside text-caption text-fg-secondary space-y-1">
           <li><code>role="grid"</code> on day grid root</li>
-          <li><code>role="gridcell"</code> + <code>aria-selected</code> on each day button</li>
-          <li>Today cell:<code>aria-current="date"</code></li>
-          <li>Disabled cell:<code>aria-disabled="true"</code></li>
-          <li>Outside-month cell:<code>aria-hidden="true"</code>(視覺顯示但 SR 跳過)</li>
+          <li><code>role="gridcell"</code> + <code>aria-selected</code> on each day cell（<code>&lt;td&gt;</code>，非內層 button）</li>
+          <li>Today cell：<code>data-today</code>（lib 不設 <code>aria-current</code>；今日靠 data-attr + 視覺底線標示）</li>
+          <li>Disabled cell：button 帶 native <code>disabled</code>（focused 時改 <code>aria-disabled="true"</code>）+ cell <code>data-disabled</code></li>
+          <li>Outside-month cell：<code>data-outside</code>（showOutsideDays 時仍 render 可互動 button，非 aria-hidden 隱藏）</li>
         </ul>
       </section>
       <section>

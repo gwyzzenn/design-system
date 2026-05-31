@@ -214,7 +214,7 @@ export const Overview = {
               <span className="rounded px-2 py-1 text-[11px] font-mono border border-dashed"
                 style={{ borderColor: 'var(--info)', backgroundColor: 'var(--info-subtle)', color: 'var(--info)' }}>startIcon</span>
             </div>
-            <span className="text-[10px] text-fg-muted font-mono">px-[calc((h-icon)/2)] · 自然正方形 · 自動 tooltip</span>
+            <span className="text-[10px] text-fg-muted font-mono">p-0 + aspect-square · 自然正方形 · 自動 tooltip</span>
           </div>
         </div>
       </div>
@@ -401,7 +401,7 @@ const InspectorInner = () => {
                 </div>
                 <div className="ml-3 flex flex-col gap-0.5">
                   <TkVal token={s.heightToken} value={s.height} />
-                  <span className="font-mono text-[10px] text-fg-muted">px-[calc((h-icon)/2)] + aspect-square · min-w-0</span>
+                  <span className="font-mono text-[10px] text-fg-muted">p-0 + aspect-square · min-w-0</span>
                 </div>
               </div>
             )}
@@ -429,8 +429,8 @@ const InspectorInner = () => {
             <PropRow label="高度" dot={Z.dim.text}><TkVal token={s.heightToken} value={s.height} /></PropRow>
             {iconOnly ? (
               <>
-                <PropRow label="內距">px-[calc((h-icon)/2)]</PropRow>
-                <PropRow label="形狀">正方形(padding 公式 + aspect-square CSS 雙重鎖)</PropRow>
+                <PropRow label="內距">p-0(padding-free)</PropRow>
+                <PropRow label="形狀">正方形(aspect-square + p-0 + flex-center)</PropRow>
                 <PropRow label="Min Width">min-w-0</PropRow>
               </>
             ) : (
@@ -586,7 +586,7 @@ export const SizeMatrix = {
               <Td>iconOnly 覆寫</Td>
               {SIZES.map((sz) => (
                 <Td key={sz} mono>
-                  <div className="text-fg-secondary">px-[calc((h-icon)/2)]</div>
+                  <div className="text-fg-secondary">p-0 + aspect-square</div>
                   <div className="text-fg-muted text-[10px]">自然正方形 · min-w-0</div>
                 </Td>
               ))}
@@ -685,9 +685,7 @@ export const StateBehavior = {
               <span className="text-fg-muted">⇄</span>
               <Button variant={v} pressed iconOnly startIcon={Settings} aria-label={`${v}（開）`} />
               <span className="text-[11px] text-fg-muted">
-                {v === 'text'
-                  ? 'text + pressed → neutral-selected family'
-                  : `${v} + pressed → primary-subtle 系列`}
+                {`${v} + pressed → primary-subtle 系列（預設 pressedTone="emphasis"；傳 pressedTone="neutral" 則為 neutral-selected 灰底）`}
               </span>
             </div>
           ))}
@@ -704,7 +702,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"無障礙設計摘要:\n\n  語意與鍵盤  :預設渲染原生 button 元素,自動帶有按鈕角色、Enter / 空白鍵觸發、Tab 聚焦等瀏覽器原生無障礙行為,無需額外設定。icon-only 按鈕請傳 aria-label 描述用途。\n\n  焦點外框  :鍵盤聚焦時(focus-visible)顯示一圈外框,讓鍵盤使用者看得到目前焦點落在哪顆按鈕;滑鼠點擊不會觸發這圈外框,避免視覺雜訊。\n\n  停用狀態  :disabled 時自動帶 aria-busy(loading 中)並降低不透明度,輔助技術會讀出「已停用」。\n\n  驗證  :Storybook a11y 面板應 0 項嚴重違規;全程鍵盤可操作(無需滑鼠);文字對比 ≥ 4.5:1、介面元素對比 ≥ 3:1(WCAG AA)。"}</p>
+      <p className="whitespace-pre-line">{"無障礙設計摘要:\n\n  語意與鍵盤  :預設渲染原生 button 元素,自動帶有按鈕角色、Enter / 空白鍵觸發、Tab 聚焦等瀏覽器原生無障礙行為,無需額外設定。icon-only 按鈕請傳 aria-label 描述用途。\n\n  焦點外框  :鍵盤聚焦時(focus-visible)顯示一圈外框,讓鍵盤使用者看得到目前焦點落在哪顆按鈕;滑鼠點擊不會觸發這圈外框,避免視覺雜訊。\n\n  停用狀態  :disabled 時品牌 / 狀態色完全移除、統一回到 neutral 停用色,原生 disabled 屬性讓輔助技術讀出「已停用」;loading 中額外帶 aria-busy 告知處理中。\n\n  驗證  :Storybook a11y 面板應 0 項嚴重違規;全程鍵盤可操作(無需滑鼠);文字對比 ≥ 4.5:1、介面元素對比 ≥ 3:1(WCAG AA)。"}</p>
     </div>
   ),
 }

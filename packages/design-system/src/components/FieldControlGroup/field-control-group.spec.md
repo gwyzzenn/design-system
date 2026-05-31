@@ -52,7 +52,7 @@ benchmark:
 
 ```ts
 interface FieldControlGroupProps extends HTMLAttributes<HTMLDivElement> {
-  size?: 'sm' | 'md' | 'lg'  // default 'md',Mode A 從 Field context 來
+  size?: 'sm' | 'md' | 'lg'  // default 'md';目前為 no-op(FCG 不傳遞),size 由各 child 自管 — 見「Size cascade」
   block?: boolean             // 對齊 Ant Space.Compact `block`,默 false=inline-flex
 }
 ```
@@ -85,23 +85,26 @@ interface FieldControlGroupProps extends HTMLAttributes<HTMLDivElement> {
 
 **禁止**:不開 `Cell` wrapper(指 indirection 不必要;Ant Space.Compact 同樣不開)。
 
-## Size cascade
+## Size
 
-**Mode A**(包進 Field 當 control slot):
+**FCG `size` prop 目前為 no-op**:本元件只負責 border-collapse 接合(border / radius / z-index),不傳遞 size 給 children(無 Context Provider / 無 cloneElement)。Children 的尺寸完全由 child 自己決定 — 以下三種來源:
+
+**Mode A**(包進 Field 當 control slot):children 各自透過 `useFieldContext().size` 讀外層 `<Field>` 的 size(是 Field 的 context,不是 FCG 的)。
 ```tsx
-<Field>
+<Field size="lg">
   <FieldLabel>電話</FieldLabel>
-  <FieldControlGroup>  {/* size 自動繼承 Field context */}
+  <FieldControlGroup>  {/* 各 child 自動繼承外層 Field context size */}
     <Select className="w-[80px]" options={codes} />
     <Input className="flex-1" />
   </FieldControlGroup>
 </Field>
 ```
 
-**Mode B**(standalone):
+**Mode B**(standalone):**逐一給每個 child 設 `size`**(設 `<FieldControlGroup size>` 無效)。
 ```tsx
-<FieldControlGroup size="md">  {/* 顯式 size,默 md */}
-  ...
+<FieldControlGroup>
+  <Select size="md" className="w-[120px]" options={fields} />
+  <Input size="md" className="flex-1" />
 </FieldControlGroup>
 ```
 

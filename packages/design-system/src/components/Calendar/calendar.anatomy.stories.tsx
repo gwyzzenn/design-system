@@ -137,9 +137,9 @@ export const ColorMatrix: Story = {
                   <Td>提示可點擊新增入口</Td>
                 </tr>
                 <tr>
-                  <Td>Weekend cell(可選)</Td>
+                  <Td>Weekend cell(後續增量)</Td>
                   <Td mono>bg-muted</Td>
-                  <Td>對齊 Google Calendar,可由 prop 控制,MVP 預設關閉</Td>
+                  <Td>對齊 Google Calendar,MVP 未實作(無 weekend prop / 無 isWeekend 邏輯),列後續增量</Td>
                 </tr>
               </tbody>
             </table>

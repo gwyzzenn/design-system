@@ -66,7 +66,7 @@ export const Overview: Story = {
             <tbody>
               {[
                 ['orientation', "'vertical' | 'horizontal'", "'vertical'", 'label 位置:上方 / 左方'],
-                ['labelWidth', 'string', "'120px'", 'horizontal 模式 label 寬度'],
+                ['labelWidth', 'string', "'auto'", 'horizontal 模式 label 寬度'],
                 ['required', 'boolean', 'false', '顯示 * 星號 + context.required'],
                 ['invalid', 'boolean', 'false', 'error 狀態 + context.invalid(觸發 aria-invalid)'],
                 ['disabled', 'boolean', 'false', 'context.disabled 傳給 control'],
@@ -202,7 +202,7 @@ export const OrientationMatrix: Story = {
 
       <div>
         <H3>Horizontal — label 在控件左方</H3>
-        <Desc>Settings / 詳情頁場景。label 固定寬度(labelWidth,預設 120px)對齊縱向軸,節省垂直空間。</Desc>
+        <Desc>Settings / 詳情頁場景。label 寬度(labelWidth,預設 auto 由內容撐開)對齊縱向軸,節省垂直空間。</Desc>
         <div className="border border-dashed border-divider rounded-md p-4 max-w-2xl">
           <FieldGroup>
             <Field orientation="horizontal" required>
@@ -376,8 +376,8 @@ export const ColorMatrix: Story = {
               </tr>
               <tr>
                 <Td mono>Required 星號(*)</Td>
-                <Td><TokenCell token="--error" display="error" /></Td>
-                <Td><TokenCell token="--error" display="error" /></Td>
+                <Td><TokenCell token="--fg-muted" display="fg-muted" /></Td>
+                <Td><TokenCell token="--fg-muted" display="fg-muted(不變)" /></Td>
                 <Td><TokenCell token="--fg-disabled" display="fg-disabled" /></Td>
               </tr>
               <tr>
@@ -389,7 +389,7 @@ export const ColorMatrix: Story = {
               <tr>
                 <Td mono>FieldError</Td>
                 <Td>—(不渲染)</Td>
-                <Td><TokenCell token="--error" display="error" /></Td>
+                <Td><TokenCell token="--error-text" display="error-text" /></Td>
                 <Td>—</Td>
               </tr>
               <tr>
@@ -430,7 +430,7 @@ export const ColorMatrix: Story = {
             <Field required>
               <FieldLabel>姓名</FieldLabel>
               <Input placeholder="請輸入姓名" />
-              <FieldDescription>本欄位為必填(label 後有紅星 *)</FieldDescription>
+              <FieldDescription>本欄位為必填(label 後有星號 *)</FieldDescription>
             </Field>
           </div>
           <div>

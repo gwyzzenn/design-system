@@ -85,7 +85,7 @@ cmdk 自動處理：
 
 - **List 語意**：`role="listbox"` + `aria-activedescendant` 指向目前 highlight 項
 - **搜尋框**：`role="combobox"` + `aria-expanded` / `aria-controls` 指向 list
-- **鍵盤導覽**：↑ / ↓ 移動 highlight、Enter 選取、Esc 關閉（或清空搜尋）
+- **鍵盤導覽**：cmdk 提供 ↑ / ↓ 移動 highlight、Enter 選取（另支援 vim-style Ctrl+n/p/j/k、Home/End）。cmdk 本身無 Esc handler — Esc 關閉僅在 `CommandDialog`(Cmd+K)模式由 Radix Dialog 的 DismissableLayer 提供;inline `<Command>` 模式按 Esc 無反應
 - **空狀態**：`<CommandEmpty>` 自動帶 `role="presentation"`,不干擾 screen reader 的 list 朗讀
 
 Consumer 無需額外處理 a11y,保留 cmdk 原結構 + 使用 `<CommandInput>` / `<CommandList>` / `<CommandItem>` 即可。

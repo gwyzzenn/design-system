@@ -2,7 +2,7 @@
 // @anatomy-exempt: anatomy specs / token 對照表格用 raw <table>,非業務資料表。業務資料表才用 <DataTable>。
 // @anatomy-rationale:
 //   StateBehavior 涵蓋 fallback chain(src 失敗 → icon → alt 首字 → User icon)
-//   與 status presence dot 三態,屬資料載入的視覺降級而非互動狀態。
+//   與 status presence dot 四態(online / away / busy / offline),屬資料載入的視覺降級而非互動狀態。
 import type { Meta } from '@storybook/react'
 import { useState } from 'react'
 import { Building2, Folder, Globe } from 'lucide-react'
@@ -670,7 +670,7 @@ export const StateBehavior = {
 
       <div className="flex flex-col gap-1">
         <H3>Status presence dot(線上 / 離開 / 忙碌 / 離線)</H3>
-        <Desc>傳 status prop 在 Avatar 右下角加 6px 狀態點,色彩語意對齊 Slack / Teams 業界共識(見 NameCard ColorMatrix「四種狀態對應色彩」)。狀態本身為唯讀,Avatar 不擁有切換邏輯。</Desc>
+        <Desc>傳 status prop 在 Avatar 右下角加狀態點,尺寸為 avatar 的 28%(clamp 8–16px),色彩語意對齊 Slack / Teams 業界共識(見 NameCard ColorMatrix「四種狀態對應色彩」)。狀態本身為唯讀,Avatar 不擁有切換邏輯。</Desc>
       </div>
       <div className="flex items-center gap-6">
         {(['online', 'away', 'busy', 'offline'] as const).map(s => (

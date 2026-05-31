@@ -65,7 +65,7 @@ export const Overview: Story = {
             <tbody>
               <tr><Td mono>icon</Td><Td>選填</Td><Td>Avatar 48px neutral + icon</Td><Td>—</Td></tr>
               <tr><Td mono>title</Td><Td>選填</Td><Td>16px font-medium centered</Td><Td>icon → 文字固定 16px(mb-4)</Td></tr>
-              <tr><Td mono>description</Td><Td>必有(預設唯一 slot)</Td><Td>14px · fg-secondary(有 title/action 時)/ fg-muted(孤身 description,placeholder tier)· centered</Td><Td mono>--item-gap-label-desc-reading-lg(2px,title body-lg)</Td></tr>
+              <tr><Td mono>description</Td><Td>必有(預設唯一 slot)</Td><Td>14px(standalone / sm·md row 子樹)/ 16px(lg RowSizeContext 子樹,如 lg menu)· fg-secondary(有 title/action 時)/ fg-muted(孤身 description,placeholder tier)· centered</Td><Td mono>--item-gap-label-desc-reading-lg(2px,title body-lg)</Td></tr>
               <tr><Td mono>action</Td><Td>選填</Td><Td>CTA Button</Td><Td>固定 24px(mt-6)</Td></tr>
             </tbody>
           </table>
@@ -81,7 +81,7 @@ export const Overview: Story = {
               {[
                 ['icon', 'LucideIcon', '—', 'Avatar 48px 內的 icon'],
                 ['title', 'string', '—', '主要標題(16px medium)'],
-                ['description', 'string', '必填(預設唯一 slot)', '說明文字(14px fg-secondary)'],
+                ['description', 'string', '必填(預設唯一 slot)', '說明文字(14px;lg RowSizeContext 子樹內 16px · fg-secondary)'],
                 ['action', 'ReactNode', '—', 'CTA button / 操作區'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>

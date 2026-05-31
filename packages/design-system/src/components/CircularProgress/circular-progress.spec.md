@@ -182,7 +182,7 @@ Track 色鎖 `var(--secondary)`(= neutral-3,與 ProgressBar track 一致)。
 | 模式 | role | aria 屬性 |
 |------|------|----------|
 | Determinate(`value` 有值) | `progressbar` | `aria-valuenow / aria-valuemin=0 / aria-valuemax=100` + optional `aria-label` |
-| Indeterminate + 有 aria-label / label | `status` | `aria-label={label ?? aria-label}` |
+| Indeterminate + 有 aria-label / label | `status` | `aria-label={aria-label ?? label}`(顯式 aria-label 優先,label 為 fallback) |
 | Indeterminate + 無 label | `aria-hidden=true` | 由父層 `aria-busy` 管理(Button 模式) |
 
 ---

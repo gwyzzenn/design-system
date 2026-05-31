@@ -235,9 +235,9 @@ Indeterminate 是由父層邏輯控制的狀態，Checkbox 本身不會自動進
 
 - **Uncontrolled**:只傳 `defaultChecked`,DOM 自管 — 適合表單 native submit
 - **Controlled**:傳 `checked` + `onCheckedChange`,React state 主導 — 適合需即時聯動其他欄位
-- **Read-only**:傳 `checked` 不傳 `onCheckedChange` → Radix 視同 controlled disabled state
+- **Read-only**:用 `readOnly` prop(不是省略 `onCheckedChange`)。`readOnly` 設 `aria-readonly` / `data-readonly` / `tabIndex=-1` + cva `pointer-events-none`,鎖互動但保留 checked 視覺。注意:只傳 `checked` 而不傳 `onCheckedChange` 僅讓 Radix 把值鎖在 prop(不會更新),控件仍可 focus / click、不會進 disabled state — 那不是 readonly
 
-CheckboxGroup 額外提供 `value` / `defaultValue` / `onValueChange`(string[] 多選 array)— group-level controlled 模式;item 不傳獨立 onChange(group 統一 dispatch)。
+CheckboxGroup 是純 layout primitive — **不**持有 group-level selection state(無 `value` / `defaultValue` / `onValueChange`)。每個 `<Checkbox>` child 各自管自己的 `checked` / `defaultChecked` / `onCheckedChange`;CheckboxGroup 只透過 `CheckboxGroupContext` 告知 child「你在 group 裡」(保留各自 label)。
 
 ---
 

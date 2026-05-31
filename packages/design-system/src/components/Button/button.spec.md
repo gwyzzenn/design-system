@@ -97,7 +97,7 @@ Button 是最基礎的互動元件，用於觸發操作或導覽。
 - 右側 suffix(badge + endIcon)內部 4px
 
 **為什麼用 label 兩側隱性呼吸而非外層 gap**:
-- Icon-only(無 label)→ 外層 padding 公式 `(field-height - icon)/2` 自然對齊,無需 gap
+- Icon-only(無 label)→ `aspect-square p-0`(padding-free 派)從 `h-field-X` 推 width=height,flex-center 讓 icon 自然置中,無需 gap
 - Has-label → label 兩側隱性 4px 給 icon 跟文字之間 / label 跟 suffix 之間,**單一規則產生兩側 symmetric spacing**
 - 若用外層 gap-1,icon-only 時要再加條件移除;label 兩側機制更穩(實作 class 細節詳 `button.tsx`)
 
@@ -120,7 +120,7 @@ Members: **Button, SegmentedControlItem, Chip**。
 - **24px 固定**（不隨 density 縮放），配合工具列密集排佈
 - **主要用法**: icon-only（無 label 或極短 label），text editor / design canvas toolbar 情境
 - **不配對 Field**（Field 家族用 sm/md/lg），純 standalone utility
-- **Icon-only 時**自動套用 `px-[calc((field-height-xs - 16px)/2)]` = `px-1`（4px）以產生正方形 hit box
+- **Icon-only 時**套用 `ICON_ONLY_BASE`（`aspect-square p-0 min-w-0 gap-0`，padding-free 派），靠 `aspect-square` 從 `h-field-xs` 推 width=height 產生正方形 hit box（詳「iconOnly 的邊界」節）
 
 雖然 code 允許 xs 帶短 label（text-caption 12px），但**主要場景應該是 icon-only**。有 label 的 compact button 建議直接用 `sm`（28px）。
 

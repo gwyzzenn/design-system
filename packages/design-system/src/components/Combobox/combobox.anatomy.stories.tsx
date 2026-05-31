@@ -308,13 +308,13 @@ export const Overview = {
               {[
                 ['mode', "'edit'|'display'|'readonly'|'disabled'", "'edit'", 'FieldMode 四模式;disabled 原生屬性會自動覆蓋'],
                 ['size', "'sm'|'md'|'lg'", "'md'", '尺寸，與 Button 共用 field-height token'],
-                ['options', 'SelectOption[]', '—', '選項列表 { value, label }'],
+                ['options', 'ComboboxOption[]', '—', '選項列表（extends SelectMenuOption：value / label / icon / avatar / description / disabled / group）'],
                 ['value', 'string[]', '[]', '已選中的值陣列'],
                 ['onChange', '(value: string[]) => void', '—', '選值改變回呼'],
                 ['error', 'boolean', 'false', '紅色邊框，只在 edit 模式有視覺效果'],
                 ['wrap', 'boolean', 'false', '換行模式——高度隨內容展開，Tags 自然換行'],
                 ['clearable', 'boolean', 'false', '有值時顯示 X clear all 按鈕'],
-                ['placeholder', 'string', "'選擇...'", '無值時 select 的提示文字'],
+                ['placeholder', 'string', '—', '無值時的提示文字；未傳時桌機 fallback 到 emptyPlaceholder（預設「選擇…」全形省略號），手機原生 select fallback「選擇...」'],
                 ['disabled', 'boolean', 'false', '原生 disabled，自動覆蓋 mode'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>
@@ -783,7 +783,7 @@ export const StateBehavior = {
           <div className="flex flex-col gap-1 text-[11px] text-fg-muted">
             <span>1. useOverflowCount hook 量測 container 寬度與每個 tag 的自然寬度</span>
             <span>2. ResizeObserver 持續監聽容器變化</span>
-            <span>3. 初次量測前 opacity:0，量測後 opacity:1，避免閃爍</span>
+            <span>3. 量測在 useLayoutEffect 內 paint 前同步完成，超出的 tag 在繪製前就已隱藏，避免閃爍</span>
             <span>4. 超出的 tag 用 DOM hidden 隱藏（非 display:none）</span>
           </div>
         </div>

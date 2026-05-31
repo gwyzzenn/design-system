@@ -47,7 +47,7 @@ benchmark:
           gap = --layout-space-tight
         [Title 16px font-medium centered]  ← 可選
          --item-gap-label-desc-reading-lg (2px)
-      [Description 14px fg-secondary centered]
+      [Description 14px(lg context 16px)fg-secondary centered]
                w-full (no max-width)
           gap = --layout-space-loose
               [Action Button]              ← 可選
@@ -73,7 +73,7 @@ Outer padding 由 **consumer 容器** 決定(Table 空狀態需較大留白、Se
 ## Typography
 
 - **Title**:body-lg + medium 字重 / foreground 色(主要閱讀重量)
-- **Description**:body tier / **`fg-muted` placeholder 等級色**(跟 input placeholder 同色,提示「這裡暫時沒內容」)
+- **Description**:字級跟 `RowSizeContext` 對齊——standalone(無 context,fallback `md`)或 `sm`/`md` row 子樹 = body tier(14px);渲染在 `lg` 的 `RowSizeContext` 子樹(如 lg menu)內時自動升 body-lg(16px),對齊該 menu items 字級 / **`fg-muted` placeholder 等級色**(跟 input placeholder 同色,提示「這裡暫時沒內容」)
 
 完整 slot / gap / typography 的 class 與 px 對照見 anatomy `Overview`(Slot 與 Spacing)+ `SlotCombinations`(Slot 間距規則)stories。
 
@@ -155,13 +155,13 @@ Empty 是 **non-interactive layout primitive**——本身無 ARIA role(讓 cons
 />
 ```
 
-## 現有消費者改寫
+## 現有消費者
 
-| 元件 | 現況 | 改為 |
+| 元件 | 消費方式 | Padding 落點 |
 |---|---|---|
-| DataTable | inline `<div>` 硬寫 className | `<Empty description={emptyState} className="py-12" />` |
-| SelectMenu | — | `<Empty description="無選項" className="py-6" />` |
-| Combobox | — | `<Empty description="找不到結果" className="py-6" />` |
+| DataTable | 外層 `<div className="flex-1 flex items-center justify-center py-12">` 包 `<Empty description={emptyState} />`(有框置中) | wrapper div(非 Empty className) |
+| SelectMenu | `<Empty description={emptyText} className="py-6" />`(loading 時 `<Empty icon={<CircularProgress size={48}/>} className="py-6" />`) | Empty className |
+| Combobox | 透過 SelectMenu(dropdown 即 SelectMenu primitive)→ 無結果時顯 SelectMenu 的 `<Empty>` | 同 SelectMenu |
 
 ## 禁止事項
 

@@ -140,9 +140,9 @@ export const Accessibility: Story = {
       <ul className="text-body space-y-2 list-disc pl-5">
         <li>
           <strong>Landmark</strong>:`&lt;header&gt;` / `&lt;nav&gt;` / `&lt;aside&gt;` / `&lt;main&gt;`
-          各自有對應的無障礙地標角色。在 primary-header 模式,最上方那條橫跨整個視窗的 global header
-          是整站層級的標頭。在 primary-sidebar 模式,header 放在主內容欄頂端、與 `&lt;main&gt;` 並排(兄弟節點,
-          不是 main 的子層),角色是當前頁的工具列,而非整站標頭。
+          各自有對應的無障礙地標角色。`&lt;header&gt;`(ChromeHeader)在兩種模式下都只被 `&lt;div&gt;` 包覆
+          (body-scoped、與 `&lt;main&gt;` 並排而非子層),依 W3C HTML-AAM 都得到 implicit `role=banner`
+          (整站層級標頭)——`&lt;div&gt;` 外層不會 scope out banner,只有 `main/article/aside/nav/section` 才會。
         </li>
         <li><strong>Skip to main</strong>:`Tab` 第一站 focus skip-link → jump 到 `#app-shell-main`(WCAG 2.4.1)</li>
         <li><strong>Keyboard shortcuts</strong>:`⌘B` / `Ctrl+B` toggle sidebar(消費 Sidebar SSOT)/ `⌘.` / `Ctrl+.` toggle aside</li>

@@ -155,8 +155,11 @@ export const Inspector: Story = {
                 <TokenCell token={state === 'drag-over' ? '--primary' : '--divider'} />
               </div>
               <div className="flex items-center gap-1.5">
-                icon:{' '}
-                <TokenCell token={state === 'drag-over' ? '--primary' : '--fg-muted'} />
+                icon glyph: <TokenCell token="--foreground" />
+                <span className="text-fg-muted">(via Empty→Avatar neutral,不隨 state 變色)</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                icon bg circle: <TokenCell token="--muted" />
               </div>
               <div className="flex items-center gap-1.5">
                 text(title): <TokenCell token="--foreground" />
@@ -212,7 +215,7 @@ export const ColorMatrix: Story = {
                   <TokenCell token="--surface" />
                 </Td>
                 <Td>
-                  <TokenCell token="--fg-muted" />
+                  <TokenCell token="--foreground" />
                 </Td>
                 <Td>hover 另加 `bg-neutral-hover`</Td>
               </tr>
@@ -225,9 +228,9 @@ export const ColorMatrix: Story = {
                   <TokenCell token="--primary-subtle" />
                 </Td>
                 <Td>
-                  <TokenCell token="--primary" />
+                  <TokenCell token="--foreground" />
                 </Td>
-                <Td>使用者拖檔進入區塊時</Td>
+                <Td>使用者拖檔進入區塊時(icon 不變色,僅 border / bg 切 primary)</Td>
               </tr>
               <tr>
                 <Td mono>loading</Td>

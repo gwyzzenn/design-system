@@ -101,7 +101,7 @@ export const ModeRule: Story = {
     <div>
       <Rule
         title="rich — 需要縮圖預覽的檔案（圖片、文件）"
-        note="左側 Avatar 56px 顯示縮圖或檔案類型 icon,右側檔名 + 大小 + 進度 bar。閱讀模式(text-body 14px),資訊容量較高"
+        note="左側 Avatar 48px square 顯示縮圖或檔案類型 icon,右側檔名 + 大小 + 進度 bar。掃描模式(text-body 14px + leading-compact;兩 mode 統一),資訊容量較高"
       >
         <FileItem
           name="Q1-report.pdf"

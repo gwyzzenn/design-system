@@ -23,7 +23,7 @@ type Story = StoryObj
 // 且要與主展示頁(carousel.stories.tsx)同源,讓設計師看到的 slide 內容跨三層一致。
 // Picsum.photos 提供 stable seeded photos(免登入 / 免 API key / 跨環境一致)。
 // 註:ColorMatrix「視覺樣本」cell 刻意保留純色 swatch(bg-foreground)——那是 token 色票
-// 非 slide 內容,用純色才能精準標 dot 的 white/60 · white/80 · white token。
+// 非 slide 內容,用純色才能精準標 dot 的 bg-on-emphasis/60 · /80 · 全(--on-emphasis = white)token。
 
 const slides = [
   { label: '京都',       image: 'https://picsum.photos/seed/kyoto/720/360' },
@@ -185,7 +185,7 @@ const InspectorInner = () => {
             </div>
           </div>
           <p className="text-[10px] text-fg-muted font-mono">
-            Arrow:w-9 h-9(36px)· left/right-3 · top-1/2 · opacity 0 → hover/focus-visible 100%<br />
+            Arrow:size="md"(h-field-md,default 32px / loose 36px,iconOnly 方形)· left/right-3 · top-1/2 · opacity 0 → hover/focus-within 100%<br />
             Dots:bottom-3 · gap-1.5 · inactive 6px × 6px / active 24px × 6px
           </p>
         </div>
@@ -203,7 +203,7 @@ const InspectorInner = () => {
           <div className="flex flex-col gap-1.5 text-[12px] font-mono">
             <div className="flex justify-between"><span className="text-fg-muted">Component</span><span>&lt;Button variant="tertiary" size="md" iconOnly /&gt;</span></div>
             <div className="flex justify-between"><span className="text-fg-muted">Size</span><span>h-field-md(field-height-md,iconOnly 方形)</span></div>
-            <div className="flex justify-between"><span className="text-fg-muted">Shape</span><span>rounded-md(繼承 Button,不破例)</span></div>
+            <div className="flex justify-between"><span className="text-fg-muted">Shape</span><span>rounded-full(documented 例外)</span></div>
             <div className="flex justify-between items-center"><span className="text-fg-muted">Fill</span><TokenCell token="--surface" /></div>
             <div className="flex justify-between items-center"><span className="text-fg-muted">Stroke</span><TokenCell token="--border" /></div>
             <div className="flex justify-between items-center"><span className="text-fg-muted">Hover</span><span>text/border → --primary-hover(Button tertiary)</span></div>
@@ -218,9 +218,9 @@ const InspectorInner = () => {
           <div className="flex flex-col gap-1.5 text-[12px] font-mono">
             <div className="flex justify-between"><span className="text-fg-muted">Position</span><span>absolute bottom-3</span></div>
             <div className="flex justify-between"><span className="text-fg-muted">Gap</span><span>gap-1.5(6px)</span></div>
-            <div className="flex justify-between"><span className="text-fg-muted">Inactive</span><span>w-1.5 h-1.5 / bg-white/60</span></div>
-            <div className="flex justify-between"><span className="text-fg-muted">Hover</span><span>bg-white/80</span></div>
-            <div className="flex justify-between"><span className="text-fg-muted">Active</span><span>w-6 h-1.5 / bg-white</span></div>
+            <div className="flex justify-between"><span className="text-fg-muted">Inactive</span><span>w-1.5 h-1.5 / bg-on-emphasis/60</span></div>
+            <div className="flex justify-between"><span className="text-fg-muted">Hover</span><span>bg-on-emphasis/80</span></div>
+            <div className="flex justify-between"><span className="text-fg-muted">Active</span><span>w-6 h-1.5 / bg-on-emphasis</span></div>
             <div className="flex justify-between"><span className="text-fg-muted">Render</span><span>scrollSnaps &gt; 1</span></div>
           </div>
         </div>
@@ -263,37 +263,37 @@ export const ColorMatrix: Story = {
     <div className="flex flex-col gap-10">
       <div>
         <H3>Arrow(浮層按鈕)</H3>
-        <Desc>Arrow 採「浮層卡片」視覺——疊在照片或內容上仍清晰可見。與 Popover / DropdownMenu trigger 的 surface-raised + elevation-200 慣例一致。</Desc>
+        <Desc>Arrow 為 `<Button variant="tertiary">`——`bg-surface` + `border-border`,無 elevation shadow,rounded-full 圓形,疊在照片或內容上仍清晰可見。</Desc>
         <div className="overflow-x-auto">
           <table className="text-caption border-collapse">
             <thead><tr><Th>State</Th><Th>Fill</Th><Th>Stroke</Th><Th>Shadow</Th><Th>Opacity</Th></tr></thead>
             <tbody>
               <tr>
                 <Td mono>default</Td>
-                <Td mono><TokenCell token="--surface-raised" /></Td>
+                <Td mono><TokenCell token="--surface" /></Td>
                 <Td mono><TokenCell token="--border" /></Td>
-                <Td mono>--elevation-200</Td>
+                <Td mono>—</Td>
                 <Td mono>0(隱藏)</Td>
               </tr>
               <tr>
                 <Td mono>group-hover</Td>
-                <Td mono><TokenCell token="--surface-raised" /></Td>
+                <Td mono><TokenCell token="--surface" /></Td>
                 <Td mono><TokenCell token="--border" /></Td>
-                <Td mono>--elevation-200</Td>
+                <Td mono>—</Td>
                 <Td mono>1(顯示)</Td>
               </tr>
               <tr>
                 <Td mono>hover(button 自身)</Td>
-                <Td mono><TokenCell token="--neutral-hover" /></Td>
-                <Td mono><TokenCell token="--border" /></Td>
-                <Td mono>--elevation-200</Td>
+                <Td mono><TokenCell token="--surface" /></Td>
+                <Td mono>text/border → --primary-hover</Td>
+                <Td mono>—</Td>
                 <Td mono>1</Td>
               </tr>
               <tr>
                 <Td mono>focus-visible</Td>
-                <Td mono><TokenCell token="--surface-raised" /></Td>
+                <Td mono><TokenCell token="--surface" /></Td>
                 <Td mono>ring-2 ring-ring ring-offset-2</Td>
-                <Td mono>--elevation-200</Td>
+                <Td mono>—</Td>
                 <Td mono>1(強制顯示 / a11y)</Td>
               </tr>
               <tr>
@@ -320,30 +320,30 @@ export const ColorMatrix: Story = {
               <tr>
                 <Td mono>inactive</Td>
                 <Td mono>6 × 6 px</Td>
-                <Td mono>bg-white/60</Td>
+                <Td mono>bg-on-emphasis/60</Td>
                 <Td>
                   <div className="bg-foreground p-4 rounded-md inline-block">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-white/60" />
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-on-emphasis/60" />
                   </div>
                 </Td>
               </tr>
               <tr>
                 <Td mono>hover</Td>
                 <Td mono>6 × 6 px</Td>
-                <Td mono>bg-white/80</Td>
+                <Td mono>bg-on-emphasis/80</Td>
                 <Td>
                   <div className="bg-foreground p-4 rounded-md inline-block">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-white/80" />
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-on-emphasis/80" />
                   </div>
                 </Td>
               </tr>
               <tr>
                 <Td mono>active</Td>
                 <Td mono>24 × 6 px</Td>
-                <Td mono>bg-white</Td>
+                <Td mono>bg-on-emphasis</Td>
                 <Td>
                   <div className="bg-foreground p-4 rounded-md inline-block">
-                    <span className="inline-block w-6 h-1.5 rounded-full bg-white" />
+                    <span className="inline-block w-6 h-1.5 rounded-full bg-on-emphasis" />
                   </div>
                 </Td>
               </tr>
@@ -374,8 +374,8 @@ export const SizeMatrix: Story = {
             <tbody>
               <tr>
                 <Td mono>Arrow button</Td>
-                <Td mono>w-9 h-9(36px)</Td>
-                <Td>圓形按鈕於照片 overlay 上的世界級慣例尺寸(Airbnb / Instagram / Netflix 皆 36–40px)</Td>
+                <Td mono>size="md"(h-field-md,default 32px / loose 36px)</Td>
+                <Td>iconOnly 方形,繼承 Button md 尺寸;rounded-full 圓形於照片 overlay 上的世界級慣例(Airbnb / Instagram / Netflix)</Td>
               </tr>
               <tr>
                 <Td mono>Arrow icon</Td>
@@ -433,7 +433,7 @@ export const StateBehavior: Story = {
             <CarouselContent>
               {slides.slice(0, 3).map((s) => (
                 <CarouselItem key={s.label}>
-                  <SampleSlide label={s.label} gradient={s.gradient} height={200} />
+                  <SampleSlide label={s.label} image={s.image} height={200} />
                 </CarouselItem>
               ))}
             </CarouselContent>
@@ -455,7 +455,7 @@ export const StateBehavior: Story = {
             <CarouselContent>
               {slides.map((s) => (
                 <CarouselItem key={s.label}>
-                  <SampleSlide label={s.label} gradient={s.gradient} height={200} />
+                  <SampleSlide label={s.label} image={s.image} height={200} />
                 </CarouselItem>
               ))}
             </CarouselContent>
@@ -489,7 +489,7 @@ export const StateBehavior: Story = {
           <Carousel>
             <CarouselContent>
               <CarouselItem>
-                <SampleSlide label={slides[0].label} gradient={slides[0].gradient} height={200} />
+                <SampleSlide label={slides[0].label} image={slides[0].image} height={200} />
               </CarouselItem>
             </CarouselContent>
             <CarouselPrevious />

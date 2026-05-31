@@ -189,7 +189,7 @@ export const ModeMatrix: Story = {
     <div className="flex flex-col gap-8">
       <div>
         <H3>rich — Avatar 48px square 在左</H3>
-        <Desc>閱讀模式(text-body 14px 1.5 line-height),資訊容量較高。適合圖片 / 文件 / 需要縮圖的場景。</Desc>
+        <Desc>掃描模式(text-body 14px + leading-compact 1.3;兩 mode 統一 scanning),資訊容量較高。適合圖片 / 文件 / 需要縮圖的場景。</Desc>
         <div className="flex flex-col gap-2 max-w-lg">
           <FileItem name="Q1-report.pdf" description="2.4 MB · 已上傳" mode="rich" />
           <FileItem name="photo.jpg" description="4.8 MB" mode="rich" thumbnailSrc="https://i.pravatar.cc/112?img=3" />
@@ -215,7 +215,7 @@ export const ModeMatrix: Story = {
             <thead><tr><Th>Mode</Th><Th>Prefix</Th><Th>Typography</Th><Th>Description</Th><Th>使用場景</Th></tr></thead>
             <tbody>
               <tr><Td mono>compact（預設）</Td><Td>Paperclip 16px</Td><Td>掃描模式(text-caption)</Td><Td>只有 error 才顯示</Td><Td>批次上傳、一般檔案</Td></tr>
-              <tr><Td mono>rich</Td><Td>Avatar 48px square</Td><Td>閱讀模式(text-body)</Td><Td>任何場景</Td><Td>圖片、文件、需要預覽</Td></tr>
+              <tr><Td mono>rich</Td><Td>Avatar 48px square</Td><Td>掃描模式(text-body;兩 mode 統一 scanning)</Td><Td>任何場景</Td><Td>圖片、文件、需要預覽</Td></tr>
             </tbody>
           </table>
         </div>
@@ -245,9 +245,9 @@ export const SizeMatrix: Story = {
               </tr>
             </thead>
             <tbody>
-              <tr><Td>Prefix</Td><Td mono>Paperclip 16px(foreground)</Td><Td mono>Avatar 56px square(縮圖或 fallback)</Td></tr>
-              <tr><Td>Row 高度(無 bar)</Td><Td mono>h-field-md(32/36 density)</Td><Td mono>≈ 56px + py</Td></tr>
-              <tr><Td>Typography</Td><Td mono>text-body leading-compact(掃描模式)</Td><Td mono>text-body 預設行高(閱讀模式)</Td></tr>
+              <tr><Td>Prefix</Td><Td mono>Paperclip 16px(foreground)</Td><Td mono>Avatar 48px square(縮圖或 fallback)</Td></tr>
+              <tr><Td>Row 高度(無 bar)</Td><Td mono>px-3 py-2(content 1lh)</Td><Td mono>content col minHeight 48(avatar)+ py-3</Td></tr>
+              <tr><Td>Typography</Td><Td mono>text-body leading-compact(掃描模式)</Td><Td mono>text-body leading-compact(掃描模式;兩 mode 統一 scanning)</Td></tr>
               <tr><Td>Description</Td><Td>僅 error 才顯示</Td><Td>任何場景都可顯示</Td></tr>
               <tr><Td>Progress bar</Td><Td mono>絕對定位 2px 在底</Td><Td mono>inline 4px,bar 底部對齊 avatar</Td></tr>
               <tr><Td>Actions</Td><Td>右側 Button xs iconOnly(24 固定;靠列內 wrapper trick 不撐高列)</Td><Td>右側 Button xs iconOnly(24 固定,列內操作 ≤ 24 上限;多操作橫排)</Td></tr>

@@ -78,11 +78,10 @@ Calendar 是**事件檢視 canvas**,讓 user 以**月 / 週 / 日** 三種 view 
   events={Event[]}                          // 事件資料
   onEventClick={(event) => ...}             // 點 event tile 回調
   onDateClick={(date) => ...}               // 點月 cell 回調(用於新增)
-  onRangeSelect={(from, to) => ...}         // 月 view 拖拉選一段 range(新增 multi-day)
+  onCreateEvent={() => ...}                 // 點「新事件」CTA 回調
   weekStartsOn={0 | 1}                      // 0=Sun, 1=Mon
   renderEventTile={(event) => ReactNode}    // 自訂 event tile 視覺
-  renderEmpty={() => ReactNode}             // 無事件狀態
-  size="md" | "lg"                          // cell 大小(MVP 兩尺寸)
+  size="md" | "lg"                          // cell 大小(MVP 只 md;lg 為 tech debt)
   className
 />
 ```
@@ -96,7 +95,7 @@ interface CalendarEvent {
   start: string | Date       // ISO "YYYY-MM-DDTHH:mm" 或 "YYYY-MM-DD"(all-day)
   end: string | Date
   allDay?: boolean            // true = 跨整日,渲染為橫跨數欄的 tile
-  color?: string              // 事件類別色(來自 DS palette,consumer 自選)
+  color?: 'blue' | 'green' | 'orange' | 'purple' | 'red' | 'yellow'  // DS primitive 色名(對照 Tag / Badge)
   metadata?: Record<string, unknown>   // 自由資料,renderEventTile 讀
 }
 ```
@@ -130,7 +129,7 @@ interface CalendarEvent {
 - **Today cell**:日期數字以 primary-filled pill 強調(對齊 Google Calendar today pill)
 - **Outside day cell**:上/下月溢出日期弱化字色 + 背景略暗區分
 - **Hover cell**:整 cell 帶 neutral-hover 提示可點擊新增入口
-- **Weekend cell**:可選弱化背景(對齊 Google;MVP 預設關閉)
+- **Weekend cell**:弱化背景(對齊 Google);MVP 未實作,列後續增量
 
 ### Event tile 規則
 
@@ -161,18 +160,18 @@ interface CalendarEvent {
 ### Empty
 無事件時 cell 空白(不顯示 empty state)——calendar 本身是 canvas,空白 = 沒事件,語意自明。
 
-**不用 `<Empty>` 元件**——Empty 是「引導使用者做什麼」,月曆空白是常態不是引導目標。若整個月**零事件**可選擇顯示 subtle 提示(`<Empty icon={CalendarPlus} title="本月無事件" />`),由 consumer 在 `renderEmpty` 提供。
+**不用 `<Empty>` 元件**——Empty 是「引導使用者做什麼」,月曆空白是常態不是引導目標。若整個月**零事件**需要 subtle 提示(`<Empty icon={CalendarPlus} title="本月無事件" />`),由 consumer 自行疊在 Calendar 外層(MVP 無內建 `renderEmpty` hook,列後續增量)。
 
 ### Loading
-載入 events 時,cells 用 `<Skeleton>` placeholder tile(對齊其他非同步元件)。
+MVP 無內建 loading 狀態(無 `loading` prop / 無 Skeleton 分支)——events 由 consumer 取得,載入中時 consumer 自行決定是否在 Calendar 外層顯示 placeholder。後續增量擬以 `<Skeleton>` placeholder tile 對齊其他非同步元件(見「MVP vs 後續增量」)。
 
 ### Error
-載入失敗時,顯示 toolbar 內 inline error hint + retry button;不 block 整個 calendar 顯示。
+MVP 無內建 error 狀態(無 `error` / `onRetry` prop)——載入失敗由 consumer 在外層處理。後續增量擬在 toolbar 內顯示 inline error hint + retry button 且不 block 整個 calendar 顯示。
 
 ### a11y
 - Toolbar navigation 用 `<nav aria-label="calendar navigation">`
-- Month grid 用 `role="grid"`,每 cell `role="gridcell"`,日期用 `aria-label="2026 年 4 月 3 日,3 個事件"`
-- Event tile `role="button"` + descriptive `aria-label`(title + time)
+- Month grid 用 `role="grid"`,每 cell `role="gridcell"`,日期用 ISO 格式 `aria-label="2026-04-03,3 個事件"`
+- Event tile `role="button"` + `aria-label`(事件標題,格式 `事件:{title}`)
 - Keyboard(MVP 實作現況):Tab 逐一 focus 每個日期格與其中的事件 tile;Enter / Space 啟用目前 focus 的事件 tile(觸發 `onEventClick`);toolbar 的 prev / 今天 / next / 檢視切換為標準可聚焦控件。方向鍵在格間移動、PageUp/Down 切月為後續增量(見「MVP vs 後續增量」),尚未實作
 
 ---
@@ -182,7 +181,7 @@ interface CalendarEvent {
 - ❌ 不用 `<DayPicker>` 為底層——DayPicker 是 form control 用,結構不適合 page-level event canvas
 - ❌ 不硬寫 month grid 為 `<table>`——用 CSS grid(月 view 可能跨 cell span event,table 不好 span)
 - ❌ 不把 event 資料存在元件內部 state——event 是 consumer 責任,本元件是純 view
-- ❌ 不自動打開「新事件」表單——`onDateClick` / `onRangeSelect` 回調給 consumer 決定(避免強制開 Dialog UX)
+- ❌ 不自動打開「新事件」表單——`onDateClick` / `onCreateEvent` 回調給 consumer 決定(避免強制開 Dialog UX)
 - ❌ 不重造 date math——用 `date-fns`
 
 ---
@@ -195,7 +194,7 @@ interface CalendarEvent {
 - Event tile render(單 line + color variant + truncate)
 - Today cell highlight
 - Outside days visual
-- Empty / loading 基礎
+- Empty 為常態空白(無內建 empty/loading/error UI)
 
 ### 後續(tech debt)
 - 週 view(timeline 24 小時縱軸)
@@ -205,6 +204,8 @@ interface CalendarEvent {
 - 「+N more」展開 popover
 - 左側 mini month + filter sidebar
 - 多曆疊加(multi-calendar sources)
+- 內建 loading(Skeleton)/ error(inline hint + retry)/ renderEmpty hook
+- 拖拉選 range(`onRangeSelect`)
 - Print view / iCal export
 
 ---

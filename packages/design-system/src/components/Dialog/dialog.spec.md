@@ -157,7 +157,7 @@ Dialog 是容器，無整體 disabled / loading / empty 狀態——這些屬於
 
 Radix Dialog 自動處理：
 
-- **Modal 語意**：`role="dialog"` + `aria-modal="true"`
+- **Modal 語意**：`role="dialog"`(Radix 刻意**不**設 `aria-modal="true"`,改用 aria-hidden 的 `hideOthers()` 把背景兄弟節點設 `aria-hidden` + FocusScope trap 達成隔離,避免 `aria-modal` 在部分 screen reader 隱藏整頁的已知 bug）
 - **標題綁定**：`<DialogTitle>` 自動成為 `aria-labelledby` 指向對象，screen reader 開啟時讀出標題
 - **Focus trap**：焦點鎖在 Dialog 內，Tab 循環不逃出
 - **Esc 關閉**：按 Esc 自動關閉

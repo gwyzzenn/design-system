@@ -221,7 +221,7 @@ Avatar **固定 48px square**,不隨 content 高度變化。content(label + desc
   name="report.pdf"
   description="2.3 MB"
   onClick={() => openViewer(id)}
-  actions={hasDeletePermission ? <ItemInlineActionButton icon={Trash2} size="sm" onClick={del} /> : undefined}
+  actions={hasDeletePermission ? <Button size="xs" iconOnly variant="text" startIcon={Trash2} onClick={del} aria-label="刪除" /> : undefined}
 />
 ```
 
@@ -332,30 +332,23 @@ Type A completed(100% bar + ✓)屬「剛完成的 upload session」視覺;Type 
 
 Consumer 自行組合。按 `patterns/element-anatomy/item-anatomy.spec.md`「Predicate」+「Row action 絕對值 cap」,**row dedicated action 絕對值 cap = ≤ 24px,不隨 row tier 放大**。依 row 高度分兩種實作:
 
-| Mode | Row 高度 | 實作 | 尺寸 |
-|------|---------|------|------|
-| `rich` | 56 (≥ 28) | **Button iconOnly `size="xs"`**(24 固定,不隨 row 放大) | 24 |
-| `compact` | 24 | **ItemInlineActionButton**(row 太小容不下 Button xs 24,會填滿 row 無呼吸) | icon 16, hover-bg 22 |
+**兩 mode 統一(2026-04-23 canonical)**:rich + compact 都用 **Button iconOnly `size="xs"`**(24 固定,≤ cap):
+
+| Mode | 實作 | 尺寸 |
+|------|------|------|
+| `rich` | **Button iconOnly `size="xs"`**(24 固定,不隨 row 放大) | 24 |
+| `compact` | **Button iconOnly `size="xs"`**(同 rich;靠 suffix wrapper `[&>[data-unbounded]]:my-[calc((1lh-var(--field-height-xs))/2)]` trick 把 24 footprint 收斂到 1lh,不撐高 row,視覺 / touch target 仍 24) | 24 |
 
 ```tsx
-// Rich(row 56)→ Button xs iconOnly 固定 24(≤ 24 cap)
+// Rich + Compact 統一 → Button xs iconOnly 固定 24(≤ 24 cap)
 <FileItem actions={
   <Button size="xs" iconOnly variant="text" startIcon={Trash2} aria-label="刪除" onClick={del} />
 } />
-
-// Compact(row 24)→ Inline Action(因 Button xs 24 會填滿 row)
-<FileItem actions={
-  <ItemInlineActionButton icon={Trash2} size="sm" aria-label="刪除" onClick={del} />
-} />
 ```
 
-**為什麼 Row ≥ 28 用 Button xs 固定**:row 放大不代表 action 要放大——世界級 DS(Material DataGrid / Polaris / Atlassian / Apple HIG)row action 都是固定小 icon button(20–24),row 高度變化只影響 row padding 與 content,不影響 action 尺寸。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
+**為什麼 row action 固定 Button xs(24)**:row 放大不代表 action 要放大——世界級 DS(Material DataGrid / Polaris / Atlassian / Apple HIG)row action 都是固定小 icon button(20–24),row 高度變化只影響 row padding 與 content,不影響 action 尺寸。compact row 雖矮,但 Button 24 透過 suffix wrapper 的 data-unbounded margin trick 收斂到 1lh footprint(同 chrome SurfaceHeader dismiss canonical),不會填滿 row。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 
-**為什麼 Row ≤ 24 用 Inline Action**:compact row 高度 24 裝不下 Button xs(24)——Button 會填滿整個 row,失去 row padding 與 icon 呼吸空間。Inline Action(icon 16 + hover-bg 22)剛好符合「action ≤ row - padding」的呼吸需求。
-
-**Trash/Delete 不是 dismiss 語意**:`dismiss` 嚴格保留給「X close overlay session」(Dialog / Sheet / Popover / Alert close X)。Row 的 Trash/Delete 語意是 `onRemove`(從集合移除一個 item,見 `.claude/rules/ui-development.md`「元件 Props 命名」「onRemove」),**不套 Button `dismiss` prop**:
-- Rich mode Button `variant="text"` 預設 icon 已是 fg-muted → foreground,hover 弱化視覺自然呈現
-- Compact mode ItemInlineActionButton 本來就 fg-muted → foreground(Inline Action default)
+**Trash/Delete 不是 dismiss 語意**:`dismiss` 嚴格保留給「X close overlay session」(Dialog / Sheet / Popover / Alert close X)。Row 的 Trash/Delete 語意是 `onRemove`(從集合移除一個 item,見 `.claude/rules/ui-development.md`「元件 Props 命名」「onRemove」),**不套 Button `dismiss` prop**:Button `variant="text"` 預設 icon 已是 fg-muted → foreground,hover 弱化視覺自然呈現(兩 mode 同)。
 
 參見 `patterns/element-anatomy/item-anatomy.spec.md`「Predicate」+「Real case 表」+「Row action 絕對值 cap」。
 
@@ -369,9 +362,9 @@ Consumer 自行組合。按 `patterns/element-anatomy/item-anatomy.spec.md`「Pr
 | `error` | `XCircle` 紅 ✗ | `RotateCw ⟲` | `onRetry` |
 | `uploading` | *(progress %)* | *(無 swap)* | — |
 
-**幾何一致性(2026-04-22 canonical · row action ≤ 24 cap)**:status slot 容器大小 **= consumer 的 delete action 尺寸**:
+**幾何一致性(2026-04-23 統一 canonical · row action ≤ 24 cap)**:status slot 容器大小 **= consumer 的 delete action 尺寸**,兩 mode 統一:
 - `mode="rich"` → `var(--field-height-xs)`(24 固定,與 Button xs iconOnly 同)
-- `mode="compact"` → 16px(與 ItemInlineActionButton icon 同)
+- `mode="compact"` → `var(--field-height-xs)`(24,同 rich;compact 靠 status slot wrapper 的 `[&>[data-unbounded]]:my-[calc((1lh-var(--field-height-xs))/2)]` 把 24 footprint 收斂到 1lh,不撐高 row,視覺 / touch target 仍 24)
 
 Passive status icon 置中於 action-sized 容器,hover 時 active action 填滿同一容器。這讓 flex gap token 測量的是**兩個同尺寸 action slot 之間的真實 gap**,不被 hover bg overflow 吃掉——status slot 尺寸 = 同 size delete slot,gap token 才能如實呈現;歷史 bug 細節見 CLAUDE.md `# 失敗記憶索引`。
 
@@ -399,16 +392,18 @@ Passive status icon 置中於 action-sized 容器,hover 時 active action 填滿
   status="error"
   description="There's something wrong."
   onRetry={() => retryUpload(id)}        // hover ✗ → ⟲
-  actions={<ItemInlineActionButton icon={Trash2} size="sm" onClick={del} aria-label="刪除" />}
+  actions={<Button size="xs" iconOnly variant="text" startIcon={Trash2} onClick={del} aria-label="刪除" />}
 />
 ```
 
 ## Suffix 24px 閾值
 
-| Mode | 最大 suffix 元素 | 有 desc 時 | alignment |
-|---|---|---|---|
-| compact（預設） | Button xs = 24px ≤ 24px | — | `h-[1lh]` inline |
-| rich | Button sm = 28px > 24px | block | `h-[calc(1lh+2px+desc_lh)]` |
+兩 mode 統一:suffix 最大元素 = Button xs = 24px ≤ 24px(小 suffix)→ `h-[1lh]` inline,不因 desc wrap 改公式(對齊 item-anatomy「24px 閾值對齊規則」)。
+
+| Mode | 最大 suffix 元素 | alignment |
+|---|---|---|
+| compact（預設） | Button xs = 24px ≤ 24px | `h-[1lh]` inline |
+| rich | Button xs = 24px ≤ 24px | `h-[1lh]` inline |
 
 ## A11y 預設
 

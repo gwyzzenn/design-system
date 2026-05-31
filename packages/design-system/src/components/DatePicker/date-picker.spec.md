@@ -300,7 +300,7 @@ DatePicker 套 `React.forwardRef` + `displayName`,但**不 `...props` spread DOM
 ## A11y 預設
 
 - Trigger:`role="combobox"` + `aria-haspopup="dialog"` + `aria-expanded={open}` + 必含 accessible name(`aria-label` / 或外層 `<label>` / 或 fieldCtx label)
-- Popover content:`role="dialog"` + `aria-label="日期選擇"`(Range:`"日期區間選擇"`)
+- Popover content:`role="dialog"`;單一日期 popover 不重覆 `aria-label`(由 trigger 的 `role="combobox"` accessible name 標示),Range popover 加 `aria-label="日期區間選擇"`
 - DateGrid 鍵盤:Arrow keys 切日 / PageUp/Down 切月 / Home/End 行首尾(react-day-picker v9 內建)
 - Trigger 鍵盤:Space / Enter open;Esc close + focus return to trigger(Radix Popover 內建)
 - Range 雙 trigger:`activeEnd` state 指向當前編輯端,`aria-expanded` 對應只當該 trigger active 時 true
@@ -312,8 +312,7 @@ DatePicker 套 `React.forwardRef` + `displayName`,但**不 `...props` spread DOM
 走 Field SSOT(`Field/form-validation.spec.md`)。DatePicker 為 form control,validation 行為:
 
 - `required` + `value=null` → submit 時 trigger error,`aria-invalid="true"` + error border
-- `min` / `max` date constraint:value 超出範圍時自動 error(consumer 傳 `disabledDates` predicate 視覺 disable,但 typed input 仍可輸入無效值需 validation 攔)
-- Range mode:start > end → invalid;consumer 應確保 start 先 commit 才接受 end
+- Range mode:start > end → invalid;component 內建 `isOutOfRangeOrder` 在 picker 端視覺 disable 違序日期(activeEnd='end' 時 `date < start` disable;activeEnd='start' 時 `date > end` disable),consumer 仍應在 submit 端確保 start 先 commit 才接受 end
 - Typed input(`typeable=true`):`parseDateInput` 失敗 → `aria-invalid`,blur 觸發 error message
 - Validation timing:typed input → blur + submit;picker pick → onChange 即時(已選有效日期不需延遲)
 
@@ -321,7 +320,7 @@ DatePicker 套 `React.forwardRef` + `displayName`,但**不 `...props` spread DOM
 
 - **Disabled**:Field SSOT own;trigger Button 自動繼承 disabled(`text-fg-disabled` + cursor-not-allowed + 不開 picker)。Display mode + disabled 維持格式化日期文字但 token 切 disabled。
 - **Loading(server-rendered grid)**:DatePicker 為 sync UI 不獨立 own loading。若 consumer 場景需 async date constraint fetch(如後端 disabled-dates list),consumer 應先 disable trigger 直到 fetch 完成,或在 popover 開啟後 body 切 `<Empty icon={<CircularProgress/>}/>`(對齊 panel-body loading SSOT)。本 spec scope 內不渲 loading state。
-- **Empty(no value / disabled all dates)**:`value=null` → trigger 顯 placeholder(預設「選擇日期」);若 `disabledDates` predicate 將所有可選日期 disable,DateGrid 自動顯 disabled cells,無導覽目標時鍵盤焦點停留(react-day-picker v9 內建)。
+- **Empty(no value)**:`value=null` → trigger 顯 placeholder(預設 `YYYY/MM/DD`,showTime 時 `YYYY/MM/DD HH:MM`;consumer 可傳 `placeholder` 覆寫)。無導覽目標時鍵盤焦點停留(react-day-picker v9 內建)。
 - **Invalid date input**:Field validation 處理 `aria-invalid="true"` + error border + 下方 error message;DatePicker 本身不 own validation 規則。
 - **Dark mode / density**:走 Field + Popover SSOT 自動 adapt;DateGrid 內 cell 尺寸固定不隨 density 漂移(date grid 為密度敏感不可變區)。
 

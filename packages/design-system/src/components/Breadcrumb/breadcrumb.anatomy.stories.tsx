@@ -66,7 +66,7 @@ export const Overview: Story = {
               <tr><Td mono>BreadcrumbLink</Td><Td>可點擊的上層 / 中層</Td><Td mono>&lt;a&gt;</Td></tr>
               <tr><Td mono>BreadcrumbPage</Td><Td>當前頁(最末項,不可點擊)</Td><Td mono>&lt;span aria-current="page"&gt;</Td></tr>
               <tr><Td mono>BreadcrumbSeparator</Td><Td>ChevronRight 分隔符</Td><Td mono>&lt;li role="presentation"&gt;</Td></tr>
-              <tr><Td mono>BreadcrumbEllipsis</Td><Td>中間層過多時的省略符</Td><Td>—</Td></tr>
+              <tr><Td mono>BreadcrumbEllipsis</Td><Td>中間層過多時可點擊展開的省略符</Td><Td mono>&lt;button type="button"&gt;</Td></tr>
             </tbody>
           </table>
         </div>
@@ -257,9 +257,9 @@ export const SizeMatrix: Story = {
           <table className="text-caption border-collapse">
             <thead><tr><Th>Size</Th><Th>字體 Token</Th><Th>Separator icon</Th><Th>配對 title</Th><Th>使用場景</Th></tr></thead>
             <tbody>
-              <tr><Td mono>sm</Td><Td mono>text-body(14px)</Td><Td mono>14px</Td><Td mono>text-h4(20px)</Td><Td>Dialog / panel / drawer header</Td></tr>
-              <tr><Td mono>md ★default</Td><Td mono>text-body(14px)</Td><Td mono>14px</Td><Td mono>text-h3(24px)</Td><Td>一般頁面 header</Td></tr>
-              <tr><Td mono>lg</Td><Td mono>text-body-lg(16px)</Td><Td mono>16px</Td><Td mono>text-h2(32px)</Td><Td>Detail page hero / landing</Td></tr>
+              <tr><Td mono>sm</Td><Td mono>text-body(14px)</Td><Td mono>16px</Td><Td mono>text-h4(20px)</Td><Td>Dialog / panel / drawer header</Td></tr>
+              <tr><Td mono>md ★default</Td><Td mono>text-body(14px)</Td><Td mono>16px</Td><Td mono>text-h3(24px)</Td><Td>一般頁面 header</Td></tr>
+              <tr><Td mono>lg</Td><Td mono>text-body-lg(16px)</Td><Td mono>20px</Td><Td mono>text-h2(32px)</Td><Td>Detail page hero / landing</Td></tr>
             </tbody>
           </table>
         </div>
@@ -438,7 +438,7 @@ export const CollapseMatrix: Story = {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <p className="text-footnote text-fg-muted mt-3">Ellipsis 可以 hover 展開中間層(consumer 自行實作互動,本元件只渲染 `...` icon)</p>
+        <p className="text-footnote text-fg-muted mt-3">點 Ellipsis 按鈕(包在 DropdownMenuTrigger 內)以 DropdownMenu 展開中間層;BreadcrumbEllipsis 渲染的是完整可點擊按鈕(消費 ItemInlineActionButton,帶 aria-label / focus / hover bg)。declarative `items` 與 compositional 兩種用法都會自動接上 DropdownMenu 收合。</p>
       </div>
     </div>
   ),
@@ -451,7 +451,7 @@ export const Accessibility = {
   render: () => (
     <div className="max-w-3xl text-body text-fg-secondary">
       <h3 className="text-h5 text-foreground mb-2">無障礙設計</h3>
-      <p className="whitespace-pre-line">{"Breadcrumb 結構是原生 HTML(nav + ol + li + a/span);asChild 多型渲染用 Radix Slot,但 Slot 只合併 prop、不管理焦點 / ARIA / 鍵盤(非行為型 primitive)。摘要:\n\n  ARIA  :外層 nav 帶 aria-label=\"Breadcrumb\";當前頁 BreadcrumbPage 帶 aria-current=\"page\";分隔符 aria-hidden 不進無障礙樹。a11y 行為來自原生 HTML 語意,非 Slot 提供。\n\n  Keyboard 行為  :\n\n- Tab — 逐個 link 依序聚焦(每個連結都是獨立 tab stop,無 focus trap)\n- Enter — 觸發連結導覽\n\n  Focus  :聚焦時顯示 visible ring(outline: 2px solid var(--ring));連結逐個依序聚焦,不攔截焦點。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
+      <p className="whitespace-pre-line">{"Breadcrumb 結構是原生 HTML(nav + ol + li + a/span);asChild 多型渲染用 Radix Slot,但 Slot 只合併 prop、不管理焦點 / ARIA / 鍵盤(非行為型 primitive)。摘要:\n\n  ARIA  :外層 nav 帶 aria-label=\"Breadcrumb\";當前頁 BreadcrumbPage 帶 aria-current=\"page\";分隔符 aria-hidden 不進無障礙樹。a11y 行為來自原生 HTML 語意,非 Slot 提供。\n\n  Keyboard 行為  :\n\n- Tab — 逐個 link 依序聚焦(每個連結都是獨立 tab stop,無 focus trap)\n- Enter — 觸發連結導覽\n\n  Focus  :聚焦時顯示 visible ring — BreadcrumbLink 用 ring-2 ring-ring ring-offset-1(box-shadow ring),BreadcrumbEllipsis 按鈕用 outline-2 outline-ring;連結逐個依序聚焦,不攔截焦點。\n\n  驗證  :Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。"}</p>
     </div>
   ),
 }

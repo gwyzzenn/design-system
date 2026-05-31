@@ -113,7 +113,7 @@ CheckboxItem 和 RadioItem 雖然涉及「選擇」，但它們控制的是**即
 [prefix]  [label]  [suffix]
 ```
 
-- prefix：`DropdownMenuItemIcon` 包裹 startIcon，`h-[1lh]` 對齊第一行 label。icon 跟 label 同色（foreground）
+- prefix：由 `DropdownMenuItem` 的 `startIcon` prop 傳入，經 MenuItem 內部以 item-anatomy 的 `<ItemPrefix>` / `<ItemIcon>`（`h-[1lh]` 對齊第一行 label）渲染。icon 跟 label 同色（foreground）
 - label：文字內容，`flex-1`
 - suffix：`DropdownMenuShortcut` 或自行組合的後綴容器，`ml-auto` 靠右。指示型 icon 用 `fg-muted`
 
@@ -230,7 +230,7 @@ Item-level default / hover / focused / selected / disabled **色彩**由 MenuIte
 - Enter — 選擇
 - Esc — 關閉
 
-**Focus**:Radix primitive 自管 focus trap / restoration / visible ring(`outline: 2px solid var(--ring)` per design-system focus-visible canonical)。
+**Focus**:Radix primitive 自管 focus trap / restoration。鍵盤導覽到的項目以 highlight **底色**標示(Radix `data-[highlighted]:bg-neutral-hover`,本元件刻意採 `data-highlighted` 而非 `:focus-visible` outline ring,跨瀏覽器一致 — 見 dropdown-menu.tsx docblock「Hover / highlight canonical」),不畫 `outline: 2px solid var(--ring)` 外框。
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 

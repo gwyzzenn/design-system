@@ -425,7 +425,7 @@ export const A11yRule: Story = {
 
       <Rule
         title="Recharts accessibilityLayer prop"
-        note="長條、折線、面積圖加上 accessibilityLayer,啟用鍵盤焦點與讀屏器朗讀。圓餅 / 環圈圖目前沒有加這個能力,鍵盤無法逐點瀏覽。"
+        note="長條、折線、面積圖加上 accessibilityLayer,啟用鍵盤焦點與讀屏器朗讀。圓餅 / 環圈圖經 Recharts 預設一樣啟用 accessibilityLayer(可聚焦),但方向鍵導覽建立在軸刻度數值索引上,無數值軸的圓餅圖無法逐片導覽。"
       >
         <Label>
           &lt;BarChart accessibilityLayer ...&gt; — 方向鍵可瀏覽資料點,讀屏器讀出當前值

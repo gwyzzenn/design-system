@@ -80,7 +80,7 @@ Family 的 canonical 規定的是「同用途同 layout」;FileViewer 用途(ful
 
 ```
 ┌──────────────────────────────────────────────────────────┐  ← data-theme="dark" subtree
-│ Toolbar(--chrome-header-height,bg-surface border-b)      │
+│ Toolbar(--chrome-header-height,bg-surface-raised border-b)│
 │  [icon] file.name …(ellipsis)                            │
 │                           [ZoomInput] [Info] [DL] [X]    │  ← zoom→info→download→close(影響力遞增)
 ├──────────────────────────────────────────────────────────┤
@@ -94,7 +94,7 @@ Family 的 canonical 規定的是「同用途同 layout」;FileViewer 用途(ful
 │                                              │  metadata││
 │                                              └──────────┘│
 ├──────────────────────────────────────────────────────────┤
-│ Filmstrip(h-24,bg-surface border-t,水平捲動 thumb)       │
+│ Filmstrip(h-24,bg-surface-raised border-t,水平捲動 thumb) │
 │  [■][■][◼][■][■] …  ← 64×64 thumbnails + fade mask      │
 └──────────────────────────────────────────────────────────┘
 ```
@@ -150,12 +150,12 @@ Toolbar 右側 `X` + InfoPanel header `X` **都走 `<Button iconOnly dismiss siz
 - **視覺一致**:`dismiss` prop 強制 `variant="text"` + icon 色 `fg-muted → hover foreground`,跟 Inline Action dismiss 外觀一致(cross-implementation dimming canonical),無視覺差異
 - **語義區隔**:跟其他 `<Button iconOnly>`(info / download)屬同一元件家族(都是 chrome button),以 `dismiss` prop 明示「結束 session」語意,比 Button vs Inline Action 兩元件混用更清晰
 
-### Prev/Next 檔案切換(hover-only,對齊 Google Photos / Dropbox lightbox / Carousel)
+### Prev/Next 檔案切換(idle-fade,對齊 Google Photos / Dropbox lightbox / Carousel)
 
-viewport 左右的 `<` `>` 切檔案箭頭**預設 opacity-0**,`group-hover/viewer:opacity-100` + `focus-within:opacity-100` 才浮現。理由:
+viewport 左右的 `<` `>` 切檔案箭頭**預設 opacity-0**,由 React state `armVisible` 控制浮現:viewport `onMouseMove` 顯示 → 持續 **2.5s 無 mouse move** 自動淡出 → `onMouseLeave` 立即隱藏(JS idle-timer 機制,對齊 Google Photos lightbox 風格);另加 `focus-within:opacity-100`(a11y CSS fallback,鍵盤 focus 強制顯示)。理由:
 
-- **世界級對照**:Google Photos / Dropbox preview / PhotoSwipe / Instagram lightbox 皆 hover-only — 常駐箭頭干擾 media(檔案)閱讀
-- **a11y**:鍵盤 focus 時強制顯示(不 hover 不知道有箭頭不可用)
+- **世界級對照**:Google Photos / Dropbox preview / PhotoSwipe / Instagram lightbox 皆 hover/idle-fade — 常駐箭頭干擾 media(檔案)閱讀。**用 JS idle-timer 而非純 CSS `group-hover`**:CSS hover 在滑鼠停留時箭頭恆顯,idle-timer 才能做到「停留也淡出」的世界級沉浸體驗
+- **a11y**:鍵盤 focus 時強制顯示(`focus-within:opacity-100`,不 hover 也知道有箭頭可用)
 - **邊界**:第一/最後一張時直接不 render(非 disabled state,避免視覺噪音)
 - 對齊 `components/Carousel/carousel.spec.md`「Arrow 行為」canonical
 
@@ -202,7 +202,7 @@ Shell 看到 `pageNumber` capability 時自動在 toolbar 顯示 page navigator(
 - **onLoad 自動 fit-to-page**(世界級 canonical:Figma / Preview.app / Acrobat 開圖預設 fit-page,非 100%)——shell 計算 `min(cw/iw, ch/ih)` 對應的 zoom %,透過 `onZoomChange` 更新 UI 顯示真實倍率(例:40%) <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 - **zoom = 100% 語義 = natural pixel size**(跟 Figma / Preview 一致),不是 CSS-contained 的 fit scale
 - Scroll wheel 縮放;`zoom > 100%` 時可拖曳 pan
-- **Wheel step canonical 為 `0.03`(每 tick ~3% scale delta)+ smoothStep `0.005`**——對齊 Figma / Preview.app / Photoshop 細緻度。原 0.1(10%)太粗,接近 Google Slides 離散慣例非世界級連續 zoom。library 內部 multiplicative 乘算 → log 視覺等距(符合「等距」需求) <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
+- **Wheel step canonical 為 `0.03`(每 tick ~3% scale delta)**——對齊 Figma / Preview.app / Photoshop 細緻度。原 0.1(10%)太粗,接近 Google Slides 離散慣例非世界級連續 zoom。library 內部 multiplicative 乘算 → log 視覺等距(符合「等距」需求)。註:原想加 `smoothStep: 0.005` 作 trackpad 細緻度,但當前 react-zoom-pan-pinch 版本型別不含該 key,**未啟用**;若需要升級到有此 prop 的版本或切 `smoothScroll` API <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 - **Zoom anchor(中心點)canonical**:
   - **Wheel zoom** — anchor 固定在 **cursor pointer 位置**(react-zoom-pan-pinch default,對齊 Figma / Photoshop / 瀏覽器 cmd-scroll canonical)。user 滑鼠指哪,zoom 就以那點為中心,內容不會「跑掉」 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
   - **± button zoom / preset / fit / input 打字**(沒 cursor 位置時)— 走 library canonical `api.centerView(targetScale, 200)`,自動處理 scale + 置中 + animation + bounds。**不自算 `setTransform`**(動畫期間讀 stale positionX 會漂)
@@ -211,7 +211,7 @@ Shell 看到 `pageNumber` capability 時自動在 toolbar 顯示 page navigator(
   - 結果:user 看哪,zoom 完 **看哪**,視覺焦點不漂移 — 世界級 media viewer 共識
 - Min scale 10%,max scale 400%
 - 雙擊重設 100%
-- 切換檔案時 shell 自動重設 zoom 到 100%,新圖 onLoad 會再自動 fit-page(雙層保險)
+- 切換檔案時 shell **不重設 zoom**——把「下一張該怎麼初始化 zoom」的決定權交給 renderer:image-renderer 自己 watch `file.url` 變化 → reset loaded → onLoad → 重 fit-page(含 cache 命中時 `<img complete>` 主動觸發,避免 onLoad 不 fire 卡在上一張的 zoom)。原本 shell `setZoom(100)` 在 cache 命中時會卡 100% 不 fit,已移除
 
 ---
 
@@ -220,18 +220,18 @@ Shell 看到 `pageNumber` capability 時自動在 toolbar 顯示 page navigator(
 ### 結構(2026-04-21 canonical)
 
 ```
-[−]  [ % input(bare)  ⌄ ]  [+]
- │         │               │
- │         │               └─ Button iconOnly Plus(zoom in 到下一個 preset)
- │         └─ Input variant="bare" size="sm",w-20 + text-center + tabular-nums;
- │            endAction = ChevronDown(觸發 DropdownMenu)
+[−]  [ % input  ⌄ ]  [+]
+ │         │         │
+ │         │         └─ Button iconOnly Plus(zoom in 到下一個 preset)
+ │         └─ Input size="sm" autoWidth(field-sizing:content 隨 value 文字寬)
+ │            + text-center + tabular-nums;endSlot = ChevronDown(觸發 DropdownMenu)
  └─ Button iconOnly Minus(zoom out 到上一個 preset)
 ```
 
 **消費 DS primitive**:
 - `<Button>` iconOnly size="sm" 作 ± 按鈕(Minus / Plus icon,disabled 於邊界)
-- `<Input variant="bare" size="sm">` 作 % 輸入(Toolbar inline editing canonical)
-- Input `endAction` slot 渲染 ⌄ chevron 作 DropdownMenu trigger
+- `<Input size="sm" autoWidth>` 作 % 輸入(autoWidth 隨輸入文字寬;Toolbar inline editing canonical)
+- Input `endSlot` escape hatch 包 `<DropdownMenuTrigger asChild>` + `<ItemInlineActionButton icon={ChevronDown}>` 作 chevron(非宣告式 `endAction`——chevron 同時是 DropdownMenu trigger,需 asChild 把 trigger 行為掛到 inline action)
 - `<DropdownMenu>` 作 preset + fit 選單(取代先前 `<Popover>` + 手刻 button list)
 
 ### 互動規則
@@ -269,7 +269,7 @@ Shell 看到 `pageNumber` capability 時自動在 toolbar 顯示 page navigator(
 
 - **僅在 `showFilmstrip === true && files.length > 1` 顯示**
 - **Thumb 固定 64×64**——小到能塞 10+ 檔在畫面上,大到能辨識內容
-- **thumb gap `gap-1`(4px)**——世界級 lightbox(Google Photos / Dropbox)都用緊密 gap
+- **thumb gap `gap-[var(--layout-space-tight)]`**(density-aware token,非寫死 gap-1)——世界級 lightbox(Google Photos / Dropbox)都用緊密 gap
 - **當前 thumb**:`ring-2 ring-primary`(明顯 outline);其他 `ring-1 ring-border` + `hover:ring-border-hover`
 - **ScrollIntoView**:切換當前 file 時 active thumb 自動 scroll 到視野中央
 - **消費 `horizontal-overflow` pattern**:隱藏 native scrollbar + fade-mask + scroll arrows(canScroll 時)
@@ -300,8 +300,8 @@ Shell 看到 `pageNumber` capability 時自動在 toolbar 顯示 page navigator(
 | 區塊 | Token | 說明 |
 |------|-------|------|
 | Overlay | `bg-overlay` | 與 Dialog 共用;覆蓋背景頁面 |
-| Chrome bg | `bg-canvas`(dark subtree) | dark theme 下 canvas = 近黑底,讓圖片顯色最自然 |
-| Toolbar / Panel / Filmstrip bg | `bg-surface` | 比 canvas 高一階,形成 chrome 分層 |
+| Viewport bg | `bg-canvas`(dark subtree) | dark theme 下 canvas = 近黑底,讓圖片顯色最自然 |
+| Toolbar / Panel / Filmstrip bg | `bg-surface-raised` | chrome 為遮蓋型浮層必須不透明;**不用 bg-surface**(dark = white α8 半透明,outer 透明時失去 backdrop 會洗白)|
 | 分隔線 | `border-divider` | Toolbar 底 / InfoPanel 左 / Filmstrip 頂 |
 | 檔名文字 | `text-body-lg text-foreground` | Dialog title 同級 |
 | 按鈕 | `Button variant="text" size="sm" iconOnly` | viewer chrome 密集 UI 用 text variant(不搶焦點) |
@@ -345,7 +345,8 @@ Radix DialogPrimitive 自動處理:
 - `role="dialog"` + `aria-modal="true"`
 - `<DialogPrimitive.Title>`(sr-only)自動成 `aria-labelledby` 目標——screen reader 開啟時讀「檔案檢視器:{file.name}」
 - Focus trap:焦點鎖在 viewer 內
-- Esc 關閉;Overlay click 關閉(Radix 預設)
+- Esc 關閉(Radix DismissableLayer 預設)
+- Backdrop click 關閉**非** Radix outside-click:Content 為 `fixed inset-0` 全螢幕覆蓋整個 viewport、Overlay 是其後層 sibling,Radix outside-click 不會 fire。實際靠自寫 geometric onClick handler(判斷 click 座標是否落在 `<img>` rect 外 → 才關)
 
 自加的 a11y:
 - 所有 iconOnly button 皆有 `aria-label`(中文,跟 DS 其他元件風格一致)

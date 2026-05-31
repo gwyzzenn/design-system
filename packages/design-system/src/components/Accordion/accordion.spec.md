@@ -101,7 +101,7 @@ Consumer 無需額外處理,保留 Radix `data-state` 屬性即可。
 
 ## 邊界狀態
 
-Empty state 由 consumer 處理(無 items 則不渲染);loading 狀態由 consumer 用 `<Skeleton />` 包;disabled state 詳 `../Field/field-controls.spec.md`;density 由 Radix 繼承。
+Empty state 由 consumer 處理(無 items 則不渲染);loading 狀態由 consumer 用 `<Skeleton />` 包;disabled state 詳 `../Field/field-controls.spec.md`;本元件無 density 概念,padding 固定為 `py-4 / pb-4`(不隨 density token 變動)。
 
 ---
 

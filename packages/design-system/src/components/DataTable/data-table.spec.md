@@ -433,7 +433,7 @@ tableOptions={{ getSubRows, getRowCanExpand, state: { expanded }, onExpandedChan
 - Chevron:注入 first non-`__select__` content cell,rotate-90 展/收
 - Click 分權:chevron stopPropagation 不 fire select
 - Leaf placeholder:同層 sibling 有 expandable 時 leaf 也佔位
-- a11y:row `aria-expanded` / `aria-level`
+- a11y:`aria-expanded` 套在展開 chevron `<button>`(非 row);`aria-level` 尚未實作(row depth 目前僅以 `--tree-indent-*` 縮排視覺呈現)
 - Selection cascade:default OFF;`selectionCascade` opt-in 待 v2
 
 ### Drag visual SSOT(2026-05-06 v14.5)
@@ -444,7 +444,7 @@ Row drag + column reorder + TreeView 共用 `lib/drag-visual.ts`:source `opacity
 
 `enableRowDrag?: boolean` + `onRowReorder?: (sourceId, targetId, 'before' | 'after')`。Library:@dnd-kit/sortable + @dnd-kit/core。**必填 `getRowId`**(否則 dnd 用 row.index reorder 後錯位)。
 
-- **Handle**:`<Button variant="tertiary" iconOnly size="xs" startIcon={GripVertical} />` 24px elevated chip(`bg-surface` + `border-divider`),`absolute left-1 top-1/2 -translate-y-1/2` 4px inset 不佔 column 空間;**hover-reveal** `opacity-0 group-hover/row:opacity-100`。對齊 Jira backlog(@benchmark-unverified,M22)。Tertiary chip 非 ItemInlineAction 因透明背景撞 table border。
+- **Handle**:`<Button variant="tertiary" iconOnly size="xs" startIcon={GripVertical} />` 24px chip,所有 state(idle / hover / aria-disabled)統一 `bg-surface-raised`(border / shadow 已 retire,2026-05-12 per user「我有叫你加 elevation 嗎」),`absolute left-1 top-1/2 -translate-y-1/2` 4px inset 不佔 column 空間;**hover-reveal** `opacity-0 group-hover/row:opacity-100`。對齊 Jira backlog(@benchmark-unverified,M22)。Tertiary chip 非 ItemInlineAction 因透明背景撞 table border。
 - **Sort × Drag 互斥**:sort.length>0 → handle disabled+Tooltip。**Top-level only**(`row.depth>0` 不顯 handle)。**Position**:active vs over 視覺位置 → `'after'`/`'before'` 對齊 `arrayMove`。**Consumer-managed mutation**:`onRowReorder(sourceId, targetId, position)`,DS 不持 row order(Notion/Airtable/Linear)。 <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 - **Virtualization 整合**(v3 2026-05-05):enableRowDrag 自動 `overscan≥10` + drag 期 freeze `measureElement` + `modifiers={[restrictToVerticalAxis]}` 鎖 Y 軸。**3-panel mirror sync**:各 region 共享 SortableContext.items 自然同 transform;handle 只 render primary region(left 優先 → center)避雙觸發。**Cross-parent drop 禁止**(已知 limit):nested 只同 top-level 重排,collisionDetection 過濾,顯 invalid signal。
 
@@ -497,18 +497,19 @@ DataTable 是 composite multi-section 元件,**不套 canonical 5**(Inspector / 
 - Column headers:`<th scope="col">` 自帶 `role="columnheader"`(implicit per HTML semantics)
 - Row headers(若有):`<th scope="row">` 自帶 `role="rowheader"`
 - Sortable column:`aria-sort="none" | "ascending" | "descending"` on `<th>`
-- Selection state(若啟用 selection mode):row 套 `aria-selected="true" | "false"`,multi-selectable 場景套 `aria-multiselectable="true"` on grid root
-- 字 cell hover overlay action:trigger `aria-haspopup` + `aria-controls` 對應 floating overlay
+- Selection state(若啟用 selection mode):視覺以 row bg(hover / `primary-subtle` selected)+ `__select__` 欄勾選框呈現;selected row 的勾選框由 Checkbox primitive 自帶 `aria-checked` 傳達狀態(row 本身目前**未**套 `aria-selected`,`grid` root 亦未套 `aria-multiselectable` — 留待 `role="grid"` future tier)
+- 字 cell hover overlay action:overlay 為 absolute/fixed paint layer(`DataTableInteractionLayer`),trigger 目前**未**套 `aria-haspopup` / `aria-controls`(留待 future tier)
 
-**Keyboard 行為**(per APG grid pattern):
-- ↑↓←→:cell-to-cell navigation(focus walks 一格一格)
-- Home / End:row 開頭 / 結尾
-- Ctrl+Home / Ctrl+End:grid 開頭 / 結尾
-- PageDown / PageUp:跳 viewport-rows
-- Enter / Space:cell action(activate editing or select)
-- Esc:cancel editing / clear selection
+**Keyboard 行為**(目前實作 — `tableKeyboardHandler`):
+- ↑↓←→:cell-to-cell navigation **僅 `spreadsheetMode` opt-in 時生效**(`spreadsheetMode && selectedCellId != null && editingCellId == null`);預設模式方向鍵無作用
+- Enter / F2:spreadsheet 模式下進 cell editing(cell 可編輯 + 非 boolean/url + 非 disabled 時)
+- Cmd/Ctrl+A:`mode="multi"` selection 時選全可見列(扣 disabled)
+- Esc:取消 editing(spreadsheet)/ 清 selection(selection mode)
+- Tab:進入表格後操作排序與勾選
 
-**Focus**:focus walks single tab stop into grid then `tabindex=-1` cells with arrow nav;focus-visible ring(`outline: 2px solid var(--ring)`)。對齊 [WAI APG keyboard model](https://www.w3.org/WAI/ARIA/apg/patterns/grid/#keyboardinteraction)。
+> APG grid full keyboard model(Home/End、Ctrl+Home/End、PageUp/PageDown、roving cell action)為 `role="grid"` future tier 目標,**尚未實作**。
+
+**Focus**:table root `tabIndex=0` **僅在 selection enabled 或 `spreadsheetMode` 時**(否則 `undefined` = 不可 focus);cell 目前無 roving `tabindex=-1` 機制。互動元素(勾選框 / 排序 header / 展開鈕 / row action)各自 focusable + focus-visible ring(`outline: 2px solid var(--ring)`)。APG grid roving-tabindex focus model 為 future tier 目標,尚未實作 → 見 [WAI APG keyboard model](https://www.w3.org/WAI/ARIA/apg/patterns/grid/#keyboardinteraction)。
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 

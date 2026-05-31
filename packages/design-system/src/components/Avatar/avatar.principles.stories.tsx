@@ -122,7 +122,7 @@ export const FallbackRule: Story = {
     <div>
       <Rule
         title="有 src → 顯示圖片;沒有 src / 圖片載入失敗 → 顯示 initials"
-        note="Fallback 用 `name` 取首字母(中文取第一字,英文取前兩字首字母大寫)。背景色由 `color` prop 決定"
+        note="Fallback 用 `alt` 取首字母(一律取第一個字元並轉大寫,不分中英)。背景色由 `color` prop 決定"
       >
         <div className="flex items-center gap-3">
           <Avatar alt="Ada Chen" size={40} src="https://i.pravatar.cc/80?img=1" />
@@ -130,7 +130,7 @@ export const FallbackRule: Story = {
           <Avatar alt="Alice Wang" size={40} />
           <Avatar alt="ABC Corp" size={40} color="blue" />
         </div>
-        <Label>↑ 依序:有圖 / 中文首字 / 英文前兩字 / 組織首字 + 色彩</Label>
+        <Label>↑ 依序:有圖 / 圖片失敗取首字母 / 英文取首字母 / 組織首字 + 色彩</Label>
       </Rule>
     </div>
   ),

@@ -84,7 +84,7 @@ Breadcrumb 顯示「當前頁面在資訊階層中的位置」，同時提供快
 | `BreadcrumbLink` | 可點擊路徑項（非當前）| `<a>` 或 Slot（支援 `asChild` 給 router Link）|
 | `BreadcrumbPage` | 當前頁面（非 clickable）| `<span aria-current="page">` |
 | `BreadcrumbSeparator` | 項目間分隔 | `<li role="presentation">` + `ChevronRight` icon |
-| `BreadcrumbEllipsis` | 省略中間路徑的 `⋯` | `<span aria-hidden>` + `MoreHorizontal` |
+| `BreadcrumbEllipsis` | 省略中間路徑的 `⋯`（可點擊展開折疊路徑）| `<button type="button" aria-label="顯示折疊路徑">` + `MoreHorizontal`（消費 `ItemInlineActionButton` primitive，作為 DropdownMenuTrigger）|
 
 ---
 
@@ -93,12 +93,12 @@ Breadcrumb 顯示「當前頁面在資訊階層中的位置」，同時提供快
 | Slot | Token | 原因 |
 |---|---|---|
 | 基底字體 | `text-body` (14px) | navigation 尺度的標準 |
-| 間距（items 之間） | `gap-2` (8px) | 對齊 item-layout pattern 的 slot gap |
+| 間距（items 之間，含 separator）| `gap-1` (4px) | 緊湊節奏，符合 breadcrumb 密集流動感（`breadcrumb.tsx` BreadcrumbList `<ol>`）|
 | **`BreadcrumbLink`（可點擊）預設** | `text-fg-secondary` | neutral-8, 提示「可互動但非焦點」 |
 | **`BreadcrumbLink` hover** | **`text-primary-hover`** | 藍字 + `transition-colors duration-150`，明確回饋「點這個會有動作」 |
 | **`BreadcrumbPage`（當前）** | `text-foreground`（不加粗）| neutral-9 深色區分於 fg-secondary 的 links，但**不加粗**——加粗會讓 breadcrumb 最右端視覺過重，破壞「你從哪來 → 你在這」的流動感 |
-| **`BreadcrumbSeparator`** | `text-fg-muted` + `ChevronRight` size=`BREADCRUMB_ICON_SIZE[size]`(`breadcrumb.tsx:130` SSOT,sm/md=16, lg=20) | 視覺降噪,separator 不搶焦點;對齊 `uiSize.spec.md` Icon Size Tier(2026-05-18 retire 過去 14) |
-| **`BreadcrumbEllipsis`** | `text-fg-muted` + `MoreHorizontal` size=`BREADCRUMB_ICON_SIZE[size]` | 同 separator 層級 |
+| **`BreadcrumbSeparator`** | `text-fg-muted` + `ChevronRight` size=`BREADCRUMB_ICON_SIZE[size]`(`breadcrumb.tsx:134` SSOT,sm/md=16, lg=20) | 視覺降噪,separator 不搶焦點;對齊 `uiSize.spec.md` Icon Size Tier(2026-05-18 retire 過去 14) |
+| **`BreadcrumbEllipsis`** | `text-fg-muted` + `MoreHorizontal`，icon **固定 16px**（消費 `ItemInlineActionButton` 並硬傳 `size="md"`，不隨 BreadcrumbList size 變化）| Breadcrumb 不在 RowSizeProvider 樹內，固定 md tier（16px icon + 18px hover bg，對齊 inline-action.spec.md 尺寸表）|
 | **`BreadcrumbLink` / `BreadcrumbPage` `startIcon`**(2026-05-20 ship)| `<Icon size={BREADCRUMB_ICON_SIZE[size]} aria-hidden />`(sm/md=16, lg=20)| 首項 Home icon 業界慣例(Material / Atlassian)。Consumer 只傳 `LucideIcon`,DS 統一管 size 消費 BREADCRUMB_ICON_SIZE SSOT — 對齊 `uiSize.spec.md` Icon Size Tier,**禁 consumer 傳 size prop**(避免再次 14 / 20 等寫死 drift)|
 
 ## 對齊既有設計語言
@@ -240,7 +240,7 @@ ColorMatrix 已建:展示 BreadcrumbLink / Page / Separator / Ellipsis 四種節
 - Tab — 逐個 link 導覽
 - Enter — navigate
 
-**Focus**:聚焦時顯示 visible ring(`outline: 2px solid var(--ring)` per design-system focus-visible canonical);連結逐個依序成為 tab stop,不攔截焦點(無 focus trap — breadcrumb 是序列式導覽,trap 反而是無障礙 bug)。
+**Focus**:聚焦時顯示 visible ring;`BreadcrumbLink` 用 `focus-visible:ring-2 ring-ring ring-offset-1`（box-shadow ring，對齊全系統 focus-visible canonical，見上方互動狀態段 L118），`BreadcrumbEllipsis` 按鈕（消費 `ItemInlineActionButton`）用 `focus-visible:outline-2 outline-ring`。連結逐個依序成為 tab stop,不攔截焦點(無 focus trap — breadcrumb 是序列式導覽,trap 反而是無障礙 bug)。
 
 **驗證**:Storybook a11y addon panel 應 0 critical violation;鍵盤完整可操作(無需滑鼠)。WCAG AA contrast ≥ 4.5:1(text)/ 3:1(UI)。
 

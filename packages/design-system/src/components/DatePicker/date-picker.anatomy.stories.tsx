@@ -711,7 +711,7 @@ export const StateBehavior = {
               <thead><tr><Th>設定</Th><Th>readonly 預覽</Th><Th>Display 預覽</Th></tr></thead>
               <tbody>
                 <tr>
-                  <Td>預設（MM/DD/YYYY）</Td>
+                  <Td>預設（YYYY/MM/DD）</Td>
                   <td className="p-2 border-b border-divider"><DatePicker mode="readonly" value="2026-04-02" /></td>
                   <td className="p-2 border-b border-divider"><DatePicker mode="display" value="2026-04-02" /></td>
                 </tr>
@@ -820,8 +820,8 @@ export const CalendarTokens = {
                   <tr>
                     <Td>today</Td>
                     <Td>文字下方藍色底線</Td>
-                    <Td mono>underline · decoration-primary · decoration-2 · underline-offset-4</Td>
-                    <Td>非 ring circle(避免與 hover 混淆,對齊 Ant / Google Calendar / macOS Calendar)</Td>
+                    <Td mono>[&gt;button]:after:bg-primary · after:h-[1.5px] · after:w-[40%] · after:rounded-full · after:bottom-[5px]</Td>
+                    <Td>after 偽元素 bar(非 text-decoration underline、非 ring circle),避免與 hover 混淆,對齊 Ant / Google Calendar / macOS Calendar</Td>
                   </tr>
                   <tr>
                     <Td>disabled</Td>
@@ -838,13 +838,13 @@ export const CalendarTokens = {
                   <tr>
                     <Td>range track(中間日期)</Td>
                     <Td>灰底矩形橫條</Td>
-                    <Td mono>bg-[var(--color-neutral-3)](day 容器層)</Td>
+                    <Td mono>before:bg-neutral-selected(day 容器層 before 偽元素 track)</Td>
                     <Td>與端點圓接縫形成連續 bar</Td>
                   </tr>
                   <tr>
                     <Td>hover(未選中)</Td>
                     <Td>藍圈 outline 無 fill</Td>
-                    <Td mono>hover:ring-1 · hover:ring-primary · hover:bg-transparent</Td>
+                    <Td mono>hover:ring-[1.5px] · hover:ring-primary · hover:bg-transparent</Td>
                     <Td>非 filled 避免跟 selected 混淆</Td>
                   </tr>
                   <tr>
@@ -869,13 +869,13 @@ export const CalendarTokens = {
                   </tr>
                   <tr>
                     <Td>Nav 按鈕(prev / next)</Td>
-                    <Td mono>h-9 · w-9 · rounded-md · text-fg-muted · hover:bg-neutral-hover</Td>
-                    <Td>Tertiary-style icon button,hover 才浮現背景。w-9 對齊 day cell 做左右對稱</Td>
+                    <Td mono>Button variant=&quot;text&quot; size=&quot;xs&quot; iconOnly · absolute top-0 left/right-0</Td>
+                    <Td>消費 Button(variant=&quot;text&quot;)— 尺寸由 size=&quot;xs&quot; 決定,色彩走 Button 預設 text-foreground(neutral-9),不另開 fg-muted tier;absolute 貼齊 caption 兩側</Td>
                   </tr>
                   <tr>
                     <Td>星期標頭</Td>
-                    <Td mono>h-8 · w-9 · text-caption · text-fg-muted · font-normal</Td>
-                    <Td>Mon / Tue...弱化為輔助資訊</Td>
+                    <Td mono>h-7 · text-body · text-foreground · font-medium · align-middle · text-center</Td>
+                    <Td>Mon / Tue...與 caption「May 2026」同視覺權重(都屬 calendar header 區),不弱化</Td>
                   </tr>
                   <tr>
                     <Td>日格</Td>
