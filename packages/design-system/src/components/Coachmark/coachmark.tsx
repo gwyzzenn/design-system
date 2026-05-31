@@ -148,6 +148,11 @@ const Coachmark = React.forwardRef<HTMLDivElement, CoachmarkProps>(
         ? KIND_TITLE[kind as 'tips' | 'new-features']
         : kind
 
+    // 2026-05-31 #6:PopoverContent(role=dialog)需 accessible name。dialog aria-labelledby 接可見標題
+    // (優先 headerTitle 的 PopoverTitle,否則 body title 的 h3);皆無則 aria-label fallback。
+    const titleId = React.useId()
+    const dialogLabelledBy = (headerTitle || title) ? titleId : undefined
+
     return (
       <Popover open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
         <PopoverTrigger asChild>{children}</PopoverTrigger>
@@ -161,6 +166,8 @@ const Coachmark = React.forwardRef<HTMLDivElement, CoachmarkProps>(
           // Coachmark 的 CTA 不該被 auto-focus 偷觸發(user 可能還在讀 body,按 Enter 就推進)。
           // 想推進的 user 自己 tab 到 CTA 即可。
           onOpenAutoFocus={(e) => e.preventDefault()}
+          aria-labelledby={dialogLabelledBy}
+          aria-label={dialogLabelledBy ? undefined : '提示'}
           {...props}
         >
           {headerTitle && (
@@ -168,7 +175,7 @@ const Coachmark = React.forwardRef<HTMLDivElement, CoachmarkProps>(
             // **不 hideClose** — 對齊 Popover / Dialog / 所有 overlay 家族 canonical:header 必有 dismiss X
             // (user 可隨時關閉,跟 Skip / Done 是不同入口,canonical 重複不冗)
             <PopoverHeader>
-              <PopoverTitle>{headerTitle}</PopoverTitle>
+              <PopoverTitle id={titleId}>{headerTitle}</PopoverTitle>
             </PopoverHeader>
           )}
 
@@ -185,7 +192,7 @@ const Coachmark = React.forwardRef<HTMLDivElement, CoachmarkProps>(
             // 世界級參考:Notion / Linear / Figma onboarding tour 皆左對齊;Intercom Messenger 亦如是。
             <PopoverBody className="flex flex-col">
               {title && (
-                <h3 className="text-body-lg font-medium text-foreground">{title}</h3>
+                <h3 id={!headerTitle ? titleId : undefined} className="text-body-lg font-medium text-foreground">{title}</h3>
               )}
               {description && (
                 // title(body-lg 16)+ desc(body 14)→ reading-lg token(label tier 決定)

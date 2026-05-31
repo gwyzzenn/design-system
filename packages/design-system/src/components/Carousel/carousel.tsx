@@ -160,6 +160,7 @@ const Carousel = React.forwardRef<
           className={cn('group/carousel relative', className)}
           role="region"
           aria-roledescription="carousel"
+          aria-label="輪播"
           {...props}
         >
           {children}
