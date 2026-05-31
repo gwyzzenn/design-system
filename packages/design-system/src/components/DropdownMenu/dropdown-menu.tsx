@@ -407,7 +407,10 @@ const DropdownMenuRadioItem = React.forwardRef<
       ref={ref}
       disabled={disabled}
       onSelect={(e) => e.preventDefault()}
-      className={cn(radixItemClass, 'data-[state=checked]:[&>*]:bg-neutral-selected', className)}
+      // 2026-05-31 #10:selected 底色套在外層 Radix RadioItem 本身(非 `[&>*]` 子 MenuItem),
+      // 因內層 MenuItem 自帶 `!bg-transparent` 會蓋掉子層 bg → 選中底色從不顯示。
+      // 改 parent-bg pattern(對齊 DropdownMenuItem selected):RadioItem 上底色,MenuItem 透明讓它透出。
+      className={cn(radixItemClass, 'data-[state=checked]:bg-neutral-selected', className)}
       {...props}
     >
       <MenuItem

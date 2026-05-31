@@ -365,6 +365,9 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function Calend
                       aria-label={`事件:${event.title}`}
                       className={cn(
                         'rounded-md px-1.5 py-0.5 text-caption truncate cursor-pointer transition-colors',
+                        // 2026-05-31 #22:事件 tile 是 focusable(tabIndex=0 role=button)但原無 focus ring
+                        // → WCAG 2.4.7 不合規。補 focus-visible ring 對齊日期格按鈕。
+                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                         colorClass,
                       )}
                     >
