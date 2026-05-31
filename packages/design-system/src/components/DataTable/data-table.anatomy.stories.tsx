@@ -376,9 +376,10 @@ export const ColorMatrix: Story = {
       <div>
         <H3>Row 狀態色彩</H3>
         <Desc>
-          Row bg 由四個狀態決定:default / hover / selected / striped。Hover 用 neutral-hover
-          (全系統互動高亮一致,跟 TreeView / MenuItem 同套 token)。Selected 用 primary-subtle 淡底色,
-          提示「此 row 被挑出準備執行 bulk action」——不是「當前導航位置」(那是 neutral-selected)。
+          Row bg 由 default / hover / striped 決定。Hover 用 neutral-hover
+          (全系統互動高亮一致,跟 TreeView / MenuItem 同套 token)。
+          選取狀態不由 row bg 呈現,而是 __select__ 欄的 selection control(checkbox / radio)
+          ——2026-05-31 user 決策:有勾選框就只用勾選框呈現,避免「勾選框 + 底色」雙重指示。
         </Desc>
         <div className="overflow-x-auto mb-4">
           <table className="text-caption border-collapse">
@@ -404,12 +405,6 @@ export const ColorMatrix: Story = {
                 <Td><TokenCell token="--divider" display="divider" /></Td>
               </tr>
               <tr>
-                <Td mono>selected(checkbox 勾選)</Td>
-                <Td><TokenCell token="--primary-subtle" display="primary-subtle" /></Td>
-                <Td><TokenCell token="--foreground" display="foreground" /></Td>
-                <Td><TokenCell token="--divider" display="divider" /></Td>
-              </tr>
-              <tr>
                 <Td mono>striped(zebra,可選)</Td>
                 <Td><TokenCell token="--muted" display="muted(odd row)" /></Td>
                 <Td><TokenCell token="--foreground" display="foreground" /></Td>
@@ -425,8 +420,8 @@ export const ColorMatrix: Story = {
           </table>
         </div>
         <p className="text-footnote text-fg-muted mt-3">
-          selected 跟 hover 可並存(checkbox 勾選的 row,hover 仍有輕微 tint)。實際優先順序:
-          `selected + hover` → primary-subtle 加深一點;仅 hover → neutral-hover;仅 selected → primary-subtle。
+          選取狀態由 __select__ 欄的 checkbox / radio 呈現,不套 row 底色;hover 與 selection 正交
+          (已選 row 仍可有 hover 的 neutral-hover tint,但不疊額外 selected 底色)。
         </p>
       </div>
 

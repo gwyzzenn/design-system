@@ -183,8 +183,8 @@ Row actions 欄本質上是 frozen right column，左邊界也使用 full-height
 
 ### 八、Row 狀態
 
-- **不使用斑馬紋**——hover + selected 兩種狀態已足夠，斑馬紋疊加會產生四種以上的背景色組合，增加視覺雜訊
-- **Hover 與 selected 用不同色系**（neutral vs primary-subtle），讓使用者一眼區分「正在看的」與「已選的」
+- **不使用斑馬紋**——hover 狀態已足夠區分行，斑馬紋疊加會產生多種背景色組合，增加視覺雜訊
+- **選取狀態僅由 row 內的 selection control（`multi`→Checkbox / `single`→Radio）呈現，不另加 selected-row 底色**——避免「勾選框 + row 底色」雙重冗餘指示（2026-05-31 user 決策：有 checkbox 就只用 checkbox 呈現狀態）；hover 用 neutral-hover，與 selection 正交（純表示「正在看的」）
 
 ### 九、Row Actions
 
@@ -460,7 +460,7 @@ Row drag + column reorder + TreeView 共用 `lib/drag-visual.ts`:source `opacity
 
 ## 禁止事項
 
-- ❌ 不使用斑馬紋——hover / selected 已足夠區分行，斑馬紋增加狀態組合的視覺複雜度
+- ❌ 不使用斑馬紋——hover 已足夠區分行，斑馬紋增加狀態組合的視覺複雜度
 - ❌ 無隱藏內容、無 frozen column、非 inline edit 的表格不加外框
 - ❌ 非 inlineEdit table 的 body cell 之間不加垂直分隔線——靠 header 建立的欄位邊界引導即可。inlineEdit table 的 body cells **4 邊均有 1px divider**(grid editing surface canonical;對齊 AG Grid / Material X cellEditable) <!-- @benchmark-unverified: see frontmatter benchmark list for canonical DS source URL -->
 - ❌ Toolbar 不內建在 DataTable 裡——toolbar 是外部組合，職責分離
@@ -497,7 +497,7 @@ DataTable 是 composite multi-section 元件,**不套 canonical 5**(Inspector / 
 - Column headers:以 `<div role="columnheader">` 顯式標記(本元件用 div + ARIA role,非語義 `<table>` — 見定位段;不渲染 `<th>` / `scope`)
 - Row headers:目前無對應(平面 row,無 row header 語意;未渲染 `role="rowheader"`)
 - Sortable column:`aria-sort="none" | "ascending" | "descending"` on 該 column header `<div role="columnheader">`
-- Selection state(若啟用 selection mode):視覺以 row bg(hover / `primary-subtle` selected)+ `__select__` 欄勾選框呈現;selected row 的勾選框由 Checkbox primitive 自帶 `aria-checked` 傳達狀態(row 本身目前**未**套 `aria-selected`,`grid` root 亦未套 `aria-multiselectable` — 留待 `role="grid"` future tier)
+- Selection state(若啟用 selection mode):視覺**僅由 `__select__` 欄的 selection control(`multi`→Checkbox / `single`→Radio)呈現,不套 selected-row 底色**;control 自帶 `aria-checked` 傳達狀態(row 本身目前**未**套 `aria-selected`,`grid` root 亦未套 `aria-multiselectable` — 留待 `role="grid"` future tier)
 - 字 cell hover overlay action:overlay 為 absolute/fixed paint layer(`DataTableInteractionLayer`),trigger 目前**未**套 `aria-haspopup` / `aria-controls`(留待 future tier)
 
 **Keyboard 行為**(目前實作 — `tableKeyboardHandler`):
