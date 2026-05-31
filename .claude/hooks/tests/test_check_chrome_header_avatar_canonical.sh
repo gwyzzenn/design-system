@@ -7,9 +7,9 @@
 #   Scope:  *.tsx only;排除 *.test.tsx + *.spec.md
 #   Field:  .tool_input.content // .tool_input.new_string
 #   Detect: Python multiline regex — `<SidebarHeader...>...</SidebarHeader>` block
-#           內含 `<ItemAvatar\b` → soft BLOCKER inject(stderr 文字)
-#   IMPORTANT: 偵測到 drift 也是 **exit 0**(soft inject,非 exit 2)。
-#              positive case 斷言 = stderr needle + exit 0(不是 exit 2)。
+#           內含 `<ItemAvatar\b` → BLOCKER(exit 2,2026-05-31 folded-hook-audit 升 0→2)
+#   IMPORTANT: 偵測到 drift = **exit 2**(真 block;SSOT canonical per feedback_ssot_mechanical_p0_not_p1)。
+#              positive case 斷言 = stderr needle + exit 2(env escape CLAUDE_BYPASS_CHROME_HEADER_AVATAR 兜)。
 #   Allow:  SidebarFooter 內 ItemAvatar(footer 是 row context)→ silent
 #           raw <Avatar size={24}> in header → silent
 #           <ItemAvatarGroup>(word-boundary near-miss,非 banned ItemAvatar)→ silent
@@ -83,13 +83,14 @@ run_hook_raw() {
   rm -f "$stdout" "$stderr"
 }
 
-# positive: hook injects soft BLOCKER(stderr needle present)+ exit 0(soft, NOT exit 2)
-expect_inject() {
+# positive: hook BLOCKS(exit 2 + stderr needle)— 2026-05-31 folded-hook-audit 升 exit 0→2
+# (chrome-header avatar 是 SSOT canonical,per feedback_ssot_mechanical_p0_not_p1 必 P0 BLOCK;有 env escape)
+expect_block() {
   local name="$1"; local needle="$2"
-  if [ "$EXIT" = "0" ] && echo "$STDERR_TEXT" | grep -qF "$needle"; then
+  if [ "$EXIT" = "2" ] && echo "$STDERR_TEXT" | grep -qF "$needle"; then
     echo "  PASS  $name"; PASS=$((PASS+1))
   else
-    echo "  FAIL  $name (expected exit=0 + stderr '$needle', got exit=$EXIT)"
+    echo "  FAIL  $name (expected exit=2 + stderr '$needle', got exit=$EXIT)"
     echo "  --- stderr ---"; echo "$STDERR_TEXT" | sed 's/^/    /'; echo "  --- end ---"
     FAIL=$((FAIL+1)); FAILED_TESTS="${FAILED_TESTS}\n  - $name"
   fi
@@ -116,24 +117,24 @@ NEEDLE="Chrome header avatar canonical violation"
 # 1. Real violation: SidebarHeader block 內含 ItemAvatar(Write/content)
 HEADER_DRIFT=$'<SidebarHeader>\n  <ItemAvatar alt="Acme" shape="square" color="blue" solid />\n  <span>Acme Corp</span>\n</SidebarHeader>'
 run_hook "$HEADER_DRIFT"
-expect_inject "1. SidebarHeader + ItemAvatar (Write/content) → inject" "$NEEDLE"
+expect_block "1. SidebarHeader + ItemAvatar (Write/content) → block" "$NEEDLE"
 
 # 2. Same violation via Edit tool + new_string field
 run_hook "$HEADER_DRIFT" "/repo/my-project/apps/template/src/AppShell.tsx" "Edit" "new_string"
-expect_inject "2. SidebarHeader + ItemAvatar (Edit/new_string) → inject" "$NEEDLE"
+expect_block "2. SidebarHeader + ItemAvatar (Edit/new_string) → block" "$NEEDLE"
 
 # 3. Same violation via MultiEdit tool
 run_hook "$HEADER_DRIFT" "/repo/my-project/apps/template/src/AppShell.tsx" "MultiEdit" "new_string"
-expect_inject "3. SidebarHeader + ItemAvatar (MultiEdit/new_string) → inject" "$NEEDLE"
+expect_block "3. SidebarHeader + ItemAvatar (MultiEdit/new_string) → block" "$NEEDLE"
 
 # 4. DS-internal Sidebar component file scope also covered
 run_hook "$HEADER_DRIFT" "/repo/my-project/packages/design-system/src/components/Sidebar/sidebar.stories.tsx"
-expect_inject "4. DS Sidebar stories.tsx scope → inject" "$NEEDLE"
+expect_block "4. DS Sidebar stories.tsx scope → block" "$NEEDLE"
 
 # 5. ItemAvatar with attributes spanning the header block(multiline DOTALL match)
 HEADER_DRIFT_MULTILINE=$'<SidebarHeader className="px-3">\n  <div className="flex items-center gap-2">\n    <ItemAvatar\n      alt="Brand"\n      shape="square"\n    />\n    <span>Brand</span>\n  </div>\n</SidebarHeader>'
 run_hook "$HEADER_DRIFT_MULTILINE"
-expect_inject "5. nested ItemAvatar in header (multiline DOTALL) → inject" "$NEEDLE"
+expect_block "5. nested ItemAvatar in header (multiline DOTALL) → block" "$NEEDLE"
 
 # ── NEGATIVE(should be silent — guards over-broad regex)────────────────────
 

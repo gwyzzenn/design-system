@@ -4,7 +4,7 @@
 #
 # Hook 規則(PreToolUse,Edit/Write/MultiEdit on *.tsx,非 *.test.tsx):
 #   讀 tool_input.content // tool_input.new_string。
-#   DRIFT(emit stderr 警告 + exit 0,soft context-inject NOT exit 2):
+#   DRIFT(emit stderr 訊息 + exit 2 BLOCK,2026-05-31 folded-hook-audit 升 0→2):
 #     `<SidebarMenuButton ...>...</SidebarMenuButton>` block 開標籤無 `asChild`
 #     且 body 含 `<ItemAvatar` 或 `<Avatar`(word-boundary)。
 #   ALLOW(silent,exit 0,stderr empty):
@@ -15,8 +15,8 @@
 #   Gate skip(silent):非 PreToolUse / 非 Edit|Write|MultiEdit / 非 *.tsx / *.test.tsx
 #   Override:CLAUDE_BYPASS_SIDEBAR_MENU_BUTTON_WRAP=1 → silent(audit-logged)
 #
-# NOTE:此 hook 是 soft 警告(stderr context-inject + exit 0),不是 hard exit-2 BLOCKER。
-#       測試斷言 stderr needle 存在 / 為空,對齊 check_ds_anchor_preflight.sh soft pattern。
+# NOTE:此 hook 2026-05-31 升 P0 BLOCKER(stderr 訊息 + exit 2)— SSOT canonical per
+#       feedback_ssot_mechanical_p0_not_p1;verified clean on canonical sidebar + env escape 兜 false-positive。
 
 set -u
 
@@ -65,13 +65,13 @@ run_hook() {
   rm -f "$STDOUT" "$STDERR"
 }
 
-# POSITIVE: DRIFT detected → stderr warning + exit 0
-expect_warn() {
+# POSITIVE: DRIFT detected → stderr 訊息 + exit 2 BLOCK(2026-05-31 folded-hook-audit 升 0→2)
+expect_block() {
   local name="$1"
-  if [ "$EXIT" = "0" ] && echo "$STDERR_TEXT" | grep -qF "$NEEDLE"; then
+  if [ "$EXIT" = "2" ] && echo "$STDERR_TEXT" | grep -qF "$NEEDLE"; then
     echo "  PASS  $name"; PASS=$((PASS+1))
   else
-    echo "  FAIL  $name (expected WARN: exit=0 + needle, got exit=$EXIT, needle=$(echo "$STDERR_TEXT" | grep -qF "$NEEDLE" && echo found || echo MISSING))"
+    echo "  FAIL  $name (expected BLOCK: exit=2 + needle, got exit=$EXIT, needle=$(echo "$STDERR_TEXT" | grep -qF "$NEEDLE" && echo found || echo MISSING))"
     echo "  --- stderr ---"; echo "$STDERR_TEXT" | sed 's/^/    /'; echo "  --- end ---"
     FAIL=$((FAIL+1)); FAILED_TESTS="${FAILED_TESTS}\n  - $name"
   fi
@@ -156,19 +156,19 @@ CLEAN_NO_SMB='export function Card() {
   return <div className="card"><Avatar src="/x.png" alt="x" /></div>;
 }'
 
-# ── POSITIVE cases(should WARN)────────────────────────────────────────────────
+# ── POSITIVE cases(should block)────────────────────────────────────────────────
 
 # 1. 真 violation:<Avatar inside non-asChild SidebarMenuButton(guards over-narrow regex)
 run_hook "/repo/apps/template/src/UserFooter.tsx" "$DRIFT_AVATAR"
-expect_warn "1. SidebarMenuButton no-asChild + <Avatar → WARN"
+expect_block "1. SidebarMenuButton no-asChild + <Avatar → block"
 
 # 2. 真 violation 變體:<ItemAvatar prefix(同 detection branch)
 run_hook "/repo/apps/template/src/UserFooter.tsx" "$DRIFT_ITEMAVATAR"
-expect_warn "2. SidebarMenuButton no-asChild + <ItemAvatar → WARN"
+expect_block "2. SidebarMenuButton no-asChild + <ItemAvatar → block"
 
 # 3. 同 violation 但走 Edit new_string field(覆蓋 content // new_string 雙路徑)
 run_hook "/repo/apps/template/src/UserFooter.tsx" "$DRIFT_AVATAR" "new_string" "Edit"
-expect_warn "3. Edit new_string path + drift → WARN"
+expect_block "3. Edit new_string path + drift → block"
 
 # ── NEGATIVE cases — clean input(should be SILENT)─────────────────────────────
 
