@@ -108,8 +108,8 @@ export const UsageGuidance: Story = {
 
       <Section title="vs 近親 — Tooltip vs HoverCard">
         <Rule
-          title="Tooltip — 純文字、不可互動、離開 trigger 即消失"
-          note="適合一句話的提示。滑鼠離開 trigger → tooltip 立刻消失,移到浮層上也消失。使用者無法點擊 tooltip 內容"
+          title="Tooltip — 純文字、語意為描述、不放互動元素"
+          note="適合一句話的提示。語意是純描述（role=tooltip / aria-describedby），不該放可點擊元素。離開 trigger 後有短暫關閉延遲讓滑鼠可移入。"
         >
           <Tooltip>
             <TooltipTrigger asChild>
@@ -122,7 +122,7 @@ export const UsageGuidance: Story = {
 
         <Rule
           title="❌ 需要放互動元素(按鈕 / 連結):用 HoverCard"
-          note="Tooltip 不能包含可點擊元素——使用者滑鼠離開觸發器就消失,來不及點到浮層內的按鈕。需要互動內容(人物名片、連結預覽、操作按鈕)必須改用 HoverCard。"
+          note="Tooltip 語意是純描述（role=tooltip）,不該包含可點擊元素——即使 Radix 浮層技術上可 hover,語意上互動內容（人物名片、連結預覽、操作按鈕）屬 HoverCard。需要互動內容必須改用 HoverCard。"
         >
           <Tooltip>
             <TooltipTrigger asChild>

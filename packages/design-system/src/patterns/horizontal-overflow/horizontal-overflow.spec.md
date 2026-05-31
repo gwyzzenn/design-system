@@ -60,10 +60,10 @@ scope: utility primitives module (useOverflowItems hook + fade-mask + scroll-arr
   - Icon: `ChevronLeft` / `ChevronRight`
   - aria-label 內建繁中(「向左捲動」/「向右捲動」)
   - **絕對定位**在容器 `left-0` / `right-0`,`pointer-events-none` 外層 + `pointer-events-auto` 內層(讓 mask 下方仍可滑動)
-- `<OverflowMenuTriggerButton label>` (forwardRef)
+- `<OverflowMenuTriggerButton aria-label>` (forwardRef)
   - Root: `<Button variant="text" size="sm" iconOnly>`
   - Icon: `ChevronDown`
-  - 接收 `label` 當 `aria-label`(由消費者決定,例如「頁籤選單(共 5 個)」)
+  - 必填 `aria-label`(直接傳給 Button 的 `aria-label`,無 `label` alias;由消費者決定,例如「頁籤選單(共 5 個)」)
   - `forwardRef` + `...props` spread 讓 Radix `DropdownMenuTrigger asChild` 可以接管
 
 ### Hook re-export
@@ -141,7 +141,7 @@ return (
     {canScroll && (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <OverflowMenuTriggerButton label={`頁籤選單(共 ${items.length} 個)`} />
+          <OverflowMenuTriggerButton aria-label={`頁籤選單(共 ${items.length} 個)`} />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           {/* menu button container 自帶 border-b border-divider 對齊 list border */}

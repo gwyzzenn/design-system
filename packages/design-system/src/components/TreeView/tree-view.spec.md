@@ -80,7 +80,7 @@ TreeView 本身只負責三件事:
 |---|---|---|
 | **indent** | `paddingLeft = depth × indentStep` | depth > 0 |
 | **chevron** | `ChevronRight`(收合)/ `ChevronDown`(展開) | 有 children |
-| **chevron placeholder** | 等寬空白,確保同層 leaf label 對齊 | 沒 children 但同層有 expandable siblings |
+| **chevron placeholder** | 等寬空白,確保同層 leaf label 對齊 | 沒 children(每個 leaf 無條件留等寬空白,不檢查 siblings)|
 | **icon** | `LucideIcon`,跟 label 同色(內容 icon) | 可選 |
 | **label** | 主要文字 | 必有 |
 | **suffix** | badge / 計數 / inline action(⋯ menu trigger) | 可選 |
@@ -91,7 +91,7 @@ Chevron 是**展開/收合控件**,不是 prefix icon:`fg-muted`(指示色,hover
 
 ### 佔位規則(chevron + icon)
 
-同層 node 間,**有元素的 slot 必須在沒元素的 sibling 上留等寬空白**,否則 label 不對齊。Chevron 佔位:同層有任何 expandable sibling(寬 16/16/20 @ sm/md/lg);Icon 佔位:同層有任何 sibling 帶 icon(同寬)。**判斷自動化**:TreeView render 時掃 siblings 決定 placeholder,consumer 不介入。
+同層 node 間,label 需對齊。**Chevron 佔位**:每個無 children 的 leaf **無條件**渲染等寬 chevron placeholder(寬 16/16/20 @ sm/md/lg),不檢查 siblings——故有/無 expandable sibling 結果都對齊。**Icon 佔位**:icon slot 只在該 node 傳 `icon` prop 時渲染 `<ItemIcon>`,**無自動等寬 placeholder**(無 icon 的 leaf 不補空位);若要 icon 欄整齊,consumer 自行確保同層都傳 icon。
 
 ---
 
@@ -137,7 +137,7 @@ Chevron 是**展開/收合控件**,不是 prefix icon:`fg-muted`(指示色,hover
   - **Text 也不變 `text-foreground`**(已有 checkbox 強信號,text 變色會雙重 noise)→ 維持 `text-fg-secondary` muted
   - 對齊 cite:`menu-item.tsx:194-195`(MenuItem selected → bg only)+ `select-menu.tsx:352-354`(SelectMenu multi → checkbox only)
 - API:`selectionMode="multiple"` 自動 render checkbox;consumer 傳 `checkbox={<Checkbox/>}` 可 override(parent-child cascade 等 advanced 場景)
-- `Shift+Click` 範圍選取 / `Ctrl/Cmd+Click` 切換個別 / `aria-multiselectable="true"` 在 TreeView 上
+- 多選互動:點擊逐項 toggle(`handleRowClick` → `select(id)`;**不支援** `Shift+Click` 範圍選取 / `Ctrl/Cmd+Click` 修飾鍵切換——`handleRowClick` 不讀 `shiftKey/metaKey/ctrlKey`)/ `aria-multiselectable="true"` 在 TreeView 上
 
 ### 視覺信號 SSOT 對照表(single vs multi)
 
@@ -167,7 +167,6 @@ Chevron 是**展開/收合控件**,不是 prefix icon:`fg-muted`(指示色,hover
 | `Home` | 焦點移到第一個 node |
 | `End` | 焦點移到最後一個可見 node |
 | `Enter` / `Space` | 觸發 selection(跟點擊 label 同效果) |
-| `*` | 展開同層所有 siblings |
 
 遵循 [WAI-ARIA TreeView pattern](https://www.w3.org/WAI/ARIA/apg/patterns/treeview/)。
 
@@ -276,7 +275,7 @@ Icon 尺寸跟 size tier(sm/md=16, lg=20);色 `fg-muted` → hover `foreground`;
 - **Auto-expand**:拖曳停留收合 folder 500ms → 自動展開(Figma 行為);離開或結束取消計時
 - **依賴**:`@dnd-kit/core`(`useDraggable` + `useDroppable` + `DragOverlay`);state 由 consumer `onDragEnd({sourceId, targetId, position})` callback 自行更新
 
-**視覺**(2026-05-06 v14.5 SSOT 抽 `lib/drag-visual.ts`):被拖 node 原位 `opacity-30` 半透明殘影 / before-after drop indicator 為 2px primary 細線(`bg-primary` `h-0.5`,left 跟 indent 深度)/ inside drop target `bg-primary-subtle` 全行背景 / DragOverlay ghost 圓角 + icon + label + 半透明 + elevation shadow。**TreeView 是 DS 內最早 codified 的 drag canonical**,DataTable row drag + column reorder 都 inherit 此 pattern via `drag-visual.ts` SSOT module。視覺校驗見 story `DragAndDrop`。
+**視覺**(2026-05-06 v14.5 SSOT 抽 `lib/drag-visual.ts`):被拖 node 原位 `opacity-disabled`(45%)半透明殘影 / before-after drop indicator 為 2px primary 細線(`bg-primary` `h-0.5`,left 跟 indent 深度)/ inside drop target `bg-primary-subtle` 全行背景 / DragOverlay ghost 圓角 + icon + label + 半透明 + elevation shadow。**TreeView 是 DS 內最早 codified 的 drag canonical**,DataTable row drag + column reorder 都 inherit 此 pattern via `drag-visual.ts` SSOT module。視覺校驗見 story `DragAndDrop`。
 
 ---
 
@@ -319,8 +318,7 @@ TreeItem props slots(consumer 決定 node 視覺):
 | `label` | `ReactNode` | 主要文字(必填) |
 | `inlineActions` | `InlineActionConfig[]` | 右側 inline actions,詳見 `item-anatomy.spec.md` |
 | `actionsReveal` | `false \| "hover"` | 預設 `"hover"`,`false` 常駐 |
-| `status` | `'default' \| 'active' \| 'completed' \| 'error'` | Stepper 狀態視覺 |
-| `indicator` | `ReactNode` | 取代 **icon** 位置(chevron 永存)。Stepper 用 status dot / checkmark |
+| `indicator` | `ReactNode` | 取代 **icon** 位置(chevron 永存)。Stepper 狀態視覺由此傳 `<StepDone/>` / `<StepActive/>` / `<StepPending/>`(非 `status` prop——TreeItemProps 無 `status` 欄位)|
 
 **情境消費範例**(Sidebar nav / File browser / Stepper)由 stories.tsx 承載,不在本 spec 重複貼 code。
 
