@@ -227,12 +227,12 @@ export const UsageGuidance: Story = {
 }
 
 export const SidePropRule: Story = {
-  name: '位置 屬性 的世界級 慣例',
+  name: 'Side 屬性：消費者用 right（其餘內部基建）',
   render: () => (
     <div>
       <Rule
-        title="right(預設)— detail / 編輯 / 建立"
-        note="世界級 SaaS 一致的 convention:Jira issue drawer、Linear issue detail、GitHub PR file diff drawer、Stripe customer drawer、Notion database row expand 都在右側。理由是:使用者視線「從左(清單)看到右(詳情)」,右側 Sheet 符合自然閱讀動線"
+        title="right（消費者唯一合法 side，預設）— detail / 編輯 / 建立"
+        note="消費者 Sheet API 只能用 side=&quot;right&quot;。世界級 SaaS 一致的 convention:Jira issue drawer、Linear issue detail、GitHub PR file diff drawer、Stripe customer drawer、Notion database row expand 都在右側。理由是:使用者視線「從左(清單)看到右(詳情)」,右側 Sheet 符合自然閱讀動線"
       >
         <Sheet>
           <SheetTrigger asChild>
@@ -252,8 +252,8 @@ export const SidePropRule: Story = {
       </Rule>
 
       <Rule
-        title="left — navigation / filter / 主選單"
-        note="世界級 convention:Slack mobile nav、Gmail mobile hamburger、Material Design navigation drawer 都在左側。理由是:導覽的「回到哪裡」概念,視線從左開始自然找得到。Desktop 有 persistent Sidebar 的產品通常不用 left Sheet,mobile 才用"
+        title="left（DS 內部基建，非消費者 API）— Sidebar 小視口 left-slide"
+        note="left 保留 DS 內部基建用（例:Sidebar 在小視口從 left 滑入）,消費者 code 禁止傳 side=&quot;left&quot;,需 user 授權。世界級 mobile nav convention(Slack / Gmail hamburger / Material navigation drawer 在左)是此變體的設計來源,但本 DS 的 mobile navigation 應走專屬 navigation 元件,不混在消費者 Sheet。以下為內部能力示範。"
       >
         <Sheet>
           <SheetTrigger asChild>
@@ -276,8 +276,8 @@ export const SidePropRule: Story = {
       </Rule>
 
       <Rule
-        title="bottom — mobile action sheet / picker"
-        note="iOS / Material Bottom Sheet convention。手機拇指操作範圍集中在螢幕下半部,bottom Sheet 讓操作觸及成本低。桌機用 bottom Sheet 較少見(視線要向下掃,不自然)"
+        title="bottom（DS 內部基建，非消費者 API）"
+        note="bottom 保留 DS 內部基建用,消費者 code 禁止傳 side=&quot;bottom&quot;。iOS / Material Bottom Sheet convention(手機拇指操作區在螢幕下半)是此變體來源,但本 DS 若需 mobile bottom sheet 應走專屬 BottomSheet 元件,不混在消費者 Sheet 的 side prop。以下為內部能力示範。"
       >
         <Sheet>
           <SheetTrigger asChild>
@@ -300,17 +300,17 @@ export const SidePropRule: Story = {
       </Rule>
 
       <Rule
-        title="top — 少見,notification center / system announcement"
-        note="iOS Control Center 的 top pull-down 是少數案例。一般產品很少用,因為視線從頭頂滑入不自然。只在「系統層級通知」的極少數情境使用"
+        title="top（DS 內部基建，非消費者 API）"
+        note="top 保留 DS 內部基建用,消費者 code 禁止傳 side=&quot;top&quot;。一般產品極少用(視線從頭頂滑入不自然),僅系統層級的內部情境保留。"
       >
-        <Label>↑ 一般業務流程不用 top(視線動線不自然)</Label>
+        <Label>↑ 消費者不用 top;為 DS 內部保留變體</Label>
       </Rule>
 
       <Rule
-        title="❌ 錯亂 side 對應 — 編輯用 left、目錄用 right"
-        note="違反世界級 convention 會讓使用者不知道浮層是什麼類型。編輯 / 詳情永遠 right,導覽永遠 left"
+        title="❌ 消費者傳 side=&quot;left&quot; / &quot;bottom&quot; / &quot;top&quot;"
+        note="消費者 Sheet API 只能用 right。傳其他方向 = 越權使用 DS 內部基建變體(需 user 授權)。需 mobile navigation / bottom sheet 請用專屬元件,不要借 Sheet 的內部 side。"
       >
-        <Label warn>↑ 不要用 left 放編輯表單(使用者以為是目錄,打開驚訝是表單)</Label>
+        <Label warn>↑ 消費者只用 side=&quot;right&quot;;left / bottom / top 是內部基建,不可直接傳</Label>
       </Rule>
     </div>
   ),

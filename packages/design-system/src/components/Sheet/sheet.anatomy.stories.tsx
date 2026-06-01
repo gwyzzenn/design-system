@@ -25,7 +25,7 @@ export const Overview: Story = {
     <div className="flex flex-col gap-10">
       <div>
         <H3>Anatomy</H3>
-        <Desc>Sheet 基於 Radix Dialog 的 side variant——從畫面邊緣（top / bottom / left / right）滑入的浮層面板。結構跟 Dialog 同（Header + Content + Footer），差異在位置與動畫。常用於 detail panel、filter drawer、mobile navigation。</Desc>
+        <Desc>Sheet 基於 Radix Dialog 的 side variant——從畫面邊緣滑入的浮層面板。結構跟 Dialog 同（Header + Content + Footer），差異在位置與動畫。消費者 API 僅 side=&quot;right&quot;（detail panel、filter drawer）；top / bottom / left 為 DS 內部基建變體（見下方 Side 方向表）。</Desc>
         <div className="flex items-center gap-3 flex-wrap">
           <Sheet>
             <SheetTrigger asChild>
@@ -139,15 +139,16 @@ export const SideMatrix: Story = {
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
-        <H3>四個方向的設計意圖</H3>
+        <H3>Side 方向（消費者 API = right；其餘為 DS 內部基建）</H3>
+        <Desc>消費者 code 只能用 side=&quot;right&quot;。top / bottom / left 變體保留 DS 內部基建用（例：Sidebar 小視口 left-slide），消費者禁止直接傳、需授權（canonical 見 sheet.tsx L23-27 + showcase AR35）。下表後三列為內部能力 + 世界級對照，供 DS contributor 參考。</Desc>
         <div className="overflow-x-auto">
           <table className="text-caption border-collapse">
             <thead><tr><Th>Side</Th><Th>滑入方向</Th><Th>典型用途</Th><Th>世界級對照</Th></tr></thead>
             <tbody>
-              <tr><Td mono>right ★default</Td><Td>從右邊</Td><Td>Detail panel（Jira task drawer、Linear issue detail、GitHub PR file diff drawer）、filter panel</Td><Td>Jira / Linear / Notion side panel</Td></tr>
-              <tr><Td mono>left</Td><Td>從左邊</Td><Td>Mobile navigation drawer（漢堡選單展開）</Td><Td>Material mobile drawer、Slack mobile nav</Td></tr>
-              <tr><Td mono>top</Td><Td>從上方</Td><Td>Notification center、system announcement（較少見）</Td><Td>iOS Control Center top pull-down</Td></tr>
-              <tr><Td mono>bottom</Td><Td>從下方</Td><Td>Mobile bottom sheet（action sheet / picker / share menu）</Td><Td>iOS Bottom Sheet、Material Bottom Sheet</Td></tr>
+              <tr><Td mono>right ★消費者 default</Td><Td>從右邊</Td><Td>消費者 API：Detail panel（Jira task drawer、Linear issue detail、GitHub PR file diff drawer）、filter panel</Td><Td>Jira / Linear / Notion side panel</Td></tr>
+              <tr><Td mono>left（內部）</Td><Td>從左邊</Td><Td>DS 內部基建：Sidebar 小視口 left-slide（非消費者 API）</Td><Td>Material mobile drawer、Slack mobile nav</Td></tr>
+              <tr><Td mono>top（內部）</Td><Td>從上方</Td><Td>DS 內部基建保留（非消費者 API，notification center 類）</Td><Td>iOS Control Center top pull-down</Td></tr>
+              <tr><Td mono>bottom（內部）</Td><Td>從下方</Td><Td>DS 內部基建保留（非消費者 API；mobile bottom sheet 另用專屬元件）</Td><Td>iOS Bottom Sheet、Material Bottom Sheet</Td></tr>
             </tbody>
           </table>
         </div>
