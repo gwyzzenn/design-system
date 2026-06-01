@@ -261,9 +261,9 @@ export const StateBehavior: Story = {
     return (
       <div className="flex flex-col gap-10">
         <div>
-          <H3>單步 Coachmark(無 step,僅 Skip / Next)</H3>
+          <H3>單步 Coachmark(無 step,僅完成 CTA「知道了」)</H3>
           <Desc>
-            最簡 Coachmark:`onSkip` + `onNext`,無 step 計數。按 Skip 或 Next 都關閉;Esc 等同 Skip。
+            最簡 Coachmark:單一完成 CTA(`doneLabel`,預設「知道了」),無 step 計數、無 Skip(單步 skip 與關閉語義重複,對齊 spec.md CTA 語義表 L116)。Esc 關閉。
           </Desc>
           <div className="flex items-start gap-6">
             <Coachmark
@@ -271,8 +271,7 @@ export const StateBehavior: Story = {
               onOpenChange={setSingleOpen}
               image={<MediaGradient from="var(--color-indigo-6)" to="var(--color-purple-6)" icon={Bot} label="AI 助理" />}
               title="試試 AI 助理"
-              description="單步 Coachmark,僅 Skip / Next,無 step 計數。"
-              onSkip={() => setSingleOpen(false)}
+              description="單步 Coachmark,僅一個完成 CTA(知道了),無 step / Skip。"
               onNext={() => setSingleOpen(false)}
               side="right"
               align="start"

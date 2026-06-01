@@ -136,7 +136,9 @@ const Coachmark = React.forwardRef<HTMLDivElement, CoachmarkProps>(
   ) => {
     // 單/多步驟行為推導
     const isSingleStep = isLastStep && !onPrev
-    const showSkip = Boolean(onSkip) && !onPrev   // canonical:有 onPrev → 不顯示 Skip
+    // canonical(spec.md CTA 語義表 L116):有 onPrev → 不顯示 Skip;**單步驟也不顯示 Skip**
+    // (單步「skip」與「知道了」語義重複 = 同一個關閉動作,雙關閉鍵造成困惑;對齊 Apple HIG / Intercom / Pendo 單步 tip 僅一個完成鍵)
+    const showSkip = Boolean(onSkip) && !onPrev && !isSingleStep
     const nextLabel = isSingleStep ? doneLabel : isLastStep ? 'Done' : 'Next'
 
     const hasFooterContent = Boolean(step || showSkip || onNext || onPrev)
