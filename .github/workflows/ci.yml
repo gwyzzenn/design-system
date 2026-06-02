@@ -75,6 +75,16 @@ jobs:
             exit 1
           fi
 
+      - name: typecheck stories(主 tsc -b exclude stories 因 emitDeclarationOnly;本 gate 純型別檢查 stories 防 {var}-undefined / prop 型別錯 — 2026-06-02 SizeMatrix crash root cause)
+        run: |
+          OUTPUT=$(npm run typecheck:stories 2>&1)
+          if echo "$OUTPUT" | grep -q "error TS"; then
+            echo "❌ story type errors found:"
+            echo "$OUTPUT"
+            exit 1
+          fi
+          echo "✅ stories type-check clean"
+
       - name: Hook test suite
         run: |
           shopt -s nullglob

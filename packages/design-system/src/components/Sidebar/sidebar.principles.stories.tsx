@@ -22,7 +22,6 @@ import {
   SidebarMenuButton,
 } from './sidebar'
 import { TreeView, TreeItem } from '@/design-system/components/TreeView/tree-view'
-import { ItemAvatar } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
 
 const meta: Meta = {
