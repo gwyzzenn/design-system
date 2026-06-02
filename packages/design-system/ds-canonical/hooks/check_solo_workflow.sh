@@ -88,6 +88,27 @@ sys.exit(1)
 " 2>/dev/null
 }
 
+# Helper: shell-aware push-tag detect(2026-06-02 — R4 改用 shlex,對齊 R1/R2/R3,修 plain-grep
+# 對 echo/字串內字面 'git push origin v...' 的 false-positive,per M34 hook-regex 廣度對齊)。
+# shlex.split(comments=True)讓 quoted echo 字串成單一 token → 不會把字串內的 git/push 當相鄰指令。
+detect_push_tag() {
+  python3 -c "
+import shlex, sys, re
+try:
+    tokens = shlex.split(sys.stdin.read(), comments=True)
+except Exception:
+    sys.exit(1)
+for i in range(len(tokens) - 1):
+    if tokens[i] == 'git' and tokens[i+1] == 'push':
+        for j in range(i+2, len(tokens)):
+            t = tokens[j]
+            # tag-ref: --tags / refs/tags/... / v<digit>... / X:refs/tags/...
+            if t == '--tags' or 'refs/tags/' in t or re.match(r'^v[0-9]', t) or t.endswith(':v') or re.search(r':v[0-9]', t):
+                sys.exit(0)
+sys.exit(1)
+" 2>/dev/null
+}
+
 # Helper: shell-aware gh pr create / gh api pulls **WRITE** detect
 # 2026-05-09 fix(user-authorized):區分 read(default GET)vs write(POST/PATCH/PUT/DELETE)。
 # `gh api repos/.../pulls/N/comments` 預設 GET = read,**不** block;
@@ -222,8 +243,8 @@ EOF
   # beta.43/45 連環 push 失敗根因 = 發版前靠手動記得逐道 sync/check → 必漏。已修成單一
   # `npm run release:preflight`(syncs + 全 gate + dogfood,全過寫 HEAD-bound marker)。
   # 此 R4 機械強制:任何 push tag(v*)前 marker 必存在且 .head == 當前 HEAD,否則 BLOCK。
-  if echo "$COMMAND" | grep -qE 'git[[:space:]]+push' \
-     && echo "$COMMAND" | grep -qE 'git[[:space:]]+push.*([[:space:]:]v[0-9]|--tags|refs/tags/)'; then
+  # 用 detect_push_tag(shlex,對齊 R1/R2/R3)而非 plain grep —— 修 echo/字串內字面誤觸發(M34)。
+  if echo "$COMMAND" | detect_push_tag; then
     PF_MARKER="$PROJECT_DIR/.claude/logs/release-preflight-pass.json"
     PF_HEAD=$(git -C "$PROJECT_DIR" rev-parse HEAD 2>/dev/null)
     PF_MARKER_HEAD=$(jq -r '.head // empty' "$PF_MARKER" 2>/dev/null)

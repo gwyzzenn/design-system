@@ -7,12 +7,13 @@
 //
 // 本指令 = ① 先跑 SYNCS(version 5-manifest + ds-canonical → 修 drift,CI 抓不到)
 //          ② 跑全部 deterministic gate(1:1 對齊 release.yml「Audit gates」)
-//          ③ build + dogfood(packaging gate)
+//          ③ build + FULL story smoke + dogfood(packaging + runtime gate)
 //          ④ 5-manifest version 一致性 verify
-//          ⑤ 全過才寫 pass-marker(.claude/logs/release-preflight-pass.json,綁 HEAD sha)
+//          ⑤ 全過才寫 pass-marker(.claude/logs/release-preflight-pass.json,綁 HEAD sha,
+//             per-machine untracked 產物 —— 不入 git / 不入 CI,僅供本機 PreToolUse 比對)
 //
-// tag-push hook `check_tag_preflight.sh` 驗 marker.head == 當前 HEAD,否則 BLOCK
-//   → 機械強制「tag 前必跑過 preflight」,把「靠人記得」變「機械保證」。
+// tag-push 機械強制:check_solo_workflow.sh 的 R4 驗 marker.head == 當前 HEAD,否則 BLOCK
+//   → 把「靠人記得跑 preflight」變「機械保證」。(無獨立 check_tag_preflight.sh — 用 R4 復用既有 hook)
 //
 // 用法:npm run release:preflight  (bump 版本後、push tag 前跑;全過再 tag)
 
@@ -50,9 +51,15 @@ run('plugin-structure-validate', 'node scripts/plugin-structure-validate.mjs')
 run('story-quality', 'npm run --silent story-quality:check')
 run('ds-canonical drift check', 'node scripts/sync-ds-canonical.mjs --check')
 
-// ③ Build + dogfood(== release.yml publish job packaging gate)
+// ③ Build + smoke + dogfood(== release.yml publish job + smoke-shard job)
 run('build:lib', 'npm run --silent build:lib')
 run('build-storybook', 'npm run --silent build-storybook')
+// FULL story runtime smoke == release.yml smoke-shard job(被 `needs:` 硬 gate)。這是唯一能攔
+// SizeMatrix 那類 {var}-undefined / runtime crash 的 gate;build-storybook 是 compile-time、dogfood
+// 只 render 2 個 component,都攔不到。漏此道 = preflight marker 綠但 CI smoke 仍會紅(2026-06-02 audit
+// iceberg)。本機不分 shard 串跑全 947(CI 才分 4)。先清 port 殘留 server 避免 bind 衝突 false-fail。
+run('clear smoke port 8920', 'lsof -ti:8920 | xargs kill -9 2>/dev/null || true')
+run('FULL storybook runtime smoke(947 story)', 'node scripts/storybook-smoke-test.mjs --full')
 run('dogfood pre-publish verify', 'node scripts/dogfood-prepublish-verify.mjs')
 
 // ④ 5-manifest version 一致性 verify(== release.yml BLOCKER L199)

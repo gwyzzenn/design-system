@@ -1,5 +1,6 @@
 *.jsonl
 *.jsonl.*
+release-preflight-pass.json
 last-inject-ts.txt
 .last-blocked-claim.txt
 .stop-drift-last-head
