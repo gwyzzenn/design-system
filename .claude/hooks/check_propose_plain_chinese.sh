@@ -1,7 +1,7 @@
 #!/bin/bash
 # check_propose_plain_chinese.sh — Stop hook: scan AI 本 turn reply 含「要 user 決策」pattern 但用 jargon 違 propose-in-plain-chinese canonical。
 #
-# 對應 SSOT:.claude/memory/feedback_propose_in_plain_chinese.md
+# 對應 SSOT:.claude/memory/feedback_propose_discipline.md
 #         + CLAUDE.md `# 自主執行 canonical`「SSOT-UI/UX 中文具體人話」明文
 #
 # User 原話 2026-05-15:「已經跟你說過任何要我決策的東西請講具體人話,為何又跟智障一樣講人聽不懂的話呢?」
@@ -64,7 +64,7 @@ THRESHOLD=10
 if [ "$JARGON_COUNT" -ge "$THRESHOLD" ]; then
   echo "🟡 check_propose_plain_chinese WARN:本 turn reply 含 user 決策 prompt + jargon 密度 ${JARGON_COUNT}(threshold ${THRESHOLD})" >&2
   echo "" >&2
-  echo "→ 違反 propose-in-plain-chinese canonical(memory/feedback_propose_in_plain_chinese.md SSOT)" >&2
+  echo "→ 違反 propose-in-plain-chinese canonical(memory/feedback_propose_discipline.md SSOT)" >&2
   echo "→ User 原話「請講具體人話,為何又跟智障一樣講人聽不懂的話」" >&2
   echo "→ Rewrite reply:必含 3 段(發生什麼 / 影響什麼 / 各選項 outcome — 全中文具體,禁 jargon)" >&2
   echo "" >&2

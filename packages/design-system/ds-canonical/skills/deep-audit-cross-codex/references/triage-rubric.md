@@ -27,59 +27,13 @@
 - Memory file rotate(已 absorb → demote)
 - Governance / hook / skill 內部 refactor(無 BLOCKER 邏輯改)
 
-## SSOT-UI/UX propose 中文人話 format(per `feedback_propose_in_plain_chinese.md`)
+## 提案紀律(format / gate / 7 軸)→ 全走主檔,不在此重述
 
-```
-### 決策 N:<一句話標題,zero jargon>
+本檔曾把這幾項抄成舊的 4-Q(漏最關鍵的 Q0)+ 指向已刪檔 = 漂移實證;一律以主檔為準,改一處不會漏改別處:
 
-**現況**:
-- <目前 spec / code 行為,具體一句話人話>
-- 證據:<file:line>
-
-**影響**:
-- 不改:<具體後果>
-- 改了:<具體後果>
-
-**選項**:
-- A. <做法 1>
-  - 後果:<好處 / 代價>
-  - 涉及檔案:<count + file 列表>
-- B. <做法 2>
-  - 後果:<好處 / 代價>
-  - 涉及檔案:<count + file 列表>
-- C. 不動
-  - 後果:<漂移持續累積 / 或維持現況的成本>
-
-**我推**:<A / B / C> 因 <理由>
-```
-
-### 4-Q gate(propose 前必 inline 跑,失敗 → 不列 option)
-
-| Q | Check | 失敗 → |
-|---|---|---|
-| Q1 M22 cite | 3-column owner table(spec path:line / canonical sentence / conflicting code)| 撤回 propose,先補 anchor |
-| Q2 M17 SSOT | 既有 token / primitive / pattern 列消費清單 | 撤回,先 consume 既有 |
-| Q3 Rule-of-3 | 同概念 ≥ 3 處 → 選 SSOT 其他 pointer | 撤回,選 SSOT home |
-| Q4 M10 下游 | 修上游 ≥ 3 處下游 redundant 可清 | 提案加上「下游 N 處同步 retire」 |
-
-### 禁用 jargon list(propose 內 zero tolerance)
-
-❌ `L1-L7` / `canonical` / `primitive` / `SSOT` / `consume` / `traits` / `M-rule` / `cva` / `tier` / `tokens` / `wrapper`
-✅ 翻成:`主檔` / `設計原則` / `共用零件` / `通用基底` / `共用設計來源` / `沿用` / `行為類型` / `規則 N` / `樣式拼裝表` / `層級` / `設計變數` / `外殼`
-
-## Non-SSOT autonomous 7 軸 simultaneous optimize
-
-每次動 code 前 mental check:
-
-1. **言簡意賅** — comment / spec 文字短而精;禁長 docstring;禁不必要 comment(per CLAUDE.md `# Tone and style`)
-2. **效率 + 效能** — 避 unnecessary re-render / memo gap / O(N²) algorithm / context thrashing
-3. **SSOT 鐵律** — 動 visual decision 前 grep DS 既有 token / variant / pattern(M23)/ spec.md owner(M29)/ wrapper extends primitive(M30)/ token 而非 hardcode(M17)
-4. **易懂 + 維護 + 擴充** — file size budget(governance ≤ 200/300/500/800)/ function ≤ 80 / naming 一致 / public API 穩定
-5. **世界級 + 一致設計語言** — mindset #1(Polaris / Material / Atlassian / Ant / Carbon / Apple HIG ≥ 3 cite)+ M22 inline cite + M26 propose 前 WebFetch ≥ 3 source
-6. **完整 self-verify** — M20 best-practice score ≥ 80 / M31 5-step(Layer A own + Layer C codex 比稿)/ M32 pixel-quantified audit
-7. **自動 self-improve** — M14 5-layer pipeline(對話結論 → spec / hook / SKILL / CLAUDE.md / memory 該動的全動)+ M20 stop hook auto-score
-
-任一軸明顯 degrade → 撤回方案重來,**禁** 「先這樣 / 之後優化」defer keyword(M33 BLOCKER)。
+- **中文人話 propose format + 禁用 jargon 對照表** → SSOT `.claude/memory/feedback_propose_discipline.md`(hook `check_propose_plain_chinese.sh` 機械強制)
+- **Propose 前必過 7-Q gate**(Q0 先驗「問題是否真存在」/ Q1 cite / Q1' DS canonical 優先 / Q2 SSOT consume / Q3 Rule-of-3 / Q4 下游吸收 / Q5 issue 100% mapped)→ SSOT `.claude/skills/propose-options/SKILL.md`(hook `check_propose_pre_grep_verify.sh` 機械強制 Q0);M18 為 meta anchor
+- **Non-SSOT autonomous 7 軸 optimize 操作清單** → `phase-a-workflow.md` A.3;SSOT `CLAUDE.md` `# 自主執行 canonical`(檔案大小上限以該主檔為準,本檔不重述數字)
 
 ## 收斂判準 — 何時停止 rerun(Phase C.0,2026-06-01 codify)
 

@@ -22,9 +22,9 @@ originSessionId: 41fa83c2-f951-431e-911e-ed3ceb185903
 
 **Setup script 必 npx fallback**(2026-05-29 verified):`npm install -g netlify-cli` 在 sandbox / Codespaces non-root / 鎖權限 Mac 打 EACCES → try/catch + `npx -y netlify-cli` fallback 才是 robust。
 
-## Rule 3 — Codex exec mode 大 brief 死局
+## Rule 3 — Codex exec mode 大 brief 死局(SSOT 詳 `feedback_codex_exec_transport_canonical.md` Rule 3)
 
-**Anti-pattern**:DISCUSS-ONLY 大型 6-軸 brief + xhigh / medium reasoning effort = 模型 plan turn 燒掉 budget 沒輸出 verdict。**Success pattern**(2026-05-29 r5/r6 verified):`--dangerously-bypass-approvals-and-sandbox`(per `feedback_codex_visual_audit_dangerously_bypass.md`)+ `model_reasoning_effort=low` + **拆 N 個小 focused brief 並行**(每 axis 25k tokens 真完成)。
+精要:拆 N 個 single-axis focused brief 並行 + `model_reasoning_effort=low` + bypass flag;**禁** 6-軸 mega brief + xhigh(plan turn 燒光 budget 沒 verdict)。完整 anti-pattern / success-pattern + transport 細節見主檔(此規則 2026-05-29 已併入該主檔,本處僅留 pointer 回歸本檔 Netlify / 雲端路徑主題)。
 
 ## Rule 4 — 兩個 repo 都全雲端可操作 = clone-on-demand,禁把「當下沒 checkout」當能力邊界
 

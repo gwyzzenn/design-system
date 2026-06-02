@@ -28,11 +28,16 @@ User 2026-05-15 + 2026-05-27 系列 directives codified per Rule-of-3 absorb pri
 **我推**:<A / B / C> 因 <理由>
 ```
 
-**禁止**:`L1-L7` / `canonical` / `primitive` / `SSOT` / `M-rule` / `cva` 等內部術語 propose 內裸用。改翻成人話:
+**禁止**:`L1-L7` / `canonical` / `primitive` / `SSOT` / `consume` / `traits` / `M-rule` / `cva` / `tier` / `tokens` / `wrapper` 等內部術語 propose 內裸用。改翻成人話:
 - canonical → 「主檔/標準寫法」
 - primitive → 「共用零件」
 - SSOT → 「單一資料源」
 - spec → 「規格檔」
+- consume → 「沿用」
+- traits → 「行為類型」
+- tier → 「層級」
+- tokens → 「設計變數」
+- wrapper → 「外殼」
 
 **Anchor**:2026-05-15 user verbatim「要 user 決策必中文具體人話講(發生什麼/影響/選項 outcome)」。
 

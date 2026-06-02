@@ -102,32 +102,14 @@ detect_mode() {
 - **SSOT-UI/UX substantive 增刪改** = 動 component / token / spec.md 視覺結構 / 跨元件 design language / 新 API contract → **STOP propose**
 - **Non-SSOT**(bug fix / clean / refactor / 命名一致 / test / audit / verify / hook regex 加廣 / pointer 補 / spec typo / 漂移 mechanical 對齊)→ **AUTO 整批做完**
 
-**SSOT-UI/UX propose 必過 4-Q gate**(M18 + M19 ensure-canonical chain):
-- Q1 M22 cite — 3-column owner table(spec path:line / canonical sentence / conflicting code)
-- Q2 M17 SSOT consume — 既有 token / primitive / pattern 列消費清單
-- Q3 Rule-of-3 — 同概念 ≥ 3 處 → 選 SSOT 其他 pointer
-- Q4 M10 下游吸收 — 修上游 ≥ 3 處下游 redundant 可清
-
-**中文人話 propose format**(per `feedback_propose_in_plain_chinese.md` + hook `check_propose_plain_chinese.sh`,必過):
-
-```
-### 決策 N:<一句話標題,zero jargon>
-
-**現況**:<目前 code/spec 行為,人話>
-**影響**:<不改會怎樣 / 改了會怎樣,具體>
-**選項**:
-- A. <做法 1>(後果:...)
-- B. <做法 2>(後果:...)
-- C. <不動>(後果:...)
-**我推**:<A / B / C> 因 <理由>
-```
-
-禁:術語(L1-L7 / canonical / primitive / SSOT 在 propose 內裸用,該翻成「主檔/共用零件/設計原則」等人話)。
+**SSOT-UI/UX propose 必過 gate + 中文人話 format**(SSOT 在主檔,不在此重述以免多處抄寫漂移):
+- **Propose 前必過 7-Q gate**(Q0 先驗「問題是否真存在」/ Q1 cite / Q1' DS canonical 優先 / Q2 SSOT consume / Q3 Rule-of-3 / Q4 下游吸收 / Q5 issue 100% mapped)→ SSOT `.claude/skills/propose-options/SKILL.md`(hook `check_propose_pre_grep_verify.sh` 機械強制 Q0);M18 為 meta anchor
+- **中文人話 propose format + 禁用 jargon 對照表** → SSOT `.claude/memory/feedback_propose_discipline.md`(hook `check_propose_plain_chinese.sh` 機械強制)
+- **Triage 分流 + format 細則** → `references/triage-rubric.md`
 
 ### A.3 — Autonomous batch execute(non-SSOT,M33 anti-defer)
 
-7 目標 simultaneous optimize(per CLAUDE.md `# 自主執行 canonical`):
-1. 言簡意賅 / 2. 效率+效能 / 3. SSOT 鐵律(M17/M23/M29/M30)/ 4. 易懂+維護+擴充 / 5. 世界級+一致設計語言 / 6. 完整 self-verify(M20/M31/M32)/ 7. 自動 self-improve(M14/M20)
+7 軸 simultaneous optimize 操作清單 → `references/phase-a-workflow.md` A.3(SSOT `CLAUDE.md` `# 自主執行 canonical`)。
 
 **禁defer keyword**:「下次再做 / 下個 session / 省工 / 等等」(M33 BLOCKER)。
 

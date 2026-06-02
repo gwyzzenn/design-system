@@ -20,8 +20,7 @@
 - [feedback_netlify_basic_password_canonical_2026_05_29.md](feedback_netlify_basic_password_canonical_2026_05_29.md) — Netlify Basic Password canonical + Claude Code 直連 sandbox 是雲端主路徑(不是 Codespaces)+ Codex 大 brief 死局 + 兩 repo clone-on-demand 全雲端操作(2026-05-29)
 
 ## Feedback (DS canonical / 視覺判斷)
-- [feedback_story_baseline_reference.md](feedback_story_baseline_reference.md) — 寫 stories wrap primitive 必 reference 既有完整佈局 baseline(2026-05-20 AppShell-vs-Sidebar drift anchor)
-- [feedback_nearest_same_purpose_canonical.md](feedback_nearest_same_purpose_canonical.md) — M35 nearest same-purpose canonical wins(folded into M23(d);registry-driven + hook R8 + SKILL Phase 0.0)
+- [feedback_nearest_same_purpose_canonical.md](feedback_nearest_same_purpose_canonical.md) — 寫 stories wrap primitive 前必抄 production baseline(M35→M23(d);registry R8 + grep-baseline R7 + AppShell drift 錨例;2026-06-02 fold story_baseline_reference 同事件進來)
 
 ## Reference
 - [reference_deploy_targets.md](reference_deploy_targets.md) — Storybook GitHub Pages + Netlify per-branch preview + main = production
@@ -43,4 +42,10 @@
   - `feedback_m31_phaseA_first_and_autonomy_no_ask`(M31 Phase-A-first + auto-mode-no-ASK)→ fold into `feedback_codex_collab_2026_05_23_directives.md` Sub-rule 3C(Phase-A-first)+ 3D(auto-mode ASK gate)。原 #2 已涵蓋 ASK gate + dual-track-NOT-skip,#4 大半 duplicate;唯一新增 Phase-A-first explicit「script ≠ Phase A」+ mechanical backstop ref folded in。stop_self_audit.sh ref 更新 #4 → #2。#2 trim 冗段 96 行 under cap。
   - Archive: `.claude/memory/retired/2026-05-29-m31-phase-consolidate/`
   - Net delta:20 → 19 entries(-1)
+- **2026-06-02 D1/D3 prune(quality-first,user verbatim「以確保+提升產出品質為目標」)**:
+  - Memory fold:`feedback_story_baseline_reference` → `feedback_nearest_same_purpose_canonical`(同事件同原則 originSessionId a689a78e;R7+R8 兩 hook 全保留,R7 grep 機制 + 4 缺陷 + 錨例併入保留檔)
+  - 同輪清 deep-audit skill 家族 Rule-of-3 重複(propose gate / format / 禁用詞 / 7 軸 → 全改 pointer 指主檔)+ 修死檔名 ref(`feedback_propose_in_plain_chinese` 殘留 3 處)+ count drift(brief-template 82→83 / 20→19)+ 抄錯的檔案上限「500」,皆表達層對齊、零保護損失
+  - codify「品質優先」為 knowledge-prune SKILL.md 每次必遵核心前提(mindset #6 tell-me-once)
+  - Archive: `.claude/memory/retired/2026-06-02-prune/`
+  - Net delta:19 → 18 entries(-1,soft cap 18 達標)
 - [Storybook addon preset MUST be .cjs](feedback_storybook_addon_preset_must_be_cjs.md) — beta.27-.31 5 連敗 root cause: 強制 CJS evaluation,bypass Node ESM/esbuild-register CJS-interop 衝突(2026-05-28)

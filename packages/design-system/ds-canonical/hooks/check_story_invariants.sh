@@ -513,7 +513,7 @@ rule_story_baseline_reference() {
       echo "   Read 其 helper(WorkspaceBrand / MAIN_NAV / PageContent / toolbar)當 baseline。" >&2
       echo "   詳 .claude/rules/story-rules.md 「Production-grade composition fidelity」 +" >&2
       echo "   .claude/skills/story-writing/SKILL.md Phase 0 +" >&2
-      echo "   memory/feedback_story_baseline_reference.md" >&2
+      echo "   memory/feedback_nearest_same_purpose_canonical.md" >&2
     fi
 
     # 偵測明顯 simplified mock anti-pattern

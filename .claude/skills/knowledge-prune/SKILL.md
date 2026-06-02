@@ -7,6 +7,8 @@ description: Prune governance sprawl across CLAUDE.md / specs / skills / hooks /
 
 **目的**:本 DS governance 自身是活的知識庫,若只 append 會讓 CLAUDE.md 載入成本失控、MEMORY.md 條目爆炸、hook 變殭屍、spec.md 重複。本 skill 掃 8 個 home 找冗贅,提議 retire 候選,加嚴執行 Rule-of-3 SSOT + 行數預算。
 
+**🔒 核心前提(每次必遵,不需 user 提醒 — mindset #6「tell me once」)**:prune 唯一目的是**移除噪音以銳化 signal、提升遵循正確率**,**絕不以犧牲品質換行數 / 條目下降**。每次跑同時必滿足:(a) 品質不可因 prune 打折;(b) 以**提升品質**(清晰度↑ / drift 風險↓ / recall 精度↑)為目標。故:① 只 retire 真冗餘 / stale / 已被上游完整吸收的條目(這類本身是噪音,清掉反提升正確率);② consolidate 重複(同概念多 home → 選 SSOT + pointer);③ **每條真實 invariant / 機械防線必完整保留 — retire 前必 grep 確認保護已被別處覆蓋,否則不動**;④ distinct 條目強合成大條目會降 recall 精度 = 反 pattern,不做。**retire rate 是結果指標非目標**:湊 % 傷品質 = 違本前提;寧可 retire rate < 5% + report 明寫「成熟無冗餘」rationale,也不強刪真保護。本前提 override 下方所有 Phase / Checkpoint 的數值 target。
+
 **對齊 CLAUDE.md `# 治理 canonical`**:本 skill 是 L3(Periodic deep)實作。L1(pre-write hook)+ L2(fire log)自動執行,L3 需人決策 canonical retire,走 checkpoint。
 
 **對齊 CLAUDE.md `# 稽核 canonical`「Audit-vs-execute 分權」**:動 canonical substantive meaning → **STOP 提議**;對齊 / 清 duplicate / 回填 pointer → **AUTO**。
