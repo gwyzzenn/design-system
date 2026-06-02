@@ -33,6 +33,7 @@
     "a11y:check:tag": "node scripts/audit-a11y.mjs --tag",
     "story-quality:check": "node scripts/audit-story-quality.mjs --check",
     "typecheck:stories": "tsc -p packages/design-system/tsconfig.stories.json",
+    "release:preflight": "node scripts/release-preflight.mjs",
     "test:datatable-invariants": "node scripts/data-table-invariants.mjs",
     "audit:coverage-matrix": "node scripts/audit-coverage-matrix.mjs",
     "audit:datatable-row-mode": "node scripts/audit-data-table-row-mode-ssot.mjs",

@@ -86,8 +86,14 @@ User 說以下 → 繼續 edit 不 push main:
 - M21「Premature abstraction」延伸:**Premature workflow ceremony 也算**(branch + PR 是 multi-dev ceremony,solo 不需多 branch)
 - M14 AUTO integrate:5-layer 完成才 stop;不 deferred / 不分 session
 
-## 2026-06-01 — Release publish 連環 blocker → 必跑 pre-tag preflight
+## 2026-06-01/02 — Release publish 連環 blocker → ROOT CAUSE:無單一 preflight 指令 → 修成 `npm run release:preflight`
 
-**Why**:beta.43 publish 連踩 3 個 blocker(各 CI fail 一次才修):(1) 只 bump `packages/design-system/package.json`,漏跑 `scripts/sync-version-to-all-manifests.mjs`(同步 storybook-config + plugin.json + marketplace metadata/plugin = 5 manifest)→ release.yml「Version sync across 5 manifests」BLOCKER。(2) `.claude/hooks/lib/*.sh` 改過沒重 sync → `scripts/sync-ds-canonical.mjs` mirror drift → dogfood Step 0 擋。(3) dogfood(上一個的下游)。
+**Why(root cause,非各自獨立 symptom)**:beta.43(3 blocker)+ beta.45(發 3 次才成)連續失敗,**共同 root cause = 發版前靠「手動記得逐道跑 sync/check」→ 一定會漏**:beta.43 漏 `sync-version-to-all-manifests`(5 manifest)+ 漏 `sync-ds-canonical`;beta.45 編 SKILL 後又漏 `sync-ds-canonical` re-sync → dogfood Step0 drift。release CI gate 是對的,是**本地 preflight 不完整 + 沒有單一強制指令**。
 
-**How to apply**:M28 SSOT propagation(CLAUDE.md `# Git solo-work canonical` step 5.5)bump 版本後、**push tag 前必跑完整 pre-tag preflight 本地全過**才 tag:`tsc -b` + `audit-content-quality --check` + `story-quality:check` + `sync-governance-counters --check` + `sync-version-to-all-manifests.mjs` + `sync-ds-canonical.mjs` + `dogfood-prepublish-verify.mjs` + build-storybook + smoke。全過再 tag — 避免 tag→CI fail→re-tag 的 ~8min round-trip。npm 版本不可變;publish 前未上架可 `gh run cancel` + 修 + 重 tag 同版本。**publish 後驗證看 `npm view <pkg> version` 真值,不靠 CI job success**(beta.39-41 曾 job-pass 但 silent 沒 publish)。[[feedback_audit_discipline_full_sweep_deterministic_preflight]]
+**Fix(2026-06-02,真 root-cause 修)**:`npm run release:preflight`(`scripts/release-preflight.mjs`)= **單一指令**,fail-fast,1:1 對齊 release.yml:① 先 SYNCS(`sync-version-to-all-manifests` + `sync-ds-canonical` → 修 drift)② 全 deterministic gate(tsc / typecheck:stories / orphan-tokens / code-quality / content-quality / governance-counters / figma-make / plugin-structure / story-quality / ds-canonical drift)③ build:lib + build-storybook + dogfood ④ 5-manifest version 一致性 ⑤ 全過寫 `.claude/logs/release-preflight-pass.json`(綁 HEAD sha)。
+
+**Release flow(canonical,取代舊 checklist)**:bump `packages/design-system/package.json` 版本 → **`npm run release:preflight`(全過才寫 marker)** → tag → push tag。tag 前若再 commit 須重跑(marker 綁 HEAD)。
+
+**仍 defer**:tag-push enforcement hook(無 pass-marker == HEAD 就 BLOCK push tag)—— 機械強制「tag 前必跑過」。因 hook 3 副本(.claude/hooks + hooks/scripts + ds-canonical)改動成本高 + 本 session multi-copy sync 已多次出錯,謹慎 defer。**目前靠此 memory + CLAUDE.md step 5.5 把「單一指令」訂為 canonical**。
+
+**驗證**:publish 後看 `npm view <pkg> version` 真值,不靠 CI job success(beta.39-41 曾 job-pass 但 silent 沒 publish)。npm 版本不可變;未上架可 `gh run cancel` + 修 + 重 tag 同版本。[[feedback_audit_discipline_full_sweep_deterministic_preflight]] [[feedback_ai_ground_truth_unreliable_mechanical_primary]]
