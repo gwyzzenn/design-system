@@ -128,7 +128,11 @@ Avatar **固定 48px square**,不隨 content 高度變化。content(label + desc
 | rich(`surface=form` 預設) | `px-3 py-3` border card(py 固定,高度由 avatar 決定不走 row 公式)|
 | rich(`surface=upload-manager`) | **左右 + 上下 padding 全拿掉**(`px-0 py-0`)。**列高靠 avatar 48(content `minHeight`)**,卡片移除後 py 多餘 → 由面板 + gap 控制間距(2026-06-03 user 校準:rich 拿上下、compact 保留上下,因列高來源不同)|
 
-**upload-manager 面板 composition canonical**(2026-06-03,consumer 組面板用):面板提供 `px-[var(--layout-space-loose)]`(16px,與 header 內容對齊)+ 上下 padding + 列間 gap;**compact/rich 兩種 list 的面板上下 padding + gap 用同值(4px)= 視覺對稱**。item 只負責「不該由容器控的內距」(compact `py-2` 列高 / rich `0` 靠 avatar);左右一律交給面板(避免雙重 L/R padding + 對齊 header)。
+**upload-manager 面板 composition canonical**(2026-06-03 user 校準,consumer 組面板用):
+
+- **左右 padding**:compact / rich **一律 `px-[var(--layout-space-loose)]`(16px)** → item 內容左緣跟 header 標題切齊(避免雙重 L/R)。
+- **上下 padding == 列間 gap(每種 list 內對稱 = 最整齊)**,但兩 mode 取不同值:**compact list → `4px`**(`py-1` + `gap-1`,密集文字列);**rich list → `var(--layout-space-loose)`(16px)**(`py-[var(--layout-space-loose)]` + `gap-[var(--layout-space-loose)]`,卡片 + 48 縮圖列需更大呼吸)。
+- **item 只控「容器不該管的內距」**:compact `py-2`(純文字列高來源,無 avatar 撐高)/ rich `0`(列高靠 avatar 48);左右一律交給面板。
 
 ## 邊框 / 背景(AR15-21 canonical,2026-04-21 · 2026-04-22 擴充)
 
