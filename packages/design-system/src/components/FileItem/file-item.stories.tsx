@@ -203,9 +203,10 @@ export const CompactMixed = {
   ),
 }
 
-// surface="upload-manager":Google Drive / Dropbox 上傳管理面板。面板組合 canonical(2026-06-03 圖五 user 校準):
-//   - 面板「外框 padding」固定 = 左右 loose(16px)+ 上下 tight(12px),compact/rich 同(一致的面板框,左右對齊 header)
-//   - 「列間 gap」反映密度:rich = tight(12px,卡片+48 縮圖)/ compact = 4px(密集文字列)
+// surface="upload-manager":Google Drive / Dropbox 上傳管理面板。面板組合 canonical(2026-06-03 圖五/圖一 user 校準):
+//   - 左右一律 loose(16px,對齊 header);上下「邊緣→首/末 item 內容」= tight(12px),兩 mode 視覺一致
+//   - container py 需扣 item 自身 py:rich item py=0 → py-tight(12);compact item py-2(8)→ py-1(4),4+8=12
+//   - 列間 gap 反映密度:rich = tight(12px,卡片+48 縮圖)/ compact = 4px(密集文字列)
 //   - rich item 拿掉全部 padding(px-0 py-0,列高靠 avatar 48);左右交給面板,避免雙重 L/R。對比 surface=form 的 border card。
 export const UploadManagerSurface = {
   name: 'Upload manager · 豐富(無邊框)',
@@ -240,8 +241,9 @@ export const UploadManagerCompactSurface = {
         <span className="text-body font-medium text-foreground">同步 3 個檔案</span>
         <Button size="xs" iconOnly variant="text" startIcon={ChevronDown} aria-label="收合" onClick={noop} />
       </div>
-      {/* compact list:外框 px loose(16)+ py tight(12,跟 rich 面板同 frame);列間 gap-1(4px,密集列)*/}
-      <div className="flex flex-col gap-1 px-[var(--layout-space-loose)] py-[var(--layout-space-tight)]">
+      {/* compact list:px loose(16)+ py-1(4px)。compact item 自帶 py-2(8px),4+8=12 → 邊緣對齊 rich 面板的 12px
+          (container 用 12 會變 20px、比 rich 更空)。列間 gap-1(4px,密集列)。詳 spec「為何 compact container py = 4px」。 */}
+      <div className="flex flex-col gap-1 px-[var(--layout-space-loose)] py-1">
         <FileItem mode="compact" surface="upload-manager" name="季度報告.docx" status="uploading" progress={60}
           onClick={noop} actions={deleteBtn} />
         <FileItem mode="compact" surface="upload-manager" name="客戶名單.csv" status="completed"

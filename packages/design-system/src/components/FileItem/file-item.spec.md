@@ -290,9 +290,10 @@ upload-manager 的 completed(100% bar + ✓)屬「剛完成的 upload session」
 
 `surface=upload-manager` 的 FileItem list 裝在獨立浮層面板(header + 列表),item 拿掉的左右 / 上下邊距改由容器負責:
 
-- **面板外框 padding 固定(compact / rich 同 = 一致的面板框)**:左右 `px-[var(--layout-space-loose)]`(16px,item 內容左緣對齊 header 標題)+ 上下 `py-[var(--layout-space-tight)]`(12px)。
-- **列間 gap 反映密度(非外框)**:rich `gap-[var(--layout-space-tight)]`(12px,卡片 + 48 縮圖)/ compact `gap-1`(4px,密集文字列)。
-- **設計理由**:外框 padding 是「面板」屬性(與內容密度無關 → 固定);gap 是「內容密度」屬性(compact 緊 / rich 鬆)。兩者分開比「外框 == gap」更精確 —— 對齊 Material list panel「container padding 固定 + item density gap」慣例(2026-06-03 user 校準)。
+- **左右**:一律 `px-[var(--layout-space-loose)]`(16px,item 內容左緣對齊 header 標題)。
+- **上下邊緣 → 首/末 item 內容距離 = `var(--layout-space-tight)`(12px),兩 mode 視覺一致**。但 container `py` 值需扣掉 item 自身 py(避免重複計入):**rich** item py=0 → container `py-[var(--layout-space-tight)]`(12px);**compact** item 自帶 `py-2`(8px)→ container `py-1`(**4px**,4+8=12)。
+- **列間 gap 反映密度**:rich `gap-[var(--layout-space-tight)]`(12px,卡片 + 48 縮圖)/ compact `gap-1`(4px,密集文字列)。
+- **為何 compact container py = 4px 不是 12px**(2026-06-03 圖一研究校準):compact item 自帶 py-2 作列高,若 container 也用 12px → 邊緣變 20px、比 rich 的 12px 更空(反而 compact 看起來比 rich 鬆)。container 取 4px 讓 4+8=12 對齊 rich 邊緣。世界級對照:密集 list / dropdown 容器上下 padding 慣例 4–8px(Atlassian space.050–100 / 8px-base 共識),12px(space.150)屬「較不密集」級距。
 - Demo:`file-item.stories.tsx` 的 `UploadManagerSurface`(rich)/ `UploadManagerCompactSurface`(compact)。
 
 **Rich + Compact 不可混用**(見 Invariant 1 上方),故無「混用 gap」決策。
