@@ -68,7 +68,7 @@ case "$FILE_PATH" in
       *)
         if ! echo "$MERGED_CONTENT" | grep -q '@naked-row-mode-allow' \
            && echo "$MERGED_CONTENT" | grep -E "variant:\s*['\"]naked['\"]|variant=\{?['\"]naked['\"]" >/dev/null \
-           && echo "$MERGED_CONTENT" | grep -E "(inline-flex|flex)[^\"'\`]*items-center" >/dev/null \
+           && echo "$MERGED_CONTENT" | tr '\n' ' ' | grep -E "(inline-flex|flex)[^\"'\`]*items-center" >/dev/null \
            && ! echo "$MERGED_CONTENT" | grep -q "nakedCellRowModeAlign"; then
           cat >&2 <<EOF
 
@@ -184,7 +184,7 @@ if ! echo "$NEW_CONTENT" | grep -q '@disabled-color-allow'; then
      && ! echo "$NEW_CONTENT" | grep -E "(disabled:placeholder:text-fg-disabled|group-data-\[field-mode=disabled\].*placeholder:text-fg-disabled|resolvedMode\s*===\s*'disabled'.*text-fg-disabled)" >/dev/null; then
     SUSPECT_DP="$SUSPECT_DP [placeholder:text-fg-muted 無 disabled override]"
   fi
-  if echo "$NEW_CONTENT" | grep -E '<span[^>]*"text-fg-muted"[^>]*>\s*\{[^}]*placeholder' >/dev/null 2>&1 \
+  if echo "$NEW_CONTENT" | tr '\n' ' ' | grep -E '<span[^>]*"text-fg-muted"[^>]*>[[:space:]]*\{[^}]*placeholder' >/dev/null 2>&1 \
      && ! echo "$NEW_CONTENT" | grep -E "resolvedMode\s*===\s*'disabled'" >/dev/null; then
     SUSPECT_DP="$SUSPECT_DP [<span text-fg-muted>{placeholder} 不分 mode]"
   fi

@@ -138,6 +138,16 @@ expect_block "8. P1 <CircularProgress size={24}> → BLOCK"
 run_hook "$PROD_TSX" 'export const L = () => <DS.CircularProgress size="lg" />'
 expect_silent "9. P1 nearmiss <CircularProgress size=\"lg\"> → silent"
 
+# 9b. 2026-06-03 回歸防護(同 R8 bug class):屬性跨多行的真實 JSX → BLOCK。修前 grep 逐行 +
+#     [^>]+ 跨屬性匹配 → 多行 component 靜默繞過全部 anti-pattern(= BLOCKER false-negative,對抗稽核抓到)。
+run_hook "$PROD_TSX" 'export const L = () => (
+  <DS.CircularProgress
+    variant="blue"
+    size={48}
+  />
+)'
+expect_block "9b. P1 多行屬性 <CircularProgress size={48}> → BLOCK(回歸防護)"
+
 # ── P2 RadioGroupItem(broad-vs-narrow symmetry)───────────────────────────────
 
 # 10. POSITIVE:RadioGroupItem 裸用,無 SelectionItem 無 label → BLOCK

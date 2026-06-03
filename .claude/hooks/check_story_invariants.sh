@@ -517,13 +517,17 @@ rule_story_baseline_reference() {
     fi
 
     # 偵測明顯 simplified mock anti-pattern
-    if echo "$CONTENT" | grep -qE '<SidebarHeader>[[:space:]]*<span'; then
+    # 2026-06-03 修(同 R8 bug class):tr 換行→空格 flatten(grep 逐行無法跨行)+ tag anchor 加 [^>]*> 容忍屬性
+    # (真實 JSX 是 <ChromeHeader className=...> 多行,原 <ChromeHeader> 死匹配漏)。
+    local CONTENT_FLAT7
+    CONTENT_FLAT7=$(echo "$CONTENT" | tr '\n' ' ')
+    if echo "$CONTENT_FLAT7" | grep -qE '<SidebarHeader[^>]*>[[:space:]]*<span'; then
       echo "❌ R7 anti-pattern:<SidebarHeader><span> — 應 wrap WorkspaceBrand-like ItemAvatar block(per sidebar.stories IconCollapse baseline)" >&2
     fi
-    if echo "$CONTENT" | grep -qE '<SidebarMenuButton>[^<]*<[A-Z][a-zA-Z]+ className="size-'; then
+    if echo "$CONTENT_FLAT7" | grep -qE '<SidebarMenuButton[^>]*>[^<]*<[A-Z][a-zA-Z]+[[:space:]]+className="size-'; then
       echo "❌ R7 anti-pattern:<SidebarMenuButton><Icon className=\"size-N\"> — 應用 startIcon prop + tooltip prop(per sidebar.stories MAIN_NAV map)" >&2
     fi
-    if echo "$CONTENT" | grep -qE '<ChromeHeader>[^<]*<span className="[^"]*flex-1'; then
+    if echo "$CONTENT_FLAT7" | grep -qE '<ChromeHeader[^>]*>.{0,160}<span[[:space:]]+className="[^"]*flex-1'; then
       echo "❌ R7 anti-pattern:<ChromeHeader><span flex-1> — 應 SidebarTrigger + h1 緊鄰 gap-2(per sidebar.stories PageContent baseline)" >&2
     fi
   fi

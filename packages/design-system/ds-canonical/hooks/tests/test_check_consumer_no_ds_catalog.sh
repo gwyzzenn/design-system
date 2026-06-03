@@ -191,6 +191,16 @@ expect_pass_silent "17. legit business composition demo → silent"
 run_hook "Edit" "$CONSUMER_FILE" ""
 expect_pass_silent "18. empty content → silent"
 
+# 19. 2026-06-03 回歸防護(fragment-vs-file bug class):Edit 只送 new_string 片段,
+#     但 @consumer-catalog-allow marker 在檔頭(不在每次 edit 片段)→ 修前編輯有 marker 的 portal
+#     檔任一非 marker 行就被誤擋(AllDsComponents basename = catalog pattern)。本 hook 是 PostToolUse
+#     (檔已落 disk)→ 補查整檔 marker。建真實 disk 檔(含 marker)+ Edit 無 marker 片段 → 必 silent。
+DISK_PORTAL="$TMP_DIR/apps/template/src/AllDsComponents.stories.tsx"
+mkdir -p "$(dirname "$DISK_PORTAL")"
+printf '%s\n' "// @consumer-catalog-allow: documented proxy portal" "export const ImportSmoke = () => <div/>;" > "$DISK_PORTAL"
+run_hook "Edit" "$DISK_PORTAL" "  <p>some unrelated edited line without the marker</p>"
+expect_pass_silent "19. Edit 片段無 marker + 檔頭 disk marker → silent(回歸防護)"
+
 echo ""
 echo "=== Summary ==="
 echo "Passed: $PASS / $((PASS + FAIL))"

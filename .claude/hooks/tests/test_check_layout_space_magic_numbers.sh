@@ -7,7 +7,8 @@
 #   - BLOCKER(exit 2):content 任一行命中 Tailwind spacing magic-number regex
 #       \b(p|px|py|pt|pb|pl|pr|gap|space-x|space-y|m|mx|my|mt|mb|ml|mr)-(0\.5|[1-9][0-9]?(\.[0-9])?)\b
 #     且該行 **無** escape marker `@layout-space-magic-ok:`
-#   - Escape:同行加 `// @layout-space-magic-ok: <rationale>` → 該行被濾掉
+#   - Escape:同行 OR 前一行加 `// @layout-space-magic-ok: <rationale>` → 該行被濾掉
+#     (前一行支援 2026-06-03 補實作 — JSX className 行無法放同行 //,必靠前一行 {/* */})
 #   - 非 Edit/Write/MultiEdit tool / 非 .tsx,.ts / DS src / 空 content → silent exit 0
 #
 # M34 broad-vs-narrow symmetry:
@@ -156,6 +157,15 @@ expect_silent "N3. near-miss w-4/h-8/text-sm/size-3 non-spacing → silent"
 run_hook "Write" "$APP_TSX" "content" \
   'const Stack = () => <div className="gap-1">x</div>; // @layout-space-magic-ok: 4px icon stack, non-consumer-layout'
 expect_silent "N4. magic line with @layout-space-magic-ok escape → silent"
+
+# N4b. 2026-06-03 回歸防護:escape marker 在「前一行」→ silent。JSX className 行無法放同行 //,
+#      原 code 只查同行(doc 卻宣稱支援前一行)→ JSX escape 實質失效;修後前一行 marker 必被認。
+run_hook "Write" "$APP_TSX" "content" \
+  'const C = () => (
+  {/* @layout-space-magic-ok: dev artifact wrapper, non-consumer-layout */}
+  <div className="p-4">x</div>
+);'
+expect_silent "N4b. magic line with escape on PRECEDING line → silent(回歸防護)"
 
 # N5. DS source file is excluded from scope → silent (even WITH magic number)
 run_hook "Write" "$DS_TSX" "content" \

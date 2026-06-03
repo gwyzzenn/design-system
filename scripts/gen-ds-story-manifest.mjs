@@ -8,7 +8,7 @@
  * Purpose: Consumer apps(product-workspace etc.)consume this manifest to:
  *   (a) `check-consumer-story-baseline.sh` — verify @story-baseline: marker references valid DS story id
  *   (b) `composition-fidelity-visual-diff.mjs` — drive cross-side pixel diff
- *   (c) PW DsCanonicalPortal — link to DS canonical Storybook per-component
+ *   (c) PW AllDsComponents portal(ImportSmoke)— link to DS canonical Storybook
  *
  * Run automatically in `build-storybook` postbuild + CI release.yml audit gate.
  *
@@ -63,7 +63,7 @@ const manifest = {
     consumedBy: [
       '.claude/hooks/check_consumer_story_baseline.sh',
       'scripts/composition-fidelity-visual-diff.mjs',
-      'product-workspace apps/template/src/AllDsComponents.stories.tsx (DsCanonicalPortal)',
+      'product-workspace apps/template/src/AllDsComponents.stories.tsx (ImportSmoke portal → DS Storybook link)',
     ],
     generatedAt: new Date().toISOString(),
   },

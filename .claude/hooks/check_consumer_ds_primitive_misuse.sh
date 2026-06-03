@@ -39,6 +39,11 @@ if echo "$FILE" | grep -qE 'packages/design-system/src/|node_modules/'; then exi
 CONTENT=$(echo "$INPUT" | jq -r '.tool_input.new_string // .tool_input.content // ""' 2>/dev/null)
 [ -z "$CONTENT" ] && exit 0
 
+# 2026-06-03 修(同 R8 bug class):換行→空格 flatten。真實 JSX 屬性跨行(<DS.X\n  size={N}\n/>),
+# grep 逐行 + 各 pattern 用 [^>]+ 跨屬性匹配 → 不 flatten 的話多行 component 靜默繞過全部 anti-pattern 檢查
+# (= BLOCKER false-negative,consumer DS misuse 沒被擋)。[^>]+ 自帶 tag 邊界(遇 > 停),flatten 後不會跨 component。
+CONTENT=$(echo "$CONTENT" | tr '\n' ' ')
+
 # Global escape — file-wide allowlist
 if echo "$CONTENT" | grep -q '@ds-misuse-allow:'; then exit 0; fi
 
@@ -51,7 +56,7 @@ fi
 
 # Pattern 2: <RadioGroupItem> NOT wrapped in <SelectionItem control={...}>
 # Approximation: file uses RadioGroupItem but doesn't reference SelectionItem
-if echo "$CONTENT" | grep -qE '<DS\.RadioGroupItem\b' && ! echo "$CONTENT" | grep -qE 'SelectionItem|RadioGroupItem.*label='; then
+if echo "$CONTENT" | grep -qE '<DS\.RadioGroupItem\b' && ! echo "$CONTENT" | grep -qE 'SelectionItem|<DS\.RadioGroupItem[^>]+label='; then
   VIOLATIONS="${VIOLATIONS}  - <RadioGroupItem> 沒 wrap <SelectionItem control={<RadioGroupItem>}> (per selection-item.spec.md:23 SSOT spacing/padding)\n"
 fi
 

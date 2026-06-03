@@ -40,8 +40,11 @@ if echo "$FILE" | grep -qE 'packages/design-system/src/'; then exit 0; fi
 CONTENT=$(echo "$INPUT" | jq -r '.tool_input.new_string // .tool_input.content // ""' 2>/dev/null)
 [ -z "$CONTENT" ] && exit 0
 
-# Escape clause
+# Escape clause — 2026-06-03 修(同 R8 fragment-vs-file bug class):Edit 只送 new_string 片段,
+# 但 @consumer-catalog-allow marker 在檔頭(不在每次 edit 的片段裡)→ 編輯有 marker 的 portal 檔
+# 任一非 marker 行就被誤擋。本 hook 是 PostToolUse(檔已落 disk)→ 補查整檔 marker。
 if echo "$CONTENT" | grep -q '@consumer-catalog-allow:'; then exit 0; fi
+if [ -f "$FILE" ] && grep -q '@consumer-catalog-allow:' "$FILE" 2>/dev/null; then exit 0; fi
 
 VIOLATIONS=""
 

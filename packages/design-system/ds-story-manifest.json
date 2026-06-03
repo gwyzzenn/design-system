@@ -5,9 +5,9 @@
     "consumedBy": [
       ".claude/hooks/check_consumer_story_baseline.sh",
       "scripts/composition-fidelity-visual-diff.mjs",
-      "product-workspace apps/template/src/AllDsComponents.stories.tsx (DsCanonicalPortal)"
+      "product-workspace apps/template/src/AllDsComponents.stories.tsx (ImportSmoke portal → DS Storybook link)"
     ],
-    "generatedAt": "2026-06-02T18:08:38.139Z"
+    "generatedAt": "2026-06-03T03:08:44.649Z"
   },
   "components": {
     "accordion": {
