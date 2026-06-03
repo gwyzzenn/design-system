@@ -34,6 +34,7 @@
 - **Pre-edit**:`check_substantive_edit_approval_preflight.sh`(production code)+ `stop_self_audit.sh`(spec/canonical 補位)+ `check_ds_anchor_preflight.sh`(M29 anchor)
 - **Post-edit**:`stop_self_audit.sh` Mechanism 1(claim-verify-gap)BLOCKER
 - **Pre-final(宣告完成前)**:`stop_self_audit.sh` Mechanism 7(完整性宣告閘)BLOCKER — 宣告「全做完 / 全部完成」+ 本 turn 實質改動但**無全庫 stale-ref 掃描證據** → block。**觸發器 = 「宣告完成」本身,非等 user 問第二次**(2026-06-03 user-authorized,根治重複 failure)
+- **Pre-final(重大 / SSOT / 模型 / 跨多檔改動)**:除 M7 自掃外,**宣告完成前必跑「獨立對抗稽核」**(multi-agent Workflow,每路假設「還有 loose end」主動去找 + cite 證據)。**理由**:self-grep 系統性漏(self-assessment unreliable,對齊 `feedback_ai_ground_truth_unreliable_mechanical_primary`)+ 信任機械閘(preflight / R4 / hook BLOCKER)勝於自評。**小改 = M7 自掃即可**,不需對抗稽核(避免過度)。2026-06-03 user-authorized,根治「宣告做完 → user 問第 N 次 → 才補掃出 loose end」
 - **Pre-commit**:`scripts/audit-content-quality.mjs --check` + `scripts/extract-canonical-rules.mjs` 各 fail = block
 
 ## Anti-pattern(永久 ban)
@@ -44,8 +45,7 @@
 - ❌「下個 session 補」defer 可做的 verify(M33 違反)
 - ❌ pass-through Explore / codex propose 沒 own-version 比稿
 - ❌ 宣告「全做完 / 全部完成」前沒自己跑 M10「改一處看三處」全庫 stale-ref 掃描 → 等 user 問「真的做完?」才補掃出 loose end(M7 BLOCKER;anchor:CF model 改完漏 3 ref / iceberg)
-
-## 對齊歷史
+- ❌ **重大 / SSOT / 模型改動只靠自 grep 就宣告完成** → 漏 fragility / 沒貫徹到 consumer。2026-06-03 anchor:R8 用相對路徑讀 registry 非 root cwd 靜默失效、CF 模型修沒貫徹到 App.tsx marker — **全是 4-agent 對抗稽核 + preflight/R4 機械閘抓到,自 grep 漏了**。重大改動宣告前必跑獨立對抗稽核 + 信任機械 preflight 勝於自評
 
 - Linux kernel:`scripts/checkpatch.pl` pre-submit + `git log --oneline | head -3` 後 sign-off
 - Toyota TPS:Jidoka(自働化)— 機器發現異常自己停,人別繼續(對應 hook BLOCKER)
