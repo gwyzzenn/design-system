@@ -36,12 +36,29 @@ check('marketplace.json exists + valid JSON + schema', () => {
   if (!ds.version) throw new Error('design-system plugin version missing')
 })
 
-// 2. plugin.json schema
-check('plugin.json exists + valid JSON + schema', () => {
+// 2. plugin.json schema(欄位「存在」+「型別」雙驗)
+//    型別對齊官方 schema(code.claude.com/docs/en/plugins-reference):
+//    repository/homepage = STRING(非 npm package.json 的 {type,url} 物件);author = OBJECT{name}。
+//    2026-06-04 加 type 驗證 per consumer install fail anchor:repository 寫成 npm 物件 → Claude Code
+//    Zod「expected string, received object」裝不起來,而舊 check 只驗存在沒驗型別 → P0 漏出貨。
+check('plugin.json exists + valid JSON + schema(field type-checked)', () => {
   const p = JSON.parse(readFileSync(join(REPO_ROOT, '.claude-plugin/plugin.json'), 'utf8'))
   if (!p.name) throw new Error('plugin.json missing name')
   if (!p.version) throw new Error('plugin.json missing version')
   if (!p.description) throw new Error('plugin.json missing description')
+  // repository:官方 schema = STRING(URL)。npm package.json 容許 {type,url} 物件,但 Claude Code plugin 不容許。
+  if (p.repository !== undefined && typeof p.repository !== 'string') {
+    throw new Error(`plugin.json repository 必須是 string(URL),目前是 ${Array.isArray(p.repository) ? 'array' : typeof p.repository}。官方 schema 要 "https://github.com/<org>/<repo>";npm 的 {type,url} 物件寫法會讓 consumer install 失敗(Zod「expected string, received object」)`)
+  }
+  // homepage:官方 schema = STRING(URL)
+  if (p.homepage !== undefined && typeof p.homepage !== 'string') {
+    throw new Error(`plugin.json homepage 必須是 string(URL),目前是 ${typeof p.homepage}`)
+  }
+  // author:官方 schema = OBJECT { name, email?, url? };若提供必含 name
+  if (p.author !== undefined) {
+    if (typeof p.author !== 'object' || Array.isArray(p.author)) throw new Error(`plugin.json author 必須是 object { name, email?, url? },目前是 ${typeof p.author}`)
+    if (!p.author.name || typeof p.author.name !== 'string') throw new Error('plugin.json author.name 缺失或非 string')
+  }
 })
 
 // 3. skills/ + commands/ symlinks

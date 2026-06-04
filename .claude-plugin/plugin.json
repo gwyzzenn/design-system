@@ -7,10 +7,7 @@
     "name": "Your-Org DS Owner"
   },
   "homepage": "https://github.com/ajenchen/design-system",
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/ajenchen/design-system.git"
-  },
+  "repository": "https://github.com/ajenchen/design-system",
   "license": "UNLICENSED",
   "_metadata": {
     "createdAt": "2026-05-23",
