@@ -7,7 +7,7 @@
       "scripts/composition-fidelity-visual-diff.mjs",
       "product-workspace apps/template/src/AllDsComponents.stories.tsx (ImportSmoke portal → DS Storybook link)"
     ],
-    "generatedAt": "2026-06-03T03:08:44.649Z"
+    "generatedAt": "2026-06-04T00:18:16.579Z"
   },
   "components": {
     "accordion": {
@@ -770,7 +770,9 @@
           "design-system-components-fileitem-展示--compact",
           "design-system-components-fileitem-展示--hover-swap",
           "design-system-components-fileitem-展示--clickable",
-          "design-system-components-fileitem-展示--compact-mixed"
+          "design-system-components-fileitem-展示--compact-mixed",
+          "design-system-components-fileitem-展示--upload-manager-surface",
+          "design-system-components-fileitem-展示--upload-manager-compact-surface"
         ],
         "設計規格": [
           "design-system-components-fileitem-設計規格--overview",
@@ -797,7 +799,8 @@
           "design-system-components-fileupload-展示--resume-upload",
           "design-system-components-fileupload-展示--bulk-image-upload",
           "design-system-components-fileupload-展示--with-file-list",
-          "design-system-components-fileupload-展示--custom-children"
+          "design-system-components-fileupload-展示--custom-children",
+          "design-system-components-fileupload-展示--button-variant"
         ],
         "設計規格": [
           "design-system-components-fileupload-設計規格--overview",
@@ -1681,5 +1684,5 @@
     }
   },
   "totalComponents": 62,
-  "totalStories": 911
+  "totalStories": 914
 }
