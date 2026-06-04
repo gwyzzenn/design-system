@@ -98,6 +98,39 @@ for (const tok of referenced) {
   rec('I3', `引用 token ${tok} 已在 CSS 定義`, cssDefs.has(tok), '未在 primitives.css / semantic.css 找到定義')
 }
 
+// ── I4 Solid 文字對比:CAT_SOLID 每個 hue 的 on-solid 文字(白/深)實測對比必 ≥3:1(大粗字門檻)──
+//    2026-06-04 user「以最低為原則」= WCAG large/bold 3:1。white=--on-emphasis(Y=1),
+//    dark=--on-emphasis-inverse(=black-a85,15% 底色合成)。green 為 documented exception(知情違反,exempt)。
+//    機械驗 = oklch→相對亮度→contrast,禁肉眼。新增亮色 hue 配白字 → 此 gate 自動攔。
+const SOLID_TEXT_EXEMPT = new Set(['green']) // ★ user 拍板維持白字的知情例外
+const prim = readFileSync(PRIMITIVES, 'utf8')
+const oklchToLinear = (L, C, H) => {
+  const hr = (H * Math.PI) / 180, a = C * Math.cos(hr), b = C * Math.sin(hr)
+  const l_ = L + 0.3963377774 * a + 0.2158037573 * b, m_ = L - 0.1055613458 * a - 0.0638541728 * b, s_ = L - 0.0894841775 * a - 1.2914855480 * b
+  const l = l_ ** 3, m = m_ ** 3, s = s_ ** 3
+  return [4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s, -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s, -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s].map((v) => Math.min(1, Math.max(0, v)))
+}
+const lin2srgb = (v) => (v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055)
+const srgb2lin = (v) => (v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4))
+const relLum = ([R, G, B]) => 0.2126 * R + 0.7152 * G + 0.0722 * B
+const contrast = (y1, y2) => { const a = Math.max(y1, y2), b = Math.min(y1, y2); return (a + 0.05) / (b + 0.05) }
+const solidBlock = extractMapBlock('CAT_SOLID')
+for (const h of HUES) {
+  const oklchs = [...prim.matchAll(new RegExp(`--color-${h}-6:\\s*oklch\\(([\\d.]+) ([\\d.]+) ([\\d.]+)\\)`, 'g'))].map((m) => [+m[1], +m[2], +m[3]])
+  const entry = entryFor(solidBlock, h) || ''
+  const isDark = /on-emphasis-inverse/.test(entry) // 深字桶
+  if (SOLID_TEXT_EXEMPT.has(h)) { rec('I4', `CAT_SOLID.${h} 對比(documented exception,exempt)`, true); continue }
+  let worst = Infinity
+  for (const o of oklchs) {
+    const linBg = oklchToLinear(...o), Ybg = relLum(linBg)
+    let c
+    if (isDark) { const txt = linBg.map(lin2srgb).map((x) => 0.15 * x); c = contrast(relLum(txt.map(srgb2lin)), Ybg) } // black-a85 over bg
+    else c = contrast(1, Ybg) // white
+    worst = Math.min(worst, c)
+  }
+  rec('I4', `CAT_SOLID.${h} on-solid ${isDark ? '深字' : '白字'} 對比 ≥3:1`, worst >= 3.0, `實測最差 ${worst.toFixed(2)}(<3:1 → 應換${isDark ? '白' : '深'}字)`)
+}
+
 // ── Output ──
 console.log('\n=== Categorical Color SSOT Invariants ===')
 console.log(`PASS: ${passes.length}   FAIL: ${failures.length}\n`)

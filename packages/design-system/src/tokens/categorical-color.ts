@@ -61,16 +61,23 @@ export const CAT_SUBTLE: Record<CategoricalHue, string> = {
   magenta: 'bg-[var(--color-magenta-1)] text-[var(--color-magenta-7)]',
 }
 
-/** solid 模式 class:step-6 底 + on-emphasis 字(yellow step-6 太亮 → warning-foreground 深字)。 */
+/**
+ * solid 模式 class:step-6 底 + on-emphasis 配對文字。
+ * 文字色依「step-6 底亮度」分桶(WCAG ≥3:1 大粗字門檻,2026-06-04 user「以最低為原則」):
+ *   - 夠深的色底 → `text-on-emphasis`(白):blue / deep-orange / red / turquoise / indigo / purple / magenta
+ *   - 太亮的色底 → `text-[var(--on-emphasis-inverse)]`(深):yellow / amber / orange / lime(白字連 3:1 都不過)
+ *   - ★ green 例外:白字 2.47 連 3:1 都不過,但 user 拍板維持白字(綠底白字慣見觀感)= documented exception。
+ * 對比為 oklch→相對亮度實測(scripts/categorical-color-invariants.mjs 機械驗,green 列 exempt)。
+ */
 export const CAT_SOLID: Record<CategoricalHue, string> = {
   blue: 'bg-[var(--color-blue-6)] text-on-emphasis',
-  green: 'bg-[var(--color-green-6)] text-on-emphasis',
+  green: 'bg-[var(--color-green-6)] text-on-emphasis', // ★白字 documented exception(實測 2.47 < 3:1)
   'deep-orange': 'bg-[var(--color-deep-orange-6)] text-on-emphasis',
-  yellow: 'bg-[var(--color-yellow-6)] text-[var(--warning-foreground)]',
+  yellow: 'bg-[var(--color-yellow-6)] text-[var(--on-emphasis-inverse)]',
   red: 'bg-[var(--color-red-6)] text-on-emphasis',
-  orange: 'bg-[var(--color-orange-6)] text-on-emphasis',
-  amber: 'bg-[var(--color-amber-6)] text-[var(--warning-foreground)]',
-  lime: 'bg-[var(--color-lime-6)] text-on-emphasis',
+  orange: 'bg-[var(--color-orange-6)] text-[var(--on-emphasis-inverse)]',
+  amber: 'bg-[var(--color-amber-6)] text-[var(--on-emphasis-inverse)]',
+  lime: 'bg-[var(--color-lime-6)] text-[var(--on-emphasis-inverse)]',
   turquoise: 'bg-[var(--color-turquoise-6)] text-on-emphasis',
   indigo: 'bg-[var(--color-indigo-6)] text-on-emphasis',
   purple: 'bg-[var(--color-purple-6)] text-on-emphasis',
@@ -108,15 +115,16 @@ export const CAT_SUBTLE_TOKENS: Record<CategoricalHue, { bg: string; text: strin
   purple: { bg: 'var(--color-purple-1)', text: 'var(--color-purple-7)' },
   magenta: { bg: 'var(--color-magenta-1)', text: 'var(--color-magenta-7)' },
 }
+// 同 CAT_SOLID 的文字分桶(白 / 深),raw token 版供 Avatar style 物件用。green = ★白字 exception。
 export const CAT_SOLID_TOKENS: Record<CategoricalHue, { bg: string; text: string }> = {
   blue: { bg: 'var(--color-blue-6)', text: 'var(--on-emphasis)' },
-  green: { bg: 'var(--color-green-6)', text: 'var(--on-emphasis)' },
+  green: { bg: 'var(--color-green-6)', text: 'var(--on-emphasis)' }, // ★白字 documented exception
   'deep-orange': { bg: 'var(--color-deep-orange-6)', text: 'var(--on-emphasis)' },
-  yellow: { bg: 'var(--color-yellow-6)', text: 'var(--warning-foreground)' },
+  yellow: { bg: 'var(--color-yellow-6)', text: 'var(--on-emphasis-inverse)' },
   red: { bg: 'var(--color-red-6)', text: 'var(--on-emphasis)' },
-  orange: { bg: 'var(--color-orange-6)', text: 'var(--on-emphasis)' },
-  amber: { bg: 'var(--color-amber-6)', text: 'var(--warning-foreground)' },
-  lime: { bg: 'var(--color-lime-6)', text: 'var(--on-emphasis)' },
+  orange: { bg: 'var(--color-orange-6)', text: 'var(--on-emphasis-inverse)' },
+  amber: { bg: 'var(--color-amber-6)', text: 'var(--on-emphasis-inverse)' },
+  lime: { bg: 'var(--color-lime-6)', text: 'var(--on-emphasis-inverse)' },
   turquoise: { bg: 'var(--color-turquoise-6)', text: 'var(--on-emphasis)' },
   indigo: { bg: 'var(--color-indigo-6)', text: 'var(--on-emphasis)' },
   purple: { bg: 'var(--color-purple-6)', text: 'var(--on-emphasis)' },

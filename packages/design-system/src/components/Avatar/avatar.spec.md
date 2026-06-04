@@ -218,25 +218,25 @@ Icon 和 Text 模式使用 primitive step-1 subtle 背景 + 對應 step-7 前景
 
 ### Solid（`solid=true`）
 
-step-6 全色背景 + 白色前景，適合需要更強視覺權重的場景。
+step-6 全色背景 + 對比前景（白 / 深依底色明暗分桶,見下「Solid 文字色規則」）。
 
 | Color | 背景 | 前景 |
 |---|---|---|
 | neutral | `--color-neutral-9` | `--inverse-fg` |
-| blue | `--color-blue-6` | white |
-| green | `--color-green-6` | white |
-| deep-orange | `--color-deep-orange-6` | white |
-| yellow | `--color-yellow-6` | **`--warning-foreground`** |
-| red | `--color-red-6` | white |
-| orange | `--color-orange-6` | white |
-| amber | `--color-amber-6` | **`--warning-foreground`** |
-| lime | `--color-lime-6` | white |
-| turquoise | `--color-turquoise-6` | white |
-| indigo | `--color-indigo-6` | white |
-| purple | `--color-purple-6` | white |
-| magenta | `--color-magenta-6` | white |
+| blue | `--color-blue-6` | `--on-emphasis`（白） |
+| green | `--color-green-6` | `--on-emphasis`（白）★ |
+| deep-orange | `--color-deep-orange-6` | `--on-emphasis`（白） |
+| yellow | `--color-yellow-6` | **`--on-emphasis-inverse`（深）** |
+| red | `--color-red-6` | `--on-emphasis`（白） |
+| orange | `--color-orange-6` | **`--on-emphasis-inverse`（深）** |
+| amber | `--color-amber-6` | **`--on-emphasis-inverse`（深）** |
+| lime | `--color-lime-6` | **`--on-emphasis-inverse`（深）** |
+| turquoise | `--color-turquoise-6` | `--on-emphasis`（白） |
+| indigo | `--color-indigo-6` | `--on-emphasis`（白） |
+| purple | `--color-purple-6` | `--on-emphasis`（白） |
+| magenta | `--color-magenta-6` | `--on-emphasis`（白） |
 
-**yellow 例外**：yellow solid 背景亮度高，白字對比不足，改用 `--warning-foreground`（深色文字）。
+**Solid 文字色規則（on-emphasis 配對,2026-06-04,與 Tag 共用 SSOT）**：依 step-6 底色明暗分桶,合規門檻 = WCAG **large/bold 3:1**（user 拍板「以最低為原則」）。底夠深 → `--on-emphasis`（白）；底太亮 → `--on-emphasis-inverse`（深,= `black-a85`,原 `warning-foreground` 改名）:**yellow / amber / orange / lime**。**★ green 例外**:white 實測 2.47 連 3:1 都不過,但維持白字（慣見「綠底白字」觀感）= documented exception。對比由 `categorical-color-invariants.mjs` I4 機械驗(green exempt)。
 
 Image 模式不顯示背景色（圖片填滿），`solid` prop 無效果。
 
