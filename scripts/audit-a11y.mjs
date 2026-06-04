@@ -43,6 +43,15 @@ const args = process.argv.slice(2)
 const LIMIT = parseInt(args.find(a => a.startsWith('--story='))?.split('=')[1] ?? '0', 10)
 const TAG = args.find(a => a.startsWith('--tag='))?.split('=')[1]
 const VERBOSE = args.includes('--verbose')
+// 2026-06-04 baseline-diff gate(Carbon AVT pattern,advisory → enforce-on-new transition):
+//   --baseline-write:跑全掃 → 寫 a11y-baseline.json(現存 violation 快照)。建 / 更新 baseline 用。
+//   --gate:跑全掃 → 對照 baseline,只在「新增 / 增量」violation(regression)fail。CI enforce 用。
+//   (不帶旗標:原行為 = critical+serious 任一即 fail,dev spot-check 用。)
+// 指紋粒度:`storyId|ruleId` → nodeCount。regression = 新 key OR count 增加(catch 既有 violating story
+//   再加一個 white-on-bright 元素 → 同 (story,rule) count↑)。audit-error(infra timeout 等)不納指紋(flaky)。
+const GATE = args.includes('--gate')
+const WRITE_BASELINE = args.includes('--baseline-write')
+const BASELINE_FILE = path.join(ROOT, '.claude/baselines/a11y-baseline.json')
 
 if (!fs.existsSync(INDEX_FILE)) {
   console.error('❌ storybook-static/index.json not found. Run `npm run build-storybook` first.')
@@ -153,7 +162,59 @@ if (results.summary.totalViolations > 0) {
   for (const [rule, count] of topRules) console.log(`   • ${rule}: ${count}`)
 }
 
-// CI gate:critical / serious WCAG AA → exit 1;moderate / minor → warn only
+// ── Baseline fingerprint(storyId|ruleId → nodeCount;排除 flaky audit-error)──
+const curMap = {}
+for (const [sid, vs] of Object.entries(results.violationsByStory)) {
+  for (const v of vs) {
+    if (v.id === 'audit-error') continue
+    const k = `${sid}|${v.id}`
+    curMap[k] = (curMap[k] || 0) + v.nodes
+  }
+}
+const sortedMap = Object.fromEntries(Object.keys(curMap).sort().map(k => [k, curMap[k]]))
+
+// ── --baseline-write:寫 / 更新 baseline 快照 ──
+if (WRITE_BASELINE) {
+  const dir = path.dirname(BASELINE_FILE)
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
+  fs.writeFileSync(BASELINE_FILE, JSON.stringify({
+    _meta: { purpose: 'a11y baseline-diff gate — 現存 violation 快照;gate 只 fail 新增/增量(regression)。重建:npm run a11y:check -- --baseline-write(需先 build-storybook)', generatedAt: new Date().toISOString(), stories: results.total, fingerprints: Object.keys(sortedMap).length },
+    fingerprints: sortedMap,
+  }, null, 2))
+  console.log(`\n✅ baseline written: ${BASELINE_FILE}`)
+  console.log(`   ${Object.keys(sortedMap).length} fingerprints(storyId|ruleId)across ${results.total} stories`)
+  process.exit(0)
+}
+
+// ── --gate:對照 baseline,只 fail regression(新 key OR count↑)──
+if (GATE) {
+  if (!fs.existsSync(BASELINE_FILE)) {
+    console.error(`\n❌ --gate 但無 baseline(${BASELINE_FILE})。先跑 npm run a11y:check -- --baseline-write 建立。Refusing false-green.`)
+    process.exit(1)
+  }
+  const baseline = JSON.parse(fs.readFileSync(BASELINE_FILE, 'utf-8')).fingerprints || {}
+  const regressions = []
+  for (const [k, n] of Object.entries(curMap)) {
+    const base = baseline[k] || 0
+    if (n > base) regressions.push({ k, base, now: n })
+  }
+  // audit-error(infra)單獨列出但不 gate(flaky;非 a11y violation 本身)
+  const auditErrors = Object.entries(results.violationsByStory).filter(([, vs]) => vs.some(v => v.id === 'audit-error')).map(([sid]) => sid)
+  if (auditErrors.length) console.log(`\n⚠️ ${auditErrors.length} story 掃描出錯(infra,不 gate):${auditErrors.slice(0, 5).join(', ')}${auditErrors.length > 5 ? ' …' : ''}`)
+  if (regressions.length > 0) {
+    console.error(`\n❌ a11y GATE FAIL — ${regressions.length} 個新增/增量 violation(regression vs baseline):`)
+    for (const r of regressions.slice(0, 30)) console.error(`   • ${r.k}  (baseline ${r.base} → now ${r.now})`)
+    if (regressions.length > 30) console.error(`   … +${regressions.length - 30} more`)
+    console.error(`\n修:消除新違規;或若為 documented exception(如 green 綠底白字)+ intentional,跑 --baseline-write 更新 baseline 並在 commit 說明理由。`)
+    process.exit(1)
+  }
+  // 改善(baseline 有、現在沒了)提示更新
+  const improved = Object.keys(baseline).filter(k => !(k in curMap)).length
+  console.log(`\n✅ a11y GATE PASS — 0 regression vs baseline${improved ? `(且 ${improved} 個已修復,可跑 --baseline-write 收緊 baseline)` : ''}`)
+  process.exit(0)
+}
+
+// ── 預設(無旗標):critical / serious 任一即 fail(dev spot-check)──
 const hard = results.summary.bySeverity.critical + results.summary.bySeverity.serious
 if (hard > 0) {
   console.error(`\n❌ ${hard} critical+serious WCAG AA violation(s) — CI fail`)
