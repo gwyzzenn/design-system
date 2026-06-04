@@ -482,7 +482,7 @@ ColorMatrix 已建:展示 status × 元素(filename / description / progress bar
 
 ## 相關
 
-- `../../patterns/element-anatomy/item-anatomy.spec.md` — 閱讀模式（compact / rich）
+- `../../patterns/element-anatomy/item-anatomy.spec.md` — row anatomy primitive(ItemContent / ItemPrefix;FileItem 兩 mode 採 scanning idiom)
 - `../Avatar/avatar.spec.md` — Avatar shape（rich mode 的 icon 容器）
 - `../FileUpload/file-upload.spec.md` — **配對元件**:FileUpload 是拖放 / 點擊上傳區塊,FileItem 是已上傳檔案 row 顯示;兩者構成完整 file-handling 元件組
 - `../LinkInput/link-input.spec.md` — 純連結（非 upload 流程）替代

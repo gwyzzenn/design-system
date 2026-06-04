@@ -10,7 +10,7 @@ import { ItemContent, ItemPrefix } from '@/design-system/patterns/element-anatom
 /**
  * FileItem — 檔案顯示 / 上傳進度
  *
- * Typography: 閱讀模式 — text-body (14px) 預設行高 (1.5)
+ * Typography: 兩 mode 統一 scanning — text-body (14px) + leading-compact (1.3)(詳 spec「Typography」段,2026-04-23)
  *
  * 兩種 mode（精簡 vs 完整內容呈現）:
  *
