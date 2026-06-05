@@ -176,6 +176,7 @@ CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap
 | 清 unused imports 後 runtime | tsc 不充分,需 storybook |
 | shadcn compat alias 回流 | dark mode 不聯動 |
 | `asChild ? Slot : Native` 內部 JSX 仍渲染多 children | React.Children.only runtime fail — Slot 規範 children 必為單 element,內部 `{icon}{label}{badge}` 多 expression 變 array → throw。asChild 分支 render 只傳 consumer child;tsc/build 過,story 打開才炸 |
+| `tsc -b` 不 emit declaration | 漏 TS4023「cannot be named」;改 export/型別 surface 的 deploy-safety 必跑 `npm run build:lib`(= Netlify build:dts emit .d.ts),tsc -b 全綠會騙過(2026-06-05 Badge union 連掛 3 Netlify build)|
 
 新 bug → 歸 Meta-Pattern OR 本表 1 行;> 10 條 = 漏寫,**評估 meta-merge 既有 M-rule 而非無腦新增**(meta-patterns velocity ≤ 3/quarter,單 M-rule 必吸收 ≥ 3 prior bugs)。
 

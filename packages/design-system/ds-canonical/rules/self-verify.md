@@ -10,7 +10,7 @@
 |---|---|---|
 | **Pre-edit** | (1) M29 3-column owner table(grep `*.spec.md` 找 anchor)(2) M23 既有 canonical 優先(`# SSOT 消費 canonical` 清單)(3) Touched file inventory + Read 真讀(非憑記憶)(4) 若 SSOT-UI/UX substantive → STOP 用中文 propose 等 user 拍板 | grep / Read / propose-options skill |
 | **Mid-edit** | (1) 每 5-8 個檔案或跨新 domain 跑 scoped invariant grep(2) 發現 spec/code 衝突 STOP,不選邊(3) Hook 自動 intercept(check_substantive_edit_approval_preflight / check_solo_workflow / check_story_invariants 等)| auto-fire hooks |
-| **Post-edit** | (1) `npx tsc -b`(任何 tsx/ts 改)(2) 相關 invariant script(`node scripts/data-table-invariants.mjs` 若動 DataTable / `node scripts/audit-content-quality.mjs --check` 若動 spec)(3) M10 proactive scan(`/scan-similar-bugs` 或 manual grep 同 pattern DS-wide)(4) UI 改動加 visual probe(`/visual-audit --scope=changed` 或 Playwright screenshot)(5) M14 5-layer pipeline(spec / hook / SKILL / CLAUDE.md / memory 該動的同步)| `tsc` / `*.mjs` 腳本 / visual-audit |
+| **Post-edit** | (1) `npx tsc -b`(任何 tsx/ts 改);**⚠️ 動 export/型別 surface(interface/type/cva variant union/discriminated union/新 export)必加跑 `npm run build:lib`** —— `tsc -b`(composite/build mode)**不做 declaration emit**,漏 TS4023「cannot be named」等 declaration-emit 錯;Netlify build.command = `build:lib && build-storybook`(`build:lib` 含 `build:dts` = `tsc -p` emit .d.ts)才會炸。**tsc -b PASS ≠ deploy-safe**(2026-06-05 anchor:Badge discriminated union BadgeDotProps 沒 export → Sidebar SidebarMenuBadge .d.ts TS4023 → Netlify build 連掛 3 commit,tsc -b 全綠騙過)。type-surface deploy-safety 證明 = `build:lib` exit 0,非 tsc -b。(2) 相關 invariant script(`node scripts/data-table-invariants.mjs` 若動 DataTable / `node scripts/audit-content-quality.mjs --check` 若動 spec)(3) M10 proactive scan(`/scan-similar-bugs` 或 manual grep 同 pattern DS-wide)(4) UI 改動加 visual probe(`/visual-audit --scope=changed` 或 Playwright screenshot)(5) M14 5-layer pipeline(spec / hook / SKILL / CLAUDE.md / memory 該動的同步)| `tsc` / `*.mjs` 腳本 / visual-audit |
 | **Pre-commit / Pre-final** | (1) Claim-verify table:每「已修」「已驗」對應具體 command + artifact + file:line(2) 過 `scripts/audit-content-quality.mjs --check`(3) Stop hook BLOCKER 紅燈通過(claim-verify-gap / codex-verify / codex-transport)(4) Commit message 含 cite + verdict keyword 滿足 `check_codex_collab_5step.sh` | claim-verify table + content-quality + stop hook |
 
 ## 強制 trigger condition(滿足任一 → 整 4 階段必跑)
@@ -40,6 +40,7 @@
 ## Anti-pattern(永久 ban)
 
 - ❌「我感覺修好了」沒跑 tsc / invariant 就 claim done
+- ❌ 動 export/型別 surface(interface/discriminated union/新 export)只跑 `tsc -b` 就宣告 deploy-safe —— tsc -b 不 emit declaration,漏 TS4023「cannot be named」,Netlify `build:dts` 才炸;必跑 `npm run build:lib`(2026-06-05 Badge union 連掛 3 Netlify build,tsc -b 全綠騙過)
 - ❌ 動 spec / src 沒先 grep owner anchor(M29 違反)
 - ❌ 改 hook 沒跑 syntax check + smoke test
 - ❌「下個 session 補」defer 可做的 verify(M33 違反)
