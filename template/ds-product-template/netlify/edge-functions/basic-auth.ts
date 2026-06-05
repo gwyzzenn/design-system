@@ -6,6 +6,8 @@
 //   自己實作 HTTP Basic Auth(讀 Authorization → 比對 → 回 401)。Edge Functions 免費方案可用
 //   (額度依方案,低流量內部 Storybook 綽綽有餘),且 `.netlify.app` 預設網址直接生效、無需自訂網域。
 //   (注:官方限制頁載明 `_headers` 的 basic-auth header 不會套用到 edge function,故必在此自己做。)
+//   Netlify 官方有記載此 edge-function 密碼 gate pattern(非野路子):
+//   docs.netlify.com/prompt-templates/netlify/password-protect-a-page/(env var gate 範例,© 2026 Netlify)。
 //
 // 怎麼啟用(fork user,30 秒,免費):
 //   Netlify → Site configuration → Environment variables → Add a variable
