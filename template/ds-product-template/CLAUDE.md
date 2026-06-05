@@ -168,7 +168,7 @@ npm run setup:netlify            # CLI + site + 印 dashboard URL
 - **Path 2** — GitHub Codespaces(`.devcontainer/` 已 ship):fork → Code → Codespaces → Create → container 自動裝齊
 - **Path 3** — 本地 `git clone` + `npm install` + `claude`
 
-**Claude DO NOT**:假設 user 已知 Netlify / 跳過 onboarding 直接寫 code / 沒解釋就要 user 跑 setup 命令 / 叫 user 去 Dashboard 開 Password Protection 當免費方案(那是 Pro 專屬 $20/mo,免費請走 `STORYBOOK_BASIC_AUTH` env var → Edge Function `basic-auth`)/ 講「`_headers` Basic-Auth 免費」「Dashboard Basic Password 免費 / 是 free-tier 唯一可用 / 唯一真擋陌生人的方法」(全錯;`_headers` Basic-Auth 與 Dashboard Password 都是 Pro $20/mo,免費是 Edge Function Basic Auth)/ 講 build-time 注入 `_headers` 或 `inject-basic-auth.mjs`(該機制已刪,改 edge function)/ 推薦 Identity(已 deprecated)。
+**Claude DO NOT**:假設 user 已知 Netlify / 跳過 onboarding 直接寫 code / 沒解釋就要 user 跑 setup 命令 / 叫 user 去 Dashboard 開 Password Protection 當免費方案(那是 Pro 專屬 $20/mo,免費請走 `STORYBOOK_BASIC_AUTH` env var → Edge Function `basic-auth`)/ 講「`_headers` Basic-Auth 免費」「Dashboard Basic Password 免費 / 是 free-tier 唯一可用 / 唯一真擋陌生人的方法」(全錯;`_headers` Basic-Auth 與 Dashboard Password 都是 Pro $20/mo,免費是 Edge Function Basic Auth)/ 講 build-time 注入 `_headers` 或 `inject-basic-auth.mjs`(該機制已刪,改 edge function)/ 推薦 Netlify Identity 當簡單密碼方案(它是完整 signup/login 系統,對「Storybook 上個密碼」overkill;另注:2026-02 官方已撤回 Identity 的 deprecate,**別再講它「已 deprecated」**那是過期錯誤資訊)。
 
 ---
 
