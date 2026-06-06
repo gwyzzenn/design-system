@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { ChromeHeader } from '@/design-system/patterns/header-canonical/chrome-header'
 import { Button } from '@/design-system/components/Button/button'
+import { Separator } from '@/design-system/components/Separator/separator'
 import {
   Tabs,
   TabsList,
@@ -61,8 +62,11 @@ export const SingleRow = () => (
           2026 Q1 財務報告.pdf
         </span>
       </div>
+      {/* 右側按鈕 = children + flex(title flex-1 推開);排列遵循 action-bar:
+          動作群(放大/下載)── Separator ── dismiss(關閉)分群,buttons 全 size="sm"(chrome header canonical)*/}
       <Button iconOnly size="sm" startIcon={ZoomIn} aria-label="放大" />
       <Button iconOnly size="sm" startIcon={Download} aria-label="下載" />
+      <Separator orientation="vertical" className="h-6 mx-1" />
       <Button iconOnly dismiss size="sm" startIcon={X} aria-label="關閉" />
     </ChromeHeader>
     <div className="p-6 text-body text-fg-muted">文件預覽內容區…</div>
