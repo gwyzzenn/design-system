@@ -285,6 +285,15 @@ const report = {
 const logsDir = path.join(ROOT, '.claude/logs')
 if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir, { recursive: true })
 const outPath = path.join(logsDir, 'governance-counters.json')
+// 2026-06-06 idempotent write:內容(排除 ts)無變則沿用既有 ts,避免此檔每次 session-start run
+// 都換 ts 讓 git tree 永遠 dirty(cosmetic churn,no consumer 讀 ts 判 staleness — 已 grep 確認)。
+const serialize = (r) => JSON.stringify({ ...r, ts: undefined }, null, 2)
+if (fs.existsSync(outPath)) {
+  try {
+    const existing = JSON.parse(fs.readFileSync(outPath, 'utf8'))
+    if (serialize(existing) === serialize(report) && existing.ts) report.ts = existing.ts
+  } catch { /* corrupt existing → 正常重寫 */ }
+}
 fs.writeFileSync(outPath, JSON.stringify(report, null, 2))
 
 if (!QUIET || drifts.length) {

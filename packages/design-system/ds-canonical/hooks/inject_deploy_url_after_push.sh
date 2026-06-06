@@ -36,7 +36,11 @@ CMD=$(echo "$INPUT" | jq -r '.tool_input.command // ""' 2>/dev/null)
 [ "$TOOL" != "Bash" ] && exit 0
 
 # Heuristic:detect `git push origin <branch>` patterns
-if ! echo "$CMD" | grep -qE '\bgit\s+push\s+(-u\s+)?origin\b'; then
+# 2026-06-06 fix:要求 `git push` 出現在「命令邊界」(行首 / ; / && / || / $( ),
+# 否則 `P='git push origin'` 賦值、`echo "git push origin"`、`grep 'git push origin'` 等
+# 「字串裡提到 push」會誤觸發 → falls-back 到 current branch 吐 404 preview URL 注入 context。
+# 命令邊界 = 真的在執行 push,字串提及 = 噪音。對齊「只在真推送時 relay deploy URL」root invariant。
+if ! echo "$CMD" | grep -qE '(^|[;&|(])[[:space:]]*git[[:space:]]+push[[:space:]]+(-u[[:space:]]+)?origin\b'; then
   exit 0
 fi
 
@@ -48,6 +52,21 @@ fi
 CWD=$(pwd)
 URLS_FOUND=""
 BRANCH=$(echo "$CMD" | grep -oE 'origin\s+\S+' | awk '{print $2}' | head -1)
+# 2026-06-06 fix:refspec `src:dst` → 取 dst(`HEAD:main` → `main`),否則推導出 `HEAD:main--site` 404 URL
+case "$BRANCH" in *:*) BRANCH="${BRANCH##*:}" ;; esac
+# 2026-06-06 fix:`git push origin HEAD`(或 `@`)= symbolic ref 指向當前 branch → 解析成真 branch 名,
+# 否則把字面 "HEAD" 當 branch 推導出 `HEAD--site` 404 URL(real push 常用此式,會誤吐)。
+if [ "$BRANCH" = "HEAD" ] || [ "$BRANCH" = "@" ]; then
+  BRANCH=$(git -C "$CWD" branch --show-current 2>/dev/null || echo "")
+fi
+# 2026-06-06 fix:BRANCH 含非法 git ref 字元(" ' 空白 \ 等)→ 此命令只是「字串裡含 git push origin」
+# (測試迴圈 / 文件 / echo),非真推送 → skip,避免把 `main"` 等垃圾推導成 404 URL 注入 context。
+# git ref 合法字元集 ⊂ [A-Za-z0-9._/-];非此集 = 必為解析噪音(root guard,涵蓋 refspec/tag 之外的雜訊)。
+if [ -n "$BRANCH" ] && ! echo "$BRANCH" | grep -qE '^[A-Za-z0-9._/-]+$'; then exit 0; fi
+# 2026-06-06 fix:tag push(`v1.2.3` 等)不產 branch-preview / production deploy → skip,
+# 否則把 tag 名當 branch 推導出 `v0.1.0-beta.56--site` 404 URL(release tag push 每次都誤吐)
+if echo "$BRANCH" | grep -qE '^v[0-9]'; then exit 0; fi
+if [ -n "$BRANCH" ] && git -C "$CWD" rev-parse --verify --quiet "refs/tags/$BRANCH" >/dev/null 2>&1; then exit 0; fi
 [ -z "$BRANCH" ] && BRANCH=$(git -C "$CWD" branch --show-current 2>/dev/null || echo "main")
 
 # v3 2026-05-27:curl HEAD verify URL before reporting(per user「你確定有做到」complaint)
