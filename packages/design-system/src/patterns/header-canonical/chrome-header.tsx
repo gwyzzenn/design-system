@@ -2,8 +2,8 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 
 /**
- * @internal — DS-internal primitive(2026-05-23 per `.claude/rules/ui-development.md` Public vs Internal canonical)。
- * end-user app 直接 render `<ChromeHeader />` 無 functioning UI;由 Sidebar / FileViewer / Dialog / Sheet / Popover 等 DS 元件 wrap 消費。
+ * Public chrome-header composition primitive(header-canonical Pattern 的 runtime 件,對標 item-anatomy 的 MenuItem/slots:屬公開 Pattern 的可 import primitive)。
+ * 標準頁面 chrome 用成品元件(AppShell / Sidebar / FileViewer 內建 header);自建客製 header 才直接消費本 primitive,並 follow header-canonical.spec.md 設計契約。
  *
  * ChromeHeader — Fixed-height chrome header primitive(Layout Family B,header-canonical.spec.md)
  *

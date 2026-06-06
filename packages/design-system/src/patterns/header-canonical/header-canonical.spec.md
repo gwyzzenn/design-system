@@ -1,8 +1,7 @@
 ---
 pattern: header-canonical
-internal: true
 family: self-contained  # 跨元件 header 規則 SSOT,非 row element
-scope: cross-component header SSOT (chrome + overlay families)
+scope: cross-component header anatomy + 設計原則(公開 Pattern,對標 item-anatomy)— chrome + overlay families
 benchmark:
   - GitHub Primer PageHeader: https://primer.style/components/page-header/react — hasBorder auto-suppress when Navigation slot contains UnderlineNav
   - Ant Design Tabs: https://ant.design/components/tabs — "Large size tabs are usually used in page header, and small size could be used in Modal"

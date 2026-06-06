@@ -58,6 +58,7 @@ export * from './components/TreeView/index'
 
 // ─── Patterns ─────────────────────────────────────────────────────────────
 export * from './patterns/element-anatomy/index'
+export * from './patterns/header-canonical/index'
 export * from './patterns/resize-handle/index'
 
 // ─── Internal(subpath-only,排除 root front-door per dim-72 SSOT)─────────────
@@ -73,7 +74,6 @@ export * from './patterns/resize-handle/index'
 //   - components/ProfileCard
 //   - components/SelectMenu
 //   - components/SelectionControl
-//   - patterns/header-canonical
 //   - patterns/horizontal-overflow
 //   - patterns/overlay-surface
 

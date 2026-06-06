@@ -4,8 +4,8 @@
     "1. 是原子設計值(色/字/間距/圓角/陰影)? → token",
     "2. 沒有可 render 的件,只是『怎麼組多個元件解決情境』的指南? → pattern",
     "3. 是 fork consumer 的 app scaffold? → template",
-    "4. <X/> 空 props 自己 render 出有意義 UI 且 end-user 直接用? → component",
-    "5. 其餘(自己 render 無意義 / 只被 DS 內部 wrap) → internal"
+    "4. end-user 直接 import 來用(在 root barrel 前門 export + spec frontmatter 無 internal 旗標)? → component",
+    "5. 其餘(spec frontmatter 標 internal 旗標 / 只被 DS 內部 wrap 消費、不在 root 前門) → internal"
   ],
   "categories": {
     "token": {

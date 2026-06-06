@@ -25,6 +25,7 @@
 | 使用者頭像 | `<img className="w-8 h-8 rounded-full" />` | `<Avatar>` |
 | 浮層(彈出資訊) | `<div className="absolute bg-white shadow p-3">...</div>` | `<Popover>` / `<HoverCard>` / `<Tooltip>`(視語義選) |
 | 浮層 media + title + description + actions | 自組 `<div>` 結構 | `<Coachmark>` 或 `<Dialog>`(視是否阻斷) |
+| 固定高度 chrome header(toolbar / page top bar / panel 標題列)| 自組 `<div className="flex h-12 items-center border-b px-4">...</div>` | `<ChromeHeader>`(消費 header-canonical;或在 `<AppShell header={...}>` slot 傳它)|
 
 **Story 特別提醒**:**stories 也是 code**。如果 story 在 label / comment 說「DataTable cell 用法」「Table 配額」「Menu 選單」等,**要 render 真的該元件 demo,不可用 raw `<table>` / raw `<button>` 假裝**。否則 story 教壞 consumer、自己也在破壞 DS 訓練資料。
 
@@ -40,6 +41,7 @@
 |------|---------|---------|
 | 單列 row:prefix(icon/avatar) + content + suffix(action) | `patterns/element-anatomy/item-anatomy.*` — `<MenuItem>` canonical + slot components | 任何「列表項目」元件(Menu/Tree/Sidebar/TableRow/StepItem/FileItem...) |
 | 浮層容器的 Header + Body + Footer(border-b/t + padding token) | `patterns/overlay-surface/` — `SurfaceHeader/Body/Footer` | Dialog / Popover / Drawer / Sheet / 任何 elevation-200 浮層的結構化 sub-components |
+| **固定高度 chrome header(toolbar / page top bar / panel 標題列,border-b + px-loose + 高度 token)** | `patterns/header-canonical/` — `<ChromeHeader>`(`withTabs` / `leadingRail` / `lockDensity`)+ `header-canonical.spec.md` 設計契約 + `Patterns/Header Anatomy` story | Sidebar header / FileViewer Toolbar+InfoPanel / AppShell `header` slot / 未來 Drawer top bar |
 | **垂直居中 icon + title + description(+ action)** | `components/Empty/` — `<Empty>` 元件 | **「告訴使用者狀態」的 surface**:空資料 / 拖放邀請(FileUpload)/ 錯誤 / 首次引導 / 無權限 / 載入佔位(非 Skeleton)|
 | 橫向操作按鈕列（gap-2 分組）| `patterns/action-bar/` | Toolbar、page header actions、form footer buttons |
 | 水平溢出處理(捲動/收合,**隱藏捲軸+ fade-mask** UX)| `patterns/horizontal-overflow/` | Tabs / ChipGroup / 未來 Steps 的溢出(刻意隱藏 scrollbar) |
@@ -52,6 +54,7 @@
 - 新元件有 icon+text 垂直堆疊? → 用 `<Empty>`,不自己畫 icon + title + desc
 - 新元件有橫向 row 結構(prefix/content/suffix)? → 用 `element-anatomy/item-anatomy` 的 `<MenuItem>` + slot components(`<ItemIcon>` / `<ItemAvatar>` / `<ItemLabel>` / `<ItemSuffix>` / `<ItemInlineAction>`)
 - 新元件是浮層 + 有 header/body/footer? → 用 `overlay-surface`
+- 新元件是 **固定高度 chrome header(toolbar / page top bar / panel 標題列)**? → 用 `header-canonical` 的 `<ChromeHeader>`(border/padding/高度/tabs/dismiss 全契約;或在 `<AppShell header={...}>` slot 傳 `<ChromeHeader>`),**先讀 `header-canonical.spec.md` + `Patterns/Header Anatomy` story**,不自刻 `<div className="flex h-12 items-center border-b px-4">`
 - 新元件內容**可能溢出容器且需要使用者捲動**? → 用 `ScrollArea`(跨 OS 一致 overlay 捲軸);若是刻意隱藏捲軸 + fade-mask → 用 `horizontal-overflow` pattern
 - 新元件有**圖像 / media 容器需要鎖定長寬比**(防 CLS、統一多張圖比例)? → 用 `AspectRatio` primitive,不硬寫 `aspect-video` / `aspect-square` class
 - 以上都沒命中 → 才可自建,但 **建完要立刻回來加行**(防下一個人又重造輪子)
