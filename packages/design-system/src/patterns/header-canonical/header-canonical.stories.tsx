@@ -64,8 +64,8 @@ export const SingleRow = () => (
       </div>
       {/* 右側按鈕 = children + flex(title flex-1 推開);排列遵循 action-bar:
           動作群(放大/下載)── Separator ── dismiss(關閉)分群,buttons 全 size="sm"(chrome header canonical)*/}
-      <Button iconOnly size="sm" startIcon={ZoomIn} aria-label="放大" />
-      <Button iconOnly size="sm" startIcon={Download} aria-label="下載" />
+      <Button iconOnly variant="text" size="sm" startIcon={ZoomIn} aria-label="放大" />
+      <Button iconOnly variant="text" size="sm" startIcon={Download} aria-label="下載" />
       <Separator orientation="vertical" className="h-6 mx-1" />
       <Button iconOnly dismiss size="sm" startIcon={X} aria-label="關閉" />
     </ChromeHeader>
@@ -115,8 +115,8 @@ export const WithLeadingRail = () => (
       <h2 className="flex-1 truncate text-body-lg font-medium text-foreground">
         Acme 工作區
       </h2>
-      <Button iconOnly size="sm" startIcon={Search} aria-label="搜尋" />
-      <Button iconOnly size="sm" startIcon={Bell} aria-label="通知" />
+      <Button iconOnly variant="text" size="sm" startIcon={Search} aria-label="搜尋" />
+      <Button iconOnly variant="text" size="sm" startIcon={Bell} aria-label="通知" />
     </ChromeHeader>
     <div className="p-6 text-body text-fg-muted">工作區內容區…</div>
   </Panel>
