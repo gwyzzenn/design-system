@@ -208,7 +208,16 @@ const report = {
 
 const LOG_DIR = path.join(ROOT, '.claude/logs')
 if (!fs.existsSync(LOG_DIR)) fs.mkdirSync(LOG_DIR, { recursive: true })
-fs.writeFileSync(path.join(LOG_DIR, 'audit-coverage-matrix.json'), JSON.stringify(report, null, 2))
+const __coverageOut = path.join(LOG_DIR, 'audit-coverage-matrix.json')
+// 2026-06-06 idempotent write:內容(排除 ts)無變則沿用既有 ts,避免 CI(ci.yml)每次跑 churn git tree(無 consumer 讀 ts 判 staleness)
+const __serializeCov = (o) => JSON.stringify({ ...o, ts: undefined }, null, 2)
+if (fs.existsSync(__coverageOut)) {
+  try {
+    const __e = JSON.parse(fs.readFileSync(__coverageOut, 'utf8'))
+    if (__serializeCov(__e) === __serializeCov(report) && __e.ts) report.ts = __e.ts
+  } catch { /* corrupt existing → 正常重寫 */ }
+}
+fs.writeFileSync(__coverageOut, JSON.stringify(report, null, 2))
 
 console.log('═════════════════════════════════════════════════════')
 console.log(`▶ Audit Coverage Matrix(${expected} dims anti-sample tiers)`)

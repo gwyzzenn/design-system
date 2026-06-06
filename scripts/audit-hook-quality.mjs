@@ -131,6 +131,15 @@ const summary = {
   hotHooksForTuning: report.filter(r => r.classification === 'hot').map(r => r.hook),
 }
 
+// 2026-06-06 idempotent write:內容(排除 summary.generatedAt)無變則沿用既有時戳,避免每次跑 churn git tree
+const __payloadHQ = { summary, hooks: report }
+const __serializeHQ = (o) => JSON.stringify({ ...o, summary: { ...o.summary, generatedAt: undefined } }, null, 2)
+if (existsSync(OUT)) {
+  try {
+    const __e = JSON.parse(readFileSync(OUT, 'utf8'))
+    if (__serializeHQ(__e) === __serializeHQ(__payloadHQ) && __e.summary?.generatedAt) summary.generatedAt = __e.summary.generatedAt
+  } catch { /* corrupt existing → 正常重寫 */ }
+}
 writeFileSync(OUT, JSON.stringify({ summary, hooks: report }, null, 2))
 
 // 5. Console output

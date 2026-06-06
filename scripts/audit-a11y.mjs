@@ -144,6 +144,14 @@ await browser.close()
 server.close()
 
 if (!fs.existsSync(LOG_DIR)) fs.mkdirSync(LOG_DIR, { recursive: true })
+// 2026-06-06 idempotent write:violations(排除 ts)無變則沿用既有 ts,避免 CI(a11y-and-size.yml --gate)每次跑 churn git tree
+const __serializeA11y = (o) => JSON.stringify({ ...o, ts: undefined }, null, 2)
+if (fs.existsSync(LOG_FILE)) {
+  try {
+    const __e = JSON.parse(fs.readFileSync(LOG_FILE, 'utf8'))
+    if (__serializeA11y(__e) === __serializeA11y(results) && __e.ts) results.ts = __e.ts
+  } catch { /* corrupt existing → 正常重寫 */ }
+}
 fs.writeFileSync(LOG_FILE, JSON.stringify(results, null, 2))
 
 console.log('')
