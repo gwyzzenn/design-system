@@ -36,11 +36,14 @@ CMD=$(echo "$INPUT" | jq -r '.tool_input.command // ""' 2>/dev/null)
 [ "$TOOL" != "Bash" ] && exit 0
 
 # Heuristic:detect `git push origin <branch>` patterns
-# 2026-06-06 fix:要求 `git push` 出現在「命令邊界」(行首 / ; / && / || / $( ),
-# 否則 `P='git push origin'` 賦值、`echo "git push origin"`、`grep 'git push origin'` 等
-# 「字串裡提到 push」會誤觸發 → falls-back 到 current branch 吐 404 preview URL 注入 context。
-# 命令邊界 = 真的在執行 push,字串提及 = 噪音。對齊「只在真推送時 relay deploy URL」root invariant。
-if ! echo "$CMD" | grep -qE '(^|[;&|(])[[:space:]]*git[[:space:]]+push[[:space:]]+(-u[[:space:]]+)?origin\b'; then
+# 2026-06-06 fix:要求 `git push` 在「命令邊界」(行首 / ; / && / || / $( )擋字串提及(`P='git push origin'`)。
+# 2026-06-07 fix(對抗 sweep):容忍 env-prefix(`GIT_SSH_COMMAND=… git push`)/ `git -C <dir>` /
+# push 前後任意 flag(`--force-with-lease` / `-f` / `--set-upstream` / `--no-verify` 等)。原本只認 `-u`
+# → 漏 fire 在這些「真實 push」上 = 該吐 URL 卻沒吐,defeat hook purpose。
+_ENVP='([A-Za-z_][A-Za-z0-9_]*=[^[:space:]]+[[:space:]]+)*'
+_GITPRE='git[[:space:]]+(-C[[:space:]]+[^[:space:]]+[[:space:]]+|-[A-Za-z][^[:space:]]*[[:space:]]+)*push'
+_PUSHFLAGS='([[:space:]]+-{1,2}[A-Za-z][^[:space:]]*)*'
+if ! echo "$CMD" | grep -qE "(^|[;&|(])[[:space:]]*${_ENVP}${_GITPRE}${_PUSHFLAGS}[[:space:]]+origin\b"; then
   exit 0
 fi
 
@@ -50,21 +53,35 @@ if echo "$CMD" | grep -qE 'push\s+origin\s+--delete'; then
 fi
 
 CWD=$(pwd)
+# 2026-06-07 fix:偵測「真實 working dir」作 deploy-target 偵測根,跨 repo push 不吐「錯 repo」URL
+# (anchor:syncing ds-product-template 時吐成 DS 站台 URL)。優先 `git -C <dir>`;否則命令鏈中
+# 「最後一個 cd」(= push 時 effective cwd,**非第一個**;`echo x && cd /other && git push` 必用 /other)。
+_GITC=$(echo "$CMD" | grep -oE 'git[[:space:]]+-C[[:space:]]+[^[:space:]]+' | head -1 | sed -E 's/.*-C[[:space:]]+//; s/^"//; s/"$//')
+_LASTCD=$(echo "$CMD" | grep -oE '(^|[;&|(])[[:space:]]*cd[[:space:]]+[^;&|]+' | tail -1 | sed -E 's/.*cd[[:space:]]+//; s/[[:space:]]+$//; s/^"//; s/"$//')
+for _d in "$_GITC" "$_LASTCD"; do
+  if [ -n "$_d" ] && [ -d "$_d" ] && git -C "$_d" rev-parse --git-dir >/dev/null 2>&1; then CWD="$_d"; break; fi
+done
 URLS_FOUND=""
 # 2026-06-07 ROOT fix:只從「git push ... origin <ref>」這一段擷取 branch,不是整條 compound command 的
 # 第一個 `origin X`。否則 `git fetch origin --quiet && git push origin main` 會誤抓 fetch 段的 `--quiet`
 # 當 branch → 推導 `--quiet--site` 404(此前 5 道 guard 都沒擋到,因 `--quiet` 全是合法 git ref 字元)。
 # 隔出 push 段(到下個 command 分隔 ; & | 為止)後,取 origin 後第一個 token。
-PUSH_SEG=$(echo "$CMD" | grep -oE '(^|[;&|(])[[:space:]]*git[[:space:]]+push[[:space:]][^;&|]*' | head -1)
+# PUSH_SEG 用同一 env/-C/flag-tolerant prefix 隔出 push 段(到下個分隔 ; & | 為止),再取 origin 後第一 token
+PUSH_SEG=$(echo "$CMD" | grep -oE "(^|[;&|(])[[:space:]]*${_ENVP}${_GITPRE}[^;&|]*" | head -1)
 BRANCH=$(echo "$PUSH_SEG" | grep -oE 'origin[[:space:]]+[^[:space:]]+' | head -1 | awk '{print $2}')
 # origin 後第一個 token 是 flag(`git push origin --force` = 無顯式 branch)→ 清空走 current-branch fallback
 case "$BRANCH" in -*) BRANCH="" ;; esac
 # 2026-06-06 fix:refspec `src:dst` → 取 dst(`HEAD:main` → `main`),否則推導出 `HEAD:main--site` 404 URL
 case "$BRANCH" in *:*) BRANCH="${BRANCH##*:}" ;; esac
-# 2026-06-06 fix:`git push origin HEAD`(或 `@`)= symbolic ref 指向當前 branch → 解析成真 branch 名,
-# 否則把字面 "HEAD" 當 branch 推導出 `HEAD--site` 404 URL(real push 常用此式,會誤吐)。
+# 2026-06-07 fix:full-ref dst — `HEAD:refs/heads/main` → `main`(否則 `refs/heads/main--site` 誤判 preview);
+# `refs/tags/...` → tag push,skip
+case "$BRANCH" in refs/tags/*) exit 0 ;; esac
+BRANCH="${BRANCH#refs/heads/}"
+# 2026-06-06 fix:`git push origin HEAD`(或 `@`)= symbolic ref 指向當前 branch → 解析成真 branch 名。
+# 2026-06-07 fix:detached HEAD 時 show-current 回「空字串 + exit 0」→ BRANCH 留空,交給下方 value-based fallback
+# (原 `|| echo ""` 沒用,因 git 不是失敗而是成功回空)。
 if [ "$BRANCH" = "HEAD" ] || [ "$BRANCH" = "@" ]; then
-  BRANCH=$(git -C "$CWD" branch --show-current 2>/dev/null || echo "")
+  BRANCH=$(git -C "$CWD" branch --show-current 2>/dev/null)
 fi
 # 2026-06-06 fix:BRANCH 含非法 git ref 字元(" ' 空白 \ 等)→ 此命令只是「字串裡含 git push origin」
 # (測試迴圈 / 文件 / echo),非真推送 → skip,避免把 `main"` 等垃圾推導成 404 URL 注入 context。
@@ -74,7 +91,10 @@ if [ -n "$BRANCH" ] && ! echo "$BRANCH" | grep -qE '^[A-Za-z0-9._/-]+$'; then ex
 # 否則把 tag 名當 branch 推導出 `v0.1.0-beta.56--site` 404 URL(release tag push 每次都誤吐)
 if echo "$BRANCH" | grep -qE '^v[0-9]'; then exit 0; fi
 if [ -n "$BRANCH" ] && git -C "$CWD" rev-parse --verify --quiet "refs/tags/$BRANCH" >/dev/null 2>&1; then exit 0; fi
-[ -z "$BRANCH" ] && BRANCH=$(git -C "$CWD" branch --show-current 2>/dev/null || echo "main")
+# 2026-06-07 fix:仍空(bare `git push origin` / detached HEAD / 解析不出)→ 取 current branch(value-based);
+# 仍空 → 無法產生合法 URL(會變 `https://--site` malformed)→ skip,不亂猜 main。
+[ -z "$BRANCH" ] && BRANCH=$(git -C "$CWD" branch --show-current 2>/dev/null)
+[ -z "$BRANCH" ] && exit 0
 
 # v3 2026-05-27:curl HEAD verify URL before reporting(per user「你確定有做到」complaint)
 # v4 2026-05-27:add content sniff(防 squat URLs 200 但 unrelated content)
@@ -147,18 +167,28 @@ if [ -z "$URLS_FOUND" ] && [ -f "$CWD/netlify.toml" ]; then
     if [ -n "$REPO_NAME" ]; then CANDIDATES="$CANDIDATES https://${REPO_NAME}.netlify.app"; fi
   fi
 
-  REAL_URL=""
+  REAL_URL=""; REAL_NOTE=""
   if [ "$BRANCH" = "main" ] || [ "$BRANCH" = "master" ]; then
+    # 2026-06-07 fix:優先「200 + Storybook content」;沒有則退「200(內容非 Storybook)」,
+    # **不丟棄**已驗 200 的 candidate。anchor:apps/template 是真 product app(非 Storybook)→ 原
+    # is_storybook_deploy 把活著的 200 deploy 誤當 squat 報「全 404」,違反 user「不管是否 production 都給連結」。
+    FALLBACK_URL=""
     for candidate in $CANDIDATES; do
-      if [ "$(verify_url "$candidate")" = "OK" ] && is_storybook_deploy "$candidate"; then
-        REAL_URL="$candidate"
-        break
+      if [ "$(verify_url "$candidate")" = "OK" ]; then
+        if is_storybook_deploy "$candidate"; then
+          REAL_URL="$candidate"; REAL_NOTE="✅ verified 200 + Storybook content"; break
+        elif [ -z "$FALLBACK_URL" ]; then
+          FALLBACK_URL="$candidate"
+        fi
       fi
     done
+    if [ -z "$REAL_URL" ] && [ -n "$FALLBACK_URL" ]; then
+      REAL_URL="$FALLBACK_URL"; REAL_NOTE="✅ verified 200(內容非 Storybook — 可能 product app deploy)"
+    fi
     if [ -n "$REAL_URL" ]; then
-      URLS_FOUND="${URLS_FOUND}🚀 Netlify PRODUCTION(${BRANCH}): ${REAL_URL}  ✅ verified 200 + Storybook content\n"
+      URLS_FOUND="${URLS_FOUND}🚀 Netlify PRODUCTION(${BRANCH}): ${REAL_URL}  ${REAL_NOTE}\n"
     else
-      URLS_FOUND="${URLS_FOUND}🚀 Netlify PRODUCTION URL 未驗 — tried: ${CANDIDATES// /, }\n   ⚠️ 全 404 OR squat。需要 user 手動 share dashboard URL,OR 創 \$HOME/.claude/local/deploy-targets.json:\n   {\"${OWNER_REPO}\": \"https://<actual-site>.netlify.app\"}\n"
+      URLS_FOUND="${URLS_FOUND}🚀 Netlify PRODUCTION URL 未驗 — tried: ${CANDIDATES// /, }\n   ⚠️ 全 404。需要 user 手動 share dashboard URL,OR 創 \$HOME/.claude/local/deploy-targets.json:\n   {\"${OWNER_REPO}\": \"https://<actual-site>.netlify.app\"}\n"
     fi
   else
     # Branch preview:always use `<branch>--<sitename>` pattern,but sitename unknown unless USER_OVERRIDE

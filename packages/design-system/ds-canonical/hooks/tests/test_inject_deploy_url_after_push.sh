@@ -41,8 +41,17 @@ head_leaked()   { echo "$STDOUT" | grep -qE 'HEAD(--|:|\))'; }
 fn7() { echo "$STDOUT" | grep -q "feature-test" && ! head_leaked; }
 fn8() { ! head_leaked; }
 fn9() { echo "$STDOUT" | grep -q "feature-test"; }
-has_feature() { echo "$STDOUT" | grep -q "feature-test"; }
-no_quiet()    { ! echo "$STDOUT" | grep -q -- "--quiet"; }
+has_feature()  { echo "$STDOUT" | grep -q "feature-test"; }
+no_quiet()     { ! echo "$STDOUT" | grep -q -- "--quiet"; }
+no_refsheads() { ! echo "$STDOUT" | grep -q "refs/heads"; }
+# minimal git repo on branch $2 (+ optional netlify.toml if $3=netlify), at dir $1
+mkrepo() {
+  ( cd "$1" || exit 1
+    git init -q -b "$2" 2>/dev/null || { git init -q; git checkout -q -b "$2"; }
+    : > f; [ "${3:-}" = netlify ] && : > netlify.toml
+    git add -A 2>/dev/null
+    GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t git commit -q -m i 2>/dev/null )
+}
 fn10() { has_feature && no_quiet; }   # compound:fetch 段的 --quiet 不可被誤抓為 branch
 fn11() { has_feature; }                # compound:pull 段的 main 不可被誤抓(否則 grep feature-test 失敗)
 fn12() { has_feature; }                # bare push origin → fallback current branch
@@ -120,6 +129,55 @@ check "12 bare push origin → fallback current branch" fire 'fn12'
 # 13. flag-after-origin `git push origin --force`(無顯式 branch)→ fallback 當前 branch
 run_hook "git push origin --force"
 check "13 flag-after-origin → fallback current branch (no flag-as-branch)" fire 'fn13'
+
+# 14. cross-repo cd-parse:command `cd <other-repo> && git push` → hook 用 cd'd repo 作偵測根
+#     (2026-06-07 anchor:syncing ds-product-template 時 hook 吐成 DS 站台 URL)。
+#     TMP2 無 netlify.toml → 該 SKIP;若沒 cd-parse、誤用 $TMP〔有 netlify.toml〕→ 會 inject(=回歸)。
+TMP2=$(mktemp -d)
+(
+  cd "$TMP2" || exit 1
+  git init -q -b other-branch 2>/dev/null || { git init -q; git checkout -q -b other-branch; }
+  : > somefile
+  git add -A 2>/dev/null
+  GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t git commit -q -m init 2>/dev/null
+)
+run_hook "cd $TMP2 && git push origin other-branch"
+check "14 cross-repo cd-parse → uses cd'd repo (no deploy target there → skip, not \$TMP's URL)" skip
+rm -rf "$TMP2"
+
+# 15. flag-before-origin `--force-with-lease`(原 trigger 只認 -u → 漏 fire 真實 push)→ fire
+run_hook "git push --force-with-lease origin feature-test"
+check "15 flag-before-origin (--force-with-lease) → fire" fire 'has_feature'
+
+# 16. env-prefix `GIT_SSH_COMMAND=… git push`(原被命令邊界擋掉)→ fire
+run_hook "GIT_SSH_COMMAND=ssh git push origin feature-test"
+check "16 env-prefixed git push → fire" fire 'has_feature'
+
+# 17. --set-upstream(-u 的長形,原 trigger 漏)→ fire
+run_hook "git push --set-upstream origin feature-test"
+check "17 --set-upstream → fire" fire 'has_feature'
+
+# 18. `git -C <other-repo> push` → 用 -C 的 repo 作偵測根(無 netlify → skip,不吐 \$TMP 的 URL)
+TMP3=$(mktemp -d); mkrepo "$TMP3" ob
+run_hook "git -C $TMP3 push origin ob"
+check "18 git -C <repo> → uses that repo (no deploy target → skip)" skip
+rm -rf "$TMP3"
+
+# 19. detached HEAD `git push origin HEAD` → branch 解析空 → skip(不吐 https://--site malformed)
+TMP4=$(mktemp -d); mkrepo "$TMP4" m netlify; ( cd "$TMP4" && git checkout -q --detach 2>/dev/null )
+STDOUT=$( cd "$TMP4" && HOME="$TMP4/home" CLAUDE_PROJECT_DIR="$TMP4" bash "$HOOK" <<<'{"hook_event_name":"PostToolUse","tool_name":"Bash","tool_input":{"command":"git push origin HEAD"}}' 2>&1 ); EXIT=$?
+if [ "$EXIT" = 0 ] && ! injected && ! echo "$STDOUT" | grep -qE -- '--site|\(\)'; then echo "  PASS  19 detached HEAD → skip (no malformed URL)"; PASS=$((PASS+1)); else echo "  FAIL  19 (exit=$EXIT out=${STDOUT:0:140})"; FAIL=$((FAIL+1)); FAILED="${FAILED}\n  - 19"; fi
+rm -rf "$TMP4"
+
+# 20. cd-after-command `echo x && cd <other> && git push` → 用該 cd 的 repo(非 session/first)
+TMP5=$(mktemp -d); mkrepo "$TMP5" ob
+run_hook "echo hi && cd $TMP5 && git push origin ob"
+check "20 cd-after-command → uses that cd's repo (no deploy → skip)" skip
+rm -rf "$TMP5"
+
+# 21. refspec full-ref `HEAD:refs/heads/main` → 取 main,不洩漏 refs/heads
+run_hook "git push origin HEAD:refs/heads/main"
+check "21 refspec refs/heads → no refs/heads leak" fire 'no_refsheads'
 
 teardown
 
