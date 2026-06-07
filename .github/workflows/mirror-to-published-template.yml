@@ -85,31 +85,40 @@ jobs:
           # 即可用既有 PAT 正常 sync。Workflow 檔變更需 PAT 另加 `workflow` scope(classic)或 `Workflows: write`(fine-grained)。
           # 用 clone+rsync(非 force-push 空 tree)→ 不會誤刪 published repo 既有 workflows。
           git clone --depth 1 "$REPO_URL" /tmp/published
-          rsync -a --delete --exclude='.git' --exclude='.github/workflows' /tmp/mirror-build/ /tmp/published/
+          # 2026-06-07 C1 ROOT FIX:--checksum 強制逐檔「內容」比對,不靠 size+mtime quick-check。
+          # Root cause(本地已復現 rsync -a vs -ac):`^0.1.0-beta.36` 與 `^0.1.0-beta.58` byte 長度相同
+          # (beta.NN 恆 2 位),且 git clone 與 mirror-build 同一秒寫 package.json → rsync -a 的 size+mtime
+          # 啟發式判定「沒變」靜默跳過 → 推出去的 package.json 永遠停在舊版(beta.58 mirror 假綠 + 連環 stale 根因)。
+          rsync -a --checksum --delete --exclude='.git' --exclude='.github/workflows' /tmp/mirror-build/ /tmp/published/
           cd /tmp/published
+          # 2026-06-07 fail-closed guard:rsync 後 published package.json 的 DS dep 必 == build 寫出的版本,
+          # 否則代表 overlay 又靜默失敗 → 直接 fail,絕不再靜默推 stale package.json(C1 不可回歸)。
+          BUILT_VER=$(node -p "require('$GITHUB_WORKSPACE/packages/design-system/package.json').version")
+          GOT_DEP=$(node -p "(require('/tmp/published/package.json').dependencies||{})['@qijenchen/design-system']||''")
+          if [ "$GOT_DEP" != "^$BUILT_VER" ]; then
+            echo "❌ rsync overlay 驗證失敗:published package.json DS dep = '$GOT_DEP',預期 '^$BUILT_VER'。中止,不推 stale。"
+            exit 1
+          fi
+          echo "✓ overlay 驗證通過:published package.json DS dep = $GOT_DEP"
           # Regenerate package-lock.json matching the FULL published structure(scaffold + apps/template workspace).
           # Why:published Audit CI 用 setup-node cache:npm + npm ci → 需 valid committed lock 含 @product/template
           # workspace。Template source(template/ds-product-template/)無 apps/ → 只有此 mirror 結構能生正確 lock。
-          # rsync 上一步已移除 clone 的舊 lock(mirror-build 無 lock)→ 在此重生確保與 scaffold 同步。
           #
-          # 2026-06-06 RACE FIX:此 mirror 與 Release 同 push 觸發,但 Release npm publish 約 +11min 才完成。
-          # 若 scaffold 的 @qijenchen/design-system 版本是「本次剛 bump、npm 尚未發布」→ npm install 撞
-          # ETARGET(beta.56 / beta.57 mirror 連敗 root cause)。故先 poll 等目標版本上 npm 才重生 lock。
-          # 非版本變更(template 內容改)時版本早已在 npm → poll 立即通過,零等待。
-          DS_VER=$(node -p "(require('/tmp/published/package.json').dependencies||{})['@qijenchen/design-system']||''" | sed 's/[\^~>=< ]//g')
-          if [ -n "$DS_VER" ]; then
-            echo "⏳ 等 @qijenchen/design-system@$DS_VER 上 npm(避開 release-publish race,最多 15min)..."
-            for i in $(seq 1 60); do
-              if npm view "@qijenchen/design-system@$DS_VER" version >/dev/null 2>&1; then
-                echo "✓ @qijenchen/design-system@$DS_VER 已上 npm,繼續重生 lock"; break
-              fi
-              if [ "$i" -eq 60 ]; then
-                echo "❌ 等 npm 逾時 15min — Release 可能失敗 / 延遲。本次不 mirror(避免寫出指向不存在版本的 lock)。"
-                exit 1
-              fi
-              sleep 15
-            done
-          fi
+          # RACE:此 mirror 與 Release 同 push 觸發,Release npm publish 約 +11min 才完成。mirror-build 把剛 bump 的
+          # ^$BUILT_VER 寫進 package.json,npm install 需該版已上 npm → 否則 ETARGET(beta.56/57 連敗根因)。故 poll
+          # 等「正在發布的版本」($BUILT_VER,直接讀 DS source,不靠 clone 的舊值)上 npm 才重生 lock。
+          # 非版本變更時 $BUILT_VER 早已在 npm → 立即通過,零等待。
+          echo "⏳ 等 @qijenchen/design-system@$BUILT_VER 上 npm(避開 release-publish race,最多 15min)..."
+          for i in $(seq 1 60); do
+            if npm view "@qijenchen/design-system@$BUILT_VER" version >/dev/null 2>&1; then
+              echo "✓ @qijenchen/design-system@$BUILT_VER 已上 npm,繼續重生 lock"; break
+            fi
+            if [ "$i" -eq 60 ]; then
+              echo "❌ 等 npm 逾時 15min — Release 可能失敗 / 延遲。本次不 mirror(避免寫出指向不存在版本的 lock)。"
+              exit 1
+            fi
+            sleep 15
+          done
           npm install --package-lock-only --ignore-scripts --no-audit --no-fund
           git config user.name "DS Mirror Bot"
           git config user.email "bot@noreply.github.com"
