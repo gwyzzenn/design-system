@@ -183,8 +183,7 @@ CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap
 
 # 專案 Stack
 
-Vite + React + TypeScript + Tailwind v4 + shadcn/ui + Storybook + 自訂 Design Token。
-必要檔案:`index.html` / `src/main.tsx` / `src/globals.css` / `vite.config.ts` / `package.json` / `tsconfig.json`。
+Vite + React + TypeScript + Tailwind v4 + shadcn/ui + Storybook + 自訂 Design Token。必要檔案:`index.html` / `src/main.tsx` / `src/globals.css` / `vite.config.ts` / `package.json` / `tsconfig.json`。
 完整路徑 + Token 系統 → `packages/design-system/src/tokens/README.md`(charter)— Phase 1 後 DS 內化在 npm workspace。
 
 # Path-scoped rules(2026 Anthropic 推薦)
