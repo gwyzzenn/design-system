@@ -13,6 +13,12 @@ on:
     types: [design-system-published, ds-published, ds-ssot-changed]
   workflow_dispatch:
 
+# 2026-06-07 C3 fix:同一 DS release 會同時 dispatch design-system-published / ds-published / ds-ssot-changed
+# → 多個並發 run 互推 main 造成 race / non-fast-forward / 丟更新。concurrency group serialize(不取消、排隊跑)。
+concurrency:
+  group: ds-product-template-sync
+  cancel-in-progress: false
+
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -95,5 +101,7 @@ jobs:
           git config user.email 'noreply@qijenchen.dev'
           git add -A
           git commit -m "chore(sync): auto-bump @qijenchen/* to latest @beta(from DS release dispatch)"
+          # 2026-06-07 C3 fix:推前先 rebase(autostash),萬一仍有並發(workflow_dispatch + dispatch 重疊)也不 fail。
+          git pull --rebase --autostash 2>/dev/null || true
           git push
           echo "✓ pushed auto-sync commit"

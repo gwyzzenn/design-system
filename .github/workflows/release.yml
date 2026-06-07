@@ -113,6 +113,7 @@ jobs:
           node scripts/plugin-structure-validate.mjs
           npm run --silent story-quality:check
           node scripts/sync-ds-canonical.mjs --check
+          node scripts/sync-template-canonical-app.mjs --check
 
       - name: Build Storybook
         run: npm run build-storybook
