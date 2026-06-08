@@ -1,4 +1,5 @@
-// @anatomy-exempt: Header Anatomy pattern story — demos ChromeHeader primitive 各型(single-row / withTabs / leadingRail)。
+// @anatomy-exempt: Header Anatomy pattern story — demos ChromeHeader primitive generic 型(single-row / withTabs)。
+// （leadingRail slot 因專搭 sidebar,canonical demo 在 AppShell primary-header,不在此孤立展示。）
 // 內部 title 用 flex 排列是 header content 結構,非 list row,不走 item-anatomy MenuItem。
 //
 // 公開 Pattern anatomy 參照(對標 patterns/element-anatomy/item-anatomy.stories.tsx)。
@@ -11,9 +12,6 @@ import {
   ZoomIn,
   Download,
   X,
-  Search,
-  Bell,
-  LayoutGrid,
 } from 'lucide-react'
 import { ChromeHeader } from '@/design-system/patterns/header-canonical/chrome-header'
 import { Button } from '@/design-system/components/Button/button'
@@ -105,24 +103,10 @@ export const WithTabs = () => (
   </Panel>
 )
 
-/** 3. leadingRail — 左側固定寬 rail(對標 AppShell primary-header globalHeader,
- *  rail 寬 = sidebar 收合寬,內容置中,跟 sidebar 收合 icon 完美對齊)。*/
-export const WithLeadingRail = () => (
-  <Panel>
-    <ChromeHeader
-      leadingRail={<LayoutGrid size={20} className="text-foreground" aria-hidden />}
-    >
-      <h2 className="flex-1 truncate text-body-lg font-medium text-foreground">
-        Acme 工作區
-      </h2>
-      <Button iconOnly variant="text" size="sm" startIcon={Search} aria-label="搜尋" />
-      <Button iconOnly variant="text" size="sm" startIcon={Bell} aria-label="通知" />
-    </ChromeHeader>
-    <div className="p-6 text-body text-fg-muted">工作區內容區…</div>
-  </Panel>
-)
-
-/** Overview — 三型疊起來一次看完,每型上方標清「何時用 + 對標既有元件」。 */
+/** Overview — header anatomy 兩型疊起來一次看完,每型上方標清「何時用 + 對標既有元件」。
+ *  注:ChromeHeader 另有 `leadingRail` slot,但它專為「跟 sidebar 收合 icon 對齊」而生(寬 = sidebar 收合寬),
+ *  只在有 sidebar 時有意義 → canonical demo 放 AppShell primary-header(leadingRail = <SidebarTrigger />),
+ *  不在此 generic header anatomy 孤立展示(2026-06-08 per user:孤立 demo 會誤導成通用 slot,且 icon 易被亂換)。*/
 export const Overview = () => (
   <div className="flex flex-col gap-8">
     <section className="flex flex-col gap-2">
@@ -140,11 +124,11 @@ export const Overview = () => (
       <WithTabs />
     </section>
     <section className="flex flex-col gap-2">
-      <div className="text-body font-medium text-foreground">leadingRail(左側固定寬 rail)</div>
+      <div className="text-body font-medium text-foreground">leadingRail — 見 AppShell（非此處）</div>
       <div className="text-body-sm text-fg-muted">
-        全域頂部 bar。對標 AppShell primary-header globalHeader。rail 寬 = sidebar 收合寬,跟收合 icon 對齊。
+        ChromeHeader 另有 leadingRail slot(寬 = sidebar 收合寬,專為跟 sidebar 收合 icon 對齊)。因它只在「有
+        sidebar」時有意義,canonical demo 放在 AppShell primary-header（leadingRail = SidebarTrigger）,不在此孤立展示。
       </div>
-      <WithLeadingRail />
     </section>
   </div>
 )
