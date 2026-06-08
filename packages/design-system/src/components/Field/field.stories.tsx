@@ -81,15 +81,19 @@ export const StateCascade: Story = {
           <Field disabled className="w-44"><FieldLabel>啟用通知</FieldLabel><Switch defaultChecked /></Field>
           <Field disabled className="w-44"><FieldLabel>滿意度</FieldLabel><Rating value={4} aria-label="滿意度" /></Field>
           <Field disabled className="w-44"><FieldLabel>完成度</FieldLabel><Slider value={[60]} onValueChange={() => {}} /></Field>
+          <Field disabled className="w-44"><FieldLabel>同意條款</FieldLabel><Checkbox defaultChecked /></Field>
+          <Field disabled className="w-44"><FieldLabel>付款方式</FieldLabel><RadioGroup defaultValue="card"><RadioGroupItem value="card" label="信用卡" /><RadioGroupItem value="cash" label="貨到付款" /></RadioGroup></Field>
         </div>
       </div>
       <div>
-        <p className="text-body-sm font-medium text-fg-muted mb-3">{'<Field mode="display"> — 有展示態的控件自動切純展示（Select / DatePicker 修復後生效）'}</p>
+        <p className="text-body-sm font-medium text-fg-muted mb-3">{'<Field mode="display"> — 有展示態的控件自動切純展示（Select / DatePicker / Checkbox / Switch 修復後生效）'}</p>
         <div className="flex flex-wrap gap-x-8 gap-y-4 max-w-3xl">
           <Field mode="display" className="w-44"><FieldLabel>負責人</FieldLabel><Input value="王小明" onChange={() => {}} /></Field>
           <Field mode="display" className="w-44"><FieldLabel>優先級</FieldLabel><Select options={CASCADE_PRIORITY} value="high" aria-label="優先級" /></Field>
           <Field mode="display" className="w-44"><FieldLabel>截止日</FieldLabel><DatePicker value="2026-06-20" onChange={() => {}} /></Field>
           <Field mode="display" className="w-44"><FieldLabel>數量</FieldLabel><NumberInput value={42} onChange={() => {}} /></Field>
+          <Field mode="display" className="w-44"><FieldLabel>已啟用</FieldLabel><Switch checked /></Field>
+          <Field mode="display" className="w-44"><FieldLabel>同意條款</FieldLabel><Checkbox checked /></Field>
         </div>
       </div>
     </div>

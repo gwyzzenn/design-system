@@ -160,7 +160,7 @@ Form wrapper 可透過 context 注入 `error` prop，消費者不需要在每個
 - **欄位內的展示元素**（Avatar）→ 跟隨 `<Field disabled>` / `<Field mode="disabled">` **變淡**（視覺一致），用 fieldCtx 存在性 scope（DataTable cell 無 fieldCtx → 不影響）。
 - **獨立 action 元件**（Button）→ **不**自動 cascade；由 consumer 自控 `disabled`（對齊 MUI Button 無 FormControl 整合 + Ant 排除 custom／非表單控件）。
 
-注：Switch / Slider / Rating 只有 enabled/disabled，**無** display/readonly 態 → 僅響應 `<Field disabled>`，不響應 `<Field mode="display"/"readonly">`；有 display 渲染分支的 Input 家族 / Select / Combobox / DatePicker / TimePicker / PeoplePicker 才完整響應 mode cascade。
+注：有 display 渲染分支者（Input 家族 / Select / Combobox / DatePicker / TimePicker / PeoplePicker / **Checkbox** / **Switch**，後二者 display = ✓/—）完整響應 `<Field mode="display"/"readonly">` + `<Field disabled>`；**Slider / Rating / SegmentedControl 無 display/readonly 態**（僅 enabled/disabled）→ 只響應 `<Field disabled>`。**group 控件（Checkbox/RadioGroup/Switch/SegmentedControl）雖非 fieldWrapperStyles 消費者，仍一律經 resolver hook 解析**（gate Check 1b/2 強制）。
 
 **機械強制**：`scripts/check-field-cascade-resolve.mjs`（ci + release:preflight）—— 消費 `fieldWrapperStyles` 的控件若散落手刻 `fieldCtx?.{disabled,mode}` 解析（而非走 resolver hook）= fail，防新控件重演 cascade 漏接。
 

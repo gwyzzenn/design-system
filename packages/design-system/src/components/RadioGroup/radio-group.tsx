@@ -6,7 +6,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 import type { FieldMode, FieldVariant } from "@/design-system/components/Field/field-types"
-import { useFieldContext } from "@/design-system/components/Field/field-context"
+import { useResolvedFieldMode, useResolvedFieldDisabled } from "@/design-system/components/Field/field-context"
 import { SelectionItem } from "@/design-system/components/SelectionControl/selection-item"
 import { EMPTY_DISPLAY } from "@/design-system/components/Field/field-wrapper"
 
@@ -46,11 +46,13 @@ const RadioGroup = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Root>,
   RadioGroupProps
 >(({ className, mode, variant: _chrome, value, defaultValue, ...props }, ref) => {
+  // 2026-06-08 SSOT cascade:resolvedMode 經 resolver hook 讀 fieldCtx(原 root 完全不讀 → <Field disabled>/<Field mode> 失效)
+  const resolvedMode = useResolvedFieldMode({ mode, disabled: (props as { disabled?: boolean }).disabled })
   // mode='display' — 純展示 selected option 的 label,不渲染任何 radio control 視覺。
   // 對齊 Carbon read-only single-select(只顯示 selected 內容)+ Airtable / Notion read-only。
   // 實作:walk children 找 control.value === selectedValue 的 SelectionItem,render label plain text。
   // (不用 context dispatch 給 RadioGroupItem — SelectionItem layout wrapper 仍會渲染所有 item label)
-  if (mode === 'display') {
+  if (resolvedMode === 'display') {
     const selectedValue = (value ?? defaultValue) as string | undefined
     if (!selectedValue) {
       return <div role="group" className={cn('grid', className)}><span className="text-fg-muted">{EMPTY_DISPLAY}</span></div>
@@ -77,13 +79,13 @@ const RadioGroup = React.forwardRef<
   // mode='disabled' → Radix Root disabled(原生 propagate 給所有 item);
   // mode='readonly' → context 傳 readOnly 給 items(item 渲染為 data-[readonly] 鎖互動 + aria-readonly)。
   return (
-    <RadioGroupReadonlyContext.Provider value={mode === 'readonly'}>
+    <RadioGroupReadonlyContext.Provider value={resolvedMode === 'readonly'}>
       <RadioGroupPrimitive.Root
         className={cn("grid", className)}
         value={value}
         defaultValue={defaultValue}
         {...props}
-        disabled={mode === 'disabled' || (props as { disabled?: boolean }).disabled}
+        disabled={resolvedMode === 'disabled'}
         ref={ref}
       />
     </RadioGroupReadonlyContext.Provider>
@@ -188,7 +190,7 @@ const RadioGroupItem = React.forwardRef<
     // RadioGroupItem 的 label 是「該選項」的 label（每 item 各自擁有），
     // FieldLabel 則是整個 RadioGroup 的 label。
     // 因此 RadioGroupItem 的 label 不因 Field context 被忽略。
-    const fieldCtx = useFieldContext()
+    const resolvedDisabled = useResolvedFieldDisabled(disabled)
     // group-level readonly(RadioGroup mode='readonly')或 item-level readOnly,任一 true 即鎖互動。
     const groupReadonly = React.useContext(RadioGroupReadonlyContext)
     const effectiveReadonly = readOnly || groupReadonly
@@ -200,7 +202,7 @@ const RadioGroupItem = React.forwardRef<
       <RadioGroupPrimitive.Item
         id={inputId}
         ref={ref}
-        disabled={disabled}
+        disabled={resolvedDisabled}
         aria-readonly={effectiveReadonly || undefined}
         data-readonly={effectiveReadonly || undefined}
         tabIndex={effectiveReadonly ? -1 : undefined}
@@ -219,10 +221,7 @@ const RadioGroupItem = React.forwardRef<
     // 無 label → 只渲染 radio 本體
     if (label == null) return rootEl
 
-    // 有 label → 透過 SelectionItem 包裝，與 Checkbox 一致
-    // 同時繼承 Field context 的 disabled（若 RadioGroup 在 Field disabled 內）
-    const resolvedDisabled = disabled ?? fieldCtx?.disabled ?? false
-
+    // 有 label → 透過 SelectionItem 包裝，與 Checkbox 一致（disabled 已於上方 useResolvedFieldDisabled 解析）
     return (
       <SelectionItem
         control={rootEl}

@@ -6,7 +6,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 import type { FieldMode, FieldVariant } from "@/design-system/components/Field/field-types"
-import { useFieldContext } from "@/design-system/components/Field/field-context"
+import { useFieldContext, useResolvedFieldDisabled, useResolvedFieldMode } from "@/design-system/components/Field/field-context"
 import { SelectionItem } from "@/design-system/components/SelectionControl/selection-item"
 import { CheckboxGroupContext } from "./checkbox-group"
 
@@ -164,9 +164,14 @@ const Checkbox = React.forwardRef<
     const generatedId = React.useId()
     const inputId = idProp ?? (insideGroup ? generatedId : (fieldCtx?.id ?? generatedId))
 
+    // 2026-06-08 SSOT cascade:disabled + mode 經 resolver hook(原 raw prop → <Field disabled>/<Field mode="display"> 漏 cascade)
+    const resolvedDisabled = useResolvedFieldDisabled(disabled)
+    const resolvedMode = useResolvedFieldMode({ mode, disabled, readOnly })
+    const effectiveReadOnly = readOnly || resolvedMode === 'readonly'
+
     // ── mode='display'(下移至所有 hooks 之後,per #35 Rules of Hooks)──────────
     // 純展示模式:無互動 primitive、渲染 ✓ / —(checked=true → ✓ / 其他 → —)。取代 BooleanDisplay。
-    if (mode === 'display') {
+    if (resolvedMode === 'display') {
       const isChecked = props.checked === true
       return isChecked
         ? <span className="text-foreground">✓</span>
@@ -177,10 +182,10 @@ const Checkbox = React.forwardRef<
       <CheckboxPrimitive.Root
         id={inputId}
         ref={ref}
-        disabled={disabled}
-        aria-readonly={readOnly || undefined}
-        data-readonly={readOnly || undefined}
-        tabIndex={readOnly ? -1 : undefined}
+        disabled={resolvedDisabled}
+        aria-readonly={effectiveReadOnly || undefined}
+        data-readonly={effectiveReadOnly || undefined}
+        tabIndex={effectiveReadOnly ? -1 : undefined}
         aria-describedby={fieldCtx?.descriptionId}
         className={cn(checkboxVariants({ size }), className)}
         {...props}
@@ -204,7 +209,7 @@ const Checkbox = React.forwardRef<
         label={effectiveLabel}
         description={effectiveDescription}
         htmlFor={inputId}
-        disabled={disabled}
+        disabled={resolvedDisabled}
         size={sizeKey}
       />
     )

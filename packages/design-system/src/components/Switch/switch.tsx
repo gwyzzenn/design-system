@@ -5,7 +5,7 @@ import { Check } from 'lucide-react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
-import { useFieldContext, useResolvedFieldDisabled } from '@/design-system/components/Field/field-context'
+import { useFieldContext, useResolvedFieldDisabled, useResolvedFieldMode } from '@/design-system/components/Field/field-context'
 
 /**
  * Switch — 開關控件
@@ -147,8 +147,10 @@ const Switch = React.forwardRef<
     // 2026-05-31 #35:hooks(useFieldContext / useId)必在任何 conditional return 前呼叫(Rules of Hooks)。
     // 原 mode='display' early return 寫在 hooks 之上 → runtime 切 mode 會 hook count 不一致 crash;已下移至 hooks 後。
     const fieldCtx = useFieldContext()
-    // 2026-06-08 SSOT:<Field disabled> cascade(原 disabled 直傳 prop,漏 fieldCtx.disabled)
+    // 2026-06-08 SSOT:<Field disabled>/<Field mode> cascade(原 disabled/mode 直傳 prop,漏 fieldCtx)
     const disabled = useResolvedFieldDisabled(disabledProp)
+    const resolvedMode = useResolvedFieldMode({ mode, disabled, readOnly })
+    const effectiveReadOnly = readOnly || resolvedMode === 'readonly'
     const insideField = fieldCtx?.hasFieldWrapper === true
     const effectiveLabel = insideField ? undefined : label
     const effectiveDescription = insideField ? undefined : description
@@ -167,7 +169,7 @@ const Switch = React.forwardRef<
 
     // ── mode='display'(下移至所有 hooks 之後,per #35 Rules of Hooks)──────────
     // 純展示模式:無互動 toggle、渲染 ✓ / —。與 Checkbox display 對齊(同 boolean primitive)。
-    if (mode === 'display') {
+    if (resolvedMode === 'display') {
       const isChecked = props.checked === true
       return isChecked
         ? <span className="text-foreground">✓</span>
@@ -180,9 +182,9 @@ const Switch = React.forwardRef<
         className={cn(switchVariants({ size }), alignRightInField, className)}
         ref={ref}
         disabled={disabled}
-        aria-readonly={readOnly || undefined}
-        data-readonly={readOnly || undefined}
-        tabIndex={readOnly ? -1 : undefined}
+        aria-readonly={effectiveReadOnly || undefined}
+        data-readonly={effectiveReadOnly || undefined}
+        tabIndex={effectiveReadOnly ? -1 : undefined}
         aria-describedby={fieldCtx?.descriptionId}
         {...props}
       >
