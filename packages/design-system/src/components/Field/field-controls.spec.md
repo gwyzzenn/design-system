@@ -138,6 +138,34 @@ Form wrapper 可透過 context 注入 `error` prop，消費者不需要在每個
 
 ---
 
+## Field context cascade — SSOT（2026-06-08）
+
+`<Field>` 透過 context 把欄位狀態流給「所有」子控件，控件**不可各自手刻解析邏輯**，一律消費 `field-context.ts` 的 resolver hook（SSOT，precedence 全庫一致）：
+
+| 流下的狀態 | Resolver hook | Precedence |
+|---|---|---|
+| size | `useResolvedFieldSize(prop)` | prop > fieldCtx.size > surface-size > fallback |
+| disabled | `useResolvedFieldDisabled(prop)` | prop > fieldCtx.disabled > false |
+| mode | `useResolvedFieldMode({ mode, disabled, readOnly })` | 顯式 mode prop > 有效 disabled→`'disabled'` > fieldCtx.mode > readOnly > `'edit'` |
+| variant | `useResolvedFieldVariant(prop)` | prop > fieldCtx.variant > `'default'` |
+| error/invalid | `useResolvedFieldInvalid(prop)` | prop OR fieldCtx.invalid |
+
+**precedence 關鍵**：顯式 prop 永遠最優先（故 DataTable cell 顯式傳 mode/size → 完全不受 context 影響）；其次「有效 disabled」（prop 或 `<Field disabled>`）強制 `'disabled'` 完整 chrome（對齊 MUI FormControl「disabled → label/input displayed in a disabled state」）。`<Field disabled>` 只設 `ctx.disabled=true`、`ctx.mode` 仍是 `'edit'`，故控件**必須讀 disabled 而非只讀 mode**，否則 `<Field disabled>` 失效（2026-06-08 PeoplePicker/Switch/Rating/Slider/Avatar 之 cascade bug 根因）。
+
+### 哪些元件吃 `<Field disabled>` cascade（一致判斷標準）
+
+判準 = **「這個元件是不是承載／編輯一個欄位值的互動控件？」**（對齊 MUI FormControl 對 form control 的 cascade、Ant `Form disabled` 排除非表單控件如 Segmented/Tabs）：
+
+- **承載欄位值的互動控件** → 完整 cascade（disabled + 有 display 態者含 mode）：Input / NumberInput / Textarea / LinkInput / Select / Combobox / DatePicker / TimePicker / PeoplePicker / Switch / Checkbox / RadioGroup / Slider / SegmentedControl / Rating。
+- **欄位內的展示元素**（Avatar）→ 跟隨 `<Field disabled>` / `<Field mode="disabled">` **變淡**（視覺一致），用 fieldCtx 存在性 scope（DataTable cell 無 fieldCtx → 不影響）。
+- **獨立 action 元件**（Button）→ **不**自動 cascade；由 consumer 自控 `disabled`（對齊 MUI Button 無 FormControl 整合 + Ant 排除 custom／非表單控件）。
+
+注：Switch / Slider / Rating 只有 enabled/disabled，**無** display/readonly 態 → 僅響應 `<Field disabled>`，不響應 `<Field mode="display"/"readonly">`；有 display 渲染分支的 Input 家族 / Select / Combobox / DatePicker / TimePicker / PeoplePicker 才完整響應 mode cascade。
+
+**機械強制**：`scripts/check-field-cascade-resolve.mjs`（ci + release:preflight）—— 消費 `fieldWrapperStyles` 的控件若散落手刻 `fieldCtx?.{disabled,mode}` 解析（而非走 resolver hook）= fail，防新控件重演 cascade 漏接。
+
+---
+
 ## Size — 與 Button 對齊
 
 | Size | 高度 token | Tailwind | 字體 |

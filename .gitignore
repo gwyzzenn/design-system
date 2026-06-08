@@ -114,3 +114,4 @@ tmp/
 /treeview.png
 /smoke.png
 *.tsbuildinfo
+storybook-static-baseline/

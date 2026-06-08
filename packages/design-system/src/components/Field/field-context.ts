@@ -162,6 +162,64 @@ export function useResolvedFieldSize<T extends string = FieldSize>(sizeProp?: T 
 }
 
 /**
+ * Resolve Field control 的 **disabled** — 取代散落的 `disabledProp ?? fieldCtx?.disabled`(2026-06-08 SSOT)。
+ * 優先序:顯式 prop > FieldContext.disabled(`<Field disabled>` / `<Field mode="disabled">`)> false。
+ * **caller 必傳「未預設」的原始 prop**(沒傳 = undefined),否則 `disabled=false` 預設會吃掉 `??` fallback。
+ * DataTable cell 無 FieldContext(fieldCtx=null)→ 回 prop 或 false,行為與現況完全一致(inert)。
+ */
+export function useResolvedFieldDisabled(disabledProp?: boolean | null): boolean {
+  const fieldCtx = React.useContext(FieldContext)
+  return disabledProp ?? fieldCtx?.disabled ?? false
+}
+
+/**
+ * Resolve Field control 的 **mode**(display / readonly / disabled / edit)— 2026-06-08 SSOT,統一兩派散落:
+ *   舊 Input 派 `modeProp ?? fieldCtx?.mode ?? (...)` → `<Field disabled>` 時 ctx.mode 仍 'edit',漏 disabled chrome。
+ *   舊 picker 派 `disabled ? 'disabled' : mode`(mode 預設 'edit')→ 完全不讀 fieldCtx.mode,`<Field mode="display">` 失效。
+ * 統一優先序(world-class:MUI FormControl disabled 完整 cascade + 顯式 prop 永遠最優先):
+ *   1. 顯式 mode prop(caller / DataTable cell 的 displayOrDisabled)→ **永遠最優先**,故表格等顯式場景 inert
+ *   2. 有效 disabled(prop 或 `<Field disabled>`)→ 'disabled'(完整 disabled chrome)
+ *   3. FieldContext.mode(`<Field mode="display"/"readonly">`)→ 讓 mode cascade 真正生效
+ *   4. 本地 readOnly → 'readonly'
+ *   5. 'edit'
+ * cell:mode prop 必有 → step 1 命中、fieldCtx=null → 完全 inert(Δ=0)。`disabled` 傳已 resolve 的 boolean 或未預設 prop。
+ */
+export function useResolvedFieldMode({
+  mode,
+  disabled,
+  readOnly,
+}: {
+  mode?: FieldMode | null
+  disabled?: boolean | null
+  readOnly?: boolean
+}): FieldMode {
+  const fieldCtx = React.useContext(FieldContext)
+  if (mode) return mode
+  if ((disabled ?? fieldCtx?.disabled) === true) return 'disabled'
+  if (fieldCtx?.mode) return fieldCtx.mode
+  if (readOnly) return 'readonly'
+  return 'edit'
+}
+
+/**
+ * Resolve Field control 的 **variant**(default / bare / naked 視覺外殼)— 2026-06-08 SSOT。
+ * 優先序:顯式 prop > FieldContext.variant > 'default'。與既有各控件公式一字不差(Δ=0),統一以利 gate 強制。
+ */
+export function useResolvedFieldVariant(variantProp?: FieldVariant | null): FieldVariant {
+  const fieldCtx = React.useContext(FieldContext)
+  return variantProp ?? fieldCtx?.variant ?? 'default'
+}
+
+/**
+ * Resolve Field control 的 **error/invalid** — 取代散落的 `errorProp || (fieldCtx?.invalid ?? false)`(2026-06-08 SSOT)。
+ * 自身 error prop **或** FieldContext.invalid(`<Field invalid>`)任一為真即 error。與既有公式一致(Δ=0)。
+ */
+export function useResolvedFieldInvalid(errorProp?: boolean): boolean {
+  const fieldCtx = React.useContext(FieldContext)
+  return Boolean(errorProp) || (fieldCtx?.invalid ?? false)
+}
+
+/**
  * Host(non-Field-wrapper,如 DataTable cell)注 surface density size 給 child Field controls。
  * 僅注 size 視覺訊號,不污染 FieldContext。Usage:cell-registry buildCellWithSurface。
  */

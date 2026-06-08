@@ -6,7 +6,7 @@ import { X, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
 import { fieldWrapperStyles, EMPTY_DISPLAY, nakedCellRowModeAlign, fieldDisplayTextClass } from '@/design-system/components/Field/field-wrapper'
-import { useFieldContext, useResolvedFieldSize } from '@/design-system/components/Field/field-context'
+import { useFieldContext, useResolvedFieldSize, useResolvedFieldDisabled, useResolvedFieldMode, useResolvedFieldVariant, useResolvedFieldInvalid } from '@/design-system/components/Field/field-context'
 import { Tag } from '@/design-system/components/Tag/tag'
 import { ItemInlineAction, ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { OverflowIndicator } from '@/design-system/components/OverflowIndicator/overflow-indicator'
@@ -554,13 +554,14 @@ function ReadonlyMultiSelect({
 type ComboboxInternalProps = ComboboxProps & { __triggerRef?: React.Ref<HTMLDivElement> }
 
 function NativeCombobox({
-  mode = 'edit', variant: variantProp, error = false, size = 'md', options, value = [], onChange, placeholder,
-  className, disabled, wrap = false, clearable = false, showDisplayEndIcon = false,
+  mode, variant: variantProp, error = false, size = 'md', options, value = [], onChange, placeholder,
+  className, disabled: disabledProp, wrap = false, clearable = false, showDisplayEndIcon = false,
   __triggerRef,
 }: ComboboxInternalProps) {
-  const fieldCtx = useFieldContext()
-  const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
-  const resolvedMode = disabled ? 'disabled' : mode
+  const disabled = useResolvedFieldDisabled(disabledProp)
+  const variant: FieldVariant = useResolvedFieldVariant(variantProp)
+  // 2026-06-08 SSOT:mode 經 useResolvedFieldMode;修 <Field mode="display"> 漏 cascade
+  const resolvedMode = useResolvedFieldMode({ mode, disabled })
   const iconSize = getIconSize(size)
   const showClear = clearable && value.length > 0 && resolvedMode === 'edit'
 
@@ -624,7 +625,7 @@ function NativeCombobox({
 // ── Custom Combobox (desktop — consumes SelectMenu) ───────────────────
 
 function CustomCombobox({
-  mode = 'edit', variant: variantProp, error: errorProp = false, size = 'md', options, value = [], onChange, placeholder,
+  mode, variant: variantProp, error: errorProp = false, size = 'md', options, value = [], onChange, placeholder,
   className, disabled: disabledProp, wrap = false, clearable = false, searchable = false, loading, searchIn = 'menu',
   searchPlaceholder = '搜尋…', // i18n-allow: DS default
   searchAriaLabel = '搜尋選項', // i18n-allow: DS default
@@ -645,10 +646,11 @@ function CustomCombobox({
 }: ComboboxInternalProps) {
   const tagAreaGap = tagAreaGapPx ?? GAP
   const fieldCtx = useFieldContext()
-  const error = errorProp || (fieldCtx?.invalid ?? false)
-  const disabled = disabledProp ?? fieldCtx?.disabled
-  const resolvedMode = disabled ? 'disabled' : mode
-  const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
+  const error = useResolvedFieldInvalid(errorProp)
+  const disabled = useResolvedFieldDisabled(disabledProp)
+  // 2026-06-08 SSOT:mode 經 useResolvedFieldMode;修 <Field mode="display"> 漏 cascade
+  const resolvedMode = useResolvedFieldMode({ mode, disabled })
+  const variant: FieldVariant = useResolvedFieldVariant(variantProp)
   const iconSize = getIconSize(size)
   const showClear = clearable && value.length > 0 && resolvedMode === 'edit'
   const [open, setOpen] = React.useState(defaultOpen)

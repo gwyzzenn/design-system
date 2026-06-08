@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
 import type { InlineActionConfig } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
-import { useFieldContext, useResolvedFieldSize } from '@/design-system/components/Field/field-context'
+import { useFieldContext, useResolvedFieldSize, useResolvedFieldDisabled, useResolvedFieldMode, useResolvedFieldVariant, useResolvedFieldInvalid } from '@/design-system/components/Field/field-context'
 import { ItemInlineAction } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
 // ── Format ──────────────────────────────────────────────────────────────────
@@ -96,15 +96,13 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
     ref
   ) => {
     const fieldCtx = useFieldContext()
-    const error = errorProp || (fieldCtx?.invalid ?? false)
+    const error = useResolvedFieldInvalid(errorProp)
     const size = useResolvedFieldSize(sizeProp)
-    const disabled = disabledProp ?? fieldCtx?.disabled
+    const disabled = useResolvedFieldDisabled(disabledProp)
     // chrome 透傳:per-prop override context;context 沒值則 'default'
-    const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
-    // mode resolve order(Phase B1 2026-05-05):prop > fieldCtx > readOnly/disabled fallback
-    const resolvedMode: FieldMode = modeProp
-      ?? fieldCtx?.mode
-      ?? (readOnly ? 'readonly' : disabled ? 'disabled' : 'edit')
+    const variant: FieldVariant = useResolvedFieldVariant(variantProp)
+    // 2026-06-08 SSOT:mode 經 useResolvedFieldMode 統一解析(prop > 有效 disabled > fieldCtx.mode > readOnly > 'edit')
+    const resolvedMode: FieldMode = useResolvedFieldMode({ mode: modeProp, disabled, readOnly })
 
     // display / readonly / disabled 都顯示格式化值(span 取代 input)
     if (resolvedMode !== 'edit') {

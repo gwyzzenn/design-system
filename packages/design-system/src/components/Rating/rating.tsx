@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { Star, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useFieldContext, useResolvedFieldSize } from '@/design-system/components/Field/field-context'
+import { useFieldContext, useResolvedFieldSize, useResolvedFieldDisabled } from '@/design-system/components/Field/field-context'
 
 /**
  * Rating — 星星評分元件
@@ -99,7 +99,7 @@ const Rating = React.forwardRef<HTMLDivElement, RatingProps>(
       size: sizeProp,
       precision = 'full',
       readOnly = false,
-      disabled = false,
+      disabled: disabledProp,
       loading = false,
       icon: Icon = Star,
       className,
@@ -113,6 +113,8 @@ const Rating = React.forwardRef<HTMLDivElement, RatingProps>(
     // consumer 可傳 size 顯式 override。世界級對照:Material Rating standalone 24dp、
     // Ant Rate in Form 跟 Form.itemSize,standalone 24px。
     const fieldCtx = useFieldContext()  // 保留:aria-labelledby 用 fieldCtx.labelId
+    // 2026-06-08 SSOT:<Field disabled> cascade(原 isInteractive 只看 local disabled prop)
+    const disabled = useResolvedFieldDisabled(disabledProp)
     const size = useResolvedFieldSize<'xs' | 'sm' | 'md' | 'lg'>(sizeProp, 'xs')  // SSOT:統一 size resolution(Rating default 'xs')
     const [internalValue, setInternalValue] = React.useState(defaultValue)
     const [hoverValue, setHoverValue] = React.useState<number | null>(null)

@@ -10,7 +10,7 @@ import { Popover, PopoverTrigger, PopoverAnchor, PopoverContent } from '@/design
 import { DateGrid } from '@/design-system/components/DateGrid/date-grid'
 import { Button } from '@/design-system/components/Button/button'
 import { SurfaceFooter } from '@/design-system/patterns/overlay-surface/overlay-surface'
-import { useFieldContext, useResolvedFieldSize } from '@/design-system/components/Field/field-context'
+import { useFieldContext, useResolvedFieldSize, useResolvedFieldDisabled, useResolvedFieldMode, useResolvedFieldVariant, useResolvedFieldInvalid } from '@/design-system/components/Field/field-context'
 import {
   TimeColumns,
   isoToTimeParts,
@@ -346,7 +346,7 @@ export interface DatePickerProps
 const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
   (
     {
-      mode = 'edit',
+      mode,
       variant: variantProp,
       error: errorProp = false,
       size: sizeProp,
@@ -378,10 +378,11 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
   ) => {
     const fieldCtx = useFieldContext()
     const size = useResolvedFieldSize(sizeProp)  // B 組 cascade fix:<Field size>/cell surface-size 對 DatePicker 生效
-    const error = errorProp || (fieldCtx?.invalid ?? false)
-    const disabled = disabledProp ?? fieldCtx?.disabled
-    const resolvedMode = disabled ? 'disabled' : mode
-    const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
+    const error = useResolvedFieldInvalid(errorProp)
+    const disabled = useResolvedFieldDisabled(disabledProp)
+    // 2026-06-08 SSOT:mode 經 useResolvedFieldMode;修 <Field mode="display"> 漏 cascade
+    const resolvedMode = useResolvedFieldMode({ mode, disabled })
+    const variant: FieldVariant = useResolvedFieldVariant(variantProp)
     const isEditable = resolvedMode === 'edit'
     // 2026-05-18 改 import ICON_SIZE SSOT(per user『做完』approval,消除 M17 違反 7+ 重複 ternary)
   const iconSize = ICON_SIZE[size as 'sm' | 'md' | 'lg']
@@ -707,7 +708,7 @@ export interface DatePickerRangeProps
 const DatePickerRange = React.forwardRef<HTMLDivElement, DatePickerRangeProps>(
   (
     {
-      mode = 'edit',
+      mode,
       variant: variantProp,
       error: errorProp = false,
       size: sizeProp,
@@ -733,10 +734,11 @@ const DatePickerRange = React.forwardRef<HTMLDivElement, DatePickerRangeProps>(
   ) => {
     const fieldCtx = useFieldContext()
     const size = useResolvedFieldSize(sizeProp)  // B 組 cascade fix:<Field size>/cell surface-size 對 DatePicker 生效
-    const error = errorProp || (fieldCtx?.invalid ?? false)
-    const disabled = disabledProp ?? fieldCtx?.disabled
-    const resolvedMode = disabled ? 'disabled' : mode
-    const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
+    const error = useResolvedFieldInvalid(errorProp)
+    const disabled = useResolvedFieldDisabled(disabledProp)
+    // 2026-06-08 SSOT:mode 經 useResolvedFieldMode;修 <Field mode="display"> 漏 cascade
+    const resolvedMode = useResolvedFieldMode({ mode, disabled })
+    const variant: FieldVariant = useResolvedFieldVariant(variantProp)
     const isEditable = resolvedMode === 'edit'
     // 2026-05-18 改 import ICON_SIZE SSOT(per user『做完』approval,消除 M17 違反 7+ 重複 ternary)
   const iconSize = ICON_SIZE[size as 'sm' | 'md' | 'lg']

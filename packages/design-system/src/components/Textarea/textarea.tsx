@@ -3,7 +3,7 @@ import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
-import { useFieldContext, useResolvedFieldSize } from '@/design-system/components/Field/field-context'
+import { useFieldContext, useResolvedFieldSize, useResolvedFieldMode, useResolvedFieldVariant, useResolvedFieldInvalid } from '@/design-system/components/Field/field-context'
 import { EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
 
 /**
@@ -193,13 +193,11 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     // Field context 整合：disabled / mode / chrome / invalid / size / id 都能從 context 繼承
     const fieldCtx = useFieldContext()
     // chrome 透傳:per-prop override context
-    const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
-    const error = errorProp || (fieldCtx?.invalid ?? false)
+    const variant: FieldVariant = useResolvedFieldVariant(variantProp)
+    const error = useResolvedFieldInvalid(errorProp)
     const size = useResolvedFieldSize(sizeProp)
-    // mode resolve order(Phase B1 2026-05-05):prop > fieldCtx > readOnly/disabled fallback > 'edit'
-    const resolvedMode: FieldMode = modeProp
-      ?? fieldCtx?.mode
-      ?? (readOnly ? 'readonly' : (disabled ?? fieldCtx?.disabled) ? 'disabled' : 'edit')
+    // 2026-06-08 SSOT:mode 經 useResolvedFieldMode 統一解析(prop > 有效 disabled > fieldCtx.mode > readOnly > 'edit')
+    const resolvedMode: FieldMode = useResolvedFieldMode({ mode: modeProp, disabled, readOnly })
     const isEditable = resolvedMode === 'edit'
     const isDisplay = resolvedMode === 'display'
     const inputId = idProp ?? fieldCtx?.id

@@ -5,7 +5,7 @@ import { Check } from 'lucide-react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
-import { useFieldContext } from '@/design-system/components/Field/field-context'
+import { useFieldContext, useResolvedFieldDisabled } from '@/design-system/components/Field/field-context'
 
 /**
  * Switch — 開關控件
@@ -131,7 +131,7 @@ const Switch = React.forwardRef<
       label,
       description,
       readOnly = false,
-      disabled,
+      disabled: disabledProp,
       mode,
       // chrome 對 Switch 主體無視覺影響(無 input wrapper)— 接收純為 prop 一致性;destructure 防 leak 到 DOM。
       variant: _chrome,
@@ -147,6 +147,8 @@ const Switch = React.forwardRef<
     // 2026-05-31 #35:hooks(useFieldContext / useId)必在任何 conditional return 前呼叫(Rules of Hooks)。
     // 原 mode='display' early return 寫在 hooks 之上 → runtime 切 mode 會 hook count 不一致 crash;已下移至 hooks 後。
     const fieldCtx = useFieldContext()
+    // 2026-06-08 SSOT:<Field disabled> cascade(原 disabled 直傳 prop,漏 fieldCtx.disabled)
+    const disabled = useResolvedFieldDisabled(disabledProp)
     const insideField = fieldCtx?.hasFieldWrapper === true
     const effectiveLabel = insideField ? undefined : label
     const effectiveDescription = insideField ? undefined : description

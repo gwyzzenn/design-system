@@ -11,6 +11,9 @@ import { RadioGroup, RadioGroupItem } from '@/design-system/components/RadioGrou
 import { SegmentedControl, SegmentedControlItem } from '@/design-system/components/SegmentedControl/segmented-control'
 import { Slider } from '@/design-system/components/Slider/slider'
 import { NumberInput } from '@/design-system/components/NumberInput/number-input'
+import { Select } from '@/design-system/components/Select/select'
+import { DatePicker } from '@/design-system/components/DatePicker/date-picker'
+import { Rating } from '@/design-system/components/Rating/rating'
 
 const meta: Meta = {
   title: 'Design System/Components/Field/展示',
@@ -50,6 +53,45 @@ export const Vertical: Story = {
           <FieldDescription>其他專案相關說明</FieldDescription>
         </Field>
       </FieldGroup>
+    </div>
+  ),
+}
+
+// ── Field 狀態 cascade（2026-06-08 補：disabled / mode 透過 context 流給所有 field 控件）──────
+// @story-trait-rationale: Field 透過 context 把 disabled / mode 流給「所有」field 控件。此前無 story 覆蓋此
+// cascade，致 picker 漏讀 fieldCtx.mode、Switch/Rating/Slider/PeoplePicker 漏讀 fieldCtx.disabled 的 cascade
+// bug 長期隱形（M15）。本 story 為 cascade 視覺驗證 SSOT —— 控件「皆不」自帶 disabled/mode prop，純靠 <Field> cascade。
+
+const CASCADE_PRIORITY = [
+  { value: 'high', label: '高' },
+  { value: 'medium', label: '中' },
+  { value: 'low', label: '低' },
+]
+
+export const StateCascade: Story = {
+  name: 'Field 狀態 cascade（停用 / 純展示 流給所有控件）',
+  render: () => (
+    <div className="flex flex-col gap-8">
+      <div>
+        <p className="text-body-sm font-medium text-fg-muted mb-3">{'<Field disabled> — 所有控件自動停用（含 Switch / Rating / Slider / Select / DatePicker）'}</p>
+        <div className="flex flex-wrap gap-x-8 gap-y-4 max-w-3xl">
+          <Field disabled className="w-44"><FieldLabel>負責人</FieldLabel><Input value="王小明" onChange={() => {}} /></Field>
+          <Field disabled className="w-44"><FieldLabel>優先級</FieldLabel><Select options={CASCADE_PRIORITY} value="high" onChange={() => {}} aria-label="優先級" /></Field>
+          <Field disabled className="w-44"><FieldLabel>截止日</FieldLabel><DatePicker value="2026-06-20" onChange={() => {}} /></Field>
+          <Field disabled className="w-44"><FieldLabel>啟用通知</FieldLabel><Switch defaultChecked /></Field>
+          <Field disabled className="w-44"><FieldLabel>滿意度</FieldLabel><Rating value={4} aria-label="滿意度" /></Field>
+          <Field disabled className="w-44"><FieldLabel>完成度</FieldLabel><Slider value={[60]} onValueChange={() => {}} /></Field>
+        </div>
+      </div>
+      <div>
+        <p className="text-body-sm font-medium text-fg-muted mb-3">{'<Field mode="display"> — 有展示態的控件自動切純展示（Select / DatePicker 修復後生效）'}</p>
+        <div className="flex flex-wrap gap-x-8 gap-y-4 max-w-3xl">
+          <Field mode="display" className="w-44"><FieldLabel>負責人</FieldLabel><Input value="王小明" onChange={() => {}} /></Field>
+          <Field mode="display" className="w-44"><FieldLabel>優先級</FieldLabel><Select options={CASCADE_PRIORITY} value="high" aria-label="優先級" /></Field>
+          <Field mode="display" className="w-44"><FieldLabel>截止日</FieldLabel><DatePicker value="2026-06-20" onChange={() => {}} /></Field>
+          <Field mode="display" className="w-44"><FieldLabel>數量</FieldLabel><NumberInput value={42} onChange={() => {}} /></Field>
+        </div>
+      </div>
     </div>
   ),
 }

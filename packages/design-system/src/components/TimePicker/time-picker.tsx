@@ -12,7 +12,7 @@ import {
 } from '@/design-system/components/Field/field-wrapper'
 import { ItemInlineAction, ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { Popover, PopoverTrigger, PopoverContent } from '@/design-system/components/Popover/popover'
-import { useFieldContext, useResolvedFieldSize } from '@/design-system/components/Field/field-context'
+import { useFieldContext, useResolvedFieldSize, useResolvedFieldDisabled, useResolvedFieldMode, useResolvedFieldVariant, useResolvedFieldInvalid } from '@/design-system/components/Field/field-context'
 import { Button } from '@/design-system/components/Button/button'
 import {
   TimeColumns,
@@ -142,7 +142,7 @@ export interface TimePickerProps
 const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
   (
     {
-      mode = 'edit',
+      mode,
       variant: variantProp,
       error: errorProp = false,
       size: sizeProp,
@@ -171,10 +171,11 @@ const TimePicker = React.forwardRef<HTMLDivElement, TimePickerProps>(
   ) => {
     const fieldCtx = useFieldContext()
     const size = useResolvedFieldSize(sizeProp)  // B 組 cascade fix
-    const error = errorProp || (fieldCtx?.invalid ?? false)
-    const disabled = disabledProp ?? fieldCtx?.disabled
-    const resolvedMode = disabled ? 'disabled' : mode
-    const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
+    const error = useResolvedFieldInvalid(errorProp)
+    const disabled = useResolvedFieldDisabled(disabledProp)
+    // 2026-06-08 SSOT:mode 經 useResolvedFieldMode;修 <Field mode="display"> 漏 cascade
+    const resolvedMode = useResolvedFieldMode({ mode, disabled })
+    const variant: FieldVariant = useResolvedFieldVariant(variantProp)
     const isEditable = resolvedMode === 'edit'
     // 2026-05-18 改 import ICON_SIZE SSOT(per user『做完』approval,消除 M17 違反 7+ 重複 ternary)
   const iconSize = ICON_SIZE[size as 'sm' | 'md' | 'lg']

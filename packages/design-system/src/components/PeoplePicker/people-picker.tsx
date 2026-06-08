@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
 import { fieldWrapperStyles, EMPTY_DISPLAY, nakedCellRowModeAlign } from '@/design-system/components/Field/field-wrapper'
 import { ItemSuffix } from '@/design-system/patterns/element-anatomy/item-anatomy'
-import { useFieldContext, useFieldSurface, useResolvedFieldSize } from '@/design-system/components/Field/field-context'
+import { useFieldSurface, useResolvedFieldSize, useResolvedFieldDisabled, useResolvedFieldMode, useResolvedFieldVariant } from '@/design-system/components/Field/field-context'
 import { Avatar } from '@/design-system/components/Avatar/avatar'
 import { Tag } from '@/design-system/components/Tag/tag'
 import { Select } from '@/design-system/components/Select/select'
@@ -118,7 +118,7 @@ const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(functio
   searchPlaceholder = '搜尋人員…', // i18n-allow: DS default
   emptyText = '沒有符合的人員', // i18n-allow: DS default — only for SelectMenu noResultsText
   className,
-  disabled,
+  disabled: disabledProp,
   defaultOpen = false,
   onOpenChange,
   multiDisplay = 'stack',
@@ -129,12 +129,12 @@ const PeoplePicker = React.forwardRef<HTMLDivElement, PeoplePickerProps>(functio
   'aria-label': ariaLabel,
   ...rest
 }, ref) {
-  const fieldCtx = useFieldContext()
   const surface = useFieldSurface()
   const size = useResolvedFieldSize(sizeProp)  // B 組 cascade fix
-  const mode: FieldMode = modeProp ?? fieldCtx?.mode ?? 'edit'
-  const resolvedMode: FieldMode = disabled ? 'disabled' : mode
-  const resolvedVariant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
+  const disabled = useResolvedFieldDisabled(disabledProp)
+  // 2026-06-08 SSOT:mode/disabled/variant 統一經 helper;修 <Field disabled> 漏 cascade(原只讀 fieldCtx.mode)
+  const resolvedMode: FieldMode = useResolvedFieldMode({ mode: modeProp, disabled })
+  const resolvedVariant: FieldVariant = useResolvedFieldVariant(variantProp)
   const isMulti = Array.isArray(value)
   const isEmpty = !value || (isMulti && value.length === 0)
 

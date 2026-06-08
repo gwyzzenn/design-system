@@ -7,7 +7,7 @@ import { CAT_SUBTLE_TOKENS, CAT_SOLID_TOKENS, type CategoricalColor } from '@/de
 import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/design-system/components/HoverCard/hover-card'
 import { HOVER_DELAY_RICH_MS, HOVER_DELAY_CLOSE_MS } from '@/design-system/tokens/motion/motion'
 import { Badge } from '@/design-system/components/Badge/badge'
-import { useFieldContext, useTableIsScrolling } from '@/design-system/components/Field/field-context'
+import { useResolvedFieldDisabled, useTableIsScrolling } from '@/design-system/components/Field/field-context'
 
 /**
  * Avatar — 頭像元件
@@ -145,12 +145,12 @@ const AvatarInner = React.forwardRef<HTMLDivElement, AvatarProps>(
     // 2026-05-13 R3.5(per codex Q3 verdict + user 拍「想盡辦法 auto-handle prereq」):
     // Avatar self-dim when in disabled Field wrapper context(取代既有 wrapper opacity-disabled blanket
     // 逃生艙 — color.spec.md:729 specific-disabled-color canonical)。
-    // Scope narrowest:`fieldCtx?.mode === 'disabled' && fieldCtx?.hasFieldWrapper === true`,標準 Field
+    // Scope:`useResolvedFieldDisabled()`(= fieldCtx.disabled,涵蓋 <Field disabled> 與 <Field mode="disabled">),標準 Field
     // 家族 wrapper disabled 時才 dim;**沒包在 Field wrapper 內的 standalone Avatar**(ProfileCard / FileItem /
     // HoverCard / Dialog 等 display 場景)**backward compat 不變**。對齊 avatar.spec.md「Avatar 在 disabled
     // 元件內 host-controlled opacity」canonical — 升級成「Avatar self-managed via fieldCtx」。
-    const fieldCtx = useFieldContext()
-    const isDisabledInField = fieldCtx?.mode === 'disabled' && fieldCtx?.hasFieldWrapper === true
+    // 2026-06-08 SSOT:欄位內 Avatar 跟隨 <Field disabled>/<Field mode="disabled"> 變淡(fieldCtx-scoped,cell 無 fieldCtx → 不影響)
+    const isDisabledInField = useResolvedFieldDisabled()
     const isFill = size === 'fill'
     // Fill 模式下 icon 用 60% 寬高、text 用 50cqi（container query inline-size）；
     // 數字模式下用既有 px 計算

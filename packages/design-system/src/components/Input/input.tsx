@@ -5,7 +5,7 @@ import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
 import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY } from '@/design-system/components/Field/field-wrapper'
-import { useFieldContext, useResolvedFieldSize } from '@/design-system/components/Field/field-context'
+import { useFieldContext, useResolvedFieldSize, useResolvedFieldDisabled, useResolvedFieldMode, useResolvedFieldVariant, useResolvedFieldInvalid } from '@/design-system/components/Field/field-context'
 import { ItemInlineAction, ItemPrefix, type InlineActionConfig } from '@/design-system/patterns/element-anatomy/item-anatomy'
 import { CircularProgress } from '@/design-system/components/CircularProgress/circular-progress'
 import { ICON_SIZE } from '@/design-system/tokens/uiSize/icon-size'
@@ -100,20 +100,16 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     // 2026-05-31 #11/#12:size + disabled 從 Field context cascade(對齊 NumberInput number-input.tsx:100-101
     // + MUI FormControl)。原 Input 不讀 fieldCtx.size/disabled → <Field size="lg"> / <Field disabled> 對 Input 無效。
     const size = useResolvedFieldSize(sizeProp)
-    const disabled = disabledProp ?? fieldCtx?.disabled
+    const disabled = useResolvedFieldDisabled(disabledProp)
     // chrome 透傳:per-prop override context;context 沒值則 'default'
-    const variant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
-    // mode resolve order(Phase B1 2026-05-05):
-    //   prop > fieldCtx.mode > (readOnly → 'readonly') > (disabled → 'disabled') > 'edit'
-    // loading 期間 input 保持可編輯(Ant Input.Search 派,UX「邊改邊讀」)
-    // 只用 aria-busy + endAction Spinner 標示狀態,不動 mode
-    const resolvedMode: FieldMode = modeProp
-      ?? fieldCtx?.mode
-      ?? (readOnly ? 'readonly' : disabled ? 'disabled' : 'edit')
+    const variant: FieldVariant = useResolvedFieldVariant(variantProp)
+    // 2026-06-08 SSOT:mode 經 useResolvedFieldMode 統一解析(prop > 有效 disabled > fieldCtx.mode > readOnly > 'edit')。
+    // loading 期間 input 保持可編輯(Ant Input.Search 派),只用 aria-busy + endAction Spinner,不動 mode。
+    const resolvedMode: FieldMode = useResolvedFieldMode({ mode: modeProp, disabled, readOnly })
     const isEditable = resolvedMode === 'edit'
     const isDisplay = resolvedMode === 'display'
     // error 合併:自身 error prop OR Field context invalid
-    const resolvedError = error || (fieldCtx?.invalid ?? false)
+    const resolvedError = useResolvedFieldInvalid(error)
     // 2026-05-18 改 import ICON_SIZE SSOT(per user『做完』approval,消除 M17 違反 7+ 重複 ternary)
   const iconSize = ICON_SIZE[size as 'sm' | 'md' | 'lg']
     const iconColor = resolvedMode === 'disabled' ? 'text-fg-disabled' : 'text-fg-muted'

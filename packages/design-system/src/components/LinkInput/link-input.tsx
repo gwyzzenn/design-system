@@ -4,7 +4,7 @@ import type { VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 import type { FieldMode, FieldVariant } from '@/design-system/components/Field/field-types'
 import { fieldWrapperStyles, bareInputStyles, EMPTY_DISPLAY, fieldDisplayTextClass } from '@/design-system/components/Field/field-wrapper'
-import { useFieldContext, useResolvedFieldSize } from '@/design-system/components/Field/field-context'
+import { useFieldContext, useResolvedFieldSize, useResolvedFieldDisabled, useResolvedFieldMode, useResolvedFieldVariant } from '@/design-system/components/Field/field-context'
 import { ItemInlineAction } from '@/design-system/patterns/element-anatomy/item-anatomy'
 
 // ── URL Validation ──────────────────────────────────────────────────────────
@@ -102,15 +102,13 @@ const LinkInput = React.forwardRef<HTMLInputElement, LinkInputProps>(
   ) => {
     const fieldCtx = useFieldContext()
     const size = useResolvedFieldSize(sizeProp)
-    const disabled = disabledProp ?? fieldCtx?.disabled
-    // mode resolution(對齊 input.tsx L107-112 / textarea.tsx L202 canonical):
-    //   prop > fieldCtx.mode > (readOnly → 'readonly') > (disabled → 'disabled') > 'edit'
+    const disabled = useResolvedFieldDisabled(disabledProp)
+    // 2026-06-08 SSOT:mode 經 useResolvedFieldMode 統一解析(prop > 有效 disabled > fieldCtx.mode > readOnly > 'edit')。
     // spec field-controls.spec.md L125「readOnly 原生屬性自動覆蓋 mode」契約落地。
-    const resolvedMode: FieldMode =
-      modeProp ?? fieldCtx?.mode ?? (readOnly ? 'readonly' : disabled ? 'disabled' : 'edit')
+    const resolvedMode: FieldMode = useResolvedFieldMode({ mode: modeProp, disabled, readOnly })
     const isEditable = resolvedMode === 'edit'
     // chrome resolution:per-prop > context > 'default'
-    const resolvedVariant: FieldVariant = variantProp ?? fieldCtx?.variant ?? 'default'
+    const resolvedVariant: FieldVariant = useResolvedFieldVariant(variantProp)
 
     // ── mode='display' ─────────────────────────────────────────────────────
     // 純展示:無 input chrome / 無 hover affordance / 無 Pencil edit 入口。
