@@ -117,7 +117,7 @@ disabled 元件內的所有子元素必須呈現 disabled 狀態:
 
 | 策略 | 何時用 | 消費者 | 做法 |
 |---|---|---|---|
-| **灰階 token swap** | State 由形狀 / 位置 / icon / 文字 等**非顏色載體**承載,顏色只是美學 | Button、Checkbox、Input、Slider、Tag | 每個元素換到 disabled 對應的灰階 token(`bg-disabled` / `text-fg-disabled` / `border-fg-disabled` 等) |
+| **灰階 token swap** | State 由形狀 / 位置 / icon / 文字 等**非顏色載體**承載,顏色只是美學 | Button、Checkbox、Input、Slider、Tag | 每個元素換到 disabled 對應的灰階 token(`bg-disabled` / `text-fg-disabled` / `bg-border` 等) |
 | **`opacity-disabled`** | State **完全只靠顏色區分**(形狀在 on/off 之間沒有差異),灰階化會丟失 state 辨識 | **Switch** | Root 層套 `opacity-disabled`,保留原有顏色身分,透過透明度均勻降級 |
 
 **具體判準(寫新元件時問自己)**:
@@ -133,14 +133,16 @@ disabled 元件內的所有子元素必須呈現 disabled 狀態:
 
 ### Disabled 視覺階層公式(多元素元件參考)
 
-多元素互動元件(Slider、Progress、複合 Input 等)在 disabled 狀態常需要 3–4 階灰階深度來分層:
+多元素互動元件(Slider、Progress、複合 Input 等)在 disabled 狀態常需要 2–3 階灰階深度來分層:
 
 ```
-底層背景 (n-2)  <  中層填充 (n-5)  <  輪廓邊框 (n-6)  <  文字 (n-7+)
-bg-muted          bg-border         border-fg-disabled     text-fg-disabled
+底層背景 (n-2)  <  中層填充 / 輪廓 (n-5)        <  文字 (n-6)
+bg-muted          bg-border / border-border       text-fg-disabled
 ```
 
-每階至少差 1 個 primitive step,使用者掃視時才能分清四個層。Slider 的 disabled 就是這個公式:track(底)< range(填充)< thumb border(輪廓)< label(文字)。
+每階至少差 1 個 primitive step,使用者掃視時才能分清層次。Slider 的 disabled 就是這個公式:track(底,n-2)< range 填充 = thumb 邊框(n-5,**同色**——「Range 色 = Thumb border 色」invariant,thumb 邊框是 range 的視覺延續,不論 state 永遠同色,詳 slider.tsx 註解)< label 文字(n-6)。
+
+> 2026-06-12 修:本段原寫 4 階公式、輪廓層用 `border-fg-disabled`(n-6)、文字層標 n-7+——三者皆與 code 不符(`border-fg-disabled` 全 code 零使用且違反下方規則 3「border-* 一律從 border family 選」;`--fg-disabled` 實為 n-6;slider.tsx 的 range/thumb 邊框同色是刻意設計,曾踩 thumb 融入 track 的同色融色 bug)。對齊 code 真實。
 
 ### ⚠️ fg token 不可當 bg 用(跨 family 借用是 smell)
 
