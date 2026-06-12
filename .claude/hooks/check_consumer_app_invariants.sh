@@ -218,6 +218,15 @@ if echo "$CONTENT" | grep -qE '\b[a-z][a-z-]*-\[(#[0-9a-fA-F]{3,8}|rgb|rgba|hsl|
   VIOLATIONS="${VIOLATIONS}  - 硬寫色值/字級/shadow 繞過 DS token(bg-[#hex] / text-[14px] / shadow-md)→ 改 semantic color token / text-body 等 typography token / shadow-[var(--elevation-N)](per ui-development.md「Tailwind 5 條核心」rule 3)\n"
 fi
 
+# Pattern 9(2026-06-12,user 抓 fork「四不像」G4 補洞):AppShell slot 餵 raw HTML element。
+# app-shell.spec.md:296-299 明文禁 sidebar={<div>}/header={<header>},原註「靠 audit 把關」
+# 無機械閘 → 兌現成 P0(per memory feedback_ssot_mechanical_p0_not_p1_warn)。
+# 零誤判:雙條件 = 同檔有 <DS.AppShell> + slot 屬性直接餵 raw tag(div/header/nav/aside/section)。
+if echo "$CONTENT" | grep -qE '<DS\.AppShell\b' && \
+   echo "$CONTENT" | grep -qE '\b(header|sidebar|aside)=\{ *<(div|header|nav|aside|section)\b'; then
+  VIOLATIONS="${VIOLATIONS}  - <AppShell header/sidebar/aside={<raw element>}> — slot 必餵 DS 元件(ChromeHeader / Sidebar / AppShellAside),raw div/header 漏接 border/scroll/responsive canonical(per app-shell.spec.md:296-299)\n"
+fi
+
 # Pattern 6: Overlay trigger without defaultOpen state for visual demo
 # (Skip in production .tsx; only enforce in .stories.tsx where visual snapshot matters)
 if echo "$FILE" | grep -qE '\.stories\.tsx$'; then

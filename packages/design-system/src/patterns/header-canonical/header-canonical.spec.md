@@ -69,7 +69,7 @@ benchmark:
 ### 4. Dismiss icon button(close X)
 
 - **Token**:`<Button iconOnly size="sm" dismiss />`(28px @ md / 32px @ lg)
-- **永遠 size="sm"**(不論家族 / density):chrome / overlay header 內 button 一律 sm
+- **永遠 size="sm"**(不論家族 / density):chrome / overlay header 內 button 一律 sm。**廣化(2026-06-12 user 拍板)**:header 內**所有 field-height 控件**(Button / Input / Select / SegmentedControl / Combobox 等)一律 `sm`,禁混雜不同 field height(Tabs 跟齊 chrome 高度,唯一例外 = 「Tabs 取代整個 header」的 standalone `size="lg"`,見上方表)
 - 對齊 既有 `dialog.tsx:132-153` + `sheet.tsx:122-139` + `popover.tsx:87-110`(Dialog/Sheet/Popover 已內建 close X)
 
 ### 4.5 Chrome header avatar SSOT(2026-05-21 codify per user directive)

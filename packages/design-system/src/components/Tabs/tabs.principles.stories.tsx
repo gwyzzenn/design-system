@@ -120,7 +120,7 @@ export const UsageGuidance: Story = {
                 <TabsTrigger value="products">產品</TabsTrigger>
                 <TabsTrigger value="settings" startIcon={Settings}>設定</TabsTrigger>
               </TabsList>
-              <TabsContent value="orders" className="mt-4 text-body text-fg-muted">(訂單頁的 toolbar、filters、table…)</TabsContent>
+              <TabsContent value="orders" className="text-body text-fg-muted">(訂單頁的 toolbar、filters、table…)</TabsContent>
             </Tabs>
           </div>
           <div>

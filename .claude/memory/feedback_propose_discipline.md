@@ -91,3 +91,9 @@ User 2026-05-15 + 2026-05-27 系列 directives codified per Rule-of-3 absorb pri
 
 **Rule**:turn 的「最後一條訊息」若要 user 拍板選項,必須**完整重述每個選項的人話說明 + 建議 + 理由**,禁止「選 (a) 還是 (b)」引用前文 — 手機 app 會摺疊訊息中段(tool call 之間的文字),user 只看得到最後一條。
 **Anchor**:2026-06-11 R2 拍板題 6/8 完整說明寫在中段、結尾只剩「選 (a) 還是 (b)」→ user 截圖怒「叫你解釋然後又沒解釋」(同 2026-06-10 沙箱三步驟事故同 failure mode)。
+
+## Sub-rule:URL 必獨立成行、後面不准黏任何文字(2026-06-12 第 2 次警告)
+
+**Why**:URL 跟中文/括號黏在同一行,auto-linker 會把後綴吃進連結或讓 user 手機上點不準。User verbatim:「我不是警告過你不要再把連結混入其他文字了嗎?這樣我他媽要怎麼直接點進去正確的連結??」(前次警告 + 2026-06-12 再犯:`...netlify.app(Netlify 建置 2-3 分鐘)`)。
+
+**How to apply**:任何 URL 一律單獨一行、行內只有 URL 本身;說明文字放上一行或下一行。Markdown link 形式 `[文字](url)` 也行,但裸 URL 絕不與其他字元同行。

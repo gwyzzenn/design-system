@@ -12,7 +12,12 @@
   "components": {
     "Sidebar": {
       "baseline": "packages/design-system/src/components/Sidebar/sidebar.stories.tsx#IconCollapse",
-      "requiredHelpers": ["WorkspaceBrand", "MAIN_NAV", "SidebarHeader", "SidebarFooter"],
+      "requiredHelpers": [
+        "WorkspaceBrand",
+        "MAIN_NAV",
+        "SidebarHeader",
+        "SidebarFooter"
+      ],
       "antiPatterns": [
         {
           "id": "sidebar-header-simplified-span",
@@ -25,13 +30,24 @@
           "regex": "<SidebarMenuButton[^>]*>[^<]*<[A-Z][a-zA-Z]+[[:space:]]+className=\"size-",
           "severity": "block",
           "rationale": "SidebarMenuButton 必用 startIcon prop + tooltip prop;children inline icon = drift"
+        },
+        {
+          "id": "sidebar-header-subtitle-second-line",
+          "regex": "<SidebarHeader[^>]*>[[:space:]]*<div[^>]*flex-col",
+          "severity": "block",
+          "rationale": "SidebarHeader brand 必單行(Fixed-h chrome 不可成長,sidebar.spec.md SidebarHeader 段 2026-06-12 明文)。flex-col 直接子層 = logo name 下加副標的結構簽名 — shadcn TeamSwitcher demo prior 滲漏;plan/org 資訊歸 workspace switcher dropdown row,非常駐 header"
         }
       ]
     },
     "DataTable": {
       "baseline": "packages/design-system/src/components/DataTable/data-table.stories.tsx#WithBulkActions",
       "toolbar": {
-        "requiredHelpers": ["Popover", "PopoverTrigger", "PopoverContent", "Input"],
+        "requiredHelpers": [
+          "Popover",
+          "PopoverTrigger",
+          "PopoverContent",
+          "Input"
+        ],
         "filterPanel": "DataTableFilterPanel",
         "sortManager": "DataTableSortManager",
         "buttonCanonical": {

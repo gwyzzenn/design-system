@@ -374,8 +374,8 @@ export const AffixBehavior = {
         <div className="flex flex-col gap-2">
           <span className="text-caption font-medium text-fg-secondary">affix="status-icon" — final state</span>
           <p className="text-footnote text-fg-muted">
-            success → <CircleCheck size={14} className="inline text-success" /> CircleCheck(16px, text-success);
-            error → <XCircle size={14} className="inline text-error" /> XCircle(16px, text-error);
+            success → <CircleCheck size={16} className="inline text-success" /> CircleCheck(16px, text-success);
+            error → <XCircle size={16} className="inline text-error" /> XCircle(16px, text-error);
             inProgress → 無 icon(inProgress 非終態)。
           </p>
           <div className="flex flex-col gap-2 w-[360px]">

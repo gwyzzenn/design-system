@@ -193,7 +193,7 @@ export const Overview = {
                 ['disabled', 'boolean', 'false', '不可互動，移除品牌色'],
                 ['label', 'ReactNode', '—', '選項 label；傳入時自動以 SelectionItem 包裝'],
                 ['description', 'ReactNode', '—', '次要說明文字（須與 label 搭配）'],
-                ['readOnly', 'boolean', 'false', '鎖互動、保留 checked 視覺（整組 readonly 由 RadioGroup mode="readonly" 傳遞）'],
+                ['readOnly', 'boolean', 'false', '鎖互動、保留 checked 視覺(standalone 整組 readonly 由 RadioGroup mode="readonly" 傳遞;Field 內整組改渲染灰框 + 選中項 label)'],
                 ['id', 'string', '—', '搭配 SelectionItem 的 htmlFor'],
               ].map(([p, t, d, desc]) => (
                 <tr key={p}><Td mono>{p}</Td><Td mono>{t}</Td><Td mono>{d}</Td><Td>{desc}</Td></tr>

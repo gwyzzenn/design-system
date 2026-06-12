@@ -243,7 +243,9 @@ export const OrientationMatrix: Story = {
             </Field>
             <Field orientation="horizontal">
               <FieldLabel>訂閱電子報</FieldLabel>
-              <Switch defaultChecked />
+              {/* 混合表單(Input/Select 同列)= Form-edit 情境 → Switch 靠左對齊其他控件
+                  (switch.spec.md「兩種對齊慣例」判準;ml-0 覆寫 horizontal Field 預設 ml-auto) */}
+              <Switch defaultChecked className="ml-0" />
             </Field>
             <Field orientation="horizontal">
               <FieldLabel>個人檔案公開</FieldLabel>

@@ -249,7 +249,15 @@ Indeterminate 是由父層邏輯控制的狀態，Checkbox 本身不會自動進
 
 - **Uncontrolled**:只傳 `defaultChecked`,DOM 自管 — 適合表單 native submit
 - **Controlled**:傳 `checked` + `onCheckedChange`,React state 主導 — 適合需即時聯動其他欄位
-- **Read-only**:用 `readOnly` prop(不是省略 `onCheckedChange`)。`readOnly` 設 `aria-readonly` / `data-readonly` / `tabIndex=-1` + cva `pointer-events-none`,鎖互動但保留 checked 視覺。注意:只傳 `checked` 而不傳 `onCheckedChange` 僅讓 Radix 把值鎖在 prop(不會更新),控件仍可 focus / click、不會進 disabled state — 那不是 readonly
+- **Read-only**:用 `readOnly` prop(不是省略 `onCheckedChange`)。standalone:`readOnly` 設 `aria-readonly` / `data-readonly` / `tabIndex=-1` + cva `pointer-events-none`,鎖互動但保留 checked 視覺;**Field 內(無 inline label)改渲染 readonly 灰框 + ✓/—**(見上方 mode 段)。注意:只傳 `checked` 而不傳 `onCheckedChange` 僅讓 Radix 把值鎖在 prop(不會更新),控件仍可 focus / click、不會進 disabled state — 那不是 readonly
+
+### `mode` prop(Field mode,正交於 size)
+
+`mode?: 'edit' | 'display' | 'readonly' | 'disabled'`(默認 inherit Field context 或 `'edit'`),對齊 `field-types.ts` FieldMode(完整 4-mode canonical SSOT → `Field/field-controls.spec.md`;本段鏡像 switch.spec.md 同名段):
+- `edit`(預設)— 可勾選的 Checkbox。
+- `display` — **純展示**:渲染 ✓(checked)/ —(其他),非互動、無 input chrome,供 DataTable boolean cell 非編輯態共用。
+- `readonly` — **Field 內(無 inline label)**= `fieldWrapperStyles` readonly 灰框 + ✓/—(與 Input readonly 同一視覺語言,2026-06-12 user 拍板;世界級:Salesforce output ✓ glyph / SAP 靜態文字);**standalone / 有 inline label**(SelectionItem row)= 正常色鎖互動(同下方 Read-only)。
+- `disabled` — 落到真 disabled chrome(`effectiveDisabled`,2026-06-12 修:mode='disabled' 直傳〔如 DataTable disabled cell〕與 `disabled` prop 等效,降色 + 不可 focus)。
 
 CheckboxGroup 是純 layout primitive — **不**持有 group-level selection state(無 `value` / `defaultValue` / `onValueChange`)。每個 `<Checkbox>` child 各自管自己的 `checked` / `defaultChecked` / `onCheckedChange`;CheckboxGroup 只透過 `CheckboxGroupContext` 告知 child「你在 group 裡」(保留各自 label)。
 

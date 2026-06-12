@@ -86,6 +86,18 @@ export const StateCascade: Story = {
         </div>
       </div>
       <div>
+        <p className="text-body-sm font-medium text-fg-secondary mb-3">{'<Field mode="readonly"> — 鎖定表單:文字控件灰框;boolean/單選 = 灰框 + ✓/—/選中項(2026-06-12 拍板);Rating 星星鎖定、Slider 鎖互動保留視覺'}</p>
+        <div className="flex flex-wrap gap-x-8 gap-y-4 max-w-3xl">
+          <Field mode="readonly" className="w-44"><FieldLabel>負責人</FieldLabel><Input value="王小明" onChange={() => {}} /></Field>
+          <Field mode="readonly" className="w-44"><FieldLabel>同意條款</FieldLabel><Checkbox checked /></Field>
+          <Field mode="readonly" className="w-44"><FieldLabel>已啟用</FieldLabel><Switch checked /></Field>
+          <Field mode="readonly" className="w-44"><FieldLabel>未勾選範例</FieldLabel><Checkbox /></Field>
+          <Field mode="readonly" className="w-44"><FieldLabel>付款方式</FieldLabel><RadioGroup value="card"><RadioGroupItem value="card" label="信用卡" /><RadioGroupItem value="cash" label="貨到付款" /></RadioGroup></Field>
+          <Field mode="readonly" className="w-44"><FieldLabel>滿意度</FieldLabel><Rating value={4} aria-label="滿意度" /></Field>
+          <Field mode="readonly" className="w-44"><FieldLabel>完成度</FieldLabel><Slider defaultValue={[40]} aria-label="完成度" /></Field>
+        </div>
+      </div>
+      <div>
         <p className="text-body-sm font-medium text-fg-secondary mb-3">{'<Field mode="display"> — 有展示態的控件自動切純展示（Select / DatePicker / Checkbox / Switch 修復後生效）'}</p>
         <div className="flex flex-wrap gap-x-8 gap-y-4 max-w-3xl">
           <Field mode="display" className="w-44"><FieldLabel>負責人</FieldLabel><Input value="王小明" onChange={() => {}} /></Field>
@@ -245,7 +257,8 @@ export const MixedControlAlignment: Story = {
           </Field>
           <Field orientation="horizontal" labelWidth="120px">
             <FieldLabel>開啟通知</FieldLabel>
-            <Switch />
+            {/* 混合表單 = Form-edit → ml-0 靠左(switch.spec.md「兩種對齊慣例」) */}
+            <Switch className="ml-0" />
           </Field>
         </FieldGroup>
       </div>

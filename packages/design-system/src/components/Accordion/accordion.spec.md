@@ -112,7 +112,7 @@ Consumer 無需額外處理,保留 Radix `data-state` 屬性即可。
 
 ## 邊界狀態
 
-Empty state 由 consumer 處理(無 items 則不渲染);loading 狀態由 consumer 用 `<Skeleton />` 包;disabled state 詳 `../Field/field-controls.spec.md`;本元件無 density 概念,padding 固定為 `py-4 / pb-4`(不隨 density token 變動);item 數量無內建上限與虛擬捲動(全數 render),極長清單的收納(拆頁 / 搜尋)由 consumer 內容層處理。
+Empty state 由 consumer 處理(無 items 則不渲染);loading 狀態由 consumer 用 `<Skeleton />` 包;disabled state 詳 `../Field/field-controls.spec.md`;本元件無 density 概念,padding 固定為 `py-4 / pb-4`(不隨 density token 變動)。**垂直留白世界級對照(2026-06-12 source-verified)**:shadcn trigger `py-4`=16px(本 DS 基底,一字不差)/ Ant Collapse header 垂直 = paddingSM 12px / MUI Accordion = minHeight 48 + content margin 12px(expanded 64/20 漸進式)/ Carbon = min-height token 模型——業界垂直節奏值域 12-16px,16px 為舒適端上緣;item 數量無內建上限與虛擬捲動(全數 render),極長清單的收納(拆頁 / 搜尋)由 consumer 內容層處理。
 
 ---
 

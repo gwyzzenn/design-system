@@ -90,6 +90,8 @@ Item-level default / hover / checked / disabled **色彩**與 Checkbox 共用同
 
 繼承 Field family,詳見 `../Field/field-controls.spec.md` + `../Field/form-validation.spec.md`。
 
+**Field 內 readonly(2026-06-12 user 拍板)**:不渲染 radio 群組,改渲染 `fieldWrapperStyles` readonly 灰框 + 選中項 label(= Select readonly 同款,同為單選資料的鎖定呈現);standalone readonly 維持原樣鎖互動(ReadonlyContext)。
+
 ---
 
 ## 禁止事項

@@ -32,10 +32,10 @@ export const Default: Story = {
         <TabsTrigger value="notifications" badge={<Badge count={3} />}>通知</TabsTrigger>
         <TabsTrigger value="settings">設定</TabsTrigger>
       </TabsList>
-      <TabsContent value="overview" className="p-4 text-body text-fg-secondary">專案的總覽資訊（KPI、最近活動、團隊成員簡介）</TabsContent>
-      <TabsContent value="members" className="p-4 text-body text-fg-secondary">專案成員列表（3 人待邀請）</TabsContent>
-      <TabsContent value="notifications" className="p-4 text-body text-fg-secondary">3 則未讀通知（提及、指派、留言回覆）</TabsContent>
-      <TabsContent value="settings" className="p-4 text-body text-fg-secondary">專案設定（一般、權限、整合）</TabsContent>
+      <TabsContent value="overview" className="text-body text-fg-secondary">專案的總覽資訊（KPI、最近活動、團隊成員簡介）</TabsContent>
+      <TabsContent value="members" className="text-body text-fg-secondary">專案成員列表（3 人待邀請）</TabsContent>
+      <TabsContent value="notifications" className="text-body text-fg-secondary">3 則未讀通知（提及、指派、留言回覆）</TabsContent>
+      <TabsContent value="settings" className="text-body text-fg-secondary">專案設定（一般、權限、整合）</TabsContent>
     </Tabs>
   ),
 }

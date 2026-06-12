@@ -177,7 +177,7 @@ CLAUDE.md target ≤ 200(Anthropic best-practice)/ transition ≤ 400 / hard cap
 | shadcn compat alias 回流 | dark mode 不聯動 |
 | `asChild ? Slot : Native` 內部 JSX 仍渲染多 children | React.Children.only runtime fail — Slot 規範 children 必為單 element,內部 `{icon}{label}{badge}` 多 expression 變 array → throw。asChild 分支 render 只傳 consumer child;tsc/build 過,story 打開才炸 |
 | `tsc -b` 不 emit declaration | TS4023 漏抓;型別 surface 改動必 `npm run build:lib`(詳 `.claude/rules/self-verify.md` Post-edit)|
-| `rsync -a` 對「等長 + 同秒」檔靜默跳過 | 必 `--checksum` + 寫後 fail-closed 斷言(詳 `scripts/build-published-template-mirror.mjs` 檔頭;2026-06-07 beta.56-58 anchor)|
+| 工具 flag 沉默陷阱:`rsync -a` 等長同秒靜默跳過(必 `--checksum`+fail-closed,詳 build-published-template-mirror.mjs 檔頭)/ `rg` 黏寫 `-rn` 的 `-r`=replace 輸出變假字串(`-n`/`-l` 永不黏 `r`,2026-06-12 兩次答錯 anchor)| 寫後斷言 + flag 分開寫 |
 | DS css 不在 tokens.css aggregator 也沒被 tsx import = orphan | consumer 靜默拿不到 → 跑版;hook `check_orphan_ds_css.sh` 機械攔(2026-05-27 anchor)|
 
 新 bug → 歸 Meta-Pattern OR 本表 1 行;> 10 條 = 漏寫,**評估 meta-merge 既有 M-rule 而非無腦新增**(meta-patterns velocity ≤ 3/quarter,單 M-rule 必吸收 ≥ 3 prior bugs)。

@@ -167,13 +167,13 @@ export const UsageGuidance: Story = {
                 <TabsTrigger value="members">成員</TabsTrigger>
                 <TabsTrigger value="settings">設定</TabsTrigger>
               </TabsList>
-              <TabsContent value="overview" className="pt-4">
+              <TabsContent value="overview" className="">
                 <p className="text-body">專案狀態、最近活動、關鍵指標</p>
               </TabsContent>
-              <TabsContent value="members" className="pt-4">
+              <TabsContent value="members" className="">
                 <p className="text-body">團隊成員列表、角色權限</p>
               </TabsContent>
-              <TabsContent value="settings" className="pt-4">
+              <TabsContent value="settings" className="">
                 <p className="text-body">通知、整合、危險區</p>
               </TabsContent>
             </Tabs>
