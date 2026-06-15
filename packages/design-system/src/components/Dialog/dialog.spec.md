@@ -62,7 +62,7 @@ DialogContent (fixed, centered)
 
 Dialog **繼承 page `data-density`**,不自設密度 attribute。這是 overlay primitive 的 canonical(跟 `components/Sheet/sheet.tsx` 對齊 — Sheet 不自設 density,繼承 page 層級 `html[data-density]`,見 sheet.tsx line 111 canonical)。
 
-**歷史備忘**:先前曾設 `data-layout-space="lg"` 給 header/body 寬鬆呼吸,但跟 `--chrome-header-height` canonical 衝突(md page dialog header 期望 48,強設 lg 會變 56)。**已於 2026-04-22 v5 撤回**,Dialog 全盤繼承 page density,header 高度 = `--chrome-header-height` 自動對齊(md=48 / lg=56)。
+**歷史備忘(2026-06-15 修正措辭精確度)**:先前曾設 `data-layout-space="lg"` 給 header/body 寬鬆呼吸,但跟 header 高度 canonical 衝突。**精確機制**:`--chrome-header-height` token 本身**只吃 `data-density`/`data-ui-size`,不吃 `data-layout-space`**(uiSize.css `[data-ui-size="lg"],[data-density="lg"]` 區塊)。衝突真正路徑 = header 高度 padding-based = title line-box(24)+ `py-[var(--layout-space-tight)]`×2;設 `data-layout-space="lg"` 讓 tight 12→16 → header **算出實高** = 24+16×2 = **56**,但 `--chrome-header-height` token(ui-size 沒變仍 md)= **48** → 「dialog header 實高 = chrome-header-height」canonical 破掉(**不是 token 變 56,是 padding 撐到 56**)。**已於 2026-04-22 v5 撤回**(git `c3d3b736` → `2f7792c9`),Dialog 全盤繼承 page density,header 高度 = `--chrome-header-height` 自動對齊(md=48 / lg=56)。**vs Popover**:Popover 鎖 `data-density="md"`(浮層永遠緊湊),Dialog 繼承頁面 density(modal 跟頁面一致)— 兩者刻意不同。
 
 **世界級對照**:
 - Polaris Modal:px 16(= md loose)
