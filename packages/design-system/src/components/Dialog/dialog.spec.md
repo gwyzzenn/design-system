@@ -58,18 +58,17 @@ DialogContent (fixed, centered)
 
 **Padding SSOT**：Header / Body / Footer 的 padding + 分隔線由 `patterns/overlay-surface/overlay-surface.spec.md` own——Dialog 與 Popover 共用同一套 primitive，避免 token 漂移。Dialog 特有行為:Header 的 Close 按鈕;Body 用 `<ScrollArea>` wrap(viewport-fill 專用,SSOT 見 overlay-surface.spec.md 「Body overflow canonical」節 + `components/ScrollArea/scroll-area.spec.md`)。
 
-## Density(2026-06-15:鎖 `layout-space=lg`,ui-size 繼承 page)
+## Density(2026-06-16 定論:全繼承 page,不鎖)
 
-Dialog 設 `data-layout-space="lg"`(只鎖版面間距 tier)+ **ui-size 繼承 page `data-density`**(不自設 ui-size / 不用 data-density master switch)。modal 是聚焦中斷 → 值得寬鬆呼吸 padding(避免誤按 + strapline 空間):body `px-loose`=24 / `pb-bottom`、header/footer `py-tight`=16。控件大小跟 page(`<Button size="sm">` 仍隨 page density,不被撐大)。
+Dialog **不自設任何 density attribute**,layout-space + ui-size 全繼承 page。效果:md page → body `px-loose`=16 / header `py-tight`=12(header 48);lg page → 24 / 16(header 56),隨 page。
 
-**為何只鎖 layout-space(reinstate c3d3b736 decouple)**:鎖 `data-density` master switch 會連 ui-size 一起 lg → button 32 撐高 header(2026-04-22 當年正是此痛點才撤回)。只鎖 `layout-space=lg` → padding 寬鬆但 button 跟 page(28 md)→ header 不被 button 撐高,future title+strapline 自然擴高。git 脈絡:`c3d3b736`(decouple)→ `2f7792c9`(誤撤,連 decouple 一起拿掉)→ 2026-06-15 復原(僅鎖 layout-space)。
+**為何不鎖(撤回本 session 一度加的 `data-layout-space="lg"`)**:本 `density.spec` 第 10 行親自定義 layout-space 管「dialog body padding」—— Dialog 若鎖死 layout-space,等於 override 我們自家 dial 對它點名要管的對象失效 = **自相矛盾**。有「同類 padding-density dial」的世界級 DS(SAP Fiori cozy/compact 做 `syncStyleClass` 專門把 page density 同步進 dialog;AWS Cloudscape compact「propagate to all components, in all view types」,例外只列 informational + tiny dropdown,modal 不在內)都讓 **modal 跟 page dial 走**,沒有一家把 modal 釘固定 tier。Material/Atlassian 的固定 24 是因為它們**沒有** density dial(其 24 = 我方 lg)。
 
-**Header 高度 = lg tier**:padding-based header = title line-box 24 + `py-tight`(鎖 lg=16)×2 = **56**(不論 page density)。這是 Dialog 宣告 lg tier 的結果,等同 Popover 宣告 md tier → 45。「對齊 `--chrome-header-height`」是**同 tier 內**成立(lg tier → 56 = chrome-header-height@lg),非「md page 必 48」(詳 `header-canonical.spec.md` A 家族 + `density.spec.md` 消費者清單)。
+**「modal 要寬鬆呼吸」怎麼滿足**:lg 產品自動拿 24(Material 級);md 產品本就要緊湊(資訊密集),16 是合格 modal padding(Polaris Modal = 16,世界級下限)。**「button 不撐高 header」**由 ui-size 繼承 page 解決(button = page sm),與 layout-space 鎖不鎖無關 → 故不需鎖。
 
-**世界級對照**:
-- Material M3 Dialog:px 24(= 我方 lg loose 鎖定值)
-- Atlassian Dialog:px 24
-- Polaris Modal:px 16(較緊);我方選 Material / Atlassian 的 24 寬鬆 modal 流派,理由 = 誤按防護 + 聚焦呼吸 + strapline 空間。
+**Header 高度**:padding-based = title line-box 24 + `py-tight`×2 → md 48 / lg 56,**隨 page tier**(= `--chrome-header-height` 同 tier 對齊)。
+
+**世界級對照**:Material M3 / Atlassian 24(無 dial,= 我方 lg)/ Polaris 16(= 我方 md 下限)/ SAP Fiori + Cloudscape(有 dial → modal 跟 dial = 我方繼承)。
 
 ## Layout
 
@@ -101,7 +100,7 @@ Modal 與 viewport 四邊保持 `--layout-space-bottom`（48px）最小間距。
 永遠存在於 DialogHeader 右側。使用 `<Button data-dismiss iconOnly dismiss size="sm" startIcon={X} aria-label="關閉" />`，不可移除——使用者永遠需要明確的關閉手段。
 
 **Size canonical(v5 chrome-unbounded)**:Button native size **sm**(隨 page density:28 md / 32 lg),touch target 亦同。SurfaceHeader 的 `[data-unbounded]` CSS rule 自動對 text variant / dismiss 套負 my → **layout 佔位 = title line-box**(slot 衍生自 `--font-body-lg-size`×1.5=24,見 `overlay-surface.spec.md` slot 段)。效果:
-- Header 只有 title + close X → max layout = 24 → header = 24 + 2×`py-tight`(Dialog 鎖 layout-space=lg → 16)= **56**(= `--chrome-header-height`@lg;Dialog 宣告 lg tier,不隨 page density 變)✓
+- Header 只有 title + close X → max layout = 24 → header = 24 + 2×`py-tight`(隨 page:md 12 / lg 16)= **48 md / 56 lg**(= `--chrome-header-height` 同 tier 對齊)✓
 - Header 塞 bounded primary(無 `data-unbounded`)→ header 自然長高
 
 **Canonical 來源**:Dialog 是 overlay chrome，corner close X 屬 action group region，必用 Button(非 Inline Action / 非自刻 button)。詳見 `patterns/element-anatomy/item-anatomy.spec.md`「Dismiss canonical」+ `patterns/overlay-surface/overlay-surface.spec.md`「Chrome dismiss size canonical」。
@@ -143,7 +142,7 @@ Dialog 是容器，無整體 disabled / loading / empty 狀態——這些屬於
 
 **Dark mode**：由 semantic token（`bg-surface-raised` / `border-border`）自動切換，無自訂 palette。
 
-**Density**:Dialog 鎖 `data-layout-space="lg"`(寬鬆呼吸 padding)+ ui-size 繼承 page density(控件不被撐大),見上「Density」段。
+**Density**:Dialog **全繼承 page**(layout-space + ui-size 皆不自鎖),見上「Density」段。
 
 ---
 

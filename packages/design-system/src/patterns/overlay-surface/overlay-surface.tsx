@@ -51,8 +51,10 @@ import { HEADER_TABS_SLOT_WRAPPER_CLASS } from '@/design-system/patterns/header-
 // 時標記)的 **native size 不變**(sm: 28 md / 32 lg),但 **layout 佔位** via 負 `my` 縮成 `--chrome-slot-h`。
 //
 // **Slot height = header title 的 line-height**(讓 button 不 dominate,title 自然撐 header)
-//   - Default `var(--field-height-xs)` = 24,匹配 Dialog/Sheet text-body-lg (16 × 1.5 = 24)
-//   - Popover/Coachmark override `--chrome-slot-h: 1.25rem` (20),匹配 text-body (14 × 1.5 ≈ 21,floor 20)
+//   - Default 衍生自 title typography:`calc(var(--font-body-lg-size)*1.5)` = 16×1.5 = 24(Dialog/Sheet title = text-body-lg)。
+//     2026-06-16:從寫死 `var(--field-height-xs)`(巧合也=24)改為衍生 → title 字級若改,slot 自動跟、不靠巧合(M17 SSOT;
+//     1.5 = typography.spec body 行高常數,非 token 故 inline,若 body 行高改 1.3 須同步此處)。
+//   - Popover/Coachmark override `--chrome-slot-h: 1.25rem` (20),匹配 text-body (14 × 1.5 ≈ 21,floor 20;explicit 值保留)
 //
 // Header 永遠 padding-based(無 min-h),但因 slot ≤ title line-height,header 高度由 title 主導:
 //   - Dialog: max(24 title, 24 slot) + py-tight(12*2)= 48 ✓ chrome-header-height
@@ -62,7 +64,7 @@ import { HEADER_TABS_SLOT_WRAPPER_CLASS } from '@/design-system/patterns/header-
 // 負 my 公式:(slot - native) / 2,density-aware:
 //   Dialog md: (24 - 28) / 2 = -2px;  lg: (24 - 32) / 2 = -4px
 //   Popover md: (20 - 28) / 2 = -4px
-const CHROME_UNBOUNDED_SLOT = '[&_[data-unbounded]]:my-[calc((var(--chrome-slot-h,var(--field-height-xs))-var(--field-height-sm))/2)]'
+const CHROME_UNBOUNDED_SLOT = '[&_[data-unbounded]]:my-[calc((var(--chrome-slot-h,calc(var(--font-body-lg-size)*1.5))-var(--field-height-sm))/2)]'
 
 export interface SurfaceHeaderProps
   extends React.HTMLAttributes<HTMLDivElement> {

@@ -95,14 +95,13 @@ const DialogContent = React.forwardRef<
       <DialogOverlay />
       <DialogPrimitive.Content
         ref={ref}
-        // Layout-space lock(2026-06-15 canonical,reinstate c3d3b736 decouple):modal 是聚焦中斷,值得
-        // 寬鬆呼吸 padding(避免誤按 + strapline 空間)→ 鎖 layout-space=lg(body px-loose 24、header
-        // py-tight 16)。**ui-size 不鎖、繼承 page** → 控件維持 page 尺寸(不被撐大,= c3d3b736 原始 decouple
-        // 意圖,非當年撤回的「density=lg 撐高 header」)。header 因 layout-space lg 自然 = title 24 +
-        // py-tight 16×2 = 56,它宣告 lg tier(等同 Popover 宣告 md tier = 45);對齊 chrome-header-height
-        // 是「同 tier 內」成立、非跨 page 強制(見 header-canonical.spec.md A 家族 + density.spec 消費者清單)。
-        // 世界級:Material M3 modal padding 24 / Polaris 16 lower bound。[data-layout-space="lg"] selector:layoutSpace.css L21。
-        data-layout-space="lg"
+        // Density:**全繼承 page**(layout-space + ui-size 都不自鎖)。2026-06-16 定論(撤回本 session 一度加的
+        // data-layout-space="lg"):density.spec 第 10 行親自定義 layout-space 管「dialog body padding」——
+        // Dialog 鎖死它 = override 自家 dial 對它點名要管的對象失效 = 自相矛盾。有同類 padding-density dial 的
+        // 世界級(SAP Fiori syncStyleClass / AWS Cloudscape「all view types」)都讓 modal 跟 page dial 走、不鎖固定 tier。
+        // 效果:md page → body px-loose 16 / header py-tight 12(header 48);lg page → 24 / 16(header 56),隨 page。
+        // 「modal 要寬鬆」需求在 lg 階自然滿足(Polaris modal 16 = 世界級下限,證明 md 16 合格);「button 不撐高
+        // header」由 ui-size 繼承 page 解決(button=page sm),與 layout-space 鎖不鎖無關 → 故不需鎖。
         onOpenAutoFocus={handleOpenAutoFocus}
         className={cn(
           "fixed left-1/2 top-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2",
