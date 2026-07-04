@@ -14,7 +14,7 @@
 - 新 family 宣告 / 改 family 歸屬
 - 新 pattern 加入 `patterns/` 或既有 pattern scope 改變
 
-### Non-SSOT(AUTO 整批做完,M33 anti-defer)
+### Non-SSOT(AUTO 整批做完,M20 anti-defer,原 M33)
 
 - Bug fix(spec 既有 canonical + code 跑掉 → 對齊 spec)
 - Code clean(unused import / dead export / typo / 排版)

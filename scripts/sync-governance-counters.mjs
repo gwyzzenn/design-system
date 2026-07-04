@@ -226,6 +226,10 @@ const liveCountFiles = [
   // 2026-06-12 fork-audit 抓漏:bootstrap 提示文字含 hook 數,prune-merge 59→52 時漏同步
   'template/ds-product-template/.claude/hooks/check_plugin_bootstrap.sh',
   'template/ds-product-template/.claude/hooks/block_production_edit_without_plugin.sh',
+  // 2026-07-04 治理健檢抓漏:此二檔含 skills/hooks/dims/M-rule 計數但原不在偵測範圍
+  //   → 「20 skills」stale 逃過 drift 偵測(CLAUDE.md SSOT auto-sync invariant 缺口)
+  '.claude/rules/meta-patterns.md',
+  '.claude/skills/README.md',
 ]
 // \b 前置:要求數字前有 word boundary,避免 embedded 數字誤匹配(「P0 hooks」的 0 / 「v14」/「beta.37」等)
 const countPatterns = [

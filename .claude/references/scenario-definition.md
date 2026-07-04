@@ -93,7 +93,7 @@ ajenchen/ds-product-template (published repo) ← Mirror artifact ────�
 | B3 | Mirror workspaces apps-only | `jq '.workspaces' /tmp/mirror/package.json` |
 | B4 | Mirror `.storybook/main.ts` apps-only glob | grep stories |
 | B5 | Mirror 含 `check-plugin-installed.mjs` + `setup-netlify-access.mjs` + `create-app.mjs` | ls /tmp/mirror/scripts/ |
-| B6 | Plugin install workflow(3 step + restart per CLAUDE.md)能拿到 22 skills + 59 hooks + 31 M-rules | manual plugin install + verify |
+| B6 | Plugin install workflow(3 step + restart per CLAUDE.md)能拿到 22 skills + 52 hooks + 31 M-rules | manual plugin install + verify |
 | B7 | `npm run create-app` 同 Scenario A | run + ls |
 
 ### Mirror integrity(7 cases)

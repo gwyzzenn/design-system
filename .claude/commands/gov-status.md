@@ -12,10 +12,10 @@ description: One-shot dump governance health snapshot(無 workflow,< 10s 完成)
 
 ```bash
 echo "=== File sizes ==="
-echo "CLAUDE.md: $(wc -l < CLAUDE.md | tr -d ' ') / 400 target / 800 transition"
+echo "CLAUDE.md: $(wc -l < CLAUDE.md | tr -d ' ') / 200 target / 400 transition / 800 hard cap"
 echo ""
 echo "=== Over-cap specs ==="
-for f in $(find src/design-system -name "*.spec.md"); do
+for f in $(find packages/design-system/src -name "*.spec.md"); do
   lines=$(wc -l < "$f" | tr -d ' ')
   case "$f" in
     */item-anatomy.spec.md) cap=1200 ;;
@@ -28,8 +28,9 @@ for f in $(find src/design-system -name "*.spec.md"); do
 done
 echo ""
 echo "=== Memory ==="
-MEM_DIR=/Users/chenqiren/.claude/projects/-Users-chenqiren-Library-CloudStorage-GoogleDrive-qijenchen-gmail-com--------my-project/memory
-echo "active: $(ls $MEM_DIR/*.md | grep -v retired | wc -l | tr -d ' ') / 20 target"
+# repo-relative(可攜:harness ~/.claude/.../memory 每 session sync-memory 鏡像至此)
+MEM_DIR=.claude/memory
+echo "index entries: $(grep -cE '^- \[' $MEM_DIR/MEMORY.md 2>/dev/null || echo 0) / 20 target"
 echo ""
 echo "=== Hooks / Skills / Agents / Commands ==="
 for d in hooks skills agents commands; do

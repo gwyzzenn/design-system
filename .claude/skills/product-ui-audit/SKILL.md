@@ -131,7 +131,7 @@ chain `.claude/skills/design-system-audit/references/principle-audit-protocol.md
 
 確認 audit target:file / folder / feature area。提問 user 若模糊。禁止掃整個 repo(失焦)。
 
-### Phase 1 — Parallel 6-dim audit
+### Phase 1 — Parallel 7-dim audit
 
 7 個維度各自獨立 grep + code review。可 parallelize。
 

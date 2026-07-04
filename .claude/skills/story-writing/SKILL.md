@@ -37,7 +37,7 @@ Purpose: Storybook 是公開文件,範例 = 設計系統品質。本 skill 把�
 
 ### Phase 0 — Baseline grep(legacy,2026-05-20 由 Phase 0.0 registry 取代)
 
-(per M35 升 registry-driven,Phase 0 內容由 Phase 0.0 自動 cover。保留段供 legacy reference。)
+(per M23(d)(原 M35,2026-05-22 fold)升 registry-driven,Phase 0 內容由 Phase 0.0 自動 cover。保留段供 legacy reference。)
 
 ### Phase 0.5 — 展示層拆分原則 mapping(展示 stories 必走)
 
@@ -119,4 +119,4 @@ Checkpoint: 寫完後必驗:
 
 - `.claude/rules/story-rules.md`:三層定位 + title 命名(high-level signal)
 - CLAUDE.md `# 失敗記憶索引` → 三方漂移:SegmentedControl cva defaultVariants bug
-- M3 mindset #3「改一處看三處」+ `.claude/hooks/pre_edit_spec_check.sh`:Edit 前讀 spec、三方連動靠 mindset(`check_sync_update.sh` retired/未實作)
+- M3 mindset #3「改一處看三處」:Edit 前讀 spec、三方連動靠 mindset(`pre_edit_spec_check.sh` / `check_sync_update.sh` 皆 retired/未實作)

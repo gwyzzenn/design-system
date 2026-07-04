@@ -44,7 +44,7 @@ cva `defaultVariants` 異動 → 強制 grep 該元件所有檔案確認三方�
 
 ### Phase 4 — Ship 審查(最後驗證)
 
-走 **Ship section**(6 項):
+走 **Ship section**(7 步驟 = checklist.md Ship 4 項 checkbox + visual/story-drift/code-quality 3 項前置,後三項與 Phase 4.5 重疊):
 1. `npm run storybook` 本地渲染正常
 2. `npx tsc -b` 無錯(**禁用 `--noEmit`**,root tsconfig `files: []` silent pass)
 3. import 路徑 `@/design-system/...`

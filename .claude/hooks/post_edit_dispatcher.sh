@@ -1,12 +1,14 @@
 #!/bin/bash
-# post_edit_dispatcher.sh — orchestrate 8 lib helper rules (PostToolUse Write|Edit|MultiEdit)
+# post_edit_dispatcher.sh — orchestrate 9 lib helper rules (PostToolUse Write|Edit|MultiEdit)
 #
-# 2026-05-13 /knowledge-prune consolidation:
-#   Per CLAUDE.md governance hook count budget (25 soft / 30 hard,Anthropic ~15 guideline)
+# 2026-05-13 /knowledge-prune consolidation (baseline):
+#   Per CLAUDE.md governance hook count budget (當時 25 soft / 30 hard,Anthropic ~15 guideline)
 #   Pre-consolidation: 32 hooks → BLOCKER 30 cap breached
-#   This dispatcher folds 8 lib/_*.sh helpers into one hook registration
+#   This dispatcher folded 8 lib/_*.sh helpers into one hook registration
 #   Lib helpers remain as standalone testable files (renamed `_*` per Unix internal-helper convention)
-#   Net hook count: 32 - 8 lib + 1 dispatcher = 25 ✅
+#   Baseline net hook count: 32 - 8 lib + 1 dispatcher = 25
+#   Since then +1 helper (_governance_coverage_check.sh) → 現 orchestrate 9(見下 run_helper 清單)
+#   `_*` helper 不計入 first-class hook count(root-only 口徑,見 session_start Check 7)
 #
 # Pattern: read stdin INPUT once,pipe to each helper sequentially,collect their JSON outputs
 # Each helper:

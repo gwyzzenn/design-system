@@ -1,6 +1,6 @@
 ---
 name: code-quality-audit
-description: Clean code 量化稽核 — `any` 使用 / dead export / file size / long function / circular dep / magic number。補 `/design-system-audit` 只管「design canonical」的缺口。Invoke via /code-quality-audit scope=all(release / 季度)OR scope=changed(daily)OR scope=component:X(focused)。Auto-chain by `/design-system-audit --deep` Dim 27 + `/component-quality-gate` Ship phase + `/new-component` Phase 4.5。
+description: Clean code 量化稽核 — `any` 使用 / dead export / file size / long function / circular dep / magic number。補 `/design-system-audit` 只管「design canonical」的缺口。Invoke via /code-quality-audit scope=all(release / 季度)OR scope=changed(daily)OR scope=component:X(focused)。Auto-chain by `/design-system-audit --deep` Dim 27 + `/component-quality-gate` Ship phase + `/new-component` Phase 6(經 `/component-quality-gate` Phase 4.5)。
 ---
 
 # Code Quality Audit — Clean Code 量化稽核
@@ -26,10 +26,12 @@ Scope:**tsx / ts code hygiene**,跟 design canonical 正交。
 
 - **Daily**:`/code-quality-audit --scope=changed`(git diff)
 - **Component ship**:`/component-quality-gate` Ship phase auto-chain
-- **New component**:`/new-component` Phase 4.5 auto-chain
+- **New component**:`/new-component` Phase 6(經 `/component-quality-gate` Phase 4.5) auto-chain
 - **Release / 季度**:`/code-quality-audit --scope=all`
 - **Focus one component**:`/code-quality-audit --scope=component:<Name>`
 - **CI gate**:`node scripts/code-quality-audit.mjs --check`(P0 violation → exit 1)
+
+**何時不觸發**:design canonical / spec / token 語意問題(走 `/design-system-audit` — 本 skill 只管 clean-code 量化,兩者正交不重疊);純 spec.md 文字改(無 code 量化面);純視覺 / UX / 效能(各走對應 skill)。**退場**:`--check` exit code 即結束;P0 必修才 ship,P1 flag 不 block。
 
 ## Workflow
 
@@ -53,7 +55,7 @@ Scope:**tsx / ts code hygiene**,跟 design canonical 正交。
 |---|---|
 | `/design-system-audit` Dim 27 | `--deep` 必 chain 本 skill scope=all |
 | `/component-quality-gate` Ship | chain 本 skill scope=component:{Name} |
-| `/new-component` Phase 4.5 | 元件建完必跑 scope=component:{Name} |
+| `/new-component` Phase 6(經 `/component-quality-gate` Phase 4.5) | 元件建完必跑 scope=component:{Name} |
 | Hook `check_code_quality.sh` | PostToolUse Edit/Write on src/ — 只跑 any + file-size(quick) |
 
 ## References

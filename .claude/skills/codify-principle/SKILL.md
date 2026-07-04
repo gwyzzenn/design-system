@@ -1,6 +1,6 @@
 ---
 name: codify-principle
-description: User 提出新設計原則 → auto 5-layer artifact generation pipeline。將原則文字自動轉化為 SSOT canonical text + hook scaffold + audit dim + scaffold update + memory entry,放入正確 home。對齊 M14 + M19 + 8-home 治理 canonical。Invoke when user says「我想加一條設計原則 X」「新原則 Y」「ensure X always」OR auto-recognize trigger phrase。本 skill 把 reactive markdown rule 升級成 proactive principle-to-artifact generator。
+description: User 提出**新**設計原則 → auto 5-layer artifact generation pipeline。將原則文字自動轉化為 SSOT canonical text + hook scaffold + audit dim + scaffold update + memory entry,放入正確 home。對齊 M14 + M19 + 8-home 治理 canonical。Invoke when user 明確提出一條**新**原則:「我想加一條設計原則 X」「新原則 Y」「以後都要 X(前所未有的規則)」。**分工限定**:本 skill 只管「**新**原則 → 生成 artifacts」;若 user 是對**既有**規則要求 enforce / 永不漂移(無新內容)→ 走 `/ensure-canonical`。本 skill 把 reactive markdown rule 升級成 proactive principle-to-artifact generator。
 ---
 
 # Codify Principle Skill — 原則 → 5-layer artifacts auto-generator

@@ -152,12 +152,12 @@ target PR:當前 working branch 的 PR(`mcp__github__list_pull_requests` 找到 
 
 `mcp__github__subscribe_pr_activity` → 等 webhook event,**不 poll**(Anthropic best-practice,等推送)。
 
-### Step 4:Codex 回覆 → Claude 自檢(M22/M23/M27/M8)
+### Step 4:Codex 回覆 → Claude 自檢(M22/M23/M8;含 M23(c) prop-name)
 
 收到 codex reply 必跑 4 題自檢(避免 codex 也犯 M1/M22 錯):
 1. **M22 cite check**:codex 引的 benchmark 有 inline source?無 → reply 要求補
 2. **M23 DS-first**:codex 建議是否覆蓋 DS 既有 canonical?有 → 我手動驗 DS spec/token
-3. **M27 namespace**:codex 建議 prop name 是否撞 DS 既有?
+3. **M23(c) namespace**(原 M27,2026-05-15 collapse):codex 建議 prop name 是否撞 DS 既有?
 4. **M8 ≥3 source**:codex 只引 1 家 → reply 要求補到 3 家
 
 任一題失敗 → Step 4.5 仍要跑(自檢結果記下),Step 5 一併 report。
@@ -203,7 +203,7 @@ target PR:當前 working branch 的 PR(`mcp__github__list_pull_requests` 找到 
    - **重啟**(兩邊都不對 → 重新做)
 3. 列 final 方案,不再列 A/B/C 給 user 拍 unless 真歧義
 
-**強制 reply format**:Step 4 self-check(M22/M23/M27/M8)+ 4.5 verify 表 + 4.6 regression scan 表 + 5 接受/拒絕/修正 + final action(僅真歧義列 options)。錨例 `029b647` `f24998f` `775d879`。
+**強制 reply format**:Step 4 self-check(M22/M23/M8,含 M23(c) 原 M27)+ 4.5 verify 表 + 4.6 regression scan 表 + 5 接受/拒絕/修正 + final action(僅真歧義列 options)。錨例 `029b647` `f24998f` `775d879`。
 
 ### Step 6:User approve → Claude 實作
 

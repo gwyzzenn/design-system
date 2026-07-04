@@ -24,6 +24,8 @@ description: Performance audit for design-system components and product UI. Chec
 | 日常 dev | 高效 | tsc pass + bundle diff 門檻即可 |
 | Release cut | 進階 + 全 DS scope | 全 DS render / memo / bundle 全跑 |
 
+**何時不觸發**:非「卡 / re-render / bundle / 效能」主題的 audit(走 `/design-system-audit` 或 `/ux-audit`);純 spec.md 文字改(無 render 行為變);已由 `/component-quality-gate` Phase 4.5 或 `/design-system-audit` D3 chain 時不重複 standalone 起。**退場**:Phase F STOP 報告即結束,不自動修 canonical。
+
 ## Preconditions
 
 - 元件 folder 存在於 `packages/design-system/src/components/{Name}/`

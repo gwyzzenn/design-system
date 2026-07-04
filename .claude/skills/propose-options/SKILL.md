@@ -169,7 +169,7 @@ User 已就「為什麼會給錯誤建議」糾正 ≥ 3 次:
 
 | Skill | scope |
 |---|---|
-| `pre_write_subsumption_check.sh`(hook)| Edit/Write 已發生時 |
+| `pre_write_subsumption_check.sh`(retired/未實作 — 改靠 M18 Q3 Rule-of-3 + mindset)| Edit/Write 已發生時 |
 | `post_edit_canonical_interrogate.sh`(retired/未實作 — mindset enforcement)| 寫完 canonical 後 3 題 |
 | `check_governance_compliance.sh`(retired/未實作 — 靠 `check_propose_pre_grep_verify.sh` + 加 hook 前 3 題)| 寫新 hook 7 題 |
 | **本 skill** `/propose-options` | **propose-time(寫進 user 回覆前)7 題** |

@@ -119,11 +119,11 @@ detect_mode() {
 - **中文人話 propose format + 禁用 jargon 對照表** → SSOT `.claude/memory/feedback_propose_discipline.md`(hook `check_propose_discipline.sh(r1,2026-06-11 merge)` 機械強制)
 - **Triage 分流 + format 細則** → `references/triage-rubric.md`
 
-### A.3 — Autonomous batch execute(non-SSOT,M33 anti-defer)
+### A.3 — Autonomous batch execute(non-SSOT,M20 anti-defer,原 M33)
 
 7 軸 simultaneous optimize 操作清單 → `references/phase-a-workflow.md` A.3(SSOT `CLAUDE.md` `# 自主執行 canonical`)。
 
-**禁defer keyword**:「下次再做 / 下個 session / 省工 / 等等」(M33 BLOCKER)。
+**禁defer keyword**:「下次再做 / 下個 session / 省工 / 等等」(M20 BLOCKER,原 M33)。
 
 ### A.4 — Verify-to-perfection(per self-verify.md 4 階段)
 
@@ -154,7 +154,7 @@ Brief 必含 4 段(完整 template SSOT → `references/phase-b-codex-brief.md`,
 ### B.2 — Receive codex report + Step 4 self-check + Step 4.5 verify
 
 **禁 pass-through**(per M31 + `feedback_codex_dual_track_synthesizer.md`):
-- Step 4:M22/M23/M27/M8 4 題自檢
+- Step 4:M22/M23/M8 4 題自檢(含 M23(c) prop-name,原 M27)
 - **Step 4.5 verify each claim**:grep / WebFetch / run invariant script / counter-example scan
 - 每 codex claim 標 `✅ verified` / `❌ FALSE` / `⚠️ partial`
 
@@ -237,7 +237,7 @@ Deep-audit 收尾**必自動跑** `/knowledge-prune` deep — **前提鐵律:確
 | **CP-P0** | Phase 0 結束 | Print detected mode(ds-repo / fork-user-repo),mode = non-ds 直接 exit;確認 user 跑對 repo |
 | **CP-A0** | A.0 結束 | 全盤閱讀清單給 user 看(列 N file read,per detected mode 切 scope),禁未讀就進 A.1 |
 | **CP-A1b** | A.1b 結束 | **每個** component/pattern 都有 story-vs-code adversarial verdict(讀 .tsx + wrap lib 逐句比對宣稱);**禁** 用「無 code 改動」跳過任一單元。缺任一 component verdict = 不可進 A.2(2026-05-30 403-finding 偷懶 anchor)|
-| **CP-A2** | A.2 SSOT-UI/UX propose | 中文人話 + 4-Q gate;**STOP** 等 user A/B 才動 code(fork-user-repo mode:propose scope 限 `apps/**`,禁 DS source)|
+| **CP-A2** | A.2 SSOT-UI/UX propose | 中文人話 + 7-Q gate;**STOP** 等 user A/B 才動 code(fork-user-repo mode:propose scope 限 `apps/**`,禁 DS source)|
 | **CP-B0** | B.0 codex transport | 3-test 全 ❌ + cwd=fork → **auto-fallback Phase A only 印中文**,不 interactive ASK;cwd=ds-repo → 報 user;禁 Explore 替身 |
 | **CP-B4** | B.4 cite battle | evidence 對等 → STOP 等 user 拍板,**禁** AI 自決誰勝 |
 | **CP-C2** | C.2 push gate | 等 user「Push 到 main」trigger;禁 AI 自決 merge |
@@ -247,5 +247,4 @@ Deep-audit 收尾**必自動跑** `/knowledge-prune` deep — **前提鐵律:確
 - `references/phase-a-workflow.md` — A.0 全盤閱讀 file list canonical + A.1 全 dim sub-agent dispatch template
 - `references/phase-b-codex-brief.md` — codex brief template(B.1)+ Step 4.5 verify checklist + Step 5 比稿 matrix template
 - `references/triage-rubric.md` — Scope classifier(SSOT-UI/UX vs non-SSOT)+ 中文人話 propose format + 7 autonomous 目標 expansion
-- `references/upstream-directives-r-mapping.md` — 上游 context / 框架(SSOT integrity invariant + 生態位 + canonical 全繼承)+ user-verbatim directives(2026-05-18 + 2026-05-29)+ 機械強制 R18-R26 對齊清單
-- `references/skill-relationships-antipatterns-benchmarks.md` — 與其他 skill 分工 + Anti-pattern(永久 ban)+ 世界級對照
+- `references/upstream-directives-r-mapping.md` — 上游 context / 框架(SSOT integrity invariant + 生態位 + canonical 全繼承)+ user-verbatim directives(2026-05-18 + 2026-05-29)+ 機械強制 R18-R26;`references/skill-relationships-antipatterns-benchmarks.md` — 與其他 skill 分工 + Anti-pattern(永久 ban)+ 世界級對照

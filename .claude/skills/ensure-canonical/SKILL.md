@@ -1,6 +1,6 @@
 ---
 name: ensure-canonical
-description: User 說「確保 X 一定要 / 不可繞過 / 永不漂移 / ensure X always」trigger phrase → 自動規劃完整 defense-in-depth pipeline(M14 5-layer + M8 benchmark + M17 SSOT + M10 下游),至少 3 層落地。對應 CLAUDE.md M19。Invoke via /ensure-canonical OR auto-recognize trigger keywords(確保 / 一定 / 不可繞過 / 不准 silent / 永不漂移 / ensure / always / never bypass / never silent)。本 skill 把 reactive「user 講 N 次才完整落地」改 proactive「trigger phrase auto plan 5-layer」。
+description: User 對**既有** canonical / 規則要求 enforce(「確保 X 一定要 / 不可繞過 / 永不漂移 / ensure X always」trigger phrase)→ 自動規劃完整 defense-in-depth pipeline(M14 5-layer + M8 benchmark + M17 SSOT + M10 下游),至少 3 層落地。對應 CLAUDE.md M19。Invoke via /ensure-canonical OR auto-recognize trigger keywords(確保 / 一定 / 不可繞過 / 不准 silent / 永不漂移 / ensure / always / never bypass / never silent)。**分工限定**:本 skill 管「對**既有**規則加防線 enforce」;若 user 是提出一條**新**原則(前所未有的內容)→ 走 `/codify-principle` 生成 artifacts。本 skill 把 reactive「user 講 N 次才完整落地」改 proactive「trigger phrase auto plan 5-layer」。
 ---
 
 # Ensure Canonical — User Trigger Phrase → Auto Defense-in-Depth
@@ -163,7 +163,7 @@ User 拍板才 Phase 6 起執行。
 
 - 不負責 single-file refactor(走 /design-system-audit)
 - 不負責 ad-hoc bug fix(走 /scan-similar-bugs)
-- 不替代 propose-options 4-Q gate(M18 不同階段:propose vs ensure)
+- 不替代 propose-options 7-Q gate(M18 不同階段:propose vs ensure)
 - 不自動執行 substantive 動議(必 sign-off)
 
 ## 與其他 skill 分工
@@ -171,7 +171,7 @@ User 拍板才 Phase 6 起執行。
 | Skill | Trigger | Scope |
 |-------|---------|-------|
 | **/ensure-canonical** | 「確保 X 一定要」trigger phrase | 規劃 N-layer enforcement |
-| `/propose-options` | 列 options 給 user 前 | 4-Q gate per option |
+| `/propose-options` | 列 options 給 user 前 | 7-Q gate per option |
 | `/design-system-audit` | 已 codified rule batch verify | audit 既有元件 |
 | `/knowledge-prune` | governance bloat | 8-home retire |
 | `/scan-similar-bugs` | 修 bug 後 | M10 exhaustive scan |
