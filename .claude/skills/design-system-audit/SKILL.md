@@ -5,7 +5,7 @@ description: Systematic audit of this design system for world-class quality. Run
 
 # Design System Audit (Groups A–Q + Future-proof preflight; dim count canonical per `check_dim_count_drift.sh` / `dispatch-audit-dims.mjs` SSOT — 禁 hardcode)
 
-> **Budget note**:本檔 = 88-dim **registry SSOT**(foundational;dispatch-audit-dims.mjs / deep-audit / check_dim_count_drift 全 parse 此檔),per CLAUDE.md `# 治理 canonical`「foundational SSOT 例外 ≤ 800-1200」,**不受 250 SKILL cap**(dim table 本質就是 registry,拆出會 break dispatch parser SSOT)。
+> **Budget note**(2026-07-04 治理健檢裁定 3:不開例外、瘦身至 ≤250):本檔核心 = 88-dim **registry SSOT**(dispatch-audit-dims.mjs / deep-audit / check_dim_count_drift 全 parse `## The audit dimensions` 表 → dim 表**必留本檔原位**,移出會 break parser)。workflow 散文(Phase 0-4)已拆至 `references/workflow.md`,本檔壓到 ≤250 SKILL cap,**不再引用 foundational 例外**。
 
 Purpose: catch every bug class this project has shipped historically PLUS structural gaps relative to Polaris / Material / Atlassian / Ant / Carbon / Apple HIG. Each audit has a clear rubric tied to CLAUDE.md rules. The skill reports findings and **explicitly stops at checkpoints** for user decisions before large-scope fixes.
 
@@ -33,7 +33,7 @@ Purpose: catch every bug class this project has shipped historically PLUS struct
 
 ---
 
-## The audit dimensions(Group A–P,full list per below;count canonical 不 hardcode per `check_dim_count_drift.sh`)
+## The audit dimensions(Group A–Q,full list per below;count canonical 不 hardcode per `check_dim_count_drift.sh`)
 
 Grouped by theme. Each runs as an independent subagent; many can parallelize.
 
@@ -171,7 +171,7 @@ User 2026-05-15 verbatim 抓「DS 深度稽核漏 storybook content quality」+�
 | 51 | **Theme / density visual matrix**(Material 3 dynamic color / Apple HIG Dynamic Type)| Deep mode 每 core story 跑 light/dark/high-contrast/density-md/density-lg/RTL 6-cell matrix screenshot diff;baseline drift > Δ% → flag。對齊 Polaris visual regression / Carbon dark token matrix |
 | 52 | **Header canonical cross-family invariants**(W1-W6,2026-05-17 ship per M31 codex 共識,對齊 GitHub Primer + Ant + Material v1)| Per chrome / overlay header tsx 跑:(W1) 含 Tabs child 必有 `withTabs` prop(border auto-suppress) (W2) tabs padding = header padding(`--layout-space-loose`) (W3) `--tab-height-lg` == `--chrome-header-height`(md/lg 對等) (W4) header + tabs flush stack 無 negative margin (W5) tabs default = sm 已 land + md 標 future tier (W6) cva default 已從 md 改 sm。Hook 3:`check_tab_lg_chrome_header_equal.sh`(W3) / `check_header_with_tabs_border.sh`(W1) / `check_chrome_header_handcraft.sh`(Layer 3 ChromeHeader consumption) |
 | 53 | **Code-to-spec reverse drift check**(2026-05-17 user 抓 Phase 1 漏抓 FileViewer h-14 spec drift,新加 dim)| 對每 component grep `packages/design-system/src/components/<X>/<X>.tsx` 的 className 硬寫 utility(`h-14` / `w-80` / `px-loose` 類)→ 反向掃對應 `<X>.spec.md` 是否仍寫「固定 h-NN」「寫死」keyword 但 code 已 migrate to token = drift。互補既有 forward Dim 15/20(spec → code)。Hook `check_spec_class_drift.sh` write-time soft P1 warn,本 dim batch verify 既有 60+ 元件 spec.md。錨例:2026-05-17 Phase 1 我 file-viewer.spec.md L103 寫「Known drift:h-14 硬寫不消費 token」但 file-viewer.tsx:333 已 `h-[var(--chrome-header-height)]`,3+ 次 `/design-system-audit --deep` 都沒抓到反向 drift |
-| 54 | **M35 Nearest same-purpose canonical compliance**(2026-05-20 codify per codex Layer B D4)| 對每 `*.stories.tsx` wrap 既有 primitive(Sidebar / DataTable / ChromeHeader / Dialog / Sheet / Popover)的 file 跑:(a) 檔頭含 `@story-baseline:` cite marker?(b) `.claude/references/story-baseline-registry.json` 內 primitive 的 `requiredHelpers` 全 import?(c) `antiPatterns` regex 任一 match → fail?(d) `variantRules` button variant + size + iconOnly + pressed 全 satisfy?Hook `check_story_invariants.sh R8` write-time soft warn,本 dim batch verify。錨例:2026-05-20 AppShell stories 連 5 round drift 後 codex Layer B 抓 root cause = SSOT 消費被當引用儀式 |
+| 54 | **M23(d) Nearest same-purpose canonical compliance**(原 M35,2026-05-22 fold;2026-05-20 codify per codex Layer B D4)| 對每 `*.stories.tsx` wrap 既有 primitive(Sidebar / DataTable / ChromeHeader / Dialog / Sheet / Popover)的 file 跑:(a) 檔頭含 `@story-baseline:` cite marker?(b) `.claude/references/story-baseline-registry.json` 內 primitive 的 `requiredHelpers` 全 import?(c) `antiPatterns` regex 任一 match → fail?(d) `variantRules` button variant + size + iconOnly + pressed 全 satisfy?Hook `check_story_invariants.sh R8` write-time soft warn,本 dim batch verify。錨例:2026-05-20 AppShell stories 連 5 round drift 後 codex Layer B 抓 root cause = SSOT 消費被當引用儀式 |
 | 55 | **Token cross-namespace mapping integrity**(2026-05-20 codify per user 抓 red→deep-orange bug 100+ audit 沒發現)| `tokens/color/semantic.css` 每 hue interaction token(`--blue-hover` / `--red-hover` / ...)必指向**同名**primitive(`--red-hover: var(--color-red-N)`),**禁**跨 hue 混(`--red-hover: var(--color-deep-orange-N)` 違反)。Primitive 12 hue 全該有對應 interaction(blue/red/deep-orange/orange/amber/yellow/lime/green/turquoise/indigo/purple/magenta)。Status semantic(`--error-hover` 等)直指 primitive,**不**透過 hue layer。錨例:2026-05-20 semantic.css:246 `--red-hover: var(--color-deep-orange-5)` cross-namespace bug,100+ audit 沒發現 = audit 沒檢 token mapping integrity |
 | 56 | **AppShell primary-header consistency**(2026-05-21 codify per user 抓「primary-header = primary-sidebar + 一條 global header」+「globalHeader 存在時 sidebar 內 header 該拿掉」)| 對每 consumer `.tsx`(stories / app code)grep `layout="primary-header"`,verify:(a) 同 file 含 `globalHeader=` prop(否則邏輯矛盾)/(b) 同 file 不含 `<SidebarHeader>`(WorkspaceBrand 該在 globalHeader,不重複)。World-class cite:GitHub repo sidebar 無 header(org/repo 在 global breadcrumb)+ Gmail / Figma file editor sidebar 無 header(brand 在 global top bar)。Hook `check_app_shell_primary_header_consistency.sh` write-time block(P1 warn,可 escape `// @app-shell-primary-header-allow:`)。對應 `app-shell.spec.md`「WorkspaceBrand 放置 SSOT」段 |
 | 57 | **M29 DS Anchor Preflight enforcement coverage**(2026-05-26 codify per user verbatim「該程式化的都沒程式化」)| 對每 `*.tsx`(production code,非 stories / test)grep wrap DS primitive(`<Sidebar>` / `<AppShell>` / `<DataTable>` 等)→ verify 過去 30 turns transcript 含 `Grep`/`Read` tool call hit `packages/design-system/src/**/*.spec.md` 或 `*.stories.tsx`,OR 檔頭含 `@story-baseline:` marker 或 inline 3-column owner table。Hook `check_ds_anchor_preflight.sh` write-time soft BLOCKER。對應 meta-patterns.md M29 + self-verify.md Pre-edit phase。錨例:2026-05-26 App.tsx 漏 SidebarTrigger / collapsible / startIcon mock-drift = M29 hook 不存在使 infra 沒攔 |
@@ -220,154 +220,17 @@ User 2026-05-15 verbatim 抓「DS 深度稽核漏 storybook content quality」+�
 
 ## Workflow
 
-### Phase 0 — Setup + Build Baseline
+**完整 Phase 0-4 執行細節 → [references/workflow.md](references/workflow.md)**(2026-07-04 拆出以符 SKILL ≤250 預算;dim registry 留本檔原位因 dispatch 工具 parse)。
 
-1. Read `CLAUDE.md` fully + `git status --short`
-2. **Build baseline(任一 fail STOP → Checkpoint 5)**:
-   - `npx tsc -b` — 0 errors
-   - `npx vite build` — `✓ built in`
-   - `npm run build-storybook` — clean
-3. **Mechanical content-quality baseline**:
-   - `node scripts/audit-content-quality.mjs --check` — `✅ No content drift`(16 cat)
-   - `node scripts/extract-canonical-rules.mjs` — `✅ All extracted rule keywords covered`
-   - violation → 列 P0
-4. Build fail → 不跑全 dim;報 user 決定先修 OR 繼續(broken code audit 多 dim 跑不動)
-5. TaskList entries 建好
-
-### Phase 0.5 — Preflight 全面盤查(2026-05-15 user-mandated P0,NO-SAMPLE 前置)
-
-User verbatim:「你完整稽核之前應該會先全面盤查全部檔案和所有設計原則對吧?我記得之前我有命令你要在 infra 定義這件事」+「確保現在和未來都會自動涵蓋,當有新的準則就務必更新設計系統進階稽核的內容」。
-
-**強制 chain**:`/design-system-audit --deep` 跑時 Phase 1 前自動跑 `node scripts/audit-preflight.mjs`(對應 SSOT `.claude/memory/feedback_audit_preflight_全盤查.md`)
-
-**輸出 3 件**:
-1. **檔案 enumeration**:全 `packages/design-system/src/**/*.{tsx,ts,css,md}` 計數 + per type bucket(component tsx / showcase stories / anatomy stories / principles stories / spec.md / tokens)
-2. **設計原則 enumeration**:M-rule(meta-patterns.md)+ spec trait(frontmatter)+ hook invariant + rules
-3. **Coverage matrix**:每原則 → audit dim 對應(N 對應 / NO COVER gap)— 存 `.claude/logs/audit-preflight-{date}.json`
-
-**Gap 處理**:有 gap → Phase 1 dispatch 前 user 拍板:補新 dim / 撤原則 / 接受 gap 紀錄 deferred。
-
-**Phase 1 sub-agent 必引 preflight log**:Coverage matrix 對應 dim → sub-agent 跑該 dim 時掃 file enumeration list(DS-wide ALL,不 sample,per NO-SAMPLE invariant)。
-
-### Phase 1 — Parallel audit execution
-
-Launch all audits as background subagents (single message, multiple `Agent` tool calls with `run_in_background: true`). Use prompts in [references/audit-prompts.md](references/audit-prompts.md).
-
-**Every audit prompt declares three metadata lines at top**:
-- **Type**: `Absolute` or `Consistency` (per CLAUDE.md`# 稽核 canonical`「Consistency 類稽核」)
-- **Canonical source**: where correct behavior is defined
-- **Rationale home**: where deviation justification should live (`N/A` for Absolute)
-
-Sub-agents applying a **Consistency** dim **must** search the Rationale home for each apparent deviation before reporting as VIOLATION. A documented rationale paragraph = `deviation ✓` (not a violation). Absolute dims apply strict `actual == canonical` check.
-
-Each audit reports:
-- Violations only (skip confirmations); for Consistency dims, also list `deviation ✓` items with rationale location as evidence the framework caught-and-cleared them
-- file:line for every finding
-- Suggested fix direction
-- Count + top offenders
-
-#### ⚠️ `--deep` mode NO-SKIP + NO-SAMPLE invariant(2026-05-15 user-mandated P0)
-
-User verbatim 2026-05-15:
-> 「請確保之前所有列過的關於 design system 深度稽核要做的事情在稽核時都肯定會做到」
-> 「都已經叫深度稽核到底怎麼還能疏漏?」
-> 「**稽核並非既往不咎,稽核要全盤稽核,不能只抽樣,要全盤**」
-
-**`/design-system-audit --deep` 跑時兩條 mechanical**:
-
-### NO-SKIP(原 2026-05-15)
-- Sub-agent prompt 禁含「SKIP / too heavy / DEFERRED per instruction / 跳過 dim」keyword
-- 每 dim 必跑,heavy dim(12/24/25/40-44)獨立 sub-agent,不擠 batch
-- Context 不夠 → 拆 2-stage(per-component scan → cross-component synthesis)
-
-### NO-SAMPLE(2026-05-15 補強 + 2026-05-17 P0 升級嚴格 no escape clause)
-- Sub-agent prompt **禁含「sample top N / subset / pick top X / top hot / sampled components / sample evidence allowed / heavy agent needed / full sweep deferred」**等任何縮 scope keyword
-- 每 dim 必 **DS-wide ALL components**(60+ 元件全掃),不 sample subset
-- Context 不夠 → 拆 N stages(每 stage 10-15 元件 batch),**不 sample**
-- 對應 SSOT:`memory/feedback_audit_full_sweep_not_sample.md`
-- **2026-05-17 強化(user verbatim 抓教訓)**:「每次抓出的問題你他媽要給我基於我們所有的檔案包括設計原則去再三確認到底是不是問題」+「沒有取樣這種東西」+「重新深度完整稽核」。Dispatch prompt 任何「sample evidence allowed」/「heavy agent needed for full sweep」/「sample-N」escape clause **禁止寫入** — 違 = BLOCKER 不發 dispatch
-
-**Sub-agent dispatch prompt template MUST 含(2026-05-17 升級)**:
-```
-**Coverage requirement (NO-SAMPLE STRICT, NO ESCAPE)**:
-DS-wide ALL components(grep / glob 全 packages/design-system/src/components/*/),不挑樣本。
-若 context 不夠 → 拆 stage 分批(每 stage 10-15 元件),**所有 stages 必跑完才能寫 verdict**。
-**禁止**寫「sample / top N / heavy agent needed / full sweep deferred」等 escape clause。
-若 dim 真不可能全掃,反 dispatch 給 user 拍板,不是寫 sample escape clause。
-
-**Triple-verify finding rule (2026-05-17 user-mandated)**:
-每抓 1 個 violation,sub-agent 必 verify 3 layer 才能列進 report:
-(a) grep cite 真實 file:line(不只列名,要 quote 引文)
-(b) Cross-check 對應 spec.md「禁止事項」/「何時用」/「何時不用」段 — 該違反真的違 spec 嗎?
-(c) Cross-check 既有 DS canonical/.claude/rules + structural-token-retention.md + tokens/{name}.spec.md — 屬 forward-looking / palette completeness / dark mode pair 嗎?
-任一 layer 顯示「不是 violation」→ retract from report,不送 user 拍板。
-違 triple-verify = 浪費 user 時間 false-positive,違 verbatim 2026-05-17 directive。
-```
-
-**Mechanical strength**:
-- `stop_self_audit.sh` 偵測「`--deep` + sub-agent prompt 含 SKIP / sample / heavy agent / top N keyword」→ BLOCKER inject
-- `check_audit_sample_escape.sh`(2026-05-17 新加)PreToolUse Agent 攔截 dispatch prompt 含 sample escape clause
-- 本 SKILL.md Phase 1 dispatching MUST cite「NO-SKIP + NO-SAMPLE invariant verified, triple-verify 內建,全 dim 已 dispatch」in commit message
-
-### Phase 2 — Triage + CHECKPOINT 1 (MUST ASK)
-
-Consolidate into priority matrix:
-
-| Priority | Category | Examples |
-|---|---|---|
-| **P0 (auto-fix OK)** | Three-way drift / dead links / Tailwind v4 grep violations / hardcoded colors | 明確 bug，surgical 修復，無 scope 爭議 |
-| **P1 (batch-fix + review)** | Rule A / 人話 / shadcn passthrough holes / a11y missing aria-label / anatomy missing section | 每組一個 commit，改完立刻 review |
-| **P2 (MUST ASK)** | Rule B scope / new rule proposals / Internal vs Components reclassification / cross-cutting refactors (helper extraction 41 files) | 需 user 決策 scope |
-
-### ⚠️ Checkpoints — STOP-and-ASK 場景(detail in [references/checkpoints.md](references/checkpoints.md))
-
-| # | When | Action |
-|---|------|--------|
-| 1 | Triage 完(P0+P1 auto / P2 decision)| present + 等 user approve P2 scope |
-| 2 | Audit surfaces pattern 未在 CLAUDE.md | propose 新 rule draft + 等 approve |
-| 3 | Classification ambiguous(Internal/Components / SSOT home / primitive vs semantic)| present options + rationale |
-| 4 | Cross-cutting refactor > 10 檔 | execution strategy options(1 commit / N / defer) |
-| 5 | 環境 / 建置 issue | 報 user,不在 audit scope 修 env |
-| 6 | spec 與 code 衝突 | 不 silent pick,present options + git log context |
-| 7 | 「先不管」vs「之後再處理」semantic | **「先不管」= 完全忽略**(不入 tech debt);**「之後再處理」= park to memory**;絕不混淆 |
-
-**Naming proposal**:Checkpoint 2 前必過 CLAUDE.md `## 命名必過三重 test`(SSOT in CLAUDE.md,不 re-spec)。
-
-### Phase 3 — Apply fixes (grouped commits)
-
-每 fix group:Edit(非 Write)→ `npx tsc --noEmit` pass → commit 描述性 message。Typical groups:cva drift / Spec Rule A / a11y / Anatomy / CLAUDE.md contradiction。
-
-### Phase 3.5 — 進階 6 維稽核 D3-D6(對齊 CLAUDE.md `# 稽核 canonical`)
-
-Phase 1-3 覆蓋 D1+D2;D3-D6 chain 專門 skill。**模式**:高效(default)scope=changed 只跑 D5;進階 scope=all 跑全 D3-D6(trigger:`--deep` / 動 tokens|patterns/ / user 要求「完整 audit」)。
-
-| Sub | 維度 | Skill | 規則 |
-|-----|------|-------|------|
-| 3.5a | D5 視覺 | `npm run visual-audit` Layer A → `/visual-audit` Layer B | violation 開新 commit 修回圈 |
-| 3.5b | D3 效能 | `/performance-audit` | 修實作 auto / 改 canonical STOP |
-| 3.5c | D4 UX | `/ux-audit` | P0 a11y 必修 / P1 triage |
-| 3.5d | D6 原則自檢 | `references/principle-audit-protocol.md` 4 子維(合理 / 一致 / 無矛盾 / 完整)| 動 canonical substantive STOP / 對齊 / 補 pointer AUTO;scan 前必讀「常見 FP 記憶」節 |
-
-**跳過**:spec.md 純文字改 / 高效模式只跑 3.5a。
-
-### Phase 4.5 — Governance sprawl check(2026-05-17 升:default 也 chain light)
-
-**Default mode**:chain `/knowledge-prune` Phase 0(baseline)+ Phase 1 D1(duplicate)+ D4(contradiction)輕量 **report-only**(不修),~5 min。Codex Q5 verdict:contradiction 比 dup 更會破 SSOT,該優先,故 default 不只 D1。
-
-**Deep mode**(`--deep`):chain full Phase 0-5;P0/P1 auto-fix,P2 STOP 等 user。Trigger 條件(2026-05-17 加 4 條,共 9 條):CLAUDE.md > 800 / MEMORY > 20 / 動 Meta-Pattern / hook-fires 6 月 0 fire / corrections > 10 / **audit-prompts.md coverage < 100%** / **`@benchmark-unverified-blanket` count > 0** / **new audit dim added 本次** / **hooks count >= soft threshold(26)**。
-
-**機械化 trigger 點**(2026-05-17 加):post-audit final report validator hook(`check_audit_post_report_validator.sh`)— audit Phase 4 結束 emit 「prune-chain-trigger」signal → 下一 turn `inject_pending_self_audit.sh` 注入 `/knowledge-prune scope=full` directive。**不**靠記憶。
-
-**Findings → prune feed**(M14 mandate):Phase 1 finding 含「新 rule 提議」keyword → auto-queue `/knowledge-prune` Phase 1 D3 candidate(判 abstract 或 duplicate)。
-
-### Phase 4 — Final report + memory + Self-improvement(強制)
-
-Update `memory/project_audit_progress.md`(date / coverage / findings / deferred P2)+ short report(commits / deferred / next trigger)。
-
-**Self-improvement capture(強制)**:每 audit 寫 3 行(無發現也寫「無」,不省略):
-- 新 FP pattern + 回填位置(`principle-audit-protocol.md`「常見 FP 記憶」)OR「無」
-- 新 meta-pattern + STOP 提議(動 canonical substantive)OR「無」
-- 修完矛盾 / user 糾正 + 回填 home(memory / CLAUDE.md / spec)OR「無」
+摘要:
+- **Phase 0 Setup + Build Baseline** — `tsc -b` / `vite build` / `build-storybook` + `audit-content-quality.mjs --check` baseline;fail → Checkpoint 5
+- **Phase 0.5 Preflight 全面盤查**(`--deep`,NO-SAMPLE 前置)— `audit-preflight.mjs` 出 檔案 enumeration + 原則 enumeration + coverage matrix,gap 送 user 拍板
+- **Phase 1 Parallel audit** — background sub-agents per [audit-prompts.md](audit-prompts.md);每 prompt 宣告 Type / Canonical source / Rationale home;**`--deep` NO-SKIP + NO-SAMPLE + triple-verify** 機械強制(`check_audit_sample_escape.sh` PreToolUse + `stop_self_audit.sh`)
+- **Phase 2 Triage + Checkpoint 1(MUST ASK)** — P0 auto / P1 batch+review / P2 STOP 等 user;7 checkpoints 見 [checkpoints.md](checkpoints.md)
+- **Phase 3 Apply fixes** — grouped commits,每 group `npx tsc -b` pass 才 commit
+- **Phase 3.5 進階 6 維 D3-D6** — chain `/visual-audit` / `/performance-audit` / `/ux-audit` / principle-audit-protocol
+- **Phase 4.5 Governance sprawl** — chain `/knowledge-prune`(default light report-only / `--deep` full)
+- **Phase 4 Final report + Self-improvement(強制)** — 3 行 capture(新 FP / 新 meta-pattern / 矛盾回填)
 
 ---
 

@@ -168,7 +168,7 @@ N 個 candidate 的修法 scope。**禁止 auto-fix 超過 5 檔不 ask user**�
 | `/scan-similar-bugs`(本) | **immediate-after-fix grep + verify** | M10 mechanical 落地 |
 | `/knowledge-prune` | 季度 governance prune | 不重複 |
 | `check_canonical_propagation.sh` E.2(hook;原 check_l3_primitive_import.sh folded 折入,P0 BLOCK) | L3 primitive import 違規 | 即時 detect,本 skill 是 batch retro scan |
-| `pre_write_subsumption_check.sh`(hook)| 新 file / M-row | 不重複 |
+| `pre_write_subsumption_check.sh`(retired/未實作 — 改靠 M18 Q3 Rule-of-3 + mindset)| 新 file / M-row | 不重複 |
 
 **3 層 防線**:
 - Hook(pre/post tool):**寫的瞬間** detect

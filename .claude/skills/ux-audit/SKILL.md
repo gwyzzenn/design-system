@@ -23,6 +23,8 @@ description: UX behavior audit for design-system components and product UI. Chec
 | 日常 dev | 高效 | 主要 kb path 手動過一次 |
 | Release cut | 進階 + 全 DS | 全 DS 的 a11y / interaction 全掃 |
 
+**何時不觸發**:非「鍵盤 / focus / ARIA / 動畫 / 互動 / 無障礙」主題(走 `/design-system-audit` 或 `/performance-audit`);純視覺對齊問題(走 `/visual-audit`);純 spec 文字改;已由 `/component-quality-gate` Phase 4.5 或 `/design-system-audit` D4 chain 時不重複 standalone 起。**退場**:Phase F STOP 報告即結束。
+
 ## Preconditions
 
 - 元件 folder 存在於 `packages/design-system/src/components/{Name}/`

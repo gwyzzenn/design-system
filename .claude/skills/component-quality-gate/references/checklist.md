@@ -1,4 +1,4 @@
-# 元件完成 Checklist(完整 45 項)
+# 元件完成 Checklist(完整 35 項)
 
 每個元件在進入 design-system 前必須逐項對照。這是品質閘門,不可跳過。
 
@@ -58,7 +58,7 @@
 ## Phase 4 — Ship(上線前)
 
 - [ ] `npm run storybook` 本地確認所有 stories 正常渲染
-- [ ] `npx tsc --noEmit` 無錯誤
+- [ ] `npx tsc -b` 無錯誤(禁 `--noEmit`;動 export/型別 surface 另跑 `npm run build:lib`,per self-verify.md)
 - [ ] Import 路徑正確(`@/design-system/...`)
 - [ ] 若為 internal primitive 或 shadcn passthrough,分類標註正確
 

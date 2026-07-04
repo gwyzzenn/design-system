@@ -6,7 +6,7 @@
 
 | 維度 | Skill | Audit scope |
 |------|-------|-------------|
-| **D1 設計語言一致** | `/product-ui-audit` | 6 dim(token 紀律 / layout primitive / 元件使用 / mindset / 幾何 / a11y) |
+| **D1 設計語言一致** | `/product-ui-audit` | 7 dim(token 紀律 / layout primitive / 元件使用 / mindset / 幾何 / a11y / D6 原則自檢) |
 | **D2 程式語言一致** | `tsc --noEmit` + lint | exploration 目錄 |
 | **D3 元件效能** | `/performance-audit` | render / memo / bundle(per candidate) |
 | **D4 UX 行為** | `/ux-audit` | keyboard / focus / ARIA / animation |

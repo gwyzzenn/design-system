@@ -15,11 +15,19 @@ set -uo pipefail
 #     but hard-tier context is prefixed with 🚨 BLOCKER / REQUIRED_FIRST_ACTION
 #     so Claude reads it as must-address-first instruction)
 #
-# Checks + thresholds:
-#   1. CLAUDE.md line count     — soft 400 / hard 800(CLAUDE.md L34 SSOT: transition 400 / hard cap 800)
+# Checks + thresholds(SSOT for governance numeric thresholds; CLAUDE.md `# 治理 canonical` reference here):
+#   1. CLAUDE.md line count     — stratified 500 approaching / 600 strong / 800 hard blocker
+#                                 (CLAUDE.md SSOT: target ≤200 / transition ≤400 / hard cap 800)
 #   2. Days since last prune    — soft 90   / hard 180
 #   3. user-corrections pending — soft 20   / hard 40
 #   4. Benchmarks freshness     — auto-fetch at 30 days(no hard tier)
+#   5. Fire-weighted test gap   — hook >100 fires 仍無 test → reminder
+#   6. Fix-without-scan         — 修 bug 後未跑 /scan-similar-bugs → reminder
+#   7. Hook count               — soft 26 / hard 60(root-only 口徑,`_*` lib helper 不計;見 Check 7 註)
+#   8. Memory entries           — soft 18 / hard 20
+#   9. Branch sprawl            — 同 chat 多 working branch → reminder
+#  10. SSOT auto-sync drift     — sync-governance-counters.mjs 偵測計數漂移 → reminder
+#  11. Cross-repo env smoke     — codex CLI / plugin fork 環境健檢(non-blocking)
 
 # Per-hook fire logging(enables /knowledge-prune D2 dead-hook detection)
 source "$(dirname "$0")/_log-fire.sh" 2>/dev/null && log_hook_fire
@@ -48,7 +56,7 @@ fi
 REMINDERS="${MEMSYNC_NOTE:-}"
 BLOCKERS=""
 
-# Check 1: CLAUDE.md size(soft 800 / hard 1000)
+# Check 1: CLAUDE.md size(stratified 500 approaching / 600 strong / 800 hard — SSOT 見檔頭 Checks 表)
 if [ -f CLAUDE.md ]; then
   LINES=$(wc -l < CLAUDE.md | tr -d ' ')
   # 2026-04-26 tightened thresholds(對應 M19 + user 質問「auto self-improve」要更主動):
@@ -192,12 +200,12 @@ fi
 # 現值 52。重估 verdict:60 維持 — 52 + 8 headroom(~15%)符合「升 cap 只為已 justified 新 hook」
 # 歷史節奏;降 cap 屬治理 substantive(soft 26 已在 27+ 提供 advisory),留 /knowledge-prune 評估。
 if [ "$HOOK_COUNT" -gt 60 ]; then
-  BLOCKERS="${BLOCKERS}\n- Hook count ${HOOK_COUNT}(hard 60 — Anthropic guideline ~15;含 root + lib/,排 retired/tests/). 2026-05-27 升 50→55→60(當時 3 consumer hooks ship;該 3 hook 已 2026-06-11 prune-merge 入 check_consumer_app_invariants,現值基準 52,cap 60 經 2026-06-11 重估維持)。超 60 = 先跑 /knowledge-prune 評估 retire / consolidate,不直接 re-raise。"
+  BLOCKERS="${BLOCKERS}\n- Hook count ${HOOK_COUNT}(hard 60 — Anthropic guideline ~15;root-only,排 retired/tests/ + `_*` lib helper). `_*` helper 2026-05-13 起折進 dispatcher 不計 first-class(supersede 2026-05-09 含-lib 口徑,見上方 Check 7 註)。2026-05-27 升 50→55→60(當時 3 consumer hooks ship;該 3 hook 已 2026-06-11 prune-merge 入 check_consumer_app_invariants,現值基準 52,cap 60 經 2026-06-11 重估維持)。超 60 = 先跑 /knowledge-prune 評估 retire / consolidate,不直接 re-raise。"
 elif [ "$HOOK_COUNT" -gt 26 ]; then
   # 2026-05-15 raised soft cap 25→26 per /knowledge-prune D2 audit:
   # 26 wired hooks reflects M30 wrapper-schema-drift 新增 dedicated hook(justified evolution
   # not bloat,per Task #19 closed analysis)。Re-raise to 27+ 需 audit re-justify。
-  PRUNE_TRIGGERS="${PRUNE_TRIGGERS}\n- Hook count ${HOOK_COUNT}(soft 26 trigger,2026-05-15 升 — Anthropic guideline ~15;含 root + lib/). /knowledge-prune 評估 retire / consolidate 候選."
+  PRUNE_TRIGGERS="${PRUNE_TRIGGERS}\n- Hook count ${HOOK_COUNT}(soft 26 trigger,2026-05-15 升 — Anthropic guideline ~15;root-only,`_*` lib helper 不計). /knowledge-prune 評估 retire / consolidate 候選."
 fi
 
 # Check 8: Memory entries auto-trigger(soft 18 / hard 20)

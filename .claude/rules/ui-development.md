@@ -44,7 +44,7 @@ paths:
 
 必重用既有 `components/` / 必用 design tokens(禁硬寫色/字/間距/圓角)/ 建新 UI 前查 pattern / 用 `cn()`(`@/lib/utils`)合併 Tailwind class。
 
-深度規則 → `.claude/references/ui-dev-rules.md`(slot 幾何 / Padding source / Icon size 3 層)。
+深度規則 → `.claude/references/ui-dev-rules.md`(5 sub-rule:slot 幾何 / 新增數值前必查 / Padding source / Icon size / 小尺寸 icon stroke 補償)。
 
 **一句話 pointer**:
 - 新 row 元件 → `patterns/element-anatomy/item-anatomy.spec.md`「自我檢查」
