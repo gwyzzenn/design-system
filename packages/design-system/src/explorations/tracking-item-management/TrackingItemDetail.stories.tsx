@@ -64,6 +64,7 @@ import {
   SheetBody,
 } from '@/design-system/components/Sheet/sheet'
 import { Field, FieldLabel, FieldDescription } from '@/design-system/components/Field/field'
+import { Empty } from '@/design-system/components/Empty/empty'
 import { Input } from '@/design-system/components/Input/input'
 import { Textarea } from '@/design-system/components/Textarea/textarea'
 import { DatePicker } from '@/design-system/components/DatePicker/date-picker'
@@ -331,7 +332,8 @@ function TimelineSheet({
   const records = CHANGE_RECORDS.filter((r) => r.trackingId === item.id)
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="flex flex-col">
+      {/* rightSider 寬 360px(Product Master G3:320/360;伴隨資訊窄版面,非 DS Sheet 預設 max-w-md 448) */}
+      <SheetContent className="flex flex-col sm:max-w-[360px]">
         <SheetHeader>
           <SheetTitle>{item.trackingNo} 變更時間軸</SheetTitle>
         </SheetHeader>
@@ -387,9 +389,8 @@ function TrackingItemDetailPage({ initialItemId }: { initialItemId: string }) {
     }))
   }, [item.id])
 
-  const actions = getActions(item.status).map((a) =>
-    a.key === 'hold' ? a : a, // resume 特例另外處理(下方)
-  )
+  const actions = getActions(item.status)
+  // 恢復(resume)不在靜態轉移表:目標 = 暫停前狀態(PRD 6.1「回到暫停前狀態」),runtime 由 ref 提供
   const resumeTarget = item.status === 'onHold' ? (preHoldRef.current[item.id] ?? 'ordered') : null
 
   const subItems = SUB_ITEMS.filter((s) => s.parentTrackingId === item.id)
@@ -505,7 +506,7 @@ function TrackingItemDetailPage({ initialItemId }: { initialItemId: string }) {
                   { accessorKey: 'status', header: '狀態', size: 100, cell: ({ row }) => SUB_ITEM_STATUS_LABEL[row.original.status] },
                   { accessorKey: 'ownerName', header: '負責人', size: 100 },
                 ]}
-                emptyState={<div className="py-8 text-center text-body text-fg-secondary">尚無子項</div>}
+                emptyState={<div className="py-12"><Empty description="尚無子項——可從里程碑模板一鍵生成" /></div>}
               />
             </TabsContent>
 
@@ -521,7 +522,7 @@ function TrackingItemDetailPage({ initialItemId }: { initialItemId: string }) {
                   { accessorKey: 'from', header: '舊值', size: 140 },
                   { accessorKey: 'to', header: '新值', size: 140 },
                 ]}
-                emptyState={<div className="py-8 text-center text-body text-fg-secondary">尚無變更紀錄</div>}
+                emptyState={<div className="py-12"><Empty description="尚無變更紀錄" /></div>}
               />
             </TabsContent>
           </Tabs>

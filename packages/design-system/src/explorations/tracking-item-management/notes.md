@@ -77,6 +77,17 @@ tracking-item-management/
 
 **推薦**:兩頁一起採用(互補而非互斥)——清單頁滿足「掃視」,詳情頁滿足「維護」,Peek 是兩者間的低成本橋接。但**最終定案由 stakeholder 決定**。
 
+## Refinement pass(2026-07-25,第二輪重審)
+
+同日對初版做一輪批判性重審,修 5 處:
+1. 詳情頁兩處空狀態手刻 div → 改消費 `<Empty>`(ui-development「icon+text 垂直 → `<Empty>`」自我檢查)
+2. 清單頁 DataTable 補 `emptyState`(篩選可能 0 筆)
+3. Peek / 時間軸兩個 Sheet 從 DS 預設 448px 收斂為 **360px**(Product Master G3 rightSider 320/360 規格;Playwright 實測兩者皆 360.0px)
+4. fcmt-shell 移除 `SidebarMenuButton` 冗餘 `data-active`(provider 由 `id` 自動計算 active)+ 清 `FcmtSidebar` 死參數
+5. 清 `getActions(...).map(no-op)` 死碼;空狀態文案移除 PRD 內部代號「(M3-2)」(story-rules 禁 spec 內部代號入 user-facing 文案)
+
+驗證:tsc PASS / storybook build PASS / Playwright 重截 4 畫面(Peek 360 / 已延遲篩選 / 子項空狀態 / 時間軸 360)。
+
 ## 未來評估(若定案採用)
 
 1. **變更歷程時間軸**目前是本 exploration 手刻(無 DS Timeline primitive)。若定案採用,建議評估是否升級為 DS `patterns/` 或 `components/` 正式 primitive(Rule-of-3:目前僅 1 處消費,未達門檻,先留在 exploration)。

@@ -34,7 +34,7 @@ const NAV = [
 
 export type FcmtNavId = (typeof NAV)[number]['id']
 
-function FcmtSidebar({ activeId }: { activeId: FcmtNavId }) {
+function FcmtSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -51,7 +51,8 @@ function FcmtSidebar({ activeId }: { activeId: FcmtNavId }) {
             <SidebarMenu>
               {NAV.map(({ id, label, icon }) => (
                 <SidebarMenuItem key={id}>
-                  <SidebarMenuButton id={id} startIcon={icon} tooltip={label} data-active={id === activeId || undefined}>
+                  {/* active 視覺由 SidebarProvider activeId 自動計算(id prop),不手動標 data-active */}
+                  <SidebarMenuButton id={id} startIcon={icon} tooltip={label}>
                     {label}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -113,7 +114,7 @@ export function FcmtShell({
       <SidebarProvider activeId={active} onActiveChange={setActive}>
         <AppShell
           layout="primary-sidebar"
-          sidebar={<FcmtSidebar activeId={activeId} />}
+          sidebar={<FcmtSidebar />}
           header={<FcmtHeader title={title} rightSlot={headerRightSlot} />}
         >
           {children}

@@ -42,6 +42,7 @@ import {
   SheetBody,
   SheetFooter,
 } from '@/design-system/components/Sheet/sheet'
+import { Empty } from '@/design-system/components/Empty/empty'
 import { DescriptionList, DescriptionItem } from '@/design-system/components/DescriptionList/description-list'
 
 // ── 篩選(PRD M5-1 共用篩選器;本頁先示範狀態快速篩選 chip)────────────────────
@@ -86,7 +87,8 @@ function TrackingItemPeek({
 }) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="flex flex-col">
+      {/* rightSider 寬 360px(Product Master G3:320/360;伴隨資訊窄版面,非 DS Sheet 預設 max-w-md 448) */}
+      <SheetContent className="flex flex-col sm:max-w-[360px]">
         {item && (
           <>
             <SheetHeader>
@@ -246,6 +248,7 @@ function TrackingItemListPage({ initialPeekId }: { initialPeekId?: string }) {
             columns={columns}
             data={rows}
             height="100%"
+            emptyState={<div className="py-12"><Empty description="沒有符合篩選條件的追蹤單" /></div>}
             getRowId={(row) => row.id}
             rowActions={(row) => (
               <Button
