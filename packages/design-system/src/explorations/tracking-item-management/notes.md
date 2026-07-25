@@ -7,7 +7,7 @@
 - 聚焦:App Shell 導覽、追蹤單清單(B 型總覽表格頁)、追蹤單詳情(A 型 Master-Detail)。
 - 不含本輪:Excel 匯入精靈(C 型)、報表 R1-R7、甘特/矩陣頁(D/F 型)、主檔管理 CRUD——皆為 Phase 2/3 PRD 範圍或獨立 prototype 課題。
 
-## Phase 1 — Benchmark(9 家,詳談話記錄)
+## Phase 1 — Benchmark(9 家;完整掃描表 + A/B/C 評估 → 同層 `benchmark-and-candidates.md`)
 
 Linear / Jira / Monday.com / Procore / Autodesk Construction Cloud / Smartsheet / Salesforce / SAP Ariba / Oracle Fusion Procurement。核心收斂:
 - 狀態與進度%是兩個獨立衍生軸(全 9 家一致)
@@ -35,6 +35,7 @@ Linear / Jira / Monday.com / Procore / Autodesk Construction Cloud / Smartsheet 
 ```
 tracking-item-management/
 ├── notes.md                          本檔
+├── benchmark-and-candidates.md       Phase 1 九家 benchmark 掃描 + Phase 2 A/B/C 評估與決議
 ├── tracking-item-data.ts             型別 + mock 資料(13 筆追蹤單,涵蓋全部 13 狀態)+ 狀態機 meta
 ├── fcmt-shell.tsx                    共用 AppShell 殼(兩頁共用,對齊 apps/template/src/App.tsx archetype)
 ├── TrackingItemList.stories.tsx      B 型清單 + Peek rightSider(2 stories)
